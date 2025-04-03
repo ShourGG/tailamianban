@@ -1,0 +1,74 @@
+Date : 2025-04-03 10:47:40
+Directory : d:\project\bun_vite_uno_naive
+Total : 32 files,  1275 codes, 46 comments, 685 blanks, all 2006 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| JSON with Comments |          2 |        550 |          0 |        497 |      1,047 |
+| vue                |         11 |        330 |          1 |         61 |        392 |
+| JSON               |          6 |        109 |         16 |         10 |        135 |
+| CSS                |          2 |        101 |          2 |         20 |        123 |
+| TypeScript         |          8 |         99 |         27 |         34 |        160 |
+| Markdown           |          1 |         72 |          0 |         61 |        133 |
+| HTML               |          1 |         13 |          0 |          1 |         14 |
+| XML                |          1 |          1 |          0 |          1 |          2 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                      | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                         |         32 |      1,275 |         46 |        685 |      2,006 |
+| . (Files)                                                                 |         14 |        797 |         22 |        581 |      1,400 |
+| src                                                                       |         18 |        478 |         24 |        104 |        606 |
+| src (Files)                                                               |          2 |         78 |          9 |         27 |        114 |
+| src\assets                                                                |          3 |        102 |          2 |         21 |        125 |
+| src\components                                                            |          9 |        248 |          1 |         41 |        290 |
+| src\components (Files)                                                    |          3 |        193 |          0 |         32 |        225 |
+| src\components\__tests__                                                  |          1 |          9 |          0 |          4 |         13 |
+| src\components\icons                                                      |          5 |         46 |          1 |          5 |         52 |
+| src\router                                                                |          1 |         18 |         12 |          8 |         38 |
+| src\stores                                                                |          1 |         10 |          0 |          3 |         13 |
+| src\views                                                                 |          2 |         22 |          0 |          4 |         26 |
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                  | language           | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| d:\project\bun_vite_uno_naive\.prettierrc.json                            | JSON               |          6 |          0 |          1 |          7 |
+| d:\project\bun_vite_uno_naive\README.md                                   | Markdown           |         72 |          0 |         61 |        133 |
+| d:\project\bun_vite_uno_naive\bun.lock                                    | JSON with Comments |        536 |          0 |        496 |      1,032 |
+| d:\project\bun_vite_uno_naive\cspell.json                                 | JSON               |         16 |         16 |          2 |         34 |
+| d:\project\bun_vite_uno_naive\env.d.ts                                    | TypeScript         |          0 |          1 |          1 |          2 |
+| d:\project\bun_vite_uno_naive\eslint.config.ts                            | TypeScript         |         23 |          4 |          6 |         33 |
+| d:\project\bun_vite_uno_naive\index.html                                  | HTML               |         13 |          0 |          1 |         14 |
+| d:\project\bun_vite_uno_naive\package.json                                | JSON               |         48 |          0 |          1 |         49 |
+| d:\project\bun_vite_uno_naive\src\App.vue                                 | vue                |         69 |          0 |         20 |         89 |
+| d:\project\bun_vite_uno_naive\src\assets\base.css                         | CSS                |         71 |          2 |         14 |         87 |
+| d:\project\bun_vite_uno_naive\src\assets\logo.svg                         | XML                |          1 |          0 |          1 |          2 |
+| d:\project\bun_vite_uno_naive\src\assets\main.css                         | CSS                |         30 |          0 |          6 |         36 |
+| d:\project\bun_vite_uno_naive\src\components\HelloWorld.vue               | vue                |         36 |          0 |          6 |         42 |
+| d:\project\bun_vite_uno_naive\src\components\TheWelcome.vue               | vue                |         81 |          0 |         14 |         95 |
+| d:\project\bun_vite_uno_naive\src\components\WelcomeItem.vue              | vue                |         76 |          0 |         12 |         88 |
+| d:\project\bun_vite_uno_naive\src\components\__tests__\HelloWorld.spec.ts | TypeScript         |          9 |          0 |          4 |         13 |
+| d:\project\bun_vite_uno_naive\src\components\icons\IconCommunity.vue      | vue                |          7 |          0 |          1 |          8 |
+| d:\project\bun_vite_uno_naive\src\components\icons\IconDocumentation.vue  | vue                |          7 |          0 |          1 |          8 |
+| d:\project\bun_vite_uno_naive\src\components\icons\IconEcosystem.vue      | vue                |          7 |          0 |          1 |          8 |
+| d:\project\bun_vite_uno_naive\src\components\icons\IconSupport.vue        | vue                |          7 |          0 |          1 |          8 |
+| d:\project\bun_vite_uno_naive\src\components\icons\IconTooling.vue        | vue                |         18 |          1 |          1 |         20 |
+| d:\project\bun_vite_uno_naive\src\main.ts                                 | TypeScript         |          9 |          9 |          7 |         25 |
+| d:\project\bun_vite_uno_naive\src\router\index.ts                         | TypeScript         |         18 |         12 |          8 |         38 |
+| d:\project\bun_vite_uno_naive\src\stores\counter.ts                       | TypeScript         |         10 |          0 |          3 |         13 |
+| d:\project\bun_vite_uno_naive\src\views\AboutView.vue                     | vue                |         14 |          0 |          2 |         16 |
+| d:\project\bun_vite_uno_naive\src\views\HomeView.vue                      | vue                |          8 |          0 |          2 |         10 |
+| d:\project\bun_vite_uno_naive\tsconfig.app.json                           | JSON               |         11 |          0 |          2 |         13 |
+| d:\project\bun_vite_uno_naive\tsconfig.json                               | JSON with Comments |         14 |          0 |          1 |         15 |
+| d:\project\bun_vite_uno_naive\tsconfig.node.json                          | JSON               |         18 |          0 |          2 |         20 |
+| d:\project\bun_vite_uno_naive\tsconfig.vitest.json                        | JSON               |         10 |          0 |          2 |         12 |
+| d:\project\bun_vite_uno_naive\vite.config.ts                              | TypeScript         |         17 |          1 |          3 |         21 |
+| d:\project\bun_vite_uno_naive\vitest.config.ts                            | TypeScript         |         13 |          0 |          2 |         15 |
+| Total                                                                     |                    |      1,275 |         46 |        685 |      2,006 |
++---------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

@@ -1,0 +1,37 @@
+/*
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-04-01 15:19:10
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-04-03 09:07:14
+ * @FilePath: \bun_vite_uno_naive\cspell.json
+ * @Description: 处理拼写检查词语黑白名单及相关配置
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
+ */
+// cSpell Settings
+{
+  // Version of the setting file.  Always 0.2
+  "version": "0.2",
+  // language - current active spelling language
+  "language": "en",
+  // words - list of words to be always considered correct
+  "words": [
+    "bunx",
+    "githubusercontent",
+    "koro",
+    "mkdirp",
+    "oxlint",
+    "Samge",
+    "streetsidesoftware",
+    "tsmerge",
+    "Vetur",
+    "visualstudio",
+    "vite",
+    "vsmarketplacebadge"
+  ],
+  // flagWords - list of words to be always considered incorrect
+  // This is useful for offensive words and common spelling errors.
+  // For example "hte" should be "the"
+  "flagWords": [
+    "hte"
+  ]
+}
