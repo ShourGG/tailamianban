@@ -1,3 +1,13 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-03-30 17:45:29
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-04-04 11:02:36
+ * @FilePath: \bun_vite_uno_naive\README.md
+ * @Description:
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
+-->
+
 # bun_vite_uno_naive
 
 关于项目介绍，使用bun作为运行时环境及包管理器，使用vite作为打包构建工具，使用uno原子化css增益，使用naiveUI框架。
@@ -120,88 +130,18 @@ key: ctrl+alt+l 生成 alt+shift+c 注释所有 +u 启用所有 +d 删除所有
 
 ## 关于 git 提交规范
 
-1. 全局安装 commitizen
+> 参考约定式提交 [约定式提交规范](https://www.conventionalcommits.org/zh-hans/v1.0.0/)
+
+### 安装相关依赖和增加相关配置
+
+1. 需要全局安装 commitizen
 
 ```bash
-bun add commitizen -g
+bun add commitizen@4.2.4 -g
 ```
 
-2. 项目安装 cz-customizable
+2. 使用 `git cz` 或 `cz` 代替 `git commit` 提交代码
 
-```bash
-bun add cz-customizable -D
-```
+这里我们强制需要按照 `commitlint` 来规范提交代码。
 
-3. 添加以下配置到 package.json 中
 
-```json
-  "config": {
-    "commitizen": {
-      "path": "node_modules/cz-customizable"
-    }
-  },
-```
-
-4. 项目根目录下创建`.cz-config.js` 自定义提示文件
-
-```js
-module.exports = {
-  // 可选类型
-  types: [
-    { value: 'wip', name: 'wip:      开发中' },
-    { value: 'feat', name: 'feat:     新功能' },
-    { value: 'fix', name: 'fix:      bug修复' },
-    { value: 'docs', name: 'docs:     文档变更' },
-    { value: 'style', name: 'style:   代码格式|样式(不影响代码运行的变动)' },
-    {
-      value: 'refactor',
-      name: 'refactor: 重构(既不是增加feature，也不是修复bug)',
-    },
-    { value: 'perf', name: 'perf:     性能优化' },
-    { value: 'test', name: 'test:     增加测试' },
-    { value: 'chore', name: 'chore:    构建过程或辅助工具的变动' },
-    { value: 'revert', name: 'revert:   回退' },
-    { value: 'build', name: 'build:    打包' },
-  ],
-  allowCustomScopes: true,
-  // 消息步骤
-  messages: {
-    type: '请选择提交类型:',
-    customScope: '请输入修改范围(必填):',
-    subject: '请简要描述提交(必填):',
-    body: '请输入详细描述(可选):',
-    footer: '请输入要关闭的issue(可选):',
-    confirmCommit: '确认使用以上信息提交？(y/n/e/h)',
-  },
-  // 跳过问题
-  skipQuestions: ['body', 'footer'],
-  // subject文字长度默认是72
-  subjectLimit: 72,
-}
-```
-
-这里有个注意点，要使用 git cz 验证的时候，需要剔除 `package.json` 文件中的 "type": "module"，否则找不到模块，因为库是基于CJS规范编写的。
-
-<!-- TODO: 分割线 -->
-
-1. 安装 husky
-
-```bash
-bun add husky -D
-```
-
-2. 初始化 husky
-
-```bash
-bunx husky-init
-```
-
-会在 `package.json` 的 `scripts` 属性中自动添加以下配置：
-
-```json
-{
-  "scripts": {
-    "prepare": " husky install"
-  }
-}
-```

@@ -16,6 +16,7 @@
   // words - list of words to be always considered correct
   "words": [
     "bunx",
+    "commitlint",
     "githubusercontent",
     "koro",
     "mkdirp",
