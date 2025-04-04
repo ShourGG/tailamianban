@@ -163,10 +163,11 @@ module.exports = {
     { value: 'revert', name: 'revert:   回退' },
     { value: 'build', name: 'build:    打包' },
   ],
+  allowCustomScopes: true,
   // 消息步骤
   messages: {
     type: '请选择提交类型:',
-    customScope: '请输入修改范围(可选):',
+    customScope: '请输入修改范围(必填):',
     subject: '请简要描述提交(必填):',
     body: '请输入详细描述(可选):',
     footer: '请输入要关闭的issue(可选):',
@@ -178,6 +179,8 @@ module.exports = {
   subjectLimit: 72,
 }
 ```
+
+这里有个注意点，要使用 git cz 验证的时候，需要剔除 `package.json` 文件中的 "type": "module"，否则找不到模块，因为库是基于CJS规范编写的。
 
 <!-- TODO: 分割线 -->
 
