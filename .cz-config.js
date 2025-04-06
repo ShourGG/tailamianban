@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-03 16:28:40
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-03 20:02:39
+ * @LastEditTime: 2025-04-06 10:17:24
  * @FilePath: \bun_vite_uno_naive\.cz-config.js
  * @Description: commitizen 中 cz-customizable 自定义配置文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -16,21 +16,23 @@ module.exports = {
 
   //MARK: 可选类型
   types: [
-    { value: 'wip', name: 'wip:      开发中' },
-    { value: 'feat', name: 'feat:     新功能' },
-    { value: 'fix', name: 'fix:      bug修复' },
-    { value: 'docs', name: 'docs:     文档变更' },
-    { value: 'style', name: 'style:    代码格式|样式(不影响代码运行的变动)' },
+    { value: 'wip', name: 'wip:      🚧 开发中' },
+    { value: 'feat', name: 'feat:     🎯 新功能' },
+    { value: 'fix', name: 'fix:      🐛 bug修复' },
+    { value: 'docs', name: 'docs:     📤 文档变更' },
+    { value: 'style', name: 'style:    💄 代码格式|样式(不影响代码运行的变动)' },
     {
       value: 'refactor',
-      name: 'refactor: 重构(既不是增加feature，也不是修复bug)',
+      name: 'refactor: ☠️  重构(既不是增加feature，也不是修复bug)',
     },
-    { value: 'perf', name: 'perf:     性能优化' },
-    { value: 'test', name: 'test:     增加测试' },
-    { value: 'chore', name: 'chore:    构建过程或辅助工具的变动' },
-    { value: 'revert', name: 'revert:   回退' },
-    { value: 'build', name: 'build:    打包' },
+    { value: 'perf', name: 'perf:     ⚡️ 性能优化' },
+    { value: 'test', name: 'test:     🔎 增加测试' },
+    { value: 'chore', name: 'chore:    ⚙️  构建过程或辅助工具的变动' },
+    { value: 'revert', name: 'revert:   🔙 回退' },
+    { value: 'build', name: 'build:    🧳 打包' },
   ],
+
+
 
 
   //MARK: 消息步骤
