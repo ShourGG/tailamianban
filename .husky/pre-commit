@@ -3,5 +3,5 @@
 
 bunx oxlint --max-warnings 0
 
-bunx eslint --ext .js,.vue,.ts,.tsx src
+bunx lint-staged
 
