@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-06 09:23:10
+ * @LastEditTime: 2025-04-06 15:25:45
  * @FilePath: \bun_vite_uno_naive\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -35,6 +35,24 @@ export default defineConfigWithVueTs(
   pluginVue.configs['flat/essential'], // Vue 专用规则
   vueTsConfigs.recommended, // TS 专用规则
 
+  //MARK: 新增文件类型覆盖规则
+
+  //! 变量使用规则
+  {
+    files: ['**/*.js'],
+    rules: {
+      'no-unused-vars': 'error',
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
+  {
+    files: ['**/*.{ts,mts,tsx,vue}'],
+    rules: {
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'error',
+    },
+  },
+
   //MARK: 测试文件规则组
   {
     ...pluginVitest.configs.recommended,
@@ -46,10 +64,6 @@ export default defineConfigWithVueTs(
     rules: {
       //! 关闭与 oxlint 重复的 ESLint 规则
       'no-undef': 'off',
-
-      //! 变量使用规则
-      'no-unused-vars': 'error',
-      '@typescript-eslint/no-unused-vars': 'error',
 
       //! 引号规范
 
@@ -98,7 +112,7 @@ export default defineConfigWithVueTs(
       'no-eval': 'error', // 禁止使用 eval
       'prefer-const': 'warn', // 建议使用 const 声明不变的变量
       'no-var': 'warn', // 建议使用 let/const 替代 var
-      'no-console': 'warn', // 禁止使用 意味着提交代码的时候，删除或者禁用console
+      'no-console': 'error', // 禁止使用 意味着提交代码的时候，删除或者禁用console
       'prefer-destructuring': [
         1,
         { object: true, array: false }, // 建议使用解构赋值
