@@ -4,32 +4,34 @@
 
 ## 项目启动
 
+使用 `bun` 运行时替代了 `node` 运行时，同时将 `bun` 作为包管理工具，所以请先确定是否安装了 `bun` 。
+
+```bash
+npm install -g bun
+```
+
+启动项目先通过 `bun` 安装依赖，你会喜欢它的稳定和速度的，性能真的拉花活了。
+
 ```sh
 bun install
 ```
 
-### Compile and Hot-Reload for Development
+### 编译和热重载开发
 
 ```sh
 bun dev
 ```
 
-### Type-Check, Compile and Minify for Production
+### 为生产进行类型检查、编译和最小化
 
 ```sh
 bun run build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+### 运行单元测试[Vitest](https://vitest.dev/)
 
 ```sh
 bun test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-bun lint
 ```
 
 ## 关于 vscode 插件使用
@@ -146,6 +148,4 @@ bun add commitizen@4.2.4 -g
 
 这里我们强制需要按照 `commitlint` 来规范提交代码。
 
-:::tip
-建议：不要随便修改配置文件相关的内容。
-:::
+🌦️ 建议：不要随便修改配置文件相关的内容。
