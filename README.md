@@ -37,12 +37,16 @@ bun lint
 > 1.  Vscode Samge Translate 插件
 
 ::: tip #f0f8ff
-desc: 用于快速中英文翻译切换，并生成变量命名方式
 
-use: Ctrl+Shift+P， 选择 Samge 进行对应功能使用
-
-key: Alt+x 翻译成中文， Alt+z 翻译成英文
 :::
+
+<span style="background: #e3f2fd; padding: 2px 8px; border-radius: 4px color:black ">
+
+- `v` 用于快速中英文翻译切换，并生成变量命名方式
+- `use` Ctrl+Shift+P， 选择 Samge 进行对应功能使用
+- `key` Alt+x 翻译成中文， Alt+z 翻译成英文
+
+</span>
 
 2. any-rule 插件
 
