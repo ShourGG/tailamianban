@@ -15,11 +15,14 @@
   "language": "en",
   // words - list of words to be always considered correct
   "words": [
+    "APIFOX",
     "bunx",
     "commitlint",
     "githubusercontent",
     "koro",
     "mkdirp",
+    "njsproj",
+    "ntvs",
     "oxlint",
     "Samge",
     "streetsidesoftware",

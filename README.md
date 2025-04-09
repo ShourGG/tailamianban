@@ -1,13 +1,3 @@
-<!--
- * @Author: ChenYu ycyplus@gmail.com
- * @Date: 2025-03-30 17:45:29
- * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-04 11:02:36
- * @FilePath: \bun_vite_uno_naive\README.md
- * @Description:
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
--->
-
 # bun_vite_uno_naive
 
 关于项目介绍，使用bun作为运行时环境及包管理器，使用vite作为打包构建工具，使用uno原子化css增益，使用naiveUI框架。
@@ -128,6 +118,36 @@ use: 通过选中变量，按下快捷键，生成打印句柄
 
 key: ctrl+alt+l 生成 alt+shift+c 注释所有 +u 启用所有 +d 删除所有
 
+## 特性
+
+- 现代Vue js生态系统
+  - `vue` 3.5.13
+  - `pinia` 3.0.1
+  - `vue-router` 4.5.0
+- 完全强类型
+  - `TypeScript` 5.8.0
+- 下一代前端构建工具
+  - vite 6.2.1
+- 基于 `axios` API 的 HTTP 请求
+  - or 0.x (not fetch)
+- 可定制的UI库
+  - `naive-ui` 2.41.0
+- 完整的工程工作流程
+  - `eslint` 9.21.0
+  - `husky` 7.0.1
+  - `lint-staged` 15.5.0
+  - `commitlint` 12.1.4
+- 本地模拟API服务器
+  - `APIFOX` || `NestJS 10.x`
+- 授权
+  - 访问令牌
+  - 刷新令牌
+  - 验证刷新令牌
+  - 基于角色授权
+- 现代应用程序部署
+  - `GitHub Actions`
+  - `Vercel` (with Serverless functions)
+
 ## 关于 git 提交规范
 
 > 参考约定式提交 [约定式提交规范](https://www.conventionalcommits.org/zh-hans/v1.0.0/)
@@ -141,6 +161,8 @@ bun add commitizen@4.2.4 -g
 ```
 
 2. 使用 `git cz` 或 `cz` 代替 `git commit` 提交代码
+
+注意，如果安装在本地，不想在全局安装，执行 `bun commit` 即可，或者配置 git alias，`git config --local alias.cz 'bunx cz'`
 
 这里我们强制需要按照 `commitlint` 来规范提交代码。
 

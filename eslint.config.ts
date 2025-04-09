@@ -1,14 +1,17 @@
 /*
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
- * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-06 15:25:45
+ * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @LastEditTime: 2025-04-09 13:53:06
  * @FilePath: \bun_vite_uno_naive\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 import pluginVue from 'eslint-plugin-vue'
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import {
+  defineConfigWithVueTs,
+  vueTsConfigs,
+} from '@vue/eslint-config-typescript'
 import pluginVitest from '@vitest/eslint-plugin'
 import oxlint from 'eslint-plugin-oxlint'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
@@ -83,7 +86,7 @@ export default defineConfigWithVueTs(
       // 限制代码块的最大嵌套深度为4层，过深的嵌套难以理解和维护，如回调地狱
       'max-depth': ['error', 4],
       // 函数复杂度阈值警告（超过 10 个逻辑分支时提示）
-      'complexity': ['warn', 10],
+      complexity: ['warn', 10],
 
       //! 异步代码规范
       // 禁止在循环中使用await，可能导致性能问题
@@ -107,7 +110,7 @@ export default defineConfigWithVueTs(
       'no-multi-spaces': 'error', // 禁止多个空格
       'space-infix-ops': 'error', // 运算符前后禁止多个空格
       'array-bracket-spacing': ['error', 'never'], // 数组统一空格
-      'arrow-spacing': ['error', { 'before': true, 'after': true }], // 箭头前后有空格
+      'arrow-spacing': ['error', { before: true, after: true }], // 箭头前后有空格
       'max-params': ['warn', 6], // 函数参数最大数量为 6
       'no-eval': 'error', // 禁止使用 eval
       'prefer-const': 'warn', // 建议使用 const 声明不变的变量
@@ -120,5 +123,5 @@ export default defineConfigWithVueTs(
       'no-duplicate-imports': 'error', // 禁止重复导入
     },
   },
-  skipFormatting,
+  skipFormatting
 )
