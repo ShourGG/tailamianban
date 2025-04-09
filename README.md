@@ -5,7 +5,7 @@
       <img src="https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/robot-left.png" />
     </picture>
   </a>
-  <p>一个基于 bun 作为运行时环境及包管理器，使用 vite 作为打包构建工具，使用uno原子化css增益，使用naiveUI框架，最新版Vue3.5构建的 RobotAdmin.</p>
+  <p>Robot Admin</p>
   <p>
     <a href="https://github.com/ChenyCHENYU/fearless/actions"><img src="https://img.shields.io/github/actions/workflow/status/ChenyCHENYU/fearless/main.yml" alt="Build Status"></a>
     <a href="https://github.com/ChenyCHENYU/fearless/blob/master/LICENSE"><img src="https://img.shields.io/github/license/ChenyCHENYU/fearless" alt="License"></a>
