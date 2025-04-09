@@ -15,9 +15,11 @@
   "language": "en",
   // words - list of words to be always considered correct
   "words": [
+    "antv",
     "APIFOX",
     "bunx",
     "commitlint",
+    "echart",
     "githubusercontent",
     "koro",
     "mkdirp",
@@ -27,6 +29,7 @@
     "Samge",
     "streetsidesoftware",
     "tsmerge",
+    "unocss",
     "unplugin",
     "Vetur",
     "visualstudio",
