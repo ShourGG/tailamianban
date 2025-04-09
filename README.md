@@ -1,7 +1,7 @@
 <div align="center">
   <a href="https://robotadmin.cn">
     <picture>
-      <source srcset="https://fearless.ChenyCHENYU.me/logo-dark.svg" media="(prefers-color-scheme: dark)">
+      <source srcset="https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/robot-left.png" media="(prefers-color-scheme: dark)">
       <img src="https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/robot-left.png" />
     </picture>
   </a>
