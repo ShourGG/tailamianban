@@ -34,13 +34,15 @@ bun lint
 
 ## 关于 vscode 插件使用
 
-1. Vscode Samge Translate 插件
+> 1.  Vscode Samge Translate 插件
 
+::: tip #f0f8ff
 desc: 用于快速中英文翻译切换，并生成变量命名方式
 
 use: Ctrl+Shift+P， 选择 Samge 进行对应功能使用
 
 key: Alt+x 翻译成中文， Alt+z 翻译成英文
+:::
 
 2. any-rule 插件
 
