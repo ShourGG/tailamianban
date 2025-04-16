@@ -1,14 +1,13 @@
 /*
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2025-04-15 21:46:33
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-04-17 00:06:44
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -50,12 +49,12 @@ export default defineConfig({
       extensions: ['vue'], // 扩展名
       version: 3, // 明确指定 Vue 3.x 版本
       resolvers: [NaiveUiResolver()],
-      include: [
-        // 严格匹配 global 目录下的 C_ 前缀组件
-        /src\/components\/global\/C_.+\.vue$/,
-        // 严格匹配 local 目录下的 c_ 前缀组件
-        /src\/components\/local\/c_.+\.vue$/,
-      ],
+      // include: [
+      //   // 严格匹配 global 目录下的 C_ 前缀组件
+      //   /src\/components\/global\/C_.+\.vue$/,
+      //   // 严格匹配 local 目录下的 c_ 前缀组件
+      //   /src\/components\/local\/c_.+\.vue$/,
+      // ],
       directives: true, // 自动导入指令，默认目录为 src/directives
     }),
   ],

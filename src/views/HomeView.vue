@@ -4,5 +4,7 @@
 <template>
   <main>
     <TheWelcome />
+    <C_Demo />
+    <NButton type="primary"> Primary </NButton>
   </main>
 </template>

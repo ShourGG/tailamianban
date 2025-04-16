@@ -1,9 +1,9 @@
 /*
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2025-04-09 13:53:06
- * @FilePath: \bun_vite_uno_naive\eslint.config.ts
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-04-17 00:07:22
+ * @FilePath: \Robot_Admin\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
@@ -93,6 +93,22 @@ export default defineConfigWithVueTs(
       'no-await-in-loop': 'error',
 
       // Vue 规范
+      //! PascalCase 命名规范
+      'vue/component-name-in-template-casing': [
+        'error',
+        'PascalCase',
+        {
+          registeredComponentsOnly: false, // 关键修改
+          ignores: [
+            'router-view',
+            'router-link',
+            'transition',
+            // 添加自定义组件前缀匹配
+            '/^C_/',
+            '/^c_/',
+          ],
+        },
+      ],
       //! 禁止在模板中注册但未使用的组件
       'vue/no-unused-components': 'error',
       //! 主动禁止 Vue 2 写法
