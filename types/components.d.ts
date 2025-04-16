@@ -9,8 +9,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     C_Demo: typeof import('./../src/components/global/C_Demo.vue')['default']
+    C_Dgg: typeof import('./../src/components/local/c_Dgg.vue')['default']
+    C_Test: typeof import('./../src/components/local/c_Test.vue')['default']
+    Demo: typeof import('./../src/components/local/Demo.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Sb: typeof import('./../src/components/local/Sb.vue')['default']
   }
 }

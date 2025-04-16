@@ -6,5 +6,8 @@
     <TheWelcome />
     <C_Demo />
     <NButton type="primary"> Primary </NButton>
+    <Demo />
+    <Sb />
+    <c_Dgg />
   </main>
 </template>
