@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-17 12:49:48
+ * @LastEditTime: 2025-04-17 12:54:18
  * @FilePath: \bun_vite_uno_naive\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -48,7 +48,6 @@ export default defineConfig({
       dirs: ['src/components/global', 'src/components/local'], // 自动导入组件
       extensions: ['vue'], // 扩展名
       version: 3, // 明确指定 Vue 3.x 版本
-      // resolvers: [NaiveUiResolver()],
       resolvers: [
         NaiveUiResolver(),
         componentName => {
