@@ -276,12 +276,12 @@ git config --global alias.cz "commit"
 
 ### 环境文件结构
 
-.env                # 全环境基础配置
-.env.development    # 开发环境
-.env.staging        # 预发布环境
-.env.test           # 测试环境
-.env.production     # 生产环境
-.env.local          # 本地覆盖配置（.gitignore）
+.env                # 全环境基础配置        
+.env.development    # 开发环境        
+.env.staging        # 预发布环境        
+.env.test           # 测试环境        
+.env.production     # 生产环境        
+.env.local          # 本地覆盖配置（.gitignore）       
 
 ## 更新日志
 
