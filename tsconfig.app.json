@@ -3,6 +3,11 @@
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "types/**/*.d.ts"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist/types",
+    "composite": true,
+    "incremental": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "paths": {
       "@/*": ["./src/*"]
