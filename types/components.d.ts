@@ -10,6 +10,9 @@ declare module 'vue' {
   export interface GlobalComponents {
     C_Demo: typeof import('./../src/components/global/C_Demo.vue')['default']
     C_dgg: typeof import('./../src/components/local/c_dgg.vue')['default']
+    IconMdiAlphaICircleOutline: typeof import('~icons/mdi/alpha-i-circle-outline')['default']
+    IMdiAlphaICircleOutline: typeof import('~icons/mdi/alpha-i-circle-outline')['default']
+    IMdiAlphaICircleOutlineunpluginIcons: typeof import('~icons/mdi/alpha-i-circle-outlineunplugin-icons')['default']
     NButton: typeof import('naive-ui')['NButton']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
