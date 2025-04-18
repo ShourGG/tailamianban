@@ -1,7 +1,0 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-bunx oxlint --max-warnings 0
-
-bunx lint-staged
-
