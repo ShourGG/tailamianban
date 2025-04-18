@@ -2,8 +2,8 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-18 17:09:40
- * @FilePath: \bun_vite_uno_naive\vite.config.ts
+ * @LastEditTime: 2025-04-19 01:09:46
+ * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
@@ -72,7 +72,7 @@ export default defineConfig({
           return null
         },
         IconsResolver({
-          prefix: 'Icon',
+          prefix: 'icon',
         }),
       ],
       // 新增 globs 配置进行文件过滤

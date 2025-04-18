@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-17 00:07:22
+ * @LastEditTime: 2025-04-19 01:06:49
  * @FilePath: \Robot_Admin\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -103,7 +103,8 @@ export default defineConfigWithVueTs(
             'router-view',
             'router-link',
             'transition',
-            // 添加自定义组件前缀匹配
+            // 添加自定义组件前缀匹配过滤检查
+            '/^icon-/i',
             '/^C_/',
             '/^c_/',
           ],
