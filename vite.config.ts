@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-19 01:09:46
+ * @LastEditTime: 2025-04-22 23:18:51
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -60,13 +60,13 @@ export default defineConfig({
             return {
               name: componentName.slice(2),
               // 使用别名@绝对路径
-              from: '@/components/global/' + componentName + '.vue',
+              from: `./src/components/global/${componentName}/index.vue`,
             }
           }
           if (componentName.startsWith('c_')) {
             return {
               name: componentName.slice(2),
-              from: '@/components/local/' + componentName + '.vue',
+              from: `./src/components/local/${componentName}/index.vue`,
             }
           }
           return null
@@ -77,8 +77,8 @@ export default defineConfig({
       ],
       // 新增 globs 配置进行文件过滤
       globs: [
-        'src/components/global/C_[A-Z]*.vue',
-        'src/components/local/c_[a-z]*.vue',
+        'src/components/global/C_*/index.vue', // 匹配目录结构
+        'src/components/local/c_*/index.vue',
       ],
       directives: true, // 自动导入指令，默认目录为 src/directives
     }),
@@ -86,6 +86,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      _views: fileURLToPath(new URL('./src/views', import.meta.url)),
     },
   },
   server: {

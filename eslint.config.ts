@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-19 01:06:49
+ * @LastEditTime: 2025-04-22 23:02:25
  * @FilePath: \Robot_Admin\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -108,6 +108,13 @@ export default defineConfigWithVueTs(
             '/^C_/',
             '/^c_/',
           ],
+        },
+      ],
+      // 新增多单词组件名例外规则
+      'vue/multi-word-component-names': [
+        'error',
+        {
+          ignores: ['index'], // 允许单单词组件名为 index
         },
       ],
       //! 禁止在模板中注册但未使用的组件

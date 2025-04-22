@@ -1,8 +1,6 @@
 <template>
   <div class="container">
     <!-- 主内容 -->
-    测试下自定义组件 C_Demo
+    登录页面
   </div>
 </template>
-
-<style scoped lang="scss"></style>

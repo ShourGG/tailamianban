@@ -10,7 +10,8 @@
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "_views/*": ["./src/views/*"]
     },
     "typeRoots": ["node_modules/@types", "src/types"]
   }
