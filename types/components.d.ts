@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     C_Demo: typeof import('./src/components/global/C_Demo/index.vue')['Demo']
     C_DemoTwo: typeof import('./../src/components/global/C_DemoTwo/index.vue')['default']
+    C_dgg: typeof import('./../src/components/local/c_dgg.vue')['default']
     'IconMdi:currencyTwd': typeof import('~icons/mdi/currency-twd')['default']
     IconMdiAccountBox: typeof import('~icons/mdi/account-box')['default']
     NButton: typeof import('naive-ui')['NButton']
