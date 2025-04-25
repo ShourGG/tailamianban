@@ -247,10 +247,10 @@ bun add commitizen@4.2.4 -g
 
 2. 使用 `git cz` 或 `cz` 代替 `git commit` 提交代码
 
-🔔: 注意，如果安装在本地，不想在全局安装，执行 `bun commit` 即可，或者配置 git alias，执行如下命令：
+🔔: 注意，如果安装在本地，不想在全局安装，本地安装的话，执行 `bun commit` 即可，或者配置 git alias，执行如下命令：
 
 ```bash
-git config --global alias.cz "commit"
+git config --global alias.cz '!bunx cz'
 ```
 
 这里我们强制要求按照 `commitlint` 来规范提交代码。
@@ -276,12 +276,12 @@ git config --global alias.cz "commit"
 
 ### 环境文件结构
 
-- .env              |    # 全环境基础配置        
-- .env.development  |    # 开发环境        
-- .env.staging      |    # 预发布环境        
-- .env.test         |    # 测试环境        
-- .env.production   |    # 生产环境        
-- .env.local        |    # 本地覆盖配置（.gitignore）       - 
+- .env | # 全环境基础配置
+- .env.development | # 开发环境
+- .env.staging | # 预发布环境
+- .env.test | # 测试环境
+- .env.production | # 生产环境
+- .env.local | # 本地覆盖配置（.gitignore） -
 
 ## 更新日志
 
@@ -333,7 +333,7 @@ git config --global alias.cz "commit"
 
 | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt=" Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>IE | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt=" Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Safari |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|                                                                                             not support                                                                                              |                                                                                            last 2 versions                                                                                             |                                                                                                  last 2 versions                                                                                                  |                                                                                                last 2 versions                                                                                                |                                                                                                last 2 versions                                            
+|                                                                                             not support                                                                                              |                                                                                            last 2 versions                                                                                             |                                                                                                  last 2 versions                                                                                                  |                                                                                                last 2 versions                                                                                                |                                                                                                last 2 versions                                                                                                |
 
 ### ❓ 问题 | Issue
 

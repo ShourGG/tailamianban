@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-22 23:18:51
+ * @LastEditTime: 2025-04-25 16:12:02
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -18,10 +18,20 @@ import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import Unocss from 'unocss/vite'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
+import viteConsolePlugin from 'vite-console-plugin'
+import { readFileSync } from 'node:fs'
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    // customConsolePlugin(),
+    viteConsolePlugin({
+      systemName: packageJson.name,
+      version: `v${packageJson.version} (开发版)`,
+      team: '信息化部-业务2室西安领域',
+      owner: 'CHENY | 编号: 409322',
+    }),
     Unocss(),
     vue(),
     vueJsx(),
@@ -91,7 +101,6 @@ export default defineConfig({
   },
   server: {
     port: 1988,
-    open: true,
     hmr: { overlay: true },
     proxy: {
       '^/api': {
