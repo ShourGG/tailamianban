@@ -43,7 +43,7 @@ export default defineConfig({
         'vue-router',
         'pinia',
         {
-          '@vueuse/core': ['useMouse', 'useLocalStorage'],
+          '@vueuse/core': ['useLocalStorage', 'useClipboard'],
         },
         {
           'naive-ui': [

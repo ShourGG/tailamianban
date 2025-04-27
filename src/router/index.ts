@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-22 22:24:23
+ * @LastEditTime: 2025-04-27 14:39:43
  * @FilePath: \Robot_Admin\src\router\index.ts
  * @Description: 路由入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -18,6 +18,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('_views/login/index.vue'),
+    },
+    {
+      path: '/demo/01-icon',
+      name: 'demo-icon',
+      component: () => import('_views/demo/01-icon/index.vue'),
     },
     {
       path: '/',

@@ -2,8 +2,8 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-18 10:03:23
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-18 15:48:02
- * @FilePath: \bun_vite_uno_naive\unocss.config.ts
+ * @LastEditTime: 2025-04-27 16:35:15
+ * @FilePath: \Robot_Admin\unocss.config.ts
  * @Description: unocss 主配置文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
@@ -16,8 +16,10 @@ import {
   transformerDirectives,
 } from 'unocss'
 
-import shortcuts from './src/styles/preset/shortcuts'
 import rules from './src/styles/preset/rules'
+
+import { iconSafelist } from './src/utils/unocss/icon-safelist'
+import { shortcutsArr } from './src/utils/unocss/shortcuts-arr'
 
 export default defineConfig({
   presets: [
@@ -34,6 +36,6 @@ export default defineConfig({
   ],
   transformers: [transformerDirectives()],
   rules,
-  shortcuts,
-  safelist: [],
+  shortcuts: shortcutsArr,
+  safelist: iconSafelist,
 })
