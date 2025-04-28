@@ -65,7 +65,7 @@ export default defineConfigWithVueTs(
       jsdoc: jsdocPlugin, // 添加 JSDoc 插件
     },
     rules: {
-      // 新增 JSDoc 注释规则
+      //! 新增 JSDoc 注释规则
       'jsdoc/require-jsdoc': [
         'error',
         {
