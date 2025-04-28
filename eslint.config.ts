@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-22 23:02:25
+ * @LastEditTime: 2025-04-28 08:55:42
  * @FilePath: \Robot_Admin\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -15,10 +15,7 @@ import {
 import pluginVitest from '@vitest/eslint-plugin'
 import oxlint from 'eslint-plugin-oxlint'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
-// To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
-// import { configureVueProject } from '@vue/eslint-config-typescript'
-// configureVueProject({ scriptLangs: ['ts', 'tsx'] })
-// More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
+import jsdocPlugin from 'eslint-plugin-jsdoc'
 
 export default defineConfigWithVueTs(
   //MARK: 基础配置组
@@ -64,7 +61,36 @@ export default defineConfigWithVueTs(
 
   //MARK: 自定义规则组（优先级最高）
   {
+    plugins: {
+      jsdoc: jsdocPlugin, // 添加 JSDoc 插件
+    },
     rules: {
+      // 新增 JSDoc 注释规则
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          require: {
+            FunctionDeclaration: true,
+            MethodDefinition: true,
+            ClassDeclaration: true,
+            ArrowFunctionExpression: true, // 强制箭头函数注释
+            FunctionExpression: true, // 强制函数表达式注释
+          },
+          contexts: [
+            'TSInterfaceDeclaration',
+            'TSTypeAliasDeclaration',
+            'FunctionDeclaration',
+            'ClassDeclaration',
+            'ClassProperty',
+            'MethodDefinition',
+            'ArrowFunctionExpression', // 覆盖箭头函数
+            'FunctionExpression', // 覆盖函数表达式
+          ],
+          checkConstructors: true, // 检查构造函数
+          checkGetters: true, // 检查 getter
+          checkSetters: true, // 检查 setter
+        },
+      ],
       //! 关闭与 oxlint 重复的 ESLint 规则
       'no-undef': 'off',
 
