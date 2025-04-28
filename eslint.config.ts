@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-28 08:57:34
+ * @LastEditTime: 2025-04-28 09:40:19
  * @FilePath: \Robot_Admin\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -77,8 +77,8 @@ export default defineConfigWithVueTs(
             FunctionExpression: true, // 强制函数表达式注释
           },
           contexts: [
-            'TSInterfaceDeclaration',
-            'TSTypeAliasDeclaration',
+            // 'TSInterfaceDeclaration',
+            // 'TSTypeAliasDeclaration',
             'FunctionDeclaration',
             'ClassDeclaration',
             'ClassProperty',
@@ -91,6 +91,7 @@ export default defineConfigWithVueTs(
           checkSetters: true, // 检查 setter
         },
       ],
+
       //! 关闭与 oxlint 重复的 ESLint 规则
       'no-undef': 'off',
 
@@ -171,6 +172,14 @@ export default defineConfigWithVueTs(
         { object: true, array: false }, // 建议使用解构赋值
       ],
       'no-duplicate-imports': 'error', // 禁止重复导入
+    },
+  },
+  //MARK: JSDoc 白名单覆盖规则
+  {
+    files: ['src/router/**/*.ts'],
+    rules: {
+      'jsdoc/require-jsdoc': 'off',
+      '@typescript-eslint/require-jsdoc': 'off',
     },
   },
   skipFormatting
