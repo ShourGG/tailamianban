@@ -2,27 +2,33 @@
   "code": "0",
   "data": [
     {
-      "path": "/home",
-      "name": "home",
-      "component": "/home/index",
-      "meta": {
-        "icon": "ic:sharp-home-work",
-        "title": "首页",
-        "link": "",
-        "hidden": false,
-        "full": false,
-        "affix": true,
-        "keepAlive": true
-      }
+      "path": "/",
+      "component": "layout",
+      "redirect": "/home",
+      "children": [
+        {
+          "path": "home",
+          "name": "home",
+          "component": "/home/index",
+          "meta": {
+            "icon": "ic:sharp-home-work",
+            "title": "首页",
+            "hidden": false,
+            "affix": true,
+            "keepAlive": true,
+            "full": false
+          }
+        }
+      ]
     },
     {
       "path": "/dashboard",
       "name": "dashboard",
+      "component": "layout",
       "redirect": "/dashboard/analysis",
       "meta": {
         "icon": "material-symbols:multiline-chart",
         "title": "仪表盘",
-        "link": "",
         "hidden": false,
         "full": false,
         "affix": false,
@@ -31,12 +37,11 @@
       "children": [
         {
           "path": "analysis",
-          "name": "analysis",
-          "component": "/analysis/index",
+          "name": "dashboard-analysis",
+          "component": "/dashboard/analysis/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "分析页",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -45,12 +50,11 @@
         },
         {
           "path": "profile",
-          "name": "profile",
-          "component": "/profile/index",
+          "name": "dashboard-profile",
+          "component": "/dashboard/profile/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "个人中心",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -62,11 +66,11 @@
     {
       "path": "/demo",
       "name": "demo",
-      "redirect": "/demo/base-icon",
+      "component": "layout",
+      "redirect": "/demo/01-icon",
       "meta": {
         "icon": "bxs:component",
         "title": "示范组件",
-        "link": "",
         "hidden": false,
         "full": false,
         "affix": false,
@@ -74,13 +78,12 @@
       },
       "children": [
         {
-          "path": "base-icon",
-          "name": "base-icon",
-          "component": "/base-icon/index",
+          "path": "icon",
+          "name": "icon",
+          "component": "/01-icon/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "图标选择器",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -90,25 +93,10 @@
         {
           "path": "area-cascade",
           "name": "area-cascade",
-          "component": "/area-cascade/index",
+          "component": "/02-area-cascade/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "级联选择器",
-            "link": "",
-            "hidden": false,
-            "full": false,
-            "affix": false,
-            "keepAlive": true
-          }
-        },
-        {
-          "path": "menu",
-          "name": "menu",
-          "component": "/menu/index",
-          "meta": {
-            "icon": "Menu",
-            "title": "菜单",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -118,11 +106,10 @@
         {
           "path": "progress",
           "name": "progress",
-          "component": "/progress/index",
+          "component": "/03-progress/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "进度条",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -132,11 +119,10 @@
         {
           "path": "time",
           "name": "time",
-          "component": "/time/index",
+          "component": "/04-time/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "时间选择器",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -146,11 +132,10 @@
         {
           "path": "date",
           "name": "date",
-          "component": "/date/index",
+          "component": "/05-date/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "日期选择器",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -160,11 +145,10 @@
         {
           "path": "city",
           "name": "city",
-          "component": "/city/index",
+          "component": "/06-city/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "城市选择器",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -176,9 +160,8 @@
           "name": "form-manage",
           "redirect": "/demo/form-manage/form",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "表单模块",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -188,11 +171,10 @@
             {
               "path": "form",
               "name": "form",
-              "component": "/form/index",
+              "component": "/07-form/index",
               "meta": {
-                "icon": "Menu",
+                "icon": "",
                 "title": "表单",
-                "link": "",
                 "hidden": false,
                 "full": false,
                 "affix": false,
@@ -202,11 +184,10 @@
             {
               "path": "form-modal",
               "name": "form-modal",
-              "component": "/form-modal/index",
+              "component": "/08-form-modal/index",
               "meta": {
-                "icon": "Menu",
+                "icon": "",
                 "title": "模态框表单",
-                "link": "",
                 "hidden": false,
                 "full": false,
                 "affix": false,
@@ -218,11 +199,10 @@
         {
           "path": "table",
           "name": "table",
-          "component": "/table/index",
+          "component": "/09-table/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "超级表格",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -232,11 +212,10 @@
         {
           "path": "table-expand",
           "name": "table-expand",
-          "component": "/table-expand/index",
+          "component": "/10-table-expand/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "测试Expand表格",
-            "link": "",
             "hidden": true,
             "full": false,
             "affix": false,
@@ -246,11 +225,10 @@
         {
           "path": "calendar",
           "name": "calendar",
-          "component": "/calendar/index",
+          "component": "/11-calendar/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "日历",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -260,11 +238,10 @@
         {
           "path": "demo-change-table",
           "name": "demo-change-table",
-          "component": "/demo-change-table/index",
+          "component": "/12-demo-change-table/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "表格动态行",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -276,11 +253,11 @@
     {
       "path": "/editor",
       "name": "editor",
+      "component": "layout",
       "redirect": "/editor/code-editor",
       "meta": {
         "icon": "dashicons:editor-kitchensink",
         "title": "编辑器组件",
-        "link": "",
         "hidden": false,
         "full": false,
         "affix": false,
@@ -290,11 +267,10 @@
         {
           "path": "code-editor",
           "name": "code-editor",
-          "component": "/code-editor/index",
+          "component": "/13-code-editor/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "代码编辑器",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -304,11 +280,10 @@
         {
           "path": "markdown-editor",
           "name": "markdown-editor",
-          "component": "/markdown-editor/index",
+          "component": "/14-markdown-editor/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "Markdown编辑器",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -318,11 +293,10 @@
         {
           "path": "text-editor",
           "name": "text-editor",
-          "component": "/text-editor/index",
+          "component": "/15-text-editor/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "富文本编辑器",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -334,11 +308,11 @@
     {
       "path": "/export-zip",
       "name": "export-zip",
+      "component": "layout",
       "redirect": "/export-zip/export-zip",
       "meta": {
         "icon": "mdi:database-export-outline",
         "title": "导出zip",
-        "link": "",
         "hidden": false,
         "full": false,
         "affix": false,
@@ -348,11 +322,10 @@
         {
           "path": "export-zip",
           "name": "export-zip",
-          "component": "/export-zip/index",
+          "component": "/16-export-zip/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "导出zip",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -364,11 +337,11 @@
     {
       "path": "/dragable",
       "name": "dragable",
+      "component": "layout",
       "redirect": "/dragable/dragable",
       "meta": {
         "icon": "ri:drag-drop-line",
         "title": "拖拽组件",
-        "link": "",
         "hidden": false,
         "full": false,
         "affix": false,
@@ -378,11 +351,10 @@
         {
           "path": "dragable",
           "name": "dragable",
-          "component": "/dragable/index",
+          "component": "/17-dragable/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "拖拽组件",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -394,11 +366,11 @@
     {
       "path": "/copy-text",
       "name": "copy-text",
+      "component": "layout",
       "redirect": "/copy-text/copy-text",
       "meta": {
         "icon": "mdi:writing-system-cjk-variant",
         "title": "复制文本",
-        "link": "",
         "hidden": false,
         "full": false,
         "affix": false,
@@ -408,11 +380,10 @@
         {
           "path": "copy-text",
           "name": "copy-text",
-          "component": "/copy-text/index",
+          "component": "/18-copy-text/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "复制文本",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -424,11 +395,11 @@
     {
       "path": "/directives",
       "name": "directives",
+      "component": "layout",
       "redirect": "/directives/copy-direct",
       "meta": {
         "icon": "material-symbols:integration-instructions-outline-rounded",
         "title": "自定义指令",
-        "link": "",
         "hidden": false,
         "full": false,
         "affix": false,
@@ -437,12 +408,11 @@
       "children": [
         {
           "path": "copy-direct",
-          "name": "directives/copy-direct",
+          "name": "directives-copy-direct",
           "component": "/directives/copy-direct/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "复制指令",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -451,12 +421,11 @@
         },
         {
           "path": "watermark-direct",
-          "name": "directives/watermark-direct",
+          "name": "directives-watermark-direct",
           "component": "/directives/watermark-direct/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "水印指令",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -465,12 +434,11 @@
         },
         {
           "path": "drag-direct",
-          "name": "directives/drag-direct",
+          "name": "directives-drag-direct",
           "component": "/directives/drag-direct/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "拖拽指令",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -479,12 +447,11 @@
         },
         {
           "path": "debounce-direct",
-          "name": "directives/debounce-direct",
+          "name": "directives-debounce-direct",
           "component": "/directives/debounce-direct/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "防抖指令",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -493,12 +460,11 @@
         },
         {
           "path": "throttle-direct",
-          "name": "directives/throttle-direct",
+          "name": "directives-throttle-direct",
           "component": "/directives/throttle-direct/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "节流指令",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -507,12 +473,11 @@
         },
         {
           "path": "longpress-direct",
-          "name": "directives/longpress-direct",
+          "name": "directives-longpress-direct",
           "component": "/directives/longpress-direct/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "长按指令",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -524,11 +489,11 @@
     {
       "path": "/user",
       "name": "user",
+      "component": "layout",
       "redirect": "/user/user-manage",
       "meta": {
         "icon": "mdi:user-key",
         "title": "用户",
-        "link": "",
         "hidden": false,
         "full": false,
         "affix": false,
@@ -540,9 +505,8 @@
           "name": "user-manage",
           "component": "/user-manage/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "员工管理",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -554,9 +518,8 @@
           "name": "user-manage-detail",
           "component": "/user-manage-detail/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "员工信息",
-            "link": "",
             "hidden": true,
             "full": false,
             "affix": false,
@@ -568,9 +531,8 @@
           "name": "role-list",
           "component": "/role-list/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "角色列表",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -582,9 +544,8 @@
           "name": "permission-list",
           "component": "/permission-list/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "权限列表",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -596,11 +557,11 @@
     {
       "path": "/sys-manage",
       "name": "sys-manage",
-      "redirect": "/sys-manage/menu-manage",
+      "component": "layout",
+      "redirect": "/sys-manage/-manage",
       "meta": {
         "icon": "eos-icons:network-file-system",
         "title": "系统管理",
-        "link": "",
         "hidden": false,
         "full": false,
         "affix": false,
@@ -612,9 +573,8 @@
           "name": "menu-manage",
           "component": "/menu-manage/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "菜单管理",
-            "link": "",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -626,9 +586,8 @@
           "name": "excelImport",
           "component": "/import/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "Excel导入",
-            "link": "",
             "hidden": true,
             "full": false,
             "affix": false,
@@ -640,11 +599,11 @@
     {
       "path": "/iframe",
       "name": "iframe",
+      "component": "layout",
       "redirect": "/iframe/iframe",
       "meta": {
         "icon": "mdi:link-variant",
         "title": "外部页面",
-        "link": "",
         "hidden": false,
         "full": false,
         "affix": false,
@@ -656,7 +615,7 @@
           "name": "iframe",
           "component": "/iframe/index",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "内嵌文档",
             "link": "https://www.tzagileteam.com/",
             "hidden": false,
@@ -670,7 +629,7 @@
           "name": "iframe-document",
           "component": "/iframe/blank",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "线上文档",
             "link": "https://www.tzagileteam.com",
             "hidden": false,
@@ -684,7 +643,7 @@
           "name": "iframe-github",
           "component": "/iframe/blank",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "Github 仓库",
             "link": "https://github.com/ChenyCHENYU/Robot-Admin",
             "hidden": false,
@@ -698,7 +657,7 @@
           "name": "iframe-gitee",
           "component": "/iframe/blank",
           "meta": {
-            "icon": "Menu",
+            "icon": "",
             "title": "Gitee 仓库",
             "link": "https://gitee.com/ycyplus163/robot-admin",
             "hidden": false,
