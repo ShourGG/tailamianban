@@ -73,7 +73,7 @@ export default defineConfigWithVueTs(
             FunctionDeclaration: true,
             MethodDefinition: true,
             ClassDeclaration: true,
-            ArrowFunctionExpression: true, // 强制箭头函数注释
+            ArrowFunctionExpression: false, // 强制箭头函数注释
             FunctionExpression: true, // 强制函数表达式注释
           },
           contexts: [
@@ -83,7 +83,7 @@ export default defineConfigWithVueTs(
             'ClassDeclaration',
             'ClassProperty',
             'MethodDefinition',
-            'ArrowFunctionExpression', // 覆盖箭头函数
+            // 'ArrowFunctionExpression', // 覆盖箭头函数
             'FunctionExpression', // 覆盖函数表达式
           ],
           checkConstructors: true, // 检查构造函数
@@ -176,7 +176,7 @@ export default defineConfigWithVueTs(
   },
   //MARK: JSDoc 白名单覆盖规则
   {
-    files: ['src/router/**/*.ts'],
+    files: ['src/router/**/*.ts', 'src/stores/**/*.ts'],
     rules: {
       'jsdoc/require-jsdoc': 'off',
       '@typescript-eslint/require-jsdoc': 'off',

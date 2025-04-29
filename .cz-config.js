@@ -32,9 +32,6 @@ module.exports = {
     { value: 'build', name: 'build:    🧳 打包' },
   ],
 
-
-
-
   //MARK: 消息步骤
   messages: {
     type: '请选择提交类型:',
