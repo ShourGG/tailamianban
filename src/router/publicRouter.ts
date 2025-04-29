@@ -17,7 +17,6 @@ export const publicRoutes: RouteRecordRaw[] = [
     meta: {
       title: '登录',
       icon: '',
-      link: '',
       hidden: true,
       full: false,
       affix: false,
@@ -31,7 +30,6 @@ export const publicRoutes: RouteRecordRaw[] = [
     meta: {
       title: '无权限',
       icon: '',
-      link: '',
       hidden: true,
       full: false,
       affix: false,
@@ -45,7 +43,6 @@ export const publicRoutes: RouteRecordRaw[] = [
     meta: {
       title: '404',
       icon: '',
-      link: '',
       hidden: true,
       full: false,
       affix: false,
@@ -58,7 +55,6 @@ export const publicRoutes: RouteRecordRaw[] = [
     meta: {
       title: '空白',
       icon: '',
-      link: '',
       hidden: true,
       full: false,
       affix: false,
