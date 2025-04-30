@@ -1,0 +1,139 @@
+/* ========================
+   设计系统变量
+   ======================== */
+   :root {
+    /* 基础色板 */
+    --color-white: #ffffff;
+    --color-black: #181818;
+
+    /* 中性色阶 */
+    --color-gray-1: #f8f8f8;
+    --color-gray-2: #f2f2f2;
+    --color-gray-3: #ebebeb;
+    --color-gray-8: #282828;
+
+    /* 主题色 */
+    --color-primary: #2c3e50;
+
+    /* 语义化变量默认值 (浅色模式) */
+    --color-bg: var(--color-white);
+    --color-bg-soft: var(--color-gray-1);
+    --color-bg-mute: var(--color-gray-2);
+    --color-border: rgba(0, 0, 0, 0.12);
+    --color-border-hover: rgba(0, 0, 0, 0.29);
+    --color-text: var(--color-black);
+    --color-text-light: rgba(60, 60, 60, 0.66);
+    --section-gap: 1.25rem;
+  }
+
+  /* ========================
+     主题切换系统
+     ======================== */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bg: var(--color-black);
+      --color-bg-soft: #222;
+      --color-bg-mute: var(--color-gray-8);
+      --color-border: rgba(255, 255, 255, 0.12);
+      --color-border-hover: rgba(255, 255, 255, 0.29);
+      --color-text: var(--color-gray-3);
+      --color-text-light: rgba(235, 235, 235, 0.64);
+    }
+  }
+
+  .dark {
+    --color-bg: var(--color-black);
+    --color-bg-soft: #222;
+    --color-bg-mute: var(--color-gray-8);
+  }
+
+  /* ========================
+     全局样式重置
+     ======================== */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+
+  html {
+    height: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family:
+      'Inter var',
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      'Helvetica Neue',
+      sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    overscroll-behavior-y: contain;
+  }
+
+  /* ========================
+     核心容器设置
+     ======================== */
+  #app {
+    min-width: 320px;
+    min-height: 100vh;
+  }
+
+  /* ========================
+     元素重置与增强
+     ======================== */
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    background: none;
+    border: none;
+    outline: none;
+  }
+
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    -webkit-user-drag: none;
+  }
+
+
+
+  /* ========================
+     滚动条美化
+     ======================== */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+
+  /* ========================
+     响应式调整
+     ======================== */
+  @media (max-width: 768px) {
+    html {
+      font-size: 14px;
+    }
+  }
+
+

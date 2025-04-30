@@ -1,15 +1,24 @@
 <!--
  * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-04-30 11:06:35
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-04-30 14:58:41
+ * @FilePath: \Robot_Admin\src\views\login\index.vue
+ * @Description: 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:07:28
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-30 01:07:32
+ * @LastEditTime: 2025-04-30 14:55:34
  * @FilePath: \Robot_Admin\src\views\login\index.vue
  * @Description: 登录页
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
   <div class="login-container">
-    <h3>{{ '登录标题' }} </h3>
+    <h3>{{ '用户登录' }} </h3>
     <C_Form
       class="login-container-form"
       :options="OPTIONS"
@@ -42,33 +51,37 @@
   const notification = useNotification()
   const loadingBar = useLoadingBar()
 
-  const login = (formScope: any) => {
-    const { form, model } = formScope
-    form.validate(async (valid: boolean) => {
-      if (valid) {
-        loading.value = true
-        loadingBar.start()
+  interface LoginModel {
+    username: string
+    password: string
+  }
 
-        try {
-          await userStore.getLoginInfo(model)
-          await initDynamicRouter()
-          notification.success({
-            content: '登录成功',
-            duration: 2500,
-          })
-        } catch (e) {
-          dialog.error({
-            title: '错误',
-            content: (e as Error).message,
-            positiveText: '重试',
-          })
-        } finally {
-          loading.value = false
-          loadingBar.finish()
-        }
+  interface FormScope {
+    form: {
+      validate: () => Promise<void>
+    }
+    model: LoginModel
+  }
+
+  const login = async (formScope: FormScope) => {
+    try {
+      await formScope.form.validate()
+      loading.value = true
+      loadingBar.start()
+
+      await userStore.getLoginInfo(formScope.model)
+      await initDynamicRouter()
+      notification.success({ content: '登录成功', duration: 2500 })
+    } catch (e) {
+      const msg = (e as Error).message
+      if (msg.includes('Validation')) {
+        message.error('表单校验失败，请检查输入')
       } else {
-        message.error('表单填写有误，请查看错误提示')
+        dialog.error({ title: '错误', content: msg, positiveText: '重试' })
       }
-    })
+    } finally {
+      loading.value = false
+      loadingBar.finish()
+    }
   }
 </script>

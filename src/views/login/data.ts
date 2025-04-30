@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:35:57
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-30 00:48:16
+ * @LastEditTime: 2025-04-30 15:28:00
  * @FilePath: \Robot_Admin\src\views\login\data.ts
  * @Description: 登录页表单数据
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.

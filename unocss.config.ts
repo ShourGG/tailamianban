@@ -16,8 +16,6 @@ import {
   transformerDirectives,
 } from 'unocss'
 
-import rules from './src/styles/preset/rules'
-
 import { iconSafelist } from './src/utils/unocss/icon-safelist'
 import { shortcutsArr } from './src/utils/unocss/shortcuts-arr'
 
@@ -35,7 +33,6 @@ export default defineConfig({
     }),
   ],
   transformers: [transformerDirectives()],
-  rules,
   shortcuts: shortcutsArr,
   safelist: iconSafelist,
 })

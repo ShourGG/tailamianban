@@ -7,6 +7,11 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
+  const NCheckboxGroup: typeof import('naive-ui')['NCheckboxGroup']
+  const NDatePicker: typeof import('naive-ui')['NDatePicker']
+  const NInput: typeof import('naive-ui')['NInput']
+  const NSelect: typeof import('naive-ui')['NSelect']
+  const NUpload: typeof import('naive-ui')['NUpload']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
