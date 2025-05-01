@@ -10,6 +10,7 @@
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "declaration": true,
+    "noImplicitAny": true, // 保留，防止隐式 any
     "emitDeclarationOnly": true,
     "outDir": "dist/types",
     "composite": true,

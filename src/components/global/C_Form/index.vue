@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-30 13:45:01
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-30 17:11:53
+ * @LastEditTime: 2025-05-01 21:44:44
  * @FilePath: \Robot_Admin\src\components\global\C_Form\index.vue
  * @Description: 表单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -15,25 +15,24 @@
     :rules="formRules"
     :validate-on-rule-change="false"
     v-bind="$attrs"
+    @submit.prevent="handleSubmit"
   >
     <!-- 循环渲染表单项 -->
     <template
-      v-for="item in processedOptions"
+      v-for="item in props.options"
       :key="item.prop"
     >
       <NFormItem
         v-if="item.show !== false"
         :label="item.label ?? undefined"
         :path="item.prop"
-        :rule="formRules[item.prop]"
       >
         <!-- 常规表单项 -->
         <template v-if="!specialTypes.includes(item.type)">
           <component
-            :is="componentMap[item.type]"
+            :is="componentMap[item.type as FormItemType]"
             v-model:value="formModel[item.prop]"
             v-bind="item.attrs"
-            @update:value="handleValueChange(item)"
           >
             <!-- 嵌套子项 -->
             <template
@@ -41,7 +40,7 @@
               :key="child.value"
             >
               <component
-                :is="childComponentMap[child.type]"
+                :is="childComponentMap[child.type as 'option' | 'checkboxItem']"
                 :value="child.value"
                 :label="child.label"
                 v-bind="child.attrs"
@@ -90,14 +89,14 @@
     <!-- 表单操作区域 -->
     <NFormItem>
       <slot
-        name="actions"
+        name="action"
         :form="formRef"
         :model="formModel"
       >
         <NSpace>
           <NButton
             type="primary"
-            @click="handleSubmit"
+            native-type="submit"
             >提交</NButton
           >
           <NButton @click="handleReset">重置</NButton>
@@ -108,14 +107,9 @@
 </template>
 
 <script lang="ts" setup>
-  import {
-    type FormInst,
-    type FormRules,
-    type UploadFileInfo,
-    type UploadCustomRequestOptions,
-  } from 'naive-ui'
+  import { type FormInst, type FormRules, type UploadFileInfo } from 'naive-ui'
   import Editor from 'wangeditor'
-  import { resolveComponent } from 'vue'
+  import { _mergeRules } from '@/utils/v_verify'
 
   // ================= 类型定义 =================
   type FormItemType =
@@ -126,36 +120,30 @@
     | 'editor'
     | 'daterange'
 
+  interface ChildOption {
+    type: 'option' | 'checkboxItem'
+    value: string | number | boolean
+    label: string
+    attrs?: Record<string, unknown>
+  }
+
   interface FormOption {
     type: FormItemType
     prop: string
     label?: string
-    value?: unknown
+    value?: string | number | boolean | Date | File[] | null
     placeholder?: string
     rules?: FormRules[string]
     attrs?: Record<string, unknown>
     uploadAttrs?: Record<string, unknown>
     uploadTip?: string
-    children?: Array<{
-      type: 'option' | 'checkboxItem'
-      value: unknown
-      label: string
-      attrs?: Record<string, unknown>
-    }>
+    children?: ChildOption[]
     show?: boolean
   }
 
-  type FormFieldType =
-    | string
-    | number
-    | boolean
-    | Date
-    | File[]
-    | null
-    | undefined
+  type FormFieldType = string | number | boolean | Date | File[] | null
 
-  // ================= 组件配置 =================
-  const specialTypes = ['upload', 'editor']
+  const specialTypes: FormItemType[] = ['upload', 'editor']
   const componentMap = {
     input: resolveComponent('NInput'),
     select: resolveComponent('NSelect'),
@@ -170,71 +158,64 @@
     checkboxItem: 'NCheckbox',
   } as const
 
-  // ================= 组件逻辑 =================
   const props = defineProps<{
     options: FormOption[]
-    immediate?: boolean
+    modelValue?: Record<string, FormFieldType>
   }>()
 
   const emit = defineEmits<{
-    (e: 'submit', model: Record<string, unknown>): void
-    (e: 'update:model', model: Record<string, unknown>): void
-    (e: 'upload-request', options: UploadCustomRequestOptions): void
+    (e: 'submit', model: Record<string, FormFieldType>): void
+    (e: 'update:modelValue', model: Record<string, FormFieldType>): void
     (e: 'editor-mounted', editor: Editor, prop: string): void
   }>()
 
-  // 响应式状态
   const formRef = ref<FormInst | null>(null)
-  const formModel = reactive<Record<string, FormFieldType>>({})
+  const formModel = reactive<Record<string, any>>({})
   const formRules = reactive<FormRules>({})
-  const processedOptions = reactive<FormOption[]>([])
   const editorInstances = new Map<string, Editor>()
 
-  // 初始化方法
-  const initialize = () => {
-    // 处理配置项
-    processedOptions.splice(
-      0,
-      processedOptions.length,
-      ...props.options.map(option => ({
-        ...option,
-        show: option.show ?? true,
-        attrs: { clearable: true, ...option.attrs },
-        uploadAttrs: {
-          multiple: false,
-          accept: '*',
-          listType: 'text',
-          ...option.uploadAttrs,
-        },
-      }))
-    )
+  const getDefaultValue = (type: FormItemType): FormFieldType => {
+    switch (type) {
+      case 'input':
+        return ''
+      case 'select':
+        return null
+      case 'checkbox':
+        return []
+      case 'upload':
+        return []
+      case 'editor':
+        return ''
+      case 'daterange':
+        return null
+      default:
+        return ''
+    }
+  }
 
-    // 初始化表单值
+  // 初始化表单
+  const initialize = (): void => {
     props.options.forEach(item => {
-      if (!(item.prop in formModel)) {
-        formModel[item.prop] =
-          (item.value as FormFieldType) ?? getDefaultValue(item.type)
+      formModel[item.prop] = item.value ?? getDefaultValue(item.type)
+      if (item.rules) {
+        // 这里自动合并校验规则，使其串行单一展示
+        formRules[item.prop] = _mergeRules(
+          Array.isArray(item.rules) ? item.rules : [item.rules]
+        )
       }
-      if (item.rules) formRules[item.prop] = item.rules
     })
-
-    // 延迟初始化编辑器
     nextTick(initEditors)
   }
 
-  // 获取类型默认值
-  const getDefaultValue = (type: FormItemType) =>
-    ({
-      input: '',
-      select: null,
-      checkbox: [],
-      upload: [],
-      editor: '',
-      daterange: null,
-    })[type]
+  // 生命周期
+  onMounted(initialize)
+  onBeforeUnmount(() => {
+    editorInstances.forEach(editor => editor.destroy())
+    editorInstances.clear()
+  })
 
   // 编辑器初始化
-  const initEditors = () => {
+  const initEditors = (): void => {
     props.options
       .filter(item => item.type === 'editor')
       .forEach(item => {
@@ -246,59 +227,85 @@
             formModel[item.prop] = html
           }
           editor.create()
-          editor.txt.html(String(formModel[item.prop] || ''))
+          editor.txt.html(String(formModel[item.prop] ?? ''))
           editorInstances.set(item.prop, editor)
           emit('editor-mounted', editor, item.prop)
         }
       })
   }
 
-  // ================= 事件处理 =================
-  const handleSubmit = (e: Event) => {
+  // 事件处理
+  const handleSubmit = async (e: Event) => {
     e.preventDefault()
-    formRef.value?.validate(errors => {
-      if (!errors) emit('submit', formModel)
-    })
+    try {
+      await formRef.value?.validate()
+      emit('submit', { ...formModel })
+    } catch {}
   }
 
   const handleReset = () => {
     formRef.value?.restoreValidation()
     props.options.forEach(item => {
-      formModel[item.prop] =
-        (item.value as FormFieldType) ?? getDefaultValue(item.type)
+      formModel[item.prop] = item.value ?? getDefaultValue(item.type)
       const editor = editorInstances.get(item.prop)
-      editor?.txt.html(String(formModel[item.prop] || ''))
+      editor?.txt.html(String(formModel[item.prop] ?? ''))
     })
-  }
-
-  const handleValueChange = (item: FormOption) => {
-    emit('update:model', formModel)
-    const onChange = item.attrs?.onChange as
-      | ((value: unknown) => void)
-      | undefined
-    onChange?.(formModel[item.prop])
   }
 
   const handleUploadChange = (item: FormOption, fileList: UploadFileInfo[]) => {
     formModel[item.prop] = fileList.map(file => file.file as File)
   }
 
-  // ================= 生命周期 =================
-  onMounted(initialize)
+  // 生命周期
+  onMounted(() => initialize())
   onBeforeUnmount(() => {
     editorInstances.forEach(editor => editor.destroy())
     editorInstances.clear()
   })
 
-  watch(() => props.options, initialize, { deep: true })
+  watch(
+    () => props.options,
+    newOptions => {
+      newOptions.forEach(item => {
+        // 确保规则更新后重新赋值
+        if (item.rules) {
+          formRules[item.prop] = item.rules
+        }
+      })
+      initialize()
+    },
+    { deep: true }
+  )
+  watch(
+    () => props.modelValue,
+    val => {
+      if (val) {
+        for (const key in val) {
+          formModel[key] = val[key]
+        }
+      }
+    },
+    { immediate: true, deep: true }
+  )
+  watch(
+    formModel,
+    val => {
+      emit('update:modelValue', { ...val })
+    },
+    { deep: true }
+  )
 
-  // ================= 暴露方法 =================
   defineExpose({
     validate: () => formRef.value?.validate(),
-    reset: handleReset,
+    reset: () => {
+      formRef.value?.restoreValidation()
+      handleReset()
+    },
     getModel: () => formModel,
-    setFields: (fields: Record<string, unknown>) => {
+    setFields: (fields: Record<string, FormFieldType>) => {
       Object.assign(formModel, fields)
     },
+    // 添加初始化方法暴露
+    initialize,
   })
 </script>

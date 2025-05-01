@@ -1,17 +1,8 @@
 <!--
  * @Author: ChenYu ycyplus@gmail.com
- * @Date: 2025-04-30 11:06:35
- * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-30 14:58:41
- * @FilePath: \Robot_Admin\src\views\login\index.vue
- * @Description: 
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
--->
-<!--
- * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:07:28
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-30 14:55:34
+ * @LastEditTime: 2025-05-01 22:42:01
  * @FilePath: \Robot_Admin\src\views\login\index.vue
  * @Description: 登录页
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -23,14 +14,14 @@
       class="login-container-form"
       :options="OPTIONS"
     >
-      <template #action="scope">
+      <template #action="formScope">
         <NButton
           class="login-container-form-btn"
           type="primary"
           :loading="loading"
-          @click="login(scope)"
+          @click="login(formScope)"
         >
-          {{ '登录按钮' }}
+          登录
         </NButton>
       </template>
     </C_Form>
@@ -45,39 +36,27 @@
 
   const loading = ref(false)
   const userStore = s_userStore()
-
-  const message = useMessage()
   const dialog = useDialog()
   const notification = useNotification()
   const loadingBar = useLoadingBar()
 
-  interface LoginModel {
-    username: string
-    password: string
-  }
-
-  interface FormScope {
-    form: {
-      validate: () => Promise<void>
-    }
-    model: LoginModel
-  }
-
-  const login = async (formScope: FormScope) => {
+  const login = async (formScope: any) => {
+    const { form, model } = formScope
     try {
-      await formScope.form.validate()
+      await form.value?.validate()
       loading.value = true
       loadingBar.start()
-
-      await userStore.getLoginInfo(formScope.model)
+      await userStore.getLoginInfo(model)
       await initDynamicRouter()
       notification.success({ content: '登录成功', duration: 2500 })
-    } catch (e) {
-      const msg = (e as Error).message
-      if (msg.includes('Validation')) {
-        message.error('表单校验失败，请检查输入')
-      } else {
-        dialog.error({ title: '错误', content: msg, positiveText: '重试' })
+    } catch (e: any) {
+      // 只处理登录接口异常，表单校验交给表单自身
+      if (e instanceof Error) {
+        dialog.error({
+          title: '错误',
+          content: e.message,
+          positiveText: '重试',
+        })
       }
     } finally {
       loading.value = false
