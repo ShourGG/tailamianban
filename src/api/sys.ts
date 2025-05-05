@@ -1,3 +1,12 @@
+/*
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-05-01 14:11:38
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-05-05 00:43:14
+ * @FilePath: \Robot_Admin\src\api\sys.ts
+ * @Description:
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
+ */
 import request from '@/axios/request'
 import DynamicRouter from '@/assets/dynamicRouter.json'
 

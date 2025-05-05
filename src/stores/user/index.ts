@@ -36,14 +36,11 @@ export const s_userStore = defineStore('user', {
         // 增强密码哈希处理
         const hashedPassword = this._generatePasswordHash(password)
         const { data } = await login({ username, password: hashedPassword })
-
         if (data.code === '0') {
           this.handleLoginSuccess(data.token)
         }
-        return data
-      } catch (error) {
-        this.handleLoginError(error)
-        throw error
+      } catch {
+        this.handleLoginError('登录失败，请检查登录接口数据')
       }
     },
 
@@ -65,7 +62,6 @@ export const s_userStore = defineStore('user', {
         content: `登录失败: ${error instanceof Error ? error.message : '检查错误'}`,
         duration: 3000,
       })
-      throw new Error(`登录失败:${error}`)
     },
 
     setToken(token: string) {

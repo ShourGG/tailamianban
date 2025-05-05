@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-30 16:34:10
+ * @LastEditTime: 2025-05-05 01:26:30
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -104,7 +104,7 @@ export default defineConfig({
     hmr: { overlay: true },
     proxy: {
       '^/api': {
-        target: 'http://121.89.210.252:3000/mock/2228/', //代理接口
+        target: 'https://apifoxmock.com/m1/4902805-4559325-default', //代理接口
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
       },

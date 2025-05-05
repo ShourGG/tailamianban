@@ -2,18 +2,12 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-15 21:01:38
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-01 21:40:14
+ * @LastEditTime: 2025-05-01 22:58:54
  * @FilePath: \Robot_Admin\src\utils\v_verify.ts
  * @Description: 表单校验规则
  */
 
 import type { FormItemRule } from 'naive-ui'
-
-// export type FieldRule = {
-//   trigger?: 'blur' | 'input' | 'change' | Array<'blur' | 'input' | 'change'>
-//   validator: (rule: FieldRule, value: any) => Promise<void>
-//   message?: string
-// }
 
 export type FieldRule = Omit<FormItemRule, 'validator'> & {
   validator: NonNullable<FormItemRule['validator']>
