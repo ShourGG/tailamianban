@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:07:28
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-01 22:53:49
+ * @LastEditTime: 2025-05-06 00:15:01
  * @FilePath: \Robot_Admin\src\views\login\index.vue
  * @Description: 登录页
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -33,18 +33,18 @@
   import { s_userStore } from '@/stores/user/index'
   import { OPTIONS } from './data.ts'
   import { useFormSubmit } from '@/hooks/useFormSubmit'
+  import { login as loginApi, type LoginResponse } from '@/api/sys'
   import './index.scss'
 
   const userStore = s_userStore()
-  const { loading, handleSubmit } = useFormSubmit()
+  const { loading, createSubmit } = useFormSubmit<LoginResponse>()
 
-  const login = (formScope: Record<string, any>) =>
-    handleSubmit(
-      formScope,
-      async (model: { username: string; password: string }) => {
-        await userStore.getLoginInfo(model)
-        await initDynamicRouter()
-      },
-      '登录成功'
-    )
+  const login = createSubmit(loginApi, {
+    successMsg: '登录成功',
+    errorMsg: '账号或密码错误',
+    onSuccess: async ({ token }) => {
+      userStore.handleLoginSuccess(token)
+      await initDynamicRouter()
+    },
+  })
 </script>

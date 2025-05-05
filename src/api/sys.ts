@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-01 14:11:38
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-05 00:43:14
+ * @LastEditTime: 2025-05-06 00:22:03
  * @FilePath: \Robot_Admin\src\api\sys.ts
  * @Description:
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -10,13 +10,20 @@
 import request from '@/axios/request'
 import DynamicRouter from '@/assets/dynamicRouter.json'
 
+export interface LoginResponse {
+  code: '0' | '1' // 根据实际业务码调整
+  token: string
+  message?: string
+}
+
 // 登录接口
-export const login = (data: unknown) => {
-  return request({
+// 添加响应数据解构
+export const login = (data: { username: string; password: string }) => {
+  return request<LoginResponse>({
+    method: 'post',
     url: '/sys/login',
-    method: 'POST',
     data,
-  })
+  }).then(res => res.data)
 }
 
 // 获取用户信息接口
