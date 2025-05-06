@@ -2,81 +2,49 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-28 15:55:55
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-28 17:25:12
- * @FilePath: \Robot_Admin\src\utils\unocss\d_route.ts
+ * @LastEditTime: 2025-05-06 15:30:55
+ * @FilePath: \Robot_Admin\src\utils\d_route.ts
  * @Description: 路由相关工具函数
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-type MenuItem = Menu.MenuOptions
-
-// 通用递归处理器类型
-type RecursiveHandler<T extends unknown[]> = (item: MenuItem, acc: T) => T
-
-/**
- * @description: 递归处理函数
- * @param {MenuItem} item 当前菜单项
- * @param {T} acc 累加器
- * @return {*} {T} 处理后的累加器
- */
-const flattenHandler = (item: MenuItem, acc: MenuItem[]): MenuItem[] => {
-  acc.push(item)
-  item.children?.forEach(child => flattenHandler(child, acc))
-  return acc
-}
-
-/**
- * @description:  递归处理器
- * @return {*} {T} 处理后的累加器
- */
-const recursiveProcessor = <T extends unknown[]>(
-  list: MenuItem[],
-  handler: RecursiveHandler<T>,
-  initial: T
-): T => {
-  return list.reduce((acc, item) => handler(item, acc), initial)
-}
-
-/**
- * @description: 使用递归，扁平化菜单列表
- * @param {MenuItem} menuList 所有菜单列表
- * @return {*} {MenuItem[]} 扁平化后的菜单列表
- */
-export const getFlatArr = (menuList: MenuItem[]): MenuItem[] =>
-  recursiveProcessor(menuList, flattenHandler, [])
+import type { DynamicRoute } from '@/router/dynamicRouter'
 
 /**
  * @description: 使用递归，过滤需要显示的菜单
  * @param {MenuItem} menuList 所有菜单列表
  * @return {*} {MenuItem[]} 过滤后的菜单列表
  */
-export const getShowMenuList = (menuList: MenuItem[]): MenuItem[] =>
-  menuList.reduce((acc, item) => {
-    if (item.meta?.hidden) return acc
+export const getShowMenuList = (menus: DynamicRoute[]): Menu.MenuOptions[] => {
+  return menus
+    .filter(menu => {
+      // 添加 name 属性存在性检查
+      if (!menu.name) {
+        console.warn(`路由 ${menu.path} 缺少 name 属性，已过滤`)
+        return false
+      }
+      return menu.meta?.hidden !== true
+    })
+    .map(menu => ({
+      ...menu,
+      name: menu.name!, // 非空断言
+      children: menu.children?.length ? getShowMenuList(menu.children) : [],
+    }))
+}
 
-    const newItem = { ...item }
-    if (newItem.children) {
-      newItem.children = getShowMenuList(newItem.children)
-    }
-    return [...acc, newItem]
-  }, [] as MenuItem[])
+// 优化后的缓存路由名称函数
+export const getKeepAliveRouterName = (
+  menuList: Menu.MenuOptions[]
+): string[] => {
+  const result: string[] = []
 
-/**
- * @description:
- * @param {MenuItem} menuList
- * @return {*}
- */
-export const getKeepAliveRouterName = (menuList: MenuItem[]): string[] => {
-  /**
-   * @description: 递归处理器 - 处理需要缓存的路由名称
-   * @param {MenuItem} item 当前菜单项
-   * @param {string} acc 累加器
-   * @return {*} {string[]} 处理后的累加器 - 缓存的路由名称数组
-   */
-  const processor = (item: MenuItem, acc: string[]): string[] => {
-    if (item.meta?.keepAlive && item.name) acc.push(item.name)
-    item.children?.forEach(child => processor(child, acc))
-    return acc
+  const processor = (items: Menu.MenuOptions[]) => {
+    items.forEach(item => {
+      if (item.meta?.keepAlive && item.name) result.push(item.name)
+      if (item.children?.length) processor(item.children)
+    })
   }
-  return recursiveProcessor(menuList, processor, [])
+
+  processor(menuList)
+  return result
 }

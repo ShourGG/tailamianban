@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 11:13:19
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-06 00:00:27
+ * @LastEditTime: 2025-05-06 15:14:13
  * @FilePath: \Robot_Admin\src\stores\permission\index.ts
  * @Description: 权限相关 store
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -11,13 +11,14 @@
 import { getAuthMenuListApi } from '@/api/sys'
 import { getAllBreadcrumbList } from '@/utils/d_breadcrumb'
 import { getKeepAliveRouterName, getShowMenuList } from '@/utils/d_route'
+import type { DynamicRoute } from '@/router/dynamicRouter'
 
 export const s_permissionStore = defineStore('permission', {
   state: () => {
     return {
       authButtonList: {},
       // menuList 作为动态路由，不会做持久化存储
-      authMenuList: [],
+      authMenuList: [] as DynamicRoute[],
     }
   },
   getters: {
@@ -50,8 +51,14 @@ export const s_permissionStore = defineStore('permission', {
      * @return {*} {Promise<void>
      */
     async getAuthMenuList() {
-      const { data } = await getAuthMenuListApi()
-      this.authMenuList = data as never[]
+      try {
+        const res = await getAuthMenuListApi()
+        this.authMenuList = res.data
+        return res // 确保返回完整响应
+      } catch (error) {
+        console.error('获取菜单失败:', error)
+        throw error
+      }
     },
   },
 })

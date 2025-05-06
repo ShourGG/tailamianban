@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-30 13:45:01
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-01 21:44:44
+ * @LastEditTime: 2025-05-06 19:24:33
  * @FilePath: \Robot_Admin\src\components\global\C_Form\index.vue
  * @Description: 表单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -15,74 +15,62 @@
     :rules="formRules"
     :validate-on-rule-change="false"
     v-bind="$attrs"
-    @submit.prevent="handleSubmit"
   >
-    <!-- 循环渲染表单项 -->
     <template
       v-for="item in props.options"
       :key="item.prop"
     >
       <NFormItem
         v-if="item.show !== false"
-        :label="item.label ?? undefined"
+        :label="item.label"
         :path="item.prop"
       >
         <!-- 常规表单项 -->
-        <template v-if="!specialTypes.includes(item.type)">
+        <component
+          v-if="!specialTypes.includes(item.type)"
+          :is="componentMap[item.type]"
+          v-model:value="formModel[item.prop]"
+          v-bind="item.attrs"
+        >
           <component
-            :is="componentMap[item.type as FormItemType]"
-            v-model:value="formModel[item.prop]"
-            v-bind="item.attrs"
-          >
-            <!-- 嵌套子项 -->
-            <template
-              v-for="child in item.children"
-              :key="child.value"
-            >
-              <component
-                :is="childComponentMap[child.type as 'option' | 'checkboxItem']"
-                :value="child.value"
-                :label="child.label"
-                v-bind="child.attrs"
-              />
-            </template>
-          </component>
-        </template>
-
-        <!-- 特殊类型处理 -->
-        <template v-else>
-          <!-- 文件上传 -->
-          <NUpload
-            v-if="item.type === 'upload'"
-            v-model:file-list="
-              formModel[item.prop] as UploadFileInfo[] | undefined
-            "
-            v-bind="item.uploadAttrs"
-            @change="({ fileList }) => handleUploadChange(item, fileList)"
-          >
-            <template #trigger>
-              <slot :name="`${item.prop}-upload-trigger`">
-                <NButton
-                  type="primary"
-                  class="mr-4"
-                  >选择文件</NButton
-                >
-              </slot>
-            </template>
-            <template #tip>
-              <slot :name="`${item.prop}-upload-tip`">
-                <span class="text-gray-400">{{ item.uploadTip }}</span>
-              </slot>
-            </template>
-          </NUpload>
-
-          <!-- 富文本编辑器 -->
-          <div
-            v-else-if="item.type === 'editor'"
-            :id="`editor-${item.prop}`"
-            class="h-96 w-full border rounded"
+            v-for="child in item.children"
+            :key="child.value"
+            :is="childComponentMap[child.type]"
+            :value="child.value"
+            :label="child.label"
+            v-bind="child.attrs"
           />
-        </template>
+        </component>
+
+        <!-- 文件上传 -->
+        <NUpload
+          v-else-if="item.type === 'upload'"
+          v-model:file-list="formModel[item.prop]"
+          v-bind="item.uploadAttrs"
+          @change="({ fileList }) => handleUploadChange(item, fileList)"
+        >
+          <template #trigger>
+            <slot :name="`${item.prop}-upload-trigger`">
+              <NButton
+                type="primary"
+                class="mr-4"
+                >选择文件</NButton
+              >
+            </slot>
+          </template>
+          <template #tip>
+            <slot :name="`${item.prop}-upload-tip`">
+              <span class="text-gray-400">{{ item.uploadTip }}</span>
+            </slot>
+          </template>
+        </NUpload>
+
+        <!-- 富文本编辑器 -->
+        <div
+          v-else-if="item.type === 'editor'"
+          :id="`editor-${item.prop}`"
+          class="h-96 w-full border rounded"
+        />
       </NFormItem>
     </template>
 
@@ -111,7 +99,9 @@
   import Editor from 'wangeditor'
   import { _mergeRules } from '@/utils/v_verify'
 
-  // ================= 类型定义 =================
+  // ================= 类型定义 ==========// ...省略其他代码...
+
+  // ==== 修改后代码 ====
   type FormItemType =
     | 'input'
     | 'select'
@@ -143,6 +133,9 @@
 
   type FormFieldType = string | number | boolean | Date | File[] | null
 
+  // ================= 组件配置 ==========// ...省略其他代码...
+
+  // ==== 修改后代码 ====
   const specialTypes: FormItemType[] = ['upload', 'editor']
   const componentMap = {
     input: resolveComponent('NInput'),
@@ -158,22 +151,34 @@
     checkboxItem: 'NCheckbox',
   } as const
 
+  // ================= 组件属性 ==========// ...省略其他代码...
+
+  // ==== 修改后代码 ====
   const props = defineProps<{
     options: FormOption[]
     modelValue?: Record<string, FormFieldType>
   }>()
 
   const emit = defineEmits<{
-    (e: 'submit', model: Record<string, FormFieldType>): void
+    (
+      e: 'submit',
+      payload: { model: Record<string, FormFieldType>; form: FormInst }
+    ): void
     (e: 'update:modelValue', model: Record<string, FormFieldType>): void
     (e: 'editor-mounted', editor: Editor, prop: string): void
   }>()
 
+  // ================= 响应式数据 ==========// ...省略其他代码...
+
+  // ==== 修改后代码 ====
   const formRef = ref<FormInst | null>(null)
   const formModel = reactive<Record<string, any>>({})
   const formRules = reactive<FormRules>({})
   const editorInstances = new Map<string, Editor>()
 
+  // ================= 工具方法 ==========// ...省略其他代码...
+
+  // ==== 修改后代码 ====
   const getDefaultValue = (type: FormItemType): FormFieldType => {
     switch (type) {
       case 'input':
@@ -193,29 +198,22 @@
     }
   }
 
-  // 初始化表单
-  const initialize = (): void => {
+  // ================= 核心方法 ==========// ...省略其他代码...
+
+  // ==== 修改后代码 ====
+  const initialize = () => {
     props.options.forEach(item => {
       formModel[item.prop] = item.value ?? getDefaultValue(item.type)
       if (item.rules) {
-        // 这里自动合并校验规则，使其串行单一展示
         formRules[item.prop] = _mergeRules(
           Array.isArray(item.rules) ? item.rules : [item.rules]
         )
       }
     })
-    nextTick(initEditors)
+    initEditors()
   }
 
-  // 生命周期
-  onMounted(initialize)
-  onBeforeUnmount(() => {
-    editorInstances.forEach(editor => editor.destroy())
-    editorInstances.clear()
-  })
-
-  // 编辑器初始化
-  const initEditors = (): void => {
+  const initEditors = () => {
     props.options
       .filter(item => item.type === 'editor')
       .forEach(item => {
@@ -234,21 +232,13 @@
       })
   }
 
-  // 事件处理
-  const handleSubmit = async (e: Event) => {
-    e.preventDefault()
-    try {
-      await formRef.value?.validate()
-      emit('submit', { ...formModel })
-    } catch {}
-  }
-
   const handleReset = () => {
     formRef.value?.restoreValidation()
     props.options.forEach(item => {
       formModel[item.prop] = item.value ?? getDefaultValue(item.type)
-      const editor = editorInstances.get(item.prop)
-      editor?.txt.html(String(formModel[item.prop] ?? ''))
+      editorInstances
+        .get(item.prop)
+        ?.txt.html(String(formModel[item.prop] ?? ''))
     })
   }
 
@@ -256,56 +246,38 @@
     formModel[item.prop] = fileList.map(file => file.file as File)
   }
 
-  // 生命周期
-  onMounted(() => initialize())
+  // ================= 生命周期 ==========// ...省略其他代码...
+
+  // ==== 修改后代码 ====
+  onMounted(() => {
+    initialize()
+    watch(() => props.options, initialize, { deep: true })
+    watch(
+      () => props.modelValue,
+      val => {
+        if (val) Object.assign(formModel, val)
+      },
+      { immediate: true, deep: true }
+    )
+    watch(formModel, val => emit('update:modelValue', { ...val }), {
+      deep: true,
+    })
+  })
+
   onBeforeUnmount(() => {
     editorInstances.forEach(editor => editor.destroy())
     editorInstances.clear()
   })
 
-  watch(
-    () => props.options,
-    newOptions => {
-      newOptions.forEach(item => {
-        // 确保规则更新后重新赋值
-        if (item.rules) {
-          formRules[item.prop] = item.rules
-        }
-      })
-      initialize()
-    },
-    { deep: true }
-  )
-  watch(
-    () => props.modelValue,
-    val => {
-      if (val) {
-        for (const key in val) {
-          formModel[key] = val[key]
-        }
-      }
-    },
-    { immediate: true, deep: true }
-  )
-  watch(
-    formModel,
-    val => {
-      emit('update:modelValue', { ...val })
-    },
-    { deep: true }
-  )
+  // ================= 组件暴露 ==========// ...省略其他代码...
 
+  // ==== 修改后代码 ====
   defineExpose({
     validate: () => formRef.value?.validate(),
-    reset: () => {
-      formRef.value?.restoreValidation()
-      handleReset()
-    },
+    reset: handleReset,
     getModel: () => formModel,
-    setFields: (fields: Record<string, FormFieldType>) => {
-      Object.assign(formModel, fields)
-    },
-    // 添加初始化方法暴露
+    setFields: (fields: Record<string, FormFieldType>) =>
+      Object.assign(formModel, fields),
     initialize,
   })
 </script>

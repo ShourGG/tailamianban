@@ -12,6 +12,7 @@ declare module 'vue' {
     C_dgg: typeof import('./../src/components/local/c_dgg.vue')['default']
     C_Form: typeof import('./../src/components/global/C_Form/index.vue')['default']
     C_Icon: typeof import('./../src/components/global/C_Icon/index.vue')['default']
+    C_Layout: typeof import('./../src/components/global/C_Layout/index.vue')['default']
     'IconMdi:currencyTwd': typeof import('~icons/mdi/currency-twd')['default']
     'IconMdi:qualityMedium': typeof import('~icons/mdi/quality-medium')['default']
     IconMdiAccountBox: typeof import('~icons/mdi/account-box')['default']

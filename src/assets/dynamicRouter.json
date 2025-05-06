@@ -15,7 +15,7 @@
             "title": "首页",
             "hidden": false,
             "affix": true,
-            "keepAlive": true,
+            "keepAlive": false,
             "full": false
           }
         }
@@ -32,7 +32,7 @@
         "hidden": false,
         "full": false,
         "affix": false,
-        "keepAlive": true
+        "keepAlive": false
       },
       "children": [
         {
@@ -45,7 +45,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
@@ -58,7 +58,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         }
       ]
@@ -74,12 +74,12 @@
         "hidden": false,
         "full": false,
         "affix": false,
-        "keepAlive": true
+        "keepAlive": false
       },
       "children": [
         {
           "path": "icon",
-          "name": "icon",
+          "name": "demo-icon",
           "component": "/01-icon/index",
           "meta": {
             "icon": "",
@@ -87,12 +87,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "area-cascade",
-          "name": "area-cascade",
+          "name": "demo-area-cascade",
           "component": "/02-area-cascade/index",
           "meta": {
             "icon": "",
@@ -100,12 +100,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "progress",
-          "name": "progress",
+          "name": "demo-progress",
           "component": "/03-progress/index",
           "meta": {
             "icon": "",
@@ -113,12 +113,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "time",
-          "name": "time",
+          "name": "demo-time",
           "component": "/04-time/index",
           "meta": {
             "icon": "",
@@ -126,12 +126,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "date",
-          "name": "date",
+          "name": "demo-date",
           "component": "/05-date/index",
           "meta": {
             "icon": "",
@@ -139,12 +139,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "city",
-          "name": "city",
+          "name": "demo-city",
           "component": "/06-city/index",
           "meta": {
             "icon": "",
@@ -152,12 +152,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "form-manage",
-          "name": "form-manage",
+          "name": "demo-form-manage",
           "redirect": "/demo/form-manage/form",
           "meta": {
             "icon": "",
@@ -165,12 +165,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           },
           "children": [
             {
               "path": "form",
-              "name": "form",
+              "name": "demo-form",
               "component": "/07-form/index",
               "meta": {
                 "icon": "",
@@ -178,12 +178,12 @@
                 "hidden": false,
                 "full": false,
                 "affix": false,
-                "keepAlive": true
+                "keepAlive": false
               }
             },
             {
               "path": "form-modal",
-              "name": "form-modal",
+              "name": "demo-form-modal",
               "component": "/08-form-modal/index",
               "meta": {
                 "icon": "",
@@ -191,14 +191,14 @@
                 "hidden": false,
                 "full": false,
                 "affix": false,
-                "keepAlive": true
+                "keepAlive": false
               }
             }
           ]
         },
         {
           "path": "table",
-          "name": "table",
+          "name": "demo-table",
           "component": "/09-table/index",
           "meta": {
             "icon": "",
@@ -206,12 +206,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "table-expand",
-          "name": "table-expand",
+          "name": "demo-table-expand",
           "component": "/10-table-expand/index",
           "meta": {
             "icon": "",
@@ -219,12 +219,12 @@
             "hidden": true,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "calendar",
-          "name": "calendar",
+          "name": "demo-calendar",
           "component": "/11-calendar/index",
           "meta": {
             "icon": "",
@@ -232,7 +232,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
@@ -245,7 +245,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         }
       ]
@@ -261,12 +261,12 @@
         "hidden": false,
         "full": false,
         "affix": false,
-        "keepAlive": true
+        "keepAlive": false
       },
       "children": [
         {
           "path": "code-editor",
-          "name": "code-editor",
+          "name": "editor-code",
           "component": "/13-code-editor/index",
           "meta": {
             "icon": "",
@@ -274,12 +274,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "markdown-editor",
-          "name": "markdown-editor",
+          "name": "editor-markdown",
           "component": "/14-markdown-editor/index",
           "meta": {
             "icon": "",
@@ -287,12 +287,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "text-editor",
-          "name": "text-editor",
+          "name": "editor-text",
           "component": "/15-text-editor/index",
           "meta": {
             "icon": "",
@@ -300,7 +300,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         }
       ]
@@ -309,19 +309,19 @@
       "path": "/export-zip",
       "name": "export-zip",
       "component": "layout",
-      "redirect": "/export-zip/export-zip",
+      "redirect": "/export-zip/index",
       "meta": {
         "icon": "mdi:database-export-outline",
         "title": "导出zip",
         "hidden": false,
         "full": false,
         "affix": false,
-        "keepAlive": true
+        "keepAlive": false
       },
       "children": [
         {
-          "path": "export-zip",
-          "name": "export-zip",
+          "path": "index",
+          "name": "export-zip-index",
           "component": "/16-export-zip/index",
           "meta": {
             "icon": "",
@@ -329,7 +329,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         }
       ]
@@ -338,19 +338,19 @@
       "path": "/dragable",
       "name": "dragable",
       "component": "layout",
-      "redirect": "/dragable/dragable",
+      "redirect": "/dragable/index",
       "meta": {
         "icon": "ri:drag-drop-line",
         "title": "拖拽组件",
         "hidden": false,
         "full": false,
         "affix": false,
-        "keepAlive": true
+        "keepAlive": false
       },
       "children": [
         {
-          "path": "dragable",
-          "name": "dragable",
+          "path": "index",
+          "name": "dragable-index",
           "component": "/17-dragable/index",
           "meta": {
             "icon": "",
@@ -358,7 +358,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         }
       ]
@@ -367,19 +367,19 @@
       "path": "/copy-text",
       "name": "copy-text",
       "component": "layout",
-      "redirect": "/copy-text/copy-text",
+      "redirect": "/copy-text/index",
       "meta": {
         "icon": "mdi:writing-system-cjk-variant",
         "title": "复制文本",
         "hidden": false,
         "full": false,
         "affix": false,
-        "keepAlive": true
+        "keepAlive": false
       },
       "children": [
         {
-          "path": "copy-text",
-          "name": "copy-text",
+          "path": "index",
+          "name": "copy-text-index",
           "component": "/18-copy-text/index",
           "meta": {
             "icon": "",
@@ -387,7 +387,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         }
       ]
@@ -403,12 +403,12 @@
         "hidden": false,
         "full": false,
         "affix": false,
-        "keepAlive": true
+        "keepAlive": false
       },
       "children": [
         {
           "path": "copy-direct",
-          "name": "directives-copy-direct",
+          "name": "directives-copy",
           "component": "/directives/copy-direct/index",
           "meta": {
             "icon": "",
@@ -416,12 +416,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "watermark-direct",
-          "name": "directives-watermark-direct",
+          "name": "directives-watermark",
           "component": "/directives/watermark-direct/index",
           "meta": {
             "icon": "",
@@ -429,12 +429,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "drag-direct",
-          "name": "directives-drag-direct",
+          "name": "directives-drag",
           "component": "/directives/drag-direct/index",
           "meta": {
             "icon": "",
@@ -442,12 +442,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "debounce-direct",
-          "name": "directives-debounce-direct",
+          "name": "directives-debounce",
           "component": "/directives/debounce-direct/index",
           "meta": {
             "icon": "",
@@ -455,12 +455,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "throttle-direct",
-          "name": "directives-throttle-direct",
+          "name": "directives-throttle",
           "component": "/directives/throttle-direct/index",
           "meta": {
             "icon": "",
@@ -468,12 +468,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "longpress-direct",
-          "name": "directives-longpress-direct",
+          "name": "directives-longpress",
           "component": "/directives/longpress-direct/index",
           "meta": {
             "icon": "",
@@ -481,7 +481,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         }
       ]
@@ -497,7 +497,7 @@
         "hidden": false,
         "full": false,
         "affix": false,
-        "keepAlive": true
+        "keepAlive": false
       },
       "children": [
         {
@@ -510,7 +510,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
@@ -523,12 +523,12 @@
             "hidden": true,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "role-list",
-          "name": "role-list",
+          "name": "user-role-list",
           "component": "/role-list/index",
           "meta": {
             "icon": "",
@@ -536,12 +536,12 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "permission-list",
-          "name": "permission-list",
+          "name": "user-permission-list",
           "component": "/permission-list/index",
           "meta": {
             "icon": "",
@@ -549,7 +549,7 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         }
       ]
@@ -558,40 +558,40 @@
       "path": "/sys-manage",
       "name": "sys-manage",
       "component": "layout",
-      "redirect": "/sys-manage/-manage",
+      "redirect": "/sys-manage/menu-manage",
       "meta": {
         "icon": "eos-icons:network-file-system",
         "title": "系统管理",
         "hidden": false,
         "full": false,
         "affix": false,
-        "keepAlive": true
+        "keepAlive": false
       },
       "children": [
         {
           "path": "menu-manage",
-          "name": "menu-manage",
-          "component": "/menu-manage/index",
+          "name": "sys-menu-manage",
+          "component": "/sys-manage/menu-manage/index",
           "meta": {
             "icon": "",
             "title": "菜单管理",
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
           "path": "excelImport",
-          "name": "excelImport",
-          "component": "/import/index",
+          "name": "sys-excel-import",
+          "component": "/sys-manage/import/index",
           "meta": {
             "icon": "",
             "title": "Excel导入",
             "hidden": true,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         }
       ]
@@ -600,19 +600,19 @@
       "path": "/iframe",
       "name": "iframe",
       "component": "layout",
-      "redirect": "/iframe/iframe",
+      "redirect": "/iframe/index",
       "meta": {
         "icon": "mdi:link-variant",
         "title": "外部页面",
         "hidden": false,
         "full": false,
         "affix": false,
-        "keepAlive": true
+        "keepAlive": false
       },
       "children": [
         {
-          "path": "iframe",
-          "name": "iframe",
+          "path": "index",
+          "name": "iframe-index",
           "component": "/iframe/index",
           "meta": {
             "icon": "",
@@ -621,11 +621,11 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
-          "path": "iframe-document",
+          "path": "document",
           "name": "iframe-document",
           "component": "/iframe/blank",
           "meta": {
@@ -635,11 +635,11 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
-          "path": "iframe-github",
+          "path": "github",
           "name": "iframe-github",
           "component": "/iframe/blank",
           "meta": {
@@ -649,21 +649,21 @@
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         },
         {
-          "path": "iframe-gitee",
+          "path": "gitee",
           "name": "iframe-gitee",
           "component": "/iframe/blank",
           "meta": {
             "icon": "",
             "title": "Gitee 仓库",
-            "link": "https://gitee.com/ycyplus163/robot-admin",
+            "link": "https://gitee.com/ChenyCHENYU/Robot-Admin",
             "hidden": false,
             "full": false,
             "affix": false,
-            "keepAlive": true
+            "keepAlive": false
           }
         }
       ]
