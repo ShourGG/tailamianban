@@ -5,7 +5,6 @@ import router from '@/router'
 import { d_setTimeStamp } from '@/utils/d_auth'
 import { createDiscreteApi } from 'naive-ui'
 import { s_appStore } from '@/stores/app/index'
-
 const { notification } = createDiscreteApi(['notification'])
 
 interface UserInfo {
@@ -29,9 +28,41 @@ export const s_userStore = defineStore('user', {
       setItem(TOKEN, token)
     },
 
+    setUserInfo(userInfo: UserInfo) {
+      this.userInfo = userInfo
+    },
+
+    async logout() {
+      try {
+        // 1. 清除用户状态
+        this.token = ''
+        this.userInfo = {}
+
+        // 2. 清除存储的数据
+        removeAllItem()
+
+        // 3. 重置其他store状态
+        s_appStore().$reset()
+
+        // 4. 清理动态路由
+        const { clearExistingRoutes } = await import('@/router/dynamicRouter')
+        clearExistingRoutes()
+
+        // 5. 确保Vue响应式更新后导航
+        router.replace('/login')
+        notification.success({
+          content: '已退出登录',
+          duration: 3000,
+        })
+      } catch (error) {
+        console.error('退出登录失败:', error)
+        // 如果出错，仍然尝试跳转到登录页
+        router.replace('/login')
+      }
+    },
+
     handleLoginSuccess(token: string) {
       this.setToken(token)
-      // 成功后跳转
       router.replace('/home')
       d_setTimeStamp()
     },
@@ -41,18 +72,6 @@ export const s_userStore = defineStore('user', {
         content: `登录失败: ${error instanceof Error ? error.message : String(error) || '检查错误'}`,
         duration: 3000,
       })
-    },
-
-    setUserInfo(userInfo: UserInfo) {
-      this.userInfo = userInfo
-    },
-
-    async logout() {
-      this.token = ''
-      this.userInfo = {}
-      removeAllItem()
-      s_appStore().$reset()
-      router.replace('/login')
     },
   },
 })

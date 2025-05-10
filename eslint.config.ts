@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-01 15:47:58
+ * @LastEditTime: 2025-05-11 02:46:13
  * @FilePath: \Robot_Admin\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -114,6 +114,16 @@ export default defineConfigWithVueTs(
       'max-depth': ['error', 4],
       // 函数复杂度阈值警告（超过 10 个逻辑分支时提示）
       complexity: ['warn', 10],
+
+      //! 表达式规范
+      '@typescript-eslint/no-unused-expressions': [
+        'error',
+        {
+          allowShortCircuit: true, // 允许短路表达式
+          allowTernary: true, // 允许三元表达式
+          allowTaggedTemplates: false, // 禁止标签模板
+        },
+      ],
 
       //! 异步代码规范
       // 禁止在循环中使用await，可能导致性能问题

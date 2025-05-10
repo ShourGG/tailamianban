@@ -76,10 +76,10 @@ const processRoute = (route: DynamicRoute): RouteRecordRaw => {
 /**
  * 清理现有路由
  */
-const clearExistingRoutes = () => {
+export const clearExistingRoutes = () => {
   router
     .getRoutes()
-    .filter(r => r.name && r.name !== 'Login')
+    .filter(r => r.name && r.name !== 'login')
     .forEach(r => router.removeRoute(r.name!))
 }
 

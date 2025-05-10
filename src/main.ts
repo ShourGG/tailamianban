@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-06 22:05:09
+ * @LastEditTime: 2025-05-10 23:33:00
  * @FilePath: \Robot_Admin\src\main.ts
  * @Description: 根入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -15,6 +15,8 @@ import { createDiscreteApi } from 'naive-ui'
 
 import App from './App.vue'
 import router from './router'
+
+import '@/router/permission'
 
 import 'virtual:uno.css'
 

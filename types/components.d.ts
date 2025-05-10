@@ -8,8 +8,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    C_Container: typeof import('./../src/components/global/C_Container/index.vue')['default']
-    C_dgg: typeof import('./../src/components/local/c_dgg.vue')['default']
     C_Form: typeof import('./../src/components/global/C_Form/index.vue')['default']
     C_Icon: typeof import('./../src/components/global/C_Icon/index.vue')['default']
     C_Layout: typeof import('./../src/components/global/C_Layout/index.vue')['default']
@@ -18,6 +16,7 @@ declare module 'vue' {
     IconMdiAccountBox: typeof import('~icons/mdi/account-box')['default']
     NBackTop: typeof import('naive-ui')['NBackTop']
     NButton: typeof import('naive-ui')['NButton']
+    NCard: typeof import('naive-ui')['NCard']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
     NCheckboxGroup: typeof import('naive-ui')['NCheckboxGroup']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
@@ -25,6 +24,8 @@ declare module 'vue' {
     NDialogProvider: typeof import('naive-ui')['NDialogProvider']
     NForm: typeof import('naive-ui')['NForm']
     NFormItem: typeof import('naive-ui')['NFormItem']
+    NGi: typeof import('naive-ui')['NGi']
+    NGrid: typeof import('naive-ui')['NGrid']
     NInput: typeof import('naive-ui')['NInput']
     NLoadingBarProvider: typeof import('naive-ui')['NLoadingBarProvider']
     NMessageProvider: typeof import('naive-ui')['NMessageProvider']
