@@ -38,10 +38,11 @@ export const s_userStore = defineStore('user', {
         this.token = ''
         this.userInfo = {}
 
-        // 2. 清除存储的数据
-        removeAllItem()
+        // 2. 重置页面标题（关键修复点）
+        document.title = import.meta.env.VITE_APP_TITLE
 
-        // 3. 重置其他store状态
+        // 3. 清除存储的数据,重置其他store状态
+        removeAllItem()
         s_appStore().$reset()
 
         // 4. 清理动态路由

@@ -123,12 +123,6 @@ export default defineConfigWithVueTs(
           allowTernary: false, // 允许三元表达式
           allowTaggedTemplates: false, // 禁止标签模板
           enforceForJSX: true, // 对 Vue/React 组件加强检查
-          //? 自定义错误提示
-          message: {
-            shortCircuit:
-              '短路表达式必须包含显式类型检查（如 typeof fn === "function"）',
-            ternary: '三元表达式只能用于赋值或返回语句',
-          },
         },
       ],
 
