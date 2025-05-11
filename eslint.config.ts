@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-11 02:46:13
+ * @LastEditTime: 2025-05-11 22:14:48
  * @FilePath: \Robot_Admin\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -120,8 +120,15 @@ export default defineConfigWithVueTs(
         'error',
         {
           allowShortCircuit: true, // 允许短路表达式
-          allowTernary: true, // 允许三元表达式
+          allowTernary: false, // 允许三元表达式
           allowTaggedTemplates: false, // 禁止标签模板
+          enforceForJSX: true, // 对 Vue/React 组件加强检查
+          //? 自定义错误提示
+          message: {
+            shortCircuit:
+              '短路表达式必须包含显式类型检查（如 typeof fn === "function"）',
+            ternary: '三元表达式只能用于赋值或返回语句',
+          },
         },
       ],
 
