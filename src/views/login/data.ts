@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:35:57
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-01 19:00:11
+ * @LastEditTime: 2025-05-12 01:00:55
  * @FilePath: \Robot_Admin\src\views\login\data.ts
  * @Description: 登录页表单数据
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -22,7 +22,9 @@ type FormField = {
   attrs: {
     clearable?: boolean
     showPassword?: boolean
-    prefixIcon?: 'user' | 'lock' | 'phone'
+    prefixIcon?: string
+    type?: 'text' | 'password'
+    showPasswordOn?: 'mousedown' | 'click'
   }
 }
 
@@ -45,9 +47,9 @@ export const OPTIONS: FormField[] = [
     prop: 'password',
     rules: [required('密码'), length('密码', 6, 15)],
     attrs: {
-      showPassword: true,
+      type: 'password', // 关键属性！必须添加
+      showPasswordOn: 'mousedown',
       clearable: true,
-      prefixIcon: 'lock',
     },
   },
 ]

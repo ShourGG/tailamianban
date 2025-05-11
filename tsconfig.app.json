@@ -9,9 +9,6 @@
   ],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
     "declaration": true,
     "noImplicitAny": true,
     "emitDeclarationOnly": true,

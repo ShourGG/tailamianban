@@ -2,29 +2,31 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:07:28
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-06 19:48:28
+ * @LastEditTime: 2025-05-11 22:51:45
  * @FilePath: \Robot_Admin\src\views\login\index.vue
  * @Description: 登录页
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
   <div class="login-container">
-    <h3>{{ '用户登录' }} </h3>
-    <C_Form
-      class="login-container-form"
-      :options="OPTIONS"
-    >
-      <template #action="formScope">
-        <NButton
-          class="login-container-form-btn"
-          type="primary"
-          :loading="loading"
-          @click.prevent="login(formScope)"
-        >
-          登录
-        </NButton>
-      </template>
-    </C_Form>
+    <div class="login-wrapper">
+      <h3 class="login-title">{{ '用户登录' }}</h3>
+      <C_Form
+        class="login-form"
+        :options="OPTIONS"
+      >
+        <template #action="formScope">
+          <NButton
+            class="login-btn"
+            type="primary"
+            :loading="loading"
+            @click.prevent="login(formScope)"
+          >
+            登录
+          </NButton>
+        </template>
+      </C_Form>
+    </div>
   </div>
 </template>
 

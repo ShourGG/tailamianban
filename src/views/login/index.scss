@@ -1,39 +1,66 @@
-$bg: #2d3a4b;
-$dark_gray: #889aa4;
-$light_gray: #666666;
-$cursor: #fff;
+$bg: #fff;
+$text-color: #424141;
+$primary-color: #1859e9;
+$border-radius: 10px;
+$form-width: 380px;
 
 .login-container {
-  min-height: 100%;
-  width: 100%;
-  background-color: $bg;
-  background-image: url(@/assets/images/login-bg.jpg);
+  position: relative;
+  min-height: 100vh;
+  padding-left: 10%;
+  background: url(@/assets/images/login-bg.jpg);
   background-size: cover;
-  overflow: hidden;
-  h3 {
-    text-align: center;
-    color: #666666;
-    margin: 560px 0 40px -60%;
-    margin-left: -69%;
-  }
-  &-form {
+  display: flex;
+  align-items: center;
+  
+  .login-wrapper {
+    width: $form-width;
     position: relative;
-    width: 380px;
-    padding-top: -60px;
-    margin-left: 10%;
-    overflow: hidden;
-    &-btn {
-      width: 380px;
-      height: 40px;
-      margin-top: 20px;
-      border-radius: 20px;
-      -webkit-border-radius: 20px;
-      -moz-border-radius: 20px;
-      -ms-border-radius: 20px;
-      -o-border-radius: 20px;
-      background-color: #1859e9;
+    margin-top: 6%;
+  }
+
+  .login-title {
+    position: absolute;
+    width: 100%;
+    top: -60px;
+    text-align: center;
+    color: $text-color;
+    font-size: 24px;
+  }
+
+  .login-form {
+    width: 100%;
+    
+    .n-form, 
+    .n-input, 
+    .n-button {
+      border: none !important;
+      box-shadow: none !important;
+      background-color: transparent !important;
     }
 
+    .n-input {
+      --n-border: none !important;
+      --n-border-hover: none !important;
+      --n-border-focus: none !important;
+      --n-border-disabled: none !important;
+      --n-box-shadow: none !important;
+      border-bottom: 1px solid #e5e7eb !important;
+      border-radius: 0 !important;
+      
+      &:hover { border-bottom-color: #c9cdd4 !important; }
+      &:focus { border-bottom-color: $primary-color !important; }
+    }
+
+    .login-btn {
+      width: 100%;
+      height: 40px;
+      margin-top: 20px;
+      border-radius: $border-radius;
+      background-color: $primary-color !important;
+      font-weight: 500;
+      &:hover { background-color: darken($primary-color, 5%) !important; }
+    }
   }
 }
 
