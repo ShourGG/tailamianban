@@ -185,9 +185,23 @@ export default defineConfigWithVueTs(
       'no-duplicate-imports': 'error', // 禁止重复导入
     },
   },
+  //MARK: 新增ESLINT白名单配置组
+  {
+    name: 'app/ignore-assets',
+    ignores: [
+      'src/assets/images/**/*',
+      '**/*.d.ts',
+      '**/auto-imports.d.ts',
+      'src/views/**/components/*.vue',
+    ],
+  },
   //MARK: JSDoc 白名单覆盖规则
   {
-    files: ['src/router/**/*.ts', 'src/stores/**/*.ts'],
+    files: [
+      'src/router/**/*.ts',
+      'src/stores/**/*.ts',
+      'src/views/**/components/*.vue', // 对于第三方组件引入的代码不做检查
+    ],
     rules: {
       'jsdoc/require-jsdoc': 'off',
       '@typescript-eslint/require-jsdoc': 'off',

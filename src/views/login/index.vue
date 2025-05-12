@@ -2,13 +2,22 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:07:28
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-11 22:51:45
+ * @LastEditTime: 2025-05-12 10:55:12
  * @FilePath: \Robot_Admin\src\views\login\index.vue
  * @Description: 登录页
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
   <div class="login-container">
+    <div
+      class="spline-background"
+      :class="{ 'fade-in': isSplineLoaded }"
+    >
+      <Spline
+        scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+        @loaded="isSplineLoaded = true"
+      />
+    </div>
     <div class="login-wrapper">
       <h3 class="login-title">{{ '用户登录' }}</h3>
       <C_Form
@@ -38,10 +47,12 @@
   import { useFormSubmit } from '@/hooks/useFormSubmit'
   import { loginApi, type LoginResponse } from '@/api/sys'
   import './index.scss'
+  import Spline from './components/Spline.vue'
 
   const router = useRouter()
   const userStore = s_userStore()
   const { loading, createSubmit } = useFormSubmit<LoginResponse>()
+  const isSplineLoaded = ref(false)
 
   const login = createSubmit(loginApi, {
     successMsg: '登录成功',
@@ -53,7 +64,6 @@
         router.push('/home')
       } catch (error) {
         console.error('登录成功后操作失败:', error)
-        // 后续根据需要处理错误，例如显示通知
       }
     },
   })
