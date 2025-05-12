@@ -166,10 +166,9 @@ declare module 'vue' {
     readonly triggerRef: UnwrapRef<typeof import('vue')['triggerRef']>
     readonly unref: UnwrapRef<typeof import('vue')['unref']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
-    readonly useClipboard: UnwrapRef<typeof import('@vueuse/core')['useClipboard']>
+    readonly useCounterStore: UnwrapRef<typeof import('../src/stores/counter')['useCounterStore']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
-    readonly useDebounceFn: UnwrapRef<typeof import('@vueuse/core')['useDebounceFn']>
     readonly useDialog: UnwrapRef<typeof import('naive-ui')['useDialog']>
     readonly useId: UnwrapRef<typeof import('vue')['useId']>
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
@@ -177,6 +176,7 @@ declare module 'vue' {
     readonly useLocalStorage: UnwrapRef<typeof import('@vueuse/core')['useLocalStorage']>
     readonly useMessage: UnwrapRef<typeof import('naive-ui')['useMessage']>
     readonly useModel: UnwrapRef<typeof import('vue')['useModel']>
+    readonly useMouse: UnwrapRef<typeof import('@vueuse/core')['useMouse']>
     readonly useNotification: UnwrapRef<typeof import('naive-ui')['useNotification']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>

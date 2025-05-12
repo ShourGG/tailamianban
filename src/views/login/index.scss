@@ -1,3 +1,4 @@
+@use "sass:color";
 $bg: #fff;
 $text-color: #424141;
 $primary-color: #1859e9;
@@ -12,7 +13,7 @@ $form-width: 380px;
   background-size: cover;
   display: flex;
   align-items: center;
-  
+
   .login-wrapper {
     width: $form-width;
     position: relative;
@@ -30,9 +31,9 @@ $form-width: 380px;
 
   .login-form {
     width: 100%;
-    
-    .n-form, 
-    .n-input, 
+
+    .n-form,
+    .n-input,
     .n-button {
       border: none !important;
       box-shadow: none !important;
@@ -47,7 +48,7 @@ $form-width: 380px;
       --n-box-shadow: none !important;
       border-bottom: 1px solid #e5e7eb !important;
       border-radius: 0 !important;
-      
+
       &:hover { border-bottom-color: #c9cdd4 !important; }
       &:focus { border-bottom-color: $primary-color !important; }
     }
@@ -59,7 +60,9 @@ $form-width: 380px;
       border-radius: $border-radius;
       background-color: $primary-color !important;
       font-weight: 500;
-      &:hover { background-color: darken($primary-color, 5%) !important; }
+      &:hover {
+        background-color: color.adjust($primary-color, $lightness: -5%) !important;
+      }
     }
   }
 }
