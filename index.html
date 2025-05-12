@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="">
   <head>
+    <!-- 只保留核心meta -->
     <meta charset="UTF-8" />
     <link
       rel="icon"
@@ -10,13 +11,10 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0"
     />
-    <title>ROBOT ADMIN</title>
+    <title>%VITE_APP_TITLE%</title>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module">
-      document.title = import.meta.env.VITE_APP_TITLE // [!code focus]
-    </script>
+    <div id="app"> </div>
     <script
       type="module"
       src="/src/main.ts"

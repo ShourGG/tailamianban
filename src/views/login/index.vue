@@ -2,20 +2,16 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:07:28
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-12 10:55:12
+ * @LastEditTime: 2025-05-12 21:25:03
  * @FilePath: \Robot_Admin\src\views\login\index.vue
  * @Description: 登录页
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
   <div class="login-container">
-    <div
-      class="spline-background"
-      :class="{ 'fade-in': isSplineLoaded }"
-    >
+    <div class="spline-background">
       <Spline
         scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-        @loaded="isSplineLoaded = true"
       />
     </div>
     <div class="login-wrapper">
@@ -52,7 +48,6 @@
   const router = useRouter()
   const userStore = s_userStore()
   const { loading, createSubmit } = useFormSubmit<LoginResponse>()
-  const isSplineLoaded = ref(false)
 
   const login = createSubmit(loginApi, {
     successMsg: '登录成功',

@@ -1,3 +1,5 @@
+//* 处理动画组件的工具函数
+
 import { type ClassValue, clsx } from 'clsx'
 
 /**
@@ -8,7 +10,5 @@ import { type ClassValue, clsx } from 'clsx'
 export function cn(...inputs: ClassValue[]) {
   return clsx(inputs)
 }
-
-// ... 保持其他工具函数不变
 
 export type ObjectValues<T> = T[keyof T]

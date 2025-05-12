@@ -2,13 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-01 22:46:09
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-06 22:06:46
+ * @LastEditTime: 2025-05-12 22:53:48
  * @FilePath: \Robot_Admin\src\hooks\useFormSubmit\index.ts
  * @Description:  表单提交封装
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-import { notification } from '@/main'
+import { notification } from '@/plugins/naive-ui'
 
 interface ApiResponse {
   code: string

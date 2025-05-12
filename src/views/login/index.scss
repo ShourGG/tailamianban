@@ -1,4 +1,4 @@
-@use "sass:color";
+@use 'sass:color';
 $bg: #fff;
 $text-color: #fdf6f6;
 $primary-color: #1859e9;
@@ -13,26 +13,25 @@ $form-width: 380px;
   align-items: center;
   overflow: hidden; // 防止3D场景溢出
 
-// 在.login-container内添加（确保在正确嵌套位置）
-.login-logo {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 999; // 提升更高
-  width: 320px;
-  height: 80px;
-  cursor: pointer;
-  
-  // 主logo样式（建议使用背景图）
-  &::after {
-    content: "";
+  // 在.login-container内添加（确保在正确嵌套位置）
+  .login-logo {
     position: absolute;
-    width: 100%;
-    height: 100%;
-     background: url(@/assets/images/login-logo.png) center/100% auto no-repeat;
+    top: 20px;
+    left: 20px;
+    z-index: 999; // 提升更高
+    width: 320px;
+    height: 80px;
+    cursor: pointer;
+
+    // 主logo样式（建议使用背景图）
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url(@/assets/images/login-logo.png) center/100% auto no-repeat;
+    }
   }
-  
-}
 
   // Spline背景
   .spline-background {
@@ -42,9 +41,7 @@ $form-width: 380px;
     width: 100%;
     height: 100%;
     z-index: 0;
-    
   }
-
 
   .login-wrapper {
     width: $form-width;
@@ -86,8 +83,12 @@ $form-width: 380px;
       border-bottom: 1px solid #e5e7eb !important;
       border-radius: 0 !important;
 
-      &:hover { border-bottom-color: #c9cdd4 !important; }
-      &:focus { border-bottom-color: $primary-color !important; }
+      &:hover {
+        border-bottom-color: #c9cdd4 !important;
+      }
+      &:focus {
+        border-bottom-color: $primary-color !important;
+      }
     }
 
     .login-btn {
@@ -98,10 +99,11 @@ $form-width: 380px;
       background-color: $primary-color !important;
       font-weight: 500;
       &:hover {
-        background-color: color.adjust($primary-color, $lightness: -5%) !important;
+        background-color: color.adjust(
+          $primary-color,
+          $lightness: -5%
+        ) !important;
       }
     }
   }
-
 }
-

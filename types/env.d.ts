@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-28 08:52:23
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-28 17:04:23
+ * @LastEditTime: 2025-05-13 00:19:52
  * @FilePath: \Robot_Admin\types\env.d.ts
  * @Description: 环境变量声明文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -26,5 +26,14 @@ declare global {
   interface ImportMetaEnv {
     readonly BASE_URL: string
     readonly VITE_ROUTER_MODE: 'hash' | 'history'
+  }
+}
+
+declare module 'naive-ui' {
+  export interface GlobalThemeOverrides {
+    common: {
+      primaryColor: string
+      primaryColorHover: string
+    }
   }
 }
