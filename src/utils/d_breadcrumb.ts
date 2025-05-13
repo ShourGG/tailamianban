@@ -13,9 +13,9 @@
  * @param {Array} menuList 所有菜单列表
  * @returns array
  */
-export function getAllBreadcrumbList(menuList: Menu.MenuOptions[]) {
+export function getAllBreadcrumbList(menuList: MenuOptions[]) {
   const handleBreadcrumbList: { [key: string]: unknown } = {}
-  const loop = (menuItem: Menu.MenuOptions) => {
+  const loop = (menuItem: MenuOptions) => {
     if (menuItem?.children?.length)
       menuItem.children.forEach(item => loop(item))
     else
@@ -34,13 +34,10 @@ export function getAllBreadcrumbList(menuList: Menu.MenuOptions[]) {
  * @param {Array} menuList 所有菜单列表
  * @returns array
  */
-export function getCurrentBreadcrumb(
-  path: string,
-  menuList: Menu.MenuOptions[]
-) {
-  const tempPath: Menu.MenuOptions[] = []
+export function getCurrentBreadcrumb(path: string, menuList: MenuOptions[]) {
+  const tempPath: MenuOptions[] = []
   try {
-    const getNodePath = (node: Menu.MenuOptions) => {
+    const getNodePath = (node: MenuOptions) => {
       tempPath.push(node)
       if (node.path === path) throw new Error('Find IT!')
       if (node.children?.length)

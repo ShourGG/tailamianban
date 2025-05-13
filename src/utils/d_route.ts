@@ -15,7 +15,7 @@ import type { DynamicRoute } from '@/router/dynamicRouter'
  * @param {MenuItem} menuList 所有菜单列表
  * @return {*} {MenuItem[]} 过滤后的菜单列表
  */
-export const getShowMenuList = (menus: DynamicRoute[]): Menu.MenuOptions[] => {
+export const getShowMenuList = (menus: DynamicRoute[]): MenuOptions[] => {
   return menus
     .filter(menu => {
       // 添加 name 属性存在性检查
@@ -27,18 +27,17 @@ export const getShowMenuList = (menus: DynamicRoute[]): Menu.MenuOptions[] => {
     })
     .map(menu => ({
       ...menu,
+      key: menu.path,
       name: menu.name!, // 非空断言
       children: menu.children?.length ? getShowMenuList(menu.children) : [],
     }))
 }
 
 // 优化后的缓存路由名称函数
-export const getKeepAliveRouterName = (
-  menuList: Menu.MenuOptions[]
-): string[] => {
+export const getKeepAliveRouterName = (menuList: MenuOptions[]): string[] => {
   const result: string[] = []
 
-  const processor = (items: Menu.MenuOptions[]) => {
+  const processor = (items: MenuOptions[]) => {
     items.forEach(item => {
       if (item.meta?.keepAlive && item.name) result.push(item.name)
       if (item.children?.length) processor(item.children)
