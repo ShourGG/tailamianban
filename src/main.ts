@@ -18,7 +18,7 @@ import router from './router'
 import { setupLoading, setupStore, setupNaiveUI } from '@/plugins'
 
 /**
- * @description:
+ * @description: 应用启动入口
  * @return {*}
  */
 async function bootstrap() {

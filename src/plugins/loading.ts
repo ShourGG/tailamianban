@@ -2,19 +2,19 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-12 22:07:55
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-13 00:17:22
+ * @LastEditTime: 2025-05-13 09:25:41
  * @FilePath: \Robot_Admin\src\plugins\loading.ts
  * @Description: 项目启动时的加载动画
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-//* 修改样式只需调整STYLE常量
-//* 修改结构只需调整HTML常量
-//* 类名变更只需修改CLASS常量
+//? 修改样式只需调整STYLE常量
+//? 修改结构只需调整HTML常量
+//? 类名变更只需修改CLASS常量
 
 /**
- * @description: 超大尺寸居中加载动画
- * @return {void}
+ * @description: 设置加载动画
+ * @return {*} {void}
  */
 export function setupLoading() {
   // 常量定义
@@ -26,17 +26,13 @@ export function setupLoading() {
     title: 'app-loading-title',
   }
 
-  // ====== 预渲染防闪烁 ======
-  const antiFlashStyle = document.createElement('style')
-  antiFlashStyle.textContent = `
-    body { opacity: 0; transition: opacity 0.15s ease-out; }
-    body.app-loading-visible { opacity: 1; }
-  `
-  document.head.appendChild(antiFlashStyle)
+  // ====== 立即设置背景色防闪 ======
+  document.documentElement.style.backgroundColor = '#fff'
+  document.body.style.backgroundColor = '#fff'
 
   // ====== 同步插入完整结构 ======
-  const HTML = `
-    <div class="${CLASS.loading}" style="opacity:0">
+  const loadingHTML = `
+    <div class="${CLASS.loading}">
       <div class="${CLASS.wrap}">
         <div class="${CLASS.loading}-logo-container">
           <img src="/src/assets/images/机器人.gif"
@@ -52,21 +48,24 @@ export function setupLoading() {
   `
 
   const loader = document.createElement('div')
-  loader.innerHTML = HTML
+  loader.innerHTML = loadingHTML
   document.body.appendChild(loader)
 
-  // ====== 分阶段显示 ======
-  const STYLE = `
+  // ====== 添加样式 ======
+  const style = document.createElement('style')
+  style.textContent = `
     /* 主容器样式 */
     .${CLASS.loading} {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
       background: #fff;
       z-index: 9999;
-      transition: opacity 0.3s;
     }
 
     /* 内容包裹层 */
@@ -85,10 +84,8 @@ export function setupLoading() {
 
     /* 超大机器人图片 */
     .${CLASS.logo} {
-      width: 320px;
-      height: 320px;
-      // opacity: 0;
-      // transition: opacity 0.3s ease-out 0.1s;
+      width: 280px;
+      height: 280px;
     }
 
     /* 点状动画 */
@@ -97,10 +94,8 @@ export function setupLoading() {
       justify-content: center;
       gap: 12px;
       margin: 0 auto 30px;
-      width: fit-content;
     }
 
-    /* 大号点状动画 */
     .${CLASS.dots} span {
       width: 18px;
       height: 18px;
@@ -109,65 +104,44 @@ export function setupLoading() {
       animation: pulse 1.4s infinite ease-in-out;
     }
 
-    /* 点动画延迟 */
     .${CLASS.dots} span:nth-child(2) { animation-delay: 0.2s; }
     .${CLASS.dots} span:nth-child(3) { animation-delay: 0.4s; }
     .${CLASS.dots} span:nth-child(4) { animation-delay: 0.6s; }
 
-    /* 超大标题 */
-    .${CLASS.title} {
-      margin: 0 auto;
-      width: fit-content;
-      color: #1677ff;
-      font-size: 3rem;
-      font-weight: bold;
-      letter-spacing: 1.5px;
-      opacity: 0;
-      transition: opacity 0.3s ease-out;
-    }
-
-    /* 点动画关键帧 */
-    @keyframes pulse {
-      0%, 40%, 100% { transform: scale(0.8); }
-      20% { transform: scale(1.2); }
-    }
-  `
-
-  const style = document.createElement('style')
-  style.textContent = STYLE
-  document.head.appendChild(style)
-
-  // ====== 分步显示动画 ======
-  setTimeout(() => {
-    // 1. 显示body
-    document.body.classList.add('app-loading-visible')
-
-    // 2. 显示加载容器
-    const loadingEl = document.querySelector(`.${CLASS.loading}`) as HTMLElement
-    loadingEl.style.opacity = '1'
-
-    // 3. 显示图片（延迟100ms）
-    setTimeout(() => {
-      const logo = document.querySelector(`.${CLASS.logo}`) as HTMLElement
-      logo.style.opacity = '1'
-    }, 100)
-
-    // 4. 显示标题（延迟200ms）
-    setTimeout(() => {
-      const title = document.querySelector(`.${CLASS.title}`) as HTMLElement
-      title.style.opacity = '1'
-    }, 200)
-  }, 10)
-
-  // ====== 移除逻辑 ======
-  const remove = () => {
-    const el = document.querySelector(`.${CLASS.loading}`) as HTMLElement
-    if (el) {
-      el.style.opacity = '0'
-      setTimeout(() => el.remove(), 300)
-    }
+    /* 标题 */
+  .${CLASS.title} {
+    color: #1677ff;
+    font-size: 2.4rem;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    opacity: 0;
+    animation: fadeIn 0.6s ease-out 0.3s forwards;
   }
 
-  window.addEventListener('DOMContentLoaded', remove)
-  setTimeout(remove, 1000)
+  /* 新增淡入关键帧 */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  `
+  document.head.appendChild(style)
+
+  // ====== 移除逻辑 ======
+  const removeLoading = () => {
+    const loading = document.querySelector(`.${CLASS.loading}`)
+    if (loading) {
+      loading.remove()
+    }
+    // 恢复默认背景色
+    document.documentElement.style.backgroundColor = ''
+    document.body.style.backgroundColor = ''
+  }
+
+  // 监听加载完成事件
+  window.addEventListener('load', () => {
+    setTimeout(removeLoading, 300) // 延迟500ms确保动画完整显示
+  })
+
+  // 设置最大等待时间
+  setTimeout(removeLoading, 1000)
 }
