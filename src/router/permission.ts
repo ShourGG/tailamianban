@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 01:02:12
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-11 01:40:41
+ * @LastEditTime: 2025-05-13 11:16:41
  * @FilePath: \Robot_Admin\src\router\permission.ts
  * @Description: 路由权限控制
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -12,15 +12,17 @@ import { s_userStore } from '@/stores/user'
 import { initDynamicRouter } from '@/router/dynamicRouter'
 import { s_permissionStore } from '@/stores/permission'
 import { createDiscreteApi } from 'naive-ui'
+import { setupNProgress } from '@/plugins/nprogress'
 
-const { loadingBar, message } = createDiscreteApi(['loadingBar', 'message'])
+const { message } = createDiscreteApi(['message'])
+const nprogress = setupNProgress()
 const WHITE_LIST = ['/login', '/404', '/401']
 const LOGIN_PATH = '/login'
 const DEFAULT_TITLE = 'Robot Admin'
 
 // 统一错误处理
 const handleRouteError = (error: unknown, customMsg?: string) => {
-  loadingBar.error()
+  nprogress.done() // 结束进度条
   console.error('路由异常:', error)
   message.error(customMsg || '系统异常，请重新登录')
   s_userStore().$reset()
@@ -29,7 +31,7 @@ const handleRouteError = (error: unknown, customMsg?: string) => {
 
 // 核心路由守卫
 router.beforeEach(async to => {
-  loadingBar.start()
+  nprogress.start() // 开始进度条
 
   try {
     const userStore = s_userStore()
@@ -66,9 +68,12 @@ router.beforeEach(async to => {
   } catch (error) {
     return handleRouteError(error)
   } finally {
-    loadingBar.finish()
+    nprogress.done() // 结束进度条
   }
 })
 
 // 全局错误处理
-router.onError(error => handleRouteError(error, '路由加载失败'))
+router.onError(error => {
+  nprogress.done() // 确保错误时进度条也会结束
+  handleRouteError(error, '路由加载失败')
+})
