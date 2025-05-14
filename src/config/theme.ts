@@ -31,9 +31,14 @@ export const themeOverrides: GlobalThemeOverrides = {
   },
   Menu: {
     borderRadius: '4px',
+    itemTextColor: 'white',
+    itemTextColorHover: 'white',
+    itemTextColorActive: 'white',
+    itemColorActive: primaryColor, // 选中蓝色
+    itemColorActiveHover: primaryHover,
+    itemColorActiveCollapsed: primaryColor,
   },
   Input: {
     borderRadius: '4px',
   },
-  // 可以继续添加其他组件的主题配置...
 }

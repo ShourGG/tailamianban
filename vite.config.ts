@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-06 21:18:45
+ * @LastEditTime: 2025-05-14 12:11:56
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -22,10 +22,8 @@ import viteConsolePlugin from 'vite-console-plugin'
 import { readFileSync } from 'node:fs'
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    // customConsolePlugin(),
     viteConsolePlugin({
       systemName: packageJson.name,
       version: `v${packageJson.version} (开发版)`,
@@ -36,14 +34,14 @@ export default defineConfig({
     vue(),
     vueJsx(),
     vueDevTools(),
-    Icons({ autoInstall: true }),
+    Icons({ autoInstall: true}),
     AutoImport({
       imports: [
         'vue',
         'vue-router',
         'pinia',
         {
-          '@vueuse/core': ['useLocalStorage', 'useClipboard','useDebounceFn'],
+          '@vueuse/core': ['useLocalStorage', 'useClipboard', 'useDebounceFn'],
         },
         {
           'naive-ui': [

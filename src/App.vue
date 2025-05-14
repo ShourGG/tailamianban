@@ -35,32 +35,3 @@
 
   const themeStore = useThemeStore()
 </script>
-
-<style>
-  .global-config-provider {
-    /* 更改为块级布局 */
-    display: block;
-    /* 确保撑满整个视口 */
-    width: 100vw;
-    height: 100vh;
-    /* 重置内部容器 */
-    > div {
-      height: 100%;
-    }
-  }
-
-  /* 添加全局样式重置 */
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden; /* 防止滚动条出现 */
-  }
-  html {
-    transition: color-scheme 0.3s ease;
-  }
-
-  html.dark {
-    color-scheme: dark;
-  }
-</style>

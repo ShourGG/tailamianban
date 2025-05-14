@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2023-06-09 16:26:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-13 23:07:00
+ * @LastEditTime: 2025-05-14 14:22:46
  * @FilePath: \Robot_Admin\src\components\global\C_Menu\index.vue
  * @Description: 菜单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -45,33 +45,28 @@
   })
 
   const normalizeOptions = (items: MenuOptions[]): MenuOption[] =>
-    items.map(item => {
-      const normalizedItem: MenuOption = {
-        key: item.key,
-        label: item.label || item.name || '',
-        disabled: item.disabled,
-        icon: item.icon
-          ? typeof item.icon === 'string'
-            ? () =>
-                h(NIcon, null, {
-                  default: () => h('i', { class: item.icon as string }),
-                })
-            : () => (typeof item.icon === 'function' ? item.icon() : item.icon)
-          : undefined,
-      }
+    items.map(
+      item =>
+        ({
+          key: item.path || '',
+          label: item.meta?.title || '',
+          disabled: item.disabled || false,
+          icon: (() => {
+            const icon = item.meta?.icon || item.icon
+            if (!icon) return undefined
 
-      if (item.type === 'divider') {
-        normalizedItem.type = 'divider'
-      } else if (item.type === 'group') {
-        normalizedItem.type = 'group'
-      }
-
-      if (item.children?.length) {
-        normalizedItem.children = normalizeOptions(item.children)
-      }
-
-      return normalizedItem
-    })
+            if (typeof icon === 'string') {
+              return () =>
+                h(NIcon, null, { default: () => h('span', { class: icon }) })
+            }
+            return typeof icon === 'function' ? icon() : icon
+          })(),
+          ...(item.type && { type: item.type }),
+          ...(item.children?.length && {
+            children: normalizeOptions(item.children),
+          }),
+        }) as MenuOption
+    )
 
   const options = computed<MenuOption[]>(() => normalizeOptions(props.data))
 </script>

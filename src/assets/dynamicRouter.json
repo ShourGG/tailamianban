@@ -11,7 +11,7 @@
           "name": "home",
           "component": "/home/index",
           "meta": {
-            "icon": "ic:sharp-home-work",
+            "icon": "",
             "title": "首页",
             "hidden": false,
             "affix": true,
@@ -27,7 +27,7 @@
       "component": "layout",
       "redirect": "/dashboard/analysis",
       "meta": {
-        "icon": "material-symbols:multiline-chart",
+        "icon": "i-mdi:monitor-dashboard",
         "title": "仪表盘",
         "hidden": false,
         "full": false,
@@ -40,7 +40,7 @@
           "name": "dashboard-analysis",
           "component": "/dashboard/analysis/index",
           "meta": {
-            "icon": "",
+            "icon": "i-mdi:account-multiple-outline",
             "title": "分析页",
             "hidden": false,
             "full": false,
@@ -69,7 +69,7 @@
       "component": "layout",
       "redirect": "/demo/01-icon",
       "meta": {
-        "icon": "bxs:component",
+        "icon": "",
         "title": "示范组件",
         "hidden": false,
         "full": false,
@@ -256,7 +256,7 @@
       "component": "layout",
       "redirect": "/editor/code-editor",
       "meta": {
-        "icon": "dashicons:editor-kitchensink",
+        "icon": "",
         "title": "编辑器组件",
         "hidden": false,
         "full": false,
@@ -311,7 +311,7 @@
       "component": "layout",
       "redirect": "/export-zip/index",
       "meta": {
-        "icon": "mdi:database-export-outline",
+        "icon": "",
         "title": "导出zip",
         "hidden": false,
         "full": false,
@@ -340,7 +340,7 @@
       "component": "layout",
       "redirect": "/dragable/index",
       "meta": {
-        "icon": "ri:drag-drop-line",
+        "icon": "",
         "title": "拖拽组件",
         "hidden": false,
         "full": false,
@@ -369,7 +369,7 @@
       "component": "layout",
       "redirect": "/copy-text/index",
       "meta": {
-        "icon": "mdi:writing-system-cjk-variant",
+        "icon": "",
         "title": "复制文本",
         "hidden": false,
         "full": false,
@@ -398,7 +398,7 @@
       "component": "layout",
       "redirect": "/directives/copy-direct",
       "meta": {
-        "icon": "material-symbols:integration-instructions-outline-rounded",
+        "icon": "",
         "title": "自定义指令",
         "hidden": false,
         "full": false,
@@ -492,7 +492,7 @@
       "component": "layout",
       "redirect": "/user/user-manage",
       "meta": {
-        "icon": "mdi:user-key",
+        "icon": "",
         "title": "用户",
         "hidden": false,
         "full": false,
@@ -560,7 +560,7 @@
       "component": "layout",
       "redirect": "/sys-manage/menu-manage",
       "meta": {
-        "icon": "eos-icons:network-file-system",
+        "icon": "",
         "title": "系统管理",
         "hidden": false,
         "full": false,
@@ -602,7 +602,7 @@
       "component": "layout",
       "redirect": "/iframe/index",
       "meta": {
-        "icon": "mdi:link-variant",
+        "icon": "",
         "title": "外部页面",
         "hidden": false,
         "full": false,

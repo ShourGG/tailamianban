@@ -20,12 +20,9 @@ declare module '*.vue' {
 declare module '@/plugins/naive-ui' {
   import type { App } from 'vue'
   export function setupNaiveUI(app: App): void
-  export const notification: typeof import('naive-ui').useNotification
 }
 
 declare module '_views/*' {
   const component: DefineComponent
   export default component
 }
-
-

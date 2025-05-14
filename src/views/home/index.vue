@@ -2,13 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-06 14:09:47
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-11 01:59:44
+ * @LastEditTime: 2025-05-14 15:40:29
  * @FilePath: \Robot_Admin\src\views\home\index.vue
  * @Description:
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
-  <div class="home-container">
+  <div class="home-container page-container">
     <!-- 页面标题和日期选择器 -->
     <NGrid
       :x-gap="12"
@@ -281,13 +281,13 @@
   import { s_userStore } from '@/stores/user'
 
   // 引用
-  const RefDeals = ref(null)
-  const RefRevenue = ref(null)
-  const Refcampagin = ref(null)
-  const RefLeads = ref(null)
-  const RefPolorChart = ref(null)
-  const RefLineChart = ref(null)
-  const pickDate = ref(null)
+  const RefDeals = ref()
+  const RefRevenue = ref()
+  const Refcampagin = ref()
+  const RefLeads = ref()
+  const RefPolorChart = ref()
+  const RefLineChart = ref()
+  const pickDate = ref()
 
   // 活动统计数据
   const campaignStats = [
@@ -345,6 +345,10 @@
     color: black;
     padding: 0px 20px;
     background-color: #fafbfe;
+    flex: 1;
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    flex-direction: column;
     .page-title-box {
       box-sizing: border-box;
       display: flex;

@@ -3,10 +3,6 @@
     vertical
     class="layout-container"
   >
-    <NSpace>
-      <NSwitch v-model:value="inverted" />
-      <span>AGILE | TEAM</span>
-    </NSpace>
     <NLayout has-sider>
       <NLayoutSider
         ref="siderRef"
@@ -15,9 +11,6 @@
         :collapsed-width="64"
         :width="240"
         show-trigger
-        :inverted="inverted"
-        @on-collapse="() => handleCollapseChange(true)"
-        @on-expand="() => handleCollapseChange(false)"
       >
         <C_Menu
           :data="menuData"
@@ -38,92 +31,10 @@
 <script setup lang="ts">
   import { type LayoutSiderInst } from 'naive-ui'
 
-  // 菜单数据 - 先定义确保后续函数可以访问
-  const menuData: MenuOptions[] = [
-    {
-      label: '且听风吟',
-      key: 'hear-the-wind-sing',
-      path: '/hear-the-wind-sing',
-      icon: 'i-mdi:robot-love-outline',
-    },
-    {
-      label: '1973年的弹珠玩具',
-      key: 'pinball-1973',
-      path: '/pinball-1973',
-      icon: 'i-mdi:robot-love-outline',
-      children: [
-        {
-          label: '鼠',
-          key: 'rat',
-          path: '/pinball-1973/rat',
-        },
-      ],
-    },
-    {
-      label: '寻羊冒险记',
-      key: 'a-wild-sheep-chase',
-      path: '/a-wild-sheep-chase',
-      icon: () => h('i', { class: 'i-carbon-book' }),
-    },
-    {
-      label: '舞，舞，舞',
-      key: 'dance-dance-dance',
-      path: '/dance-dance-dance',
-      icon: () => h('i', { class: 'i-carbon-book' }),
-      children: [
-        {
-          type: 'group',
-          label: '人物',
-          key: 'people',
-          path: '/dance-dance-dance/people',
-          children: [
-            {
-              label: '叙事者',
-              key: 'narrator',
-              path: '/dance-dance-dance/people/narrator',
-              icon: () => h('i', { class: 'i-carbon-user' }),
-            },
-            {
-              label: '羊男',
-              key: 'sheep-man',
-              path: '/dance-dance-dance/people/sheep-man',
-              icon: () => h('i', { class: 'i-carbon-user' }),
-            },
-          ],
-        },
-        {
-          label: '饮品',
-          key: 'beverage',
-          path: '/dance-dance-dance/beverage',
-          icon: () => h('i', { class: 'i-carbon-wine' }),
-          children: [
-            {
-              label: '威士忌',
-              key: 'whisky',
-              path: '/dance-dance-dance/beverage/whisky',
-            },
-          ],
-        },
-        {
-          label: '食物',
-          key: 'food',
-          path: '/dance-dance-dance/food',
-          children: [
-            {
-              label: '三明治',
-              key: 'sandwich',
-              path: '/dance-dance-dance/food/sandwich',
-            },
-          ],
-        },
-        {
-          label: '过去增多，未来减少',
-          key: 'the-past-increases-the-future-recedes',
-          path: '/dance-dance-dance/the-past-increases-the-future-recedes',
-        },
-      ],
-    },
-  ]
+  import { s_permissionStore } from '@/stores/permission'
+
+  const permissionStore = s_permissionStore()
+  const menuData = permissionStore.showMenuListGet
 
   // 路由相关
   const route = useRoute()
@@ -137,11 +48,6 @@
   // 菜单相关
   const activeKey = computed(() => route.path)
   const expandedKeys = ref<string[]>([])
-
-  // 监听折叠状态变化
-  const handleCollapseChange = (collapsed: boolean) => {
-    isCollapsed.value = collapsed
-  }
 
   // 菜单点击处理
   const handleMenuClick = (key: string) => {
