@@ -1,16 +1,16 @@
 <template>
-  <NSpace
-    vertical
-    class="layout-container"
-  >
+  <div class="layout-container">
     <NLayout has-sider>
       <NLayoutSider
+        id="unique-menu-id"
         ref="siderRef"
         bordered
         collapse-mode="width"
         :collapsed-width="64"
         :width="240"
         show-trigger
+        :native-scrollbar="false"
+        class="layout-sider no-horizontal-scroll"
       >
         <C_Menu
           :data="menuData"
@@ -22,11 +22,25 @@
           @update:value="handleMenuClick"
         />
       </NLayoutSider>
+
       <NLayout>
-        <RouterView />
+        <NLayoutHeader bordered>
+          <!-- 顶部导航栏内容 -->
+        </NLayoutHeader>
+
+        <NLayoutContent>
+          <RouterView class="main-content" />
+        </NLayoutContent>
+
+        <NLayoutFooter
+          bordered
+          class="layout-footer"
+        >
+          <!-- 底部内容 -->
+        </NLayoutFooter>
       </NLayout>
     </NLayout>
-  </NSpace>
+  </div>
 </template>
 <script setup lang="ts">
   import { type LayoutSiderInst } from 'naive-ui'
@@ -101,10 +115,50 @@
 </script>
 
 <style scoped>
+  .layout-container {
+    height: 100vh;
+    overflow: hidden;
+  }
+
   .layout-container :deep(.n-menu-item-content__icon) {
     display: flex;
     align-items: center;
+    justify-content: center;
     margin-top: -8px;
     vertical-align: top;
+    width: 24px;
+    height: 24px;
+  }
+
+  .layout-container :deep(.n-layout-header) {
+    height: 64px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .layout-container :deep(.n-layout-footer) {
+    height: 50px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .layout-container :deep(.n-layout-content) {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  /* 彻底移除横向滚动条 */
+  .no-horizontal-scroll {
+    overflow-x: hidden !important;
   }
 </style>
