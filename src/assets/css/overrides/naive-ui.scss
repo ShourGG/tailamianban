@@ -1,157 +1,110 @@
-/* Naive UI 样式覆盖 - 最终修正版 */
+/* Naive UI 样式覆盖 - 悬停图标优化完整版 */
 
-#unique-menu-id {
-  .n-menu {
-    /* 图标和箭头默认颜色 */
-    .n-menu-item-content__icon,
-    .n-submenu-arrow,
-    .n-base-icon {
-      color: #bbb !important;
-      svg {
-        color: #bbb !important;
-        fill: #bbb !important;
-      }
-    }
-
-    /* 菜单项文本默认颜色 */
-    .n-menu-item-content-header {
-      color: #bbb !important;
-    }
-
-    /* 恢复父子菜单层级缩进 */
-    .n-menu-item-content {
-      /* 一级子菜单 */
-      .n-submenu & {
-        padding-left: 36px !important;
-      }
-      
-      /* 二级子菜单 */
-      .n-submenu .n-submenu & {
-        padding-left: 52px !important;
-      }
-    }
-
-    /* 悬停样式 */
-    .n-menu-item-content:not(.n-menu-item-content--disabled):hover::before {
-      background-color: #1890ff !important; /* 悬停背景色 */
-    }
-
-    .n-menu-item-content:not(.n-menu-item-content--disabled):hover .n-menu-item-content-header,
-    .n-menu-item-content:not(.n-menu-item-content--disabled):hover .n-menu-item-content__icon,
-    .n-menu-item-content:not(.n-menu-item-content--disabled):hover .n-submenu-arrow,
-    .n-menu-item-content:not(.n-menu-item-content--disabled):hover .n-base-icon {
-      color: #e6e3e3 !important; /* 悬停时提亮一些 */
-      svg {
-        color: #e6e3e3 !important;
-        fill: #e6e3e3 !important;
-      }
-    }
-
-    /* 选中样式 */
-    .n-menu-item-content.n-menu-item-content--selected::before,
-    .n-menu-item-content--collapsed.n-menu-item-content--selected::before {
-      background-color: var(--n-item-color-active) !important; /* 选中背景色 */
-    }
-
-    .n-menu-item-content.n-menu-item-content--selected .n-menu-item-content-header,
-    .n-menu-item-content.n-menu-item-content--selected .n-menu-item-content__icon,
-    .n-menu-item-content.n-menu-item-content--selected .n-submenu-arrow,
-    .n-menu-item-content.n-menu-item-content--selected .n-base-icon,
-    .n-menu-item-content--collapsed.n-menu-item-content--selected .n-menu-item-content__icon,
-    .n-menu-item-content--collapsed.n-menu-item-content--selected .n-submenu-arrow,
-    .n-menu-item-content--collapsed.n-menu-item-content--selected .n-base-icon {
-      color: #eee !important; /* 选中时进一步提亮，但非纯白色 */
-      svg {
-        color: #eee !important;
-        fill: #eee !important;
-      }
-    }
-
-    .n-menu-item-content,
-    .n-menu-item-content--collapsed {
-      white-space: nowrap !important;
-    }
-  }
-}
-
-
+// 颜色变量
+$menu-text-color: #bbb;
+$menu-hover-color: #fff;
+$menu-active-color: #eee;
+$menu-hover-bg: #1890ff;
+$menu-sider-width: 240px;
+$menu-sider-collapsed-width: 64px;
 
 .n-layout {
   display: flex;
   height: 100vh;
   overflow: hidden;
 
-  /* 左侧菜单 - 确保高度撑满，支持折叠 */
   .n-layout-sider {
-    // 调整宽度设置，支持折叠
-    width: 240px !important;
-    min-width: 64px !important;
-    max-width: 240px !important;
+    width: $menu-sider-width;
+    min-width: $menu-sider-collapsed-width;
+    max-width: $menu-sider-width;
     height: 100%;
-    flex-shrink: 0;
     border-right: 1px solid var(--n-border-color);
-    background-color: var(--color-bg) !important;
+    background-color: var(--color-bg);
     display: flex;
     flex-direction: column;
     transition: max-width 0.3s ease;
 
-    /* 折叠状态 */
+    /* 折叠状态 - 仅修改图标颜色 */
     &--collapsed {
-      max-width: 64px !important;
-      min-width: 64px !important;
+      max-width: $menu-sider-collapsed-width;
+      min-width: $menu-sider-collapsed-width;
+      
+      .n-menu-item-content__icon {
+        color: $menu-hover-color;
+        
+        svg {
+          color: $menu-hover-color;
+          fill: $menu-hover-color;
+        }
+      }
     }
 
-    /* 菜单容器 - 撑满高度 */
     .n-menu {
       flex: 1;
-      overflow-x: hidden !important;
+      overflow-x: hidden;
 
-      /* 图标和箭头颜色 - 强制白色 */
-      .n-menu-item-content__icon,
-      .n-submenu-arrow,
-      .n-base-icon {
-        color: white !important;
-        svg {
-          color: white !important;
-          fill: white !important;
-        }
-      }
-
-      /* 恢复父子菜单层级缩进 */
       .n-menu-item-content {
-        /* 一级子菜单 */
-        .n-submenu & {
-          padding-left: 36px !important;
+        position: relative;
+        white-space: nowrap;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 4px;
+          bottom: 4px;
+          left: 12px;
+          right: 12px;
+          border-radius: 4px;
+          background-color: transparent;
+          transition: background-color 0.2s ease;
         }
-        
-        /* 二级子菜单 */
-        .n-submenu .n-submenu & {
-          padding-left: 52px !important;
+
+        /* 默认状态 */
+        &-header, &__icon, 
+        .n-submenu-arrow, .n-base-icon, svg {
+          color: $menu-text-color;
+          fill: $menu-text-color;
+          z-index: 1;
         }
-      }
 
-      /* 保持交互效果，使用 :deep() 选择器 */
-      :deep(.n-menu-item-content:hover),
-      :deep(.n-menu-item-content--collapsed:hover) {
-        background-color: #1890ff !important; /* 悬停时设置蓝色背景 */
-      }
+        /* 悬停状态 - 图标颜色调整 */
+        &:not(.n-menu-item-content--disabled):hover {
+          .n-menu-item-content__icon,
+          .n-menu-item-content__icon svg {
+            color: $menu-hover-color;
+            fill: $menu-hover-color;
+          }
+          
+          &::before {
+            background-color: $menu-hover-bg;
+          }
+          
+          &-header, 
+          .n-base-icon, svg {
+            color: $menu-text-color; /* 保持文本默认颜色 */
+            fill: $menu-text-color;
+          }
+        }
 
-      :deep(.n-menu-item-content.n-menu-item-content--selected),
-      :deep(.n-menu-item-content--collapsed.n-menu-item-content--selected) {
-        background-color: var(--n-item-color-active) !important; /* 选中时的背景色 */
-      }
-
-      :deep(.n-menu-item-content),
-      :deep(.n-menu-item-content--collapsed) {
-        white-space: nowrap !important;
+        /* 选中状态 */
+        &--selected {
+          &::before {
+            background-color: var(--n-item-color-active);
+          }
+          
+          &-header, &__icon, 
+          .n-submenu-arrow, .n-base-icon, svg {
+            color: $menu-active-color;
+            fill: $menu-active-color;
+          }
+        }
       }
     }
   }
 
-  /* 右侧内容区域 - 严格防止横向滚动 */
   .n-layout-content {
     flex: 1;
-    min-width: 0; /* 关键：允许压缩 */
+    min-width: 0;
     display: flex;
     flex-direction: column;
     
@@ -159,46 +112,23 @@
       flex: 1;
       padding: 20px;
       overflow-y: auto;
-      overflow-x: hidden; /* 禁止横向滚动 */
-      
-      /* 三层防护防止内容溢出 */
-      > * {
-        max-width: 100%;
-        box-sizing: border-box;
-        
-        * {
-          max-width: 100%;
-          overflow-wrap: break-word;
-        }
-        
-        /* 表格特殊处理 */
-        table {
-          width: 100% !important;
-          display: block;
-          overflow-x: auto; /* 表格内部滚动 */
-        }
-      }
+      overflow-x: hidden;
     }
   }
-
 }
 
-/* 滚动条样式 - 保持原有 */
-.n-scrollbar {
-  .n-scrollbar-rail--vertical {
-    width: 4px !important;
-    opacity: 0;
-    transition: opacity 0.2s;
-    
-    &__scrollbar {
-      background-color: var(--color-bg) !important;
-      opacity: 0.6;
-    }
+/* 滚动条样式 */
+.n-scrollbar .n-scrollbar-rail--vertical {
+  width: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  
+  &__scrollbar {
+    background-color: var(--color-bg);
+    opacity: 0.6;
   }
   
-  &:hover .n-scrollbar-rail--vertical {
+  &:hover {
     opacity: 1;
   }
 }
-
-

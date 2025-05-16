@@ -2,7 +2,6 @@
   <div class="layout-container">
     <NLayout has-sider>
       <NLayoutSider
-        id="unique-menu-id"
         ref="siderRef"
         bordered
         collapse-mode="width"
