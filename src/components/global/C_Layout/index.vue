@@ -19,6 +19,7 @@
           :collapsed="isCollapsed"
           :inverted="inverted"
           @update:value="handleMenuClick"
+          style="height: 100%"
         />
       </NLayoutSider>
 
@@ -148,16 +149,56 @@
     display: flex;
     flex-direction: column;
     flex: 1;
+    overflow-x: hidden; /* 移除内容区域的横向滚动条 */
   }
 
   .main-content {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+    overflow-x: hidden; /* 移除内容区域的横向滚动条 */
+    width: 100%; /* 确保内容区域宽度自适应 */
   }
 
   /* 彻底移除横向滚动条 */
   .no-horizontal-scroll {
     overflow-x: hidden !important;
+  }
+
+  /* 自定义滚动条样式 - 菜单区域 */
+  .layout-sider :deep(.n-scrollbar-rail) {
+    width: 0 !important; /* 隐藏滚动条轨道 */
+  }
+
+  .layout-sider :deep(.n-scrollbar-content) {
+    padding-right: 0 !important; /* 移除滚动条内容的右侧padding */
+  }
+
+  /* 确保内容区域自适应 */
+  .layout-container :deep(.n-layout) {
+    width: 100%;
+    min-width: 0; /* 确保flex子项可以缩小到比内容更小 */
+  }
+
+  /* 确保布局容器撑满高度 */
+  .layout-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 精确控制菜单容器 */
+  .layout-container :deep(.n-layout-sider) {
+    flex-shrink: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 精确覆盖Naive UI菜单样式 */
+  .layout-container :deep(.n-menu.n-menu--vertical) {
+    flex: 1;
+    min-height: 100vh;
+    overflow-y: auto;
   }
 </style>
