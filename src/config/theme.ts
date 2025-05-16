@@ -2,12 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-16 15:19:02
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-16 18:06:28
+ * @LastEditTime: 2025-05-16 19:42:58
  * @FilePath: \Robot_Admin\src\config\theme.ts
- * @Description:
+ * @Description: 主题配置
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
-// 自定义主题覆盖类型，兼容旧版本naive-ui
+
+// 自定义主题覆盖类型，兼容naive-ui
 export interface GlobalThemeOverrides {
   common?: {
     primaryColor?: string
@@ -18,6 +19,7 @@ export interface GlobalThemeOverrides {
     infoColorHover?: string
     infoColorPressed?: string
     infoColorSuppl?: string
+    bodyColor?: string
     [key: string]: string | undefined
   }
   Menu?: {
@@ -37,9 +39,9 @@ export interface GlobalThemeOverrides {
     itemIconColorActive?: string
     itemIconColorChildActive?: string
     itemColorHover?: string
-    color?: string // 菜单背景色
-    scrollbarColor?: string // 滚动条颜色
-    scrollbarColorHover?: string // 滚动条悬停颜色
+    color?: string
+    scrollbarColor?: string
+    scrollbarColorHover?: string
     [key: string]: string | undefined
   }
   Button?: {
@@ -56,73 +58,82 @@ export interface GlobalThemeOverrides {
   [key: string]: Record<string, string | undefined> | undefined
 }
 
-// 主题色配置
+// 主题色常量
 const primaryColor = '#2080f0'
 const primaryColorHover = '#4098fc'
 const primaryColorPressed = '#1060c9'
 const primaryColorSuppl = '#4098fc'
 
-// 菜单主题色配置 (固定样式，不随主题变化)
-const menuThemeColors = {
-  // 固定菜单背景色
-  color: 'rgb(8 20 38)',
-  scrollbarColor: 'rgb(8 20 38)',
-  scrollbarColorHover: 'rgb(8 20 38)',
-
-  // 文字颜色
-  itemTextColor: '#e5e7eb', // 默认文字颜色
-  itemTextColorHover: '#f8fafc', // 普通悬停文字颜色
-  itemTextColorActive: '#e5e7eb', // 选中项文字颜色
-  itemTextColorActiveHover: '#ffffff', // 选中项悬停文字变白
+// 亮色模式菜单配置
+const lightMenuConfig: GlobalThemeOverrides['Menu'] = {
+  color: '#0d1425',
+  scrollbarColor: '#0d1425',
+  scrollbarColorHover: '#0d1425',
+  itemTextColor: '#e5e7eb',
+  itemTextColorHover: '#f8fafc',
+  itemTextColorActive: '#e5e7eb',
+  itemTextColorActiveHover: '#ffffff',
   itemTextColorChildActive: '#e5e7eb',
-
-  // 图标颜色
-  itemIconColor: '#e5e7eb', // 默认图标颜色
-  itemIconColorHover: '#f8fafc', // 普通悬停图标颜色
-  itemIconColorActive: '#e5e7eb', // 选中项图标颜色
-  itemIconColorActiveHover: '#ffffff', // 选中项悬停图标变白
+  itemIconColor: '#e5e7eb',
+  itemIconColorHover: '#f8fafc',
+  itemIconColorActive: '#e5e7eb',
+  itemIconColorActiveHover: '#ffffff',
   itemIconColorChildActive: '#e5e7eb',
-
-  // 箭头颜色
   arrowColor: '#e5e7eb',
   arrowColorHover: '#f8fafc',
   arrowColorActive: '#e5e7eb',
   arrowColorChildActive: '#e5e7eb',
-
-  // 背景色状态
-  itemColorActive: '#2080F0', // 选中项蓝色背景
-  itemColorActiveHover: '#2080F0', // 选中项悬停保持蓝色背景
-  itemColorActiveCollapsed: '#2080F0', // 折叠状态
-  itemColorHover: 'rgba(255, 255, 255, 0.1)', // 普通悬停背景
-
-  // 确保菜单项撑满
+  itemColorActive: '#2080F0',
+  itemColorActiveHover: '#2080F0',
+  itemColorActiveCollapsed: '#2080F0',
+  itemColorHover: 'rgba(255, 255, 255, 0.1)',
   itemPadding: '0 16px',
   itemHeight: '44px',
   itemBorderRadius: '0',
 }
 
-// 暗色模式使用同样的菜单配置
-const darkMenuThemeColors = menuThemeColors
+// 暗色模式菜单配置
+const darkMenuConfig: GlobalThemeOverrides['Menu'] = {
+  color: 'rgb(16, 16, 20)',
+  scrollbarColor: 'rgb(16, 16, 20)',
+  scrollbarColorHover: 'rgb(24, 24, 28)',
+  itemTextColor: '#e5e7eb',
+  itemTextColorHover: '#f8fafc',
+  itemTextColorActive: '#e5e7eb',
+  itemTextColorActiveHover: '#ffffff',
+  itemTextColorChildActive: '#e5e7eb',
+  itemIconColor: '#9ca3af',
+  itemIconColorHover: '#d1d5db',
+  itemIconColorActive: '#9ca3af',
+  itemIconColorActiveHover: '#d1d5db',
+  itemIconColorChildActive: '#9ca3af',
+  arrowColor: '#9ca3af',
+  arrowColorHover: '#d1d5db',
+  arrowColorActive: '#9ca3af',
+  arrowColorChildActive: '#9ca3af',
+  itemColorActive: 'rgba(32, 128, 240, 0.2)',
+  itemColorActiveHover: 'rgba(32, 128, 240, 0.3)',
+  itemColorActiveCollapsed: 'rgba(32, 128, 240, 0.2)',
+  itemColorHover: 'rgba(255, 255, 255, 0.08)',
+  itemPadding: '0 16px',
+  itemHeight: '44px',
+  itemBorderRadius: '0',
+}
 
-// 全局主题变量覆盖
+// 亮色主题全局配置
 export const themeOverrides: GlobalThemeOverrides = {
   common: {
-    primaryColor: primaryColor,
-    primaryColorHover: primaryColorHover,
-    primaryColorPressed: primaryColorPressed,
-    primaryColorSuppl: primaryColorSuppl,
-
-    // 其他全局颜色变量
+    primaryColor,
+    primaryColorHover,
+    primaryColorPressed,
+    primaryColorSuppl,
     infoColor: primaryColor,
     infoColorHover: primaryColorHover,
     infoColorPressed: primaryColorPressed,
     infoColorSuppl: primaryColorSuppl,
+    bodyColor: '#0d1425',
   },
-
-  // 菜单组件主题覆盖
-  Menu: menuThemeColors,
-
-  // 按钮组件主题覆盖
+  Menu: lightMenuConfig,
   Button: {
     textColor: primaryColor,
     textColorHover: primaryColorHover,
@@ -133,29 +144,22 @@ export const themeOverrides: GlobalThemeOverrides = {
     borderColorPressed: primaryColorPressed,
     borderColorFocus: primaryColor,
   },
-
-  // 其他组件主题覆盖...可以根据需要添加
 }
 
-// 暗色主题变量覆盖
+// 暗色主题全局配置
 export const darkThemeOverrides: GlobalThemeOverrides = {
   common: {
-    primaryColor: primaryColor,
-    primaryColorHover: primaryColorHover,
-    primaryColorPressed: primaryColorPressed,
-    primaryColorSuppl: primaryColorSuppl,
-
-    // 其他全局颜色变量
+    primaryColor,
+    primaryColorHover,
+    primaryColorPressed,
+    primaryColorSuppl,
     infoColor: primaryColor,
     infoColorHover: primaryColorHover,
     infoColorPressed: primaryColorPressed,
     infoColorSuppl: primaryColorSuppl,
+    bodyColor: 'rgb(16, 16, 20)',
   },
-
-  // 菜单组件主题覆盖 - 暗色模式
-  Menu: darkMenuThemeColors,
-
-  // 按钮组件主题覆盖
+  Menu: darkMenuConfig,
   Button: {
     textColor: primaryColor,
     textColorHover: primaryColorHover,
@@ -168,7 +172,7 @@ export const darkThemeOverrides: GlobalThemeOverrides = {
   },
 }
 
-// 导出主题相关的常量
+// 导出主题常量
 export const themeConstants = {
   primaryColor,
   primaryColorHover,

@@ -9,7 +9,11 @@
         :width="240"
         show-trigger
         :native-scrollbar="false"
-        class="layout-sider no-horizontal-scroll"
+        :class="[
+          'layout-sider',
+          'no-horizontal-scroll',
+          isLightTheme ? 'light-theme' : 'dark-theme',
+        ]"
       >
         <C_Menu
           :data="menuData"
@@ -17,26 +21,39 @@
           :default-expanded-keys="expandedKeys"
           mode="vertical"
           :collapsed="isCollapsed"
-          :inverted="inverted"
+          :inverted="!isLightTheme"
           @update:value="handleMenuClick"
-          style="height: 100%"
         />
       </NLayoutSider>
 
       <NLayout>
-        <NLayoutHeader bordered>
-          <!-- 顶部导航栏内容 -->
+        <NLayoutHeader
+          bordered
+          position="absolute"
+          :class="[
+            'layout-header',
+            isLightTheme ? 'light-theme' : 'dark-theme',
+          ]"
+        >
+          <div class="header-content">
+            <C_Theme />
+            我是一些头部其他信息，做尝试
+          </div>
         </NLayoutHeader>
 
-        <NLayoutContent>
+        <NLayoutContent class="content-with-header">
           <RouterView class="main-content" />
         </NLayoutContent>
 
         <NLayoutFooter
           bordered
-          class="layout-footer"
+          :class="[
+            'layout-footer',
+            isLightTheme ? 'light-theme' : 'dark-theme',
+          ]"
         >
           <!-- 底部内容 -->
+          Copyright MIT © 2025 by CHENY
         </NLayoutFooter>
       </NLayout>
     </NLayout>
@@ -44,10 +61,27 @@
 </template>
 <script setup lang="ts">
   import { type LayoutSiderInst } from 'naive-ui'
-
+  import { computed, ref, watch } from 'vue'
   import { s_permissionStore } from '@/stores/permission'
+  import { useThemeStore } from '@/stores/theme'
 
   const permissionStore = s_permissionStore()
+  const themeStore = useThemeStore()
+
+  const theme = computed(() => themeStore.mode)
+  const isLightTheme = computed(() => theme.value === 'light')
+
+  watch(
+    theme,
+    newTheme => {
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    },
+    { immediate: true }
+  )
   const menuData = permissionStore.showMenuListGet
 
   // 路由相关
@@ -57,7 +91,6 @@
   // 侧边栏相关
   const siderRef = ref<LayoutSiderInst | null>(null)
   const isCollapsed = ref(false)
-  const inverted = ref(false)
 
   // 菜单相关
   const activeKey = computed(() => route.path)
@@ -130,11 +163,36 @@
     height: 24px;
   }
 
-  .layout-container :deep(.n-layout-header) {
-    height: 64px;
+  .layout-container :deep(.layout-header) {
+    height: 100px;
     padding: 0 20px;
     display: flex;
     align-items: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+  .layout-container :deep(.light-theme) {
+    background-color: #ffffff !important;
+  }
+
+  .layout-container :deep(.dark-theme) {
+    /* 使用naive-ui的默认暗色主题背景色 */
+    background-color: var(--n-color) !important;
+  }
+
+  .layout-container :deep(.header-content) {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .layout-container :deep(.content-with-header) {
+    margin-top: 100px;
+    height: calc(100vh - 150px); /* 100px header + 50px footer */
   }
 
   .layout-container :deep(.n-layout-footer) {
@@ -165,11 +223,26 @@
     overflow-x: hidden !important;
   }
 
-  /* 自定义滚动条样式 - 菜单区域 */
+  /* 菜单区域优化 - 解决主题切换闪烁 */
+  .layout-sider {
+    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    contain: strict;
+  }
+
+  /* 预加载主题样式 */
+  .layout-sider.light-theme {
+    background-color: #081426;
+  }
+
+  .layout-sider.dark-theme {
+    background-color: rgb(16, 16, 20);
+  }
   .layout-sider :deep(.n-scrollbar-rail) {
     width: 0 !important; /* 隐藏滚动条轨道 */
   }
-
   .layout-sider :deep(.n-scrollbar-content) {
     padding-right: 0 !important; /* 移除滚动条内容的右侧padding */
   }

@@ -2,10 +2,10 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-13 14:22:46
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-16 17:34:44
+ * @LastEditTime: 2025-05-16 19:24:01
  * @FilePath: \Robot_Admin\src\components\global\C_Theme\index.vue
  * @Description: 主题组件
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
   <NDropdown
@@ -64,8 +64,24 @@
     },
   ]
 
-  // 选择处理
+  // 选择处理 - 优化切换性能
   const handleSelect = (key: string) => {
+    // 1. 添加加载状态
+    const app = document.getElementById('app')
+    if (app) {
+      app.style.pointerEvents = 'none'
+      app.style.opacity = '0.99' // 触发GPU加速
+    }
+
+    // 2. 执行主题切换
     themeStore.setMode(key as ThemeMode)
+
+    // 3. 恢复交互
+    setTimeout(() => {
+      if (app) {
+        app.style.pointerEvents = ''
+        app.style.opacity = ''
+      }
+    }, 300)
   }
 </script>

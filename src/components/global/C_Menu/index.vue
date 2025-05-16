@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2023-06-09 16:26:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-16 17:54:51
+ * @LastEditTime: 2025-05-16 19:10:26
  * @FilePath: \Robot_Admin\src\components\global\C_Menu\index.vue
  * @Description: 菜单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -16,7 +16,7 @@
     :collapsed="collapsed"
     :collapsed-width="collapsedWidth"
     :collapsed-icon-size="collapsedIconSize"
-    :inverted="false"
+    :inverted="inverted"
     :theme-overrides="menuThemeOverrides"
     style="
       --primary-color: var(--n-color-primary);

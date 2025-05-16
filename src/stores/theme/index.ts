@@ -93,10 +93,34 @@ export const useThemeStore = defineStore('theme', {
       })
     },
 
-    // 设置主题模式
-    setMode(mode: ThemeMode) {
+    // 设置主题模式 - 彻底解决闪烁问题
+    async setMode(mode: ThemeMode) {
+      // 1. 预加载目标主题样式
+      const preloadStyle = document.createElement('style')
+      const targetTheme = mode === 'dark' ? darkThemeOverrides : themeOverrides
+      preloadStyle.textContent = `
+        .layout-sider, .n-menu {
+          background-color: ${targetTheme.Menu?.color || targetTheme.common?.bodyColor} !important;
+          transition: none !important;
+        }
+      `
+      document.head.appendChild(preloadStyle)
+
+      // 2. 确保样式已应用
+      await new Promise(resolve => requestAnimationFrame(resolve))
+      void document.documentElement.offsetHeight
+
+      // 3. 执行主题切换
       this.mode = mode
       localStorage.setItem('theme-mode', mode)
+
+      // 4. 等待naive-ui完成主题计算
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      // 5. 恢复过渡效果
+      setTimeout(() => {
+        document.head.removeChild(preloadStyle)
+      }, 300)
     },
 
     // 更新主题覆盖配置
