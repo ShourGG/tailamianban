@@ -183,6 +183,16 @@
     background-color: var(--n-color) !important;
   }
 
+  /* 右侧内容区域背景色 - 亮色主题 */
+  .layout-container :deep(.n-layout .n-layout-scroll-container) {
+    background-color: #f6f9fb !important;
+  }
+
+  /* 右侧内容区域背景色 - 暗色主题 */
+  html.dark .layout-container :deep(.n-layout .n-layout-scroll-container) {
+    background-color: #1c1c21 !important;
+  }
+
   .layout-container :deep(.header-content) {
     width: 100%;
     height: 100%;
