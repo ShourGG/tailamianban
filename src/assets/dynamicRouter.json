@@ -327,7 +327,7 @@
       "redirect": "/export-zip/index",
       "children": [
         {
-          "path": "index",
+          "path": "export-zip-index",
           "name": "export-zip-index",
           "component": "/16-export-zip/index",
           "meta": {
@@ -348,7 +348,7 @@
       "redirect": "/dragable/index",
       "children": [
         {
-          "path": "index",
+          "path": "dragable-index",
           "name": "dragable-index",
           "component": "/17-dragable/index",
           "meta": {
@@ -369,7 +369,7 @@
       "redirect": "/copy-text/index",
       "children": [
         {
-          "path": "index",
+          "path": "copy-text-index",
           "name": "copy-text-index",
           "component": "/18-copy-text/index",
           "meta": {
