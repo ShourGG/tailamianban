@@ -80,7 +80,7 @@
         {
           "path": "icon",
           "name": "demo-icon",
-          "component": "/01-icon/index",
+          "component": "/demo/01-icon/index",
           "meta": {
             "icon": "i-mdi:simple-icons",
             "title": "图标选择器",
@@ -156,7 +156,7 @@
           }
         },
         {
-          "path": "/form-manage",
+          "path": "form-manage",
           "name": "demo-form-manage",
           "redirect": "/demo/form-manage/form",
           "meta": {
@@ -197,7 +197,7 @@
           ]
         },
         {
-          "path": "/table-manage",
+          "path": "table-manage",
           "name": "demo-table-manage",
           "redirect": "/demo/table-manage/table",
           "meta": {

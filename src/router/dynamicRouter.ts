@@ -59,13 +59,26 @@ const resolveComponent = (path?: string) => {
 }
 
 /**
- * 路由处理中间件
+ * 路由处理中间件（核心修改）
  */
-const processRoute = (route: DynamicRoute): RouteRecordRaw => {
+const processRoute = (route: DynamicRoute, isChild = false): RouteRecordRaw => {
+  // 开发环境下检查子路由path是否已包含/
+  if (import.meta.env.DEV && isChild && route.path.startsWith('/')) {
+    console.warn(
+      `[路由警告] 子路由path "${route.path}" 已包含前导/，请确认数据源是否需要修改`,
+      route
+    )
+  }
+
+  // 自动处理子路由path（不修改原始数据）
+  const processedPath =
+    isChild && !route.path.startsWith('/') ? `/${route.path}` : route.path
+
   return {
     ...route,
+    path: processedPath,
     component: resolveComponent(route.component),
-    children: route.children?.map(child => processRoute(child)),
+    children: route.children?.map(child => processRoute(child, true)), // 标记为子路由
     meta: {
       ...route.meta,
       isLayout: route.component === 'layout',
@@ -101,8 +114,10 @@ export const initDynamicRouter = async (): Promise<boolean> => {
     // 清理旧路由
     clearExistingRoutes()
 
-    // 处理并添加新路由
-    routes.map(processRoute).forEach(route => router.addRoute(route))
+    // 处理并添加新路由（修改调用方式）
+    routes
+      .map(route => processRoute(route))
+      .forEach(route => router.addRoute(route))
 
     // 开发环境日志
     if (import.meta.env.DEV) {
