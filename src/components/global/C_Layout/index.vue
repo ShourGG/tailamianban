@@ -183,13 +183,20 @@
     background-color: var(--n-color) !important;
   }
 
-  /* 右侧内容区域背景色 - 亮色主题 */
+  /* 右侧内容区域背景色 - 默认暗色（跟随系统时使用） */
   .layout-container :deep(.n-layout .n-layout-scroll-container) {
+    background-color: #1c1c21 !important;
+  }
+
+  /* 亮色主题覆盖 */
+  html.light .layout-container :deep(.n-layout .n-layout-scroll-container),
+  body.light .layout-container :deep(.n-layout .n-layout-scroll-container) {
     background-color: #f6f9fb !important;
   }
 
-  /* 右侧内容区域背景色 - 暗色主题 */
-  html.dark .layout-container :deep(.n-layout .n-layout-scroll-container) {
+  /* 暗色主题覆盖（确保优先级） */
+  html.dark .layout-container :deep(.n-layout .n-layout-scroll-container),
+  body.dark .layout-container :deep(.n-layout .n-layout-scroll-container) {
     background-color: #1c1c21 !important;
   }
 
