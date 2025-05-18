@@ -12,6 +12,8 @@
         :width="240"
         show-trigger
         :native-scrollbar="false"
+        :collapsed="isCollapsed"
+        @update:collapsed="handleCollapsedChange"
         :class="[
           'layout-sider',
           'no-horizontal-scroll',
@@ -117,6 +119,13 @@
   // 侧边栏相关
   const siderRef = ref<LayoutSiderInst | null>(null)
   const isCollapsed = ref(false)
+
+  /**
+   * 处理侧边栏折叠状态变化
+   */
+  const handleCollapsedChange = (collapsed: boolean) => {
+    isCollapsed.value = collapsed
+  }
 </script>
 
 <style scoped>
@@ -266,5 +275,74 @@
     flex: 1;
     min-height: 100vh;
     overflow-y: auto;
+  }
+
+  /* 处理菜单折叠时的样式 */
+  .layout-container :deep(.n-menu.n-menu--collapsed) {
+    width: 64px !important;
+  }
+
+  /* 菜单折叠状态下的布局优化 */
+  .layout-container :deep(.n-menu.n-menu--collapsed) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* 菜单折叠状态下的图标和文字居中对齐 */
+  .layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item-content) {
+    justify-content: center !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    width: 64px;
+  }
+
+  /* 折叠状态下精确定位图标 - 使用直接margin调整 */
+  .layout-container :deep(.n-menu.n-menu--collapsed .n-icon) {
+    margin-left: 33px !important; /* 精确调整位置以确保图标居中 */
+  }
+
+  /* 图标居中 - 精确控制 */
+  .layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item) {
+    padding: 0 !important;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* 确保图标绝对居中 */
+  .layout-container
+    :deep(.n-menu.n-menu--collapsed .n-menu-item-content-header) {
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  /* 调整菜单项的图标和文字间距 */
+  .layout-container :deep(.n-menu-item-content__icon) {
+    margin-right: 8px;
+  }
+
+  /* 菜单折叠状态下去掉图标和文字间距 */
+  .layout-container
+    :deep(.n-menu.n-menu--collapsed .n-menu-item-content__icon) {
+    margin-right: 0;
+  }
+
+  /* 折叠状态下突出显示选中的父级菜单项图标 */
+  .layout-container
+    :deep(
+      .n-menu.n-menu--collapsed
+        .n-menu-item-content--child-active
+        .n-menu-item-content__icon
+    ) {
+    color: var(--n-item-color-active) !important;
+  }
+
+  /* 折叠状态下调整选中父级菜单项的样式 */
+  .layout-container
+    :deep(.n-menu.n-menu--collapsed .n-menu-item-content--child-active) {
+    background-color: var(--n-item-color-active-hover) !important;
+    opacity: 0.85;
   }
 </style>

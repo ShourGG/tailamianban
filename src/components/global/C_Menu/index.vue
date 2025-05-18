@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2023-06-09 16:26:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-18 17:30:03
+ * @LastEditTime: 2025-05-18 18:20:08
  * @FilePath: \Robot_Admin\src\components\global\C_Menu\index.vue
  * @Description: 菜单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -19,6 +19,9 @@
     :collapsed-icon-size="collapsedIconSize"
     :inverted="inverted"
     :theme-overrides="menuThemeOverrides"
+    :dropdown-props="dropdownProps"
+    :indent="24"
+    :root-indent="16"
     style="
       --primary-color: var(--n-color-primary);
       --n-item-color-active: var(--primary-color);
@@ -29,7 +32,12 @@
 </template>
 
 <script setup lang="ts">
-  import { NIcon, type MenuOption, type MenuInst } from 'naive-ui'
+  import {
+    NIcon,
+    type MenuOption,
+    type MenuInst,
+    type DropdownProps,
+  } from 'naive-ui'
   import { useThemeStore } from '@/stores/theme'
 
   const route = useRoute()
@@ -43,6 +51,15 @@
     collapsedWidth?: number
     collapsedIconSize?: number
     inverted?: boolean
+  }
+
+  // 下拉菜单配置 - 用于折叠模式下的子菜单显示
+  const dropdownProps: DropdownProps = {
+    placement: 'right-start' as const,
+    trigger: 'hover' as const,
+    arrowStyle: {
+      color: 'var(--n-color)',
+    },
   }
 
   const props = withDefaults(defineProps<MenuPropsWithData>(), {
