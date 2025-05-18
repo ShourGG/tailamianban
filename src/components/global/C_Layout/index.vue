@@ -1,5 +1,5 @@
 <template>
-  <div class="layout-container">
+  <div :class="['layout-container', `${themeStore.mode}-mode`]">
     <NLayout has-sider>
       <NLayoutSider
         ref="siderRef"
@@ -17,12 +17,9 @@
       >
         <C_Menu
           :data="menuData"
-          :default-value="activeKey"
-          :default-expanded-keys="expandedKeys"
           mode="vertical"
           :collapsed="isCollapsed"
           :inverted="!isLightTheme"
-          @update:value="handleMenuClick"
         />
       </NLayoutSider>
 
@@ -84,67 +81,9 @@
   )
   const menuData = permissionStore.showMenuListGet
 
-  // 路由相关
-  const route = useRoute()
-  const router = useRouter()
-
   // 侧边栏相关
   const siderRef = ref<LayoutSiderInst | null>(null)
   const isCollapsed = ref(false)
-
-  // 菜单相关
-  const activeKey = computed(() => route.path)
-  const expandedKeys = ref<string[]>([])
-
-  // 菜单点击处理
-  const handleMenuClick = (key: string) => {
-    const flattenMenu = (items: MenuOptions[]): MenuOptions[] => {
-      return items.reduce(
-        (acc, item) => [
-          ...acc,
-          item,
-          ...(item.children ? flattenMenu(item.children) : []),
-        ],
-        [] as MenuOptions[]
-      )
-    }
-
-    const menuItem = flattenMenu(menuData).find(item => item.key === key)
-    if (menuItem?.path) {
-      router.push(menuItem.path)
-    }
-  }
-
-  // 初始化展开的菜单项
-  const initExpandedKeys = () => {
-    const flattenMenu = (items: MenuOptions[]): MenuOptions[] => {
-      return items.reduce(
-        (acc, item) => [
-          ...acc,
-          item,
-          ...(item.children ? flattenMenu(item.children) : []),
-        ],
-        [] as MenuOptions[]
-      )
-    }
-
-    const paths = route.path.split('/').filter(Boolean)
-    const keys = new Set<string>()
-    let currentPath = ''
-
-    paths.forEach(path => {
-      currentPath += `/${path}`
-      const menuItem = flattenMenu(menuData).find(
-        item => item.path === currentPath
-      )
-      if (menuItem?.key) keys.add(menuItem.key)
-    })
-
-    expandedKeys.value = Array.from(keys)
-  }
-
-  // 监听路由变化
-  watch(() => route.path, initExpandedKeys, { immediate: true })
 </script>
 
 <style scoped>
@@ -183,20 +122,19 @@
     background-color: var(--n-color) !important;
   }
 
-  /* 右侧内容区域背景色 - 默认暗色（跟随系统时使用） */
+  /* 内容区域背景色 - 由主题控制 */
   .layout-container :deep(.n-layout .n-layout-scroll-container) {
+    /* 暗色默认值 - 用于跟随系统或暗色模式 */
     background-color: #1c1c21 !important;
   }
 
-  /* 亮色主题覆盖 */
-  html.light .layout-container :deep(.n-layout .n-layout-scroll-container),
-  body.light .layout-container :deep(.n-layout .n-layout-scroll-container) {
-    background-color: #f6f9fb !important;
+  /* 白色主题特定覆盖 */
+  .layout-container.light-mode :deep(.n-layout .n-layout-scroll-container) {
+    background-color: #e4e7ed !important;
   }
 
-  /* 暗色主题覆盖（确保优先级） */
-  html.dark .layout-container :deep(.n-layout .n-layout-scroll-container),
-  body.dark .layout-container :deep(.n-layout .n-layout-scroll-container) {
+  /* 暗色主题覆盖 */
+  .layout-container.dark-mode :deep(.n-layout .n-layout-scroll-container) {
     background-color: #1c1c21 !important;
   }
 
