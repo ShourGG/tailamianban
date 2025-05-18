@@ -61,7 +61,6 @@
 </template>
 <script setup lang="ts">
   import { type LayoutSiderInst } from 'naive-ui'
-  import { computed, ref, watch, onMounted, nextTick } from 'vue'
   import { s_permissionStore } from '@/stores/permission'
   import { useThemeStore } from '@/stores/theme'
 

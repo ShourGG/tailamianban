@@ -2,14 +2,14 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2023-06-09 16:26:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-18 17:07:30
+ * @LastEditTime: 2025-05-18 17:30:03
  * @FilePath: \Robot_Admin\src\components\global\C_Menu\index.vue
  * @Description: 菜单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
   <NMenu
-    v-if="isInitialized"
+    ref="menuRef"
     :options="options"
     :expanded-keys="expandedKeys"
     :value="activeKey"
@@ -29,10 +29,8 @@
 </template>
 
 <script setup lang="ts">
-  import { NIcon, type MenuOption } from 'naive-ui'
+  import { NIcon, type MenuOption, type MenuInst } from 'naive-ui'
   import { useThemeStore } from '@/stores/theme'
-  import { computed, ref, watch, onMounted, nextTick } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
 
   const route = useRoute()
   const router = useRouter()
@@ -55,8 +53,8 @@
     inverted: false,
   })
 
-  // 初始化标记，确保菜单在正确初始化后才显示
-  const isInitialized = ref(false)
+  // 菜单引用，用于调用showOption方法
+  const menuRef = ref<MenuInst | null>(null)
 
   // 当前激活的菜单项 - 根据当前路由路径动态计算
   const activeKey = computed(() => route.path)
@@ -215,12 +213,22 @@
     expandedKeys.value = keys
   }
 
+  /**
+   * 使用showOption方法展开当前路径菜单
+   */
+  const showCurrentOption = () => {
+    if (menuRef.value) {
+      // 使用当前路径作为key，确保当前选中菜单项可见
+      menuRef.value.showOption(activeKey.value)
+    }
+  }
+
   // 页面初始化时执行一次
   onMounted(() => {
     nextTick(() => {
       initExpandedKeys()
-      // 设置初始化完成标记，确保菜单显示前已经准备好展开项
-      isInitialized.value = true
+      // 直接调用showOption方法，不需要延迟
+      showCurrentOption()
     })
   })
 

@@ -5,6 +5,10 @@ import {
   type GlobalThemeOverrides,
 } from '@/config/theme'
 
+// 本地存储键名常量
+const THEME_MODE_KEY = 'theme-mode'
+const THEME_OVERRIDES_KEY = 'theme-overrides'
+
 export type ThemeMode = 'light' | 'dark' | 'system'
 
 interface ThemeState {
@@ -66,13 +70,13 @@ export const useThemeStore = defineStore('theme', {
     // 初始化主题
     init() {
       // 从localStorage读取主题设置
-      const savedMode = localStorage.getItem('theme-mode') as ThemeMode
+      const savedMode = localStorage.getItem(THEME_MODE_KEY) as ThemeMode
       if (savedMode) {
         this.mode = savedMode
       }
 
       // 尝试从本地存储加载自定义主题覆盖
-      const savedOverrides = localStorage.getItem('theme-overrides')
+      const savedOverrides = localStorage.getItem(THEME_OVERRIDES_KEY)
       if (savedOverrides) {
         try {
           const parsedOverrides = JSON.parse(savedOverrides)
@@ -127,7 +131,7 @@ export const useThemeStore = defineStore('theme', {
 
       // 设置主题
       this.mode = mode
-      localStorage.setItem('theme-mode', mode)
+      localStorage.setItem(THEME_MODE_KEY, mode)
 
       // 确保DOM更新
       await new Promise(resolve => requestAnimationFrame(resolve))
@@ -154,7 +158,7 @@ export const useThemeStore = defineStore('theme', {
       }
       // 将自定义主题保存到本地存储
       localStorage.setItem(
-        'theme-overrides',
+        THEME_OVERRIDES_KEY,
         JSON.stringify(this.customOverrides)
       )
     },
@@ -162,7 +166,7 @@ export const useThemeStore = defineStore('theme', {
     // 重置主题覆盖为默认配置
     resetThemeOverrides() {
       this.customOverrides = themeOverrides
-      localStorage.removeItem('theme-overrides')
+      localStorage.removeItem(THEME_OVERRIDES_KEY)
     },
   },
 })
