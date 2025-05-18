@@ -1,5 +1,8 @@
 <template>
-  <div :class="['layout-container', `${themeStore.mode}-mode`]">
+  <div
+    v-if="isReady"
+    :class="['layout-container', `${themeStore.mode}-mode`]"
+  >
     <NLayout has-sider>
       <NLayoutSider
         ref="siderRef"
@@ -58,15 +61,46 @@
 </template>
 <script setup lang="ts">
   import { type LayoutSiderInst } from 'naive-ui'
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, onMounted, nextTick } from 'vue'
   import { s_permissionStore } from '@/stores/permission'
   import { useThemeStore } from '@/stores/theme'
 
   const permissionStore = s_permissionStore()
   const themeStore = useThemeStore()
 
+  // 控制布局组件是否准备好显示，避免主题闪烁
+  const isReady = ref(false)
+
   const theme = computed(() => themeStore.mode)
   const isLightTheme = computed(() => theme.value === 'light')
+
+  // 在组件挂载后执行初始化
+  onMounted(() => {
+    // 创建预渲染样式，确保黑色主题下页面初始加载不会出现白闪
+    if (
+      themeStore.mode === 'dark' ||
+      (themeStore.mode === 'system' && themeStore.systemIsDark)
+    ) {
+      const style = document.createElement('style')
+      style.textContent = `
+        body, #app {
+          background-color: #1c1c21 !important;
+        }
+      `
+      document.head.appendChild(style)
+
+      // 清理临时样式
+      nextTick(() => {
+        setTimeout(() => {
+          document.head.removeChild(style)
+          isReady.value = true
+        }, 10)
+      })
+    } else {
+      // 对于浅色主题，直接显示
+      isReady.value = true
+    }
+  })
 
   watch(
     theme,
@@ -122,19 +156,24 @@
     background-color: var(--n-color) !important;
   }
 
-  /* 内容区域背景色 - 由主题控制 */
+  /* 内容区域背景色设置 */
   .layout-container :deep(.n-layout .n-layout-scroll-container) {
-    /* 暗色默认值 - 用于跟随系统或暗色模式 */
-    background-color: #1c1c21 !important;
+    /* 过渡效果由主题切换时动态添加 */
+    transition: none;
   }
 
-  /* 白色主题特定覆盖 */
+  /* 主题切换时的透明度过渡 */
+  .layout-container.theme-transitioning {
+    opacity: 0.95;
+  }
+
+  /* 根据主题设置不同的背景色 */
   .layout-container.light-mode :deep(.n-layout .n-layout-scroll-container) {
     background-color: #e4e7ed !important;
   }
 
-  /* 暗色主题覆盖 */
-  .layout-container.dark-mode :deep(.n-layout .n-layout-scroll-container) {
+  .layout-container.dark-mode :deep(.n-layout .n-layout-scroll-container),
+  .layout-container.system-mode :deep(.n-layout .n-layout-scroll-container) {
     background-color: #1c1c21 !important;
   }
 

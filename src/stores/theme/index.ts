@@ -93,34 +93,57 @@ export const useThemeStore = defineStore('theme', {
       })
     },
 
-    // 设置主题模式 - 彻底解决闪烁问题
+    // 设置主题模式 - 丝滑过渡
     async setMode(mode: ThemeMode) {
-      // 1. 预加载目标主题样式
-      const preloadStyle = document.createElement('style')
-      const targetTheme = mode === 'dark' ? darkThemeOverrides : themeOverrides
-      preloadStyle.textContent = `
-        .layout-sider, .n-menu {
-          background-color: ${targetTheme.Menu?.color || targetTheme.common?.bodyColor} !important;
-          transition: none !important;
+      // 预先创建丝滑过渡的style
+      const transitionStyle = document.createElement('style')
+      transitionStyle.textContent = `
+        /* 添加全局过渡效果 */
+        .layout-container :deep(.n-layout .n-layout-scroll-container),
+        .layout-sider,
+        .n-menu,
+        .layout-header,
+        .layout-footer,
+        .light-theme,
+        .dark-theme {
+          transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        /* 减少内容闪烁 */
+        .layout-container {
+          opacity: 0.95;
+          transition: opacity 0.35s ease-in-out;
         }
       `
-      document.head.appendChild(preloadStyle)
+      document.head.appendChild(transitionStyle)
 
-      // 2. 确保样式已应用
-      await new Promise(resolve => requestAnimationFrame(resolve))
-      void document.documentElement.offsetHeight
+      // 应用主题前等待DOM更新
+      await new Promise(resolve => setTimeout(resolve, 10))
 
-      // 3. 执行主题切换
+      // 增加透明度过渡
+      document
+        .querySelector('.layout-container')
+        ?.classList.add('theme-transitioning')
+
+      // 设置主题
       this.mode = mode
       localStorage.setItem('theme-mode', mode)
 
-      // 4. 等待naive-ui完成主题计算
-      await new Promise(resolve => setTimeout(resolve, 0))
+      // 确保DOM更新
+      await new Promise(resolve => requestAnimationFrame(resolve))
 
-      // 5. 恢复过渡效果
+      // 等待过渡完成后清理
       setTimeout(() => {
-        document.head.removeChild(preloadStyle)
-      }, 300)
+        // 恢复透明度
+        document
+          .querySelector('.layout-container')
+          ?.classList.remove('theme-transitioning')
+
+        // 移除临时样式
+        setTimeout(() => {
+          document.head.removeChild(transitionStyle)
+        }, 400)
+      }, 350)
     },
 
     // 更新主题覆盖配置

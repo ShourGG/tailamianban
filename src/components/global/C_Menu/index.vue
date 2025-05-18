@@ -2,16 +2,17 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2023-06-09 16:26:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-18 16:38:38
+ * @LastEditTime: 2025-05-18 17:07:30
  * @FilePath: \Robot_Admin\src\components\global\C_Menu\index.vue
  * @Description: 菜单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
   <NMenu
+    v-if="isInitialized"
     :options="options"
-    :default-expanded-keys="expandedKeys"
-    :default-value="activeKey"
+    :expanded-keys="expandedKeys"
+    :value="activeKey"
     :mode="mode"
     :collapsed="collapsed"
     :collapsed-width="collapsedWidth"
@@ -23,13 +24,14 @@
       --n-item-color-active: var(--primary-color);
     "
     @update:value="handleMenuClick"
+    @update:expanded-keys="onExpandedKeysChange"
   />
 </template>
 
 <script setup lang="ts">
   import { NIcon, type MenuOption } from 'naive-ui'
   import { useThemeStore } from '@/stores/theme'
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, onMounted, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   const route = useRoute()
@@ -53,7 +55,10 @@
     inverted: false,
   })
 
-  // 当前激活的菜单项
+  // 初始化标记，确保菜单在正确初始化后才显示
+  const isInitialized = ref(false)
+
+  // 当前激活的菜单项 - 根据当前路由路径动态计算
   const activeKey = computed(() => route.path)
 
   // 展开的菜单项
@@ -203,6 +208,57 @@
     expandedKeys.value = Array.from(keys)
   }
 
-  // 监听路由变化，更新展开的菜单项
-  watch(() => route.path, initExpandedKeys, { immediate: true })
+  /**
+   * 处理菜单展开状态变化
+   */
+  const onExpandedKeysChange = (keys: string[]) => {
+    expandedKeys.value = keys
+  }
+
+  // 页面初始化时执行一次
+  onMounted(() => {
+    nextTick(() => {
+      initExpandedKeys()
+      // 设置初始化完成标记，确保菜单显示前已经准备好展开项
+      isInitialized.value = true
+    })
+  })
+
+  // 监听路由变化，更新展开的菜单项，但不折叠现有展开的菜单
+  watch(
+    () => route.path,
+    () => {
+      // 获取当前路径需要展开的菜单项
+      const paths = route.path.split('/').filter(Boolean)
+      const currentPathKeys = new Set<string>()
+      let currentPath = ''
+
+      // 添加路径本身
+      paths.forEach(path => {
+        currentPath += `/${path}`
+        const menuItem = _flattenMenu(props.data).find(item => {
+          const itemPath = item.path || ''
+          return itemPath === currentPath
+        })
+
+        if (menuItem) {
+          const itemPath = menuItem.path || ''
+          const key = itemPath.startsWith('/') ? itemPath : `/${itemPath}`
+          currentPathKeys.add(key)
+        }
+      })
+
+      // 添加所有父级菜单的key
+      const parentKeys = findParentKeys(props.data, route.path)
+      parentKeys.forEach(key => currentPathKeys.add(key))
+
+      // 合并现有展开的菜单和新路径需要的菜单
+      const newKeys = new Set([
+        ...expandedKeys.value,
+        ...Array.from(currentPathKeys),
+      ])
+      expandedKeys.value = Array.from(newKeys)
+    },
+    { immediate: true }
+  )
 </script>
