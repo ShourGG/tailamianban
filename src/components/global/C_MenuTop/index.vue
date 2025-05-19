@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-19 17:13:42
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-19 22:55:14
+ * @LastEditTime: 2025-05-19 23:14:24
  * @FilePath: \Robot_Admin\src\components\global\C_MenuTop\index.vue
  * @Description: 菜单顶部区域
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -20,7 +20,14 @@
 </template>
 
 <script setup lang="ts">
+  import { useThemeStore } from '@/stores/theme'
+  import { computed } from 'vue'
   defineOptions({ name: 'C_MenuTop' })
+
+  const themeStore = useThemeStore()
+  const menuBgColor = computed(() =>
+    themeStore.isDark ? '#18181c' : '#0d1425'
+  )
 </script>
 
 <style scoped lang="scss">
@@ -31,6 +38,6 @@
     display: flex;
     align-items: center;
     padding-left: 12px;
-    background-color: #0d1425;
+    background-color: v-bind('menuBgColor');
   }
 </style>
