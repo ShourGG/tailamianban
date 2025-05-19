@@ -20,7 +20,7 @@
           isLightTheme ? 'light-theme' : 'dark-theme',
         ]"
       >
-        <div class="menu-top"> 这个放个导航logo </div>
+        <C_MenuTop />
         <div class="menu-scroll-container">
           <C_Menu
             :data="menuData"

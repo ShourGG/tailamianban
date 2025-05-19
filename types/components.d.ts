@@ -12,6 +12,7 @@ declare module 'vue' {
     C_Icon: typeof import('./../src/components/global/C_Icon/index.vue')['default']
     C_Layout: typeof import('./../src/components/global/C_Layout/index.vue')['default']
     C_Menu: typeof import('./../src/components/global/C_Menu/index.vue')['default']
+    C_MenuTop: typeof import('./../src/components/global/C_MenuTop/index.vue')['default']
     C_Theme: typeof import('./../src/components/global/C_Theme/index.vue')['default']
     'IconMdi:currencyTwd': typeof import('~icons/mdi/currency-twd')['default']
     'IconMdi:qualityMedium': typeof import('~icons/mdi/quality-medium')['default']
