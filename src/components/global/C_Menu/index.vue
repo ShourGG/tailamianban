@@ -1,8 +1,8 @@
 <!--
  * @Author: ChenYu ycyplus@gmail.com
- * @Date: 2023-06-09 16:26:10
+ * @Date: 2025-05-11 16:26:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-19 09:46:40
+ * @LastEditTime: 2025-05-19 21:38:12
  * @FilePath: \Robot_Admin\src\components\global\C_Menu\index.vue
  * @Description: 菜单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -80,7 +80,9 @@
   const expandedKeys = ref<string[]>([])
 
   /**
-   * 将菜单选项格式化为NMenu所需的格式
+   * * @description: 将菜单选项格式化为NMenu所需的格式
+   * ? @param {*} items 菜单选项数组
+   * ! @return {*} MenuOption[] 格式化后的菜单选项数组，用于NMenu组件
    */
   const normalizeOptions = (items: MenuOptions[]): MenuOption[] => {
     return items.map(item => ({
@@ -113,12 +115,14 @@
   const options = computed<MenuOption[]>(() => normalizeOptions(props.data))
 
   // 菜单主题样式
-  const menuThemeOverrides = computed(() => {
-    return themeStore.themeOverrides.Menu || {}
-  })
+  const menuThemeOverrides = computed(
+    () => themeStore.themeOverrides.Menu || {}
+  )
 
   /**
-   * 将菜单数据扁平化处理，方便查找
+   * * @description: 将菜单数据扁平化处理，方便查找
+   * ? @param {*} items 菜单选项数组
+   * ! @return {*} MenuOptions[] 扁平化后的菜单选项数组
    */
   const _flattenMenu = (items: MenuOptions[]): MenuOptions[] => {
     return items.reduce(
@@ -132,7 +136,9 @@
   }
 
   /**
-   * 处理菜单项点击事件
+   * * @description: 处理菜单项点击事件
+   * ? @param {*} key 菜单项key
+   * ! @return {*} void
    */
   const handleMenuClick = (key: string) => {
     const menuItem = _flattenMenu(props.data).find(item => {
@@ -143,14 +149,12 @@
         : `/${itemPath}`
       return normalizedPath === key
     })
-
-    if (menuItem?.path) {
-      router.push(menuItem.path)
-    }
+    if (menuItem?.path) router.push(menuItem.path)
   }
 
   /**
-   * 获取父级菜单项的key
+   * * @description: 获取父级菜单项的key
+   * ! @return {*} string[] 父级菜单项的key数组
    */
   const findParentKeys = (
     items: MenuOptions[],
@@ -192,7 +196,8 @@
   }
 
   /**
-   * 初始化展开的菜单项
+   * * @description: 初始化展开的菜单项
+   * ! @return {*}  void 初始化展开的菜单项
    */
   const initExpandedKeys = () => {
     const paths = route.path.split('/').filter(Boolean)
@@ -224,30 +229,20 @@
   }
 
   /**
-   * 处理菜单展开状态变化
+   * * @description: 处理菜单展开状态变化
+   * ? @param {*} keys 展开的菜单项key数组
+   * ! @return {*} void 更新展开的菜单项
    */
-  const onExpandedKeysChange = (keys: string[]) => {
-    expandedKeys.value = keys
-  }
+  const onExpandedKeysChange = (keys: string[]) => (expandedKeys.value = keys)
 
   /**
-   * 使用showOption方法展开当前路径菜单
+   * * @description: 使用showOption方法展开当前路径菜单
+   * ! @return {*}  void 展开当前路径菜单
    */
   const showCurrentOption = () => {
-    if (menuRef.value) {
-      // 使用当前路径作为key，确保当前选中菜单项可见
-      menuRef.value.showOption(activeKey.value)
-    }
+    // 使用当前路径作为key，确保当前选中菜单项可见
+    if (menuRef.value) menuRef.value.showOption(activeKey.value)
   }
-
-  // 页面初始化时执行一次
-  onMounted(() => {
-    nextTick(() => {
-      initExpandedKeys()
-      // 直接调用showOption方法，不需要延迟
-      showCurrentOption()
-    })
-  })
 
   // 监听路由变化，更新展开的菜单项，但不折叠现有展开的菜单
   watch(
@@ -286,4 +281,12 @@
     },
     { immediate: true }
   )
+
+  // 页面初始化时执行一次
+  onMounted(() => {
+    nextTick(() => {
+      initExpandedKeys()
+      showCurrentOption()
+    })
+  })
 </script>

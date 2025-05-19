@@ -4,7 +4,7 @@
     height: 100vh;
     overflow: hidden;
   }
-  
+
 
   /* ==== 头部区域样式 ==== */
 
@@ -122,7 +122,7 @@
 
   /* 菜单容器 */
   .menu-scroll-container {
-    height: calc(100vh - 100px);
+    height: calc(100vh - 56px);
     overflow-y: scroll;
     scrollbar-width: none;
     -ms-overflow-style: none;
