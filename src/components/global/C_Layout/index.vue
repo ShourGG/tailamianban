@@ -200,7 +200,7 @@
   }
 
   .layout-container.light-mode :deep(.n-layout .n-layout-scroll-container) {
-    background-color: #e4e7ed !important;
+    background-color: rgb(241 242 244) !important;
   }
 
   .layout-container.dark-mode :deep(.n-layout .n-layout-scroll-container),
