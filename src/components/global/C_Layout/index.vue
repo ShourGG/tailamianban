@@ -129,20 +129,14 @@
 </script>
 
 <style scoped>
+  /* ==== 基础布局样式 ==== */
+
   .layout-container {
     height: 100vh;
     overflow: hidden;
   }
 
-  .layout-container :deep(.n-menu-item-content__icon) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: -8px;
-    vertical-align: top;
-    width: 24px;
-    height: 24px;
-  }
+  /* ==== 头部区域样式 ==== */
 
   .layout-container :deep(.layout-header) {
     height: 100px;
@@ -155,36 +149,6 @@
     z-index: 1000;
   }
 
-  .layout-container :deep(.light-theme) {
-    background-color: #ffffff !important;
-  }
-
-  .layout-container :deep(.dark-theme) {
-    /* 使用naive-ui的默认暗色主题背景色 */
-    background-color: var(--n-color) !important;
-  }
-
-  /* 内容区域背景色设置 */
-  .layout-container :deep(.n-layout .n-layout-scroll-container) {
-    /* 过渡效果由主题切换时动态添加 */
-    transition: none;
-  }
-
-  /* 主题切换时的透明度过渡 */
-  .layout-container.theme-transitioning {
-    opacity: 0.95;
-  }
-
-  /* 根据主题设置不同的背景色 */
-  .layout-container.light-mode :deep(.n-layout .n-layout-scroll-container) {
-    background-color: #e4e7ed !important;
-  }
-
-  .layout-container.dark-mode :deep(.n-layout .n-layout-scroll-container),
-  .layout-container.system-mode :deep(.n-layout .n-layout-scroll-container) {
-    background-color: #1c1c21 !important;
-  }
-
   .layout-container :deep(.header-content) {
     width: 100%;
     height: 100%;
@@ -192,17 +156,11 @@
     align-items: center;
   }
 
+  /* ==== 内容区域样式 ==== */
+
   .layout-container :deep(.content-with-header) {
     margin-top: 100px;
     height: calc(100vh - 150px); /* 100px header + 50px footer */
-  }
-
-  .layout-container :deep(.n-layout-footer) {
-    height: 50px;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .layout-container :deep(.n-layout-content) {
@@ -220,12 +178,44 @@
     width: 100%; /* 确保内容区域宽度自适应 */
   }
 
-  /* 彻底移除横向滚动条 */
-  .no-horizontal-scroll {
-    overflow-x: hidden !important;
+  /* ==== 底部区域样式 ==== */
+
+  .layout-container :deep(.n-layout-footer) {
+    height: 50px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* 菜单区域优化 - 解决主题切换闪烁 */
+  /* ==== 主题相关样式 ==== */
+
+  .layout-container :deep(.light-theme) {
+    background-color: #ffffff !important;
+  }
+
+  .layout-container :deep(.dark-theme) {
+    /* 使用naive-ui的默认暗色主题背景色 */
+    background-color: var(--n-color) !important;
+  }
+
+  .layout-container.light-mode :deep(.n-layout .n-layout-scroll-container) {
+    background-color: #e4e7ed !important;
+  }
+
+  .layout-container.dark-mode :deep(.n-layout .n-layout-scroll-container),
+  .layout-container.system-mode :deep(.n-layout .n-layout-scroll-container) {
+    background-color: #1c1c21 !important;
+  }
+
+  /* 主题切换时的透明度过渡 */
+  .layout-container.theme-transitioning {
+    opacity: 0.95;
+  }
+
+  /* ==== 侧边栏和菜单样式 ==== */
+
+  /* 侧边栏基础样式 */
   .layout-sider {
     transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateZ(0);
@@ -242,12 +232,108 @@
   .layout-sider.dark-theme {
     background-color: rgb(16, 16, 20);
   }
+
+  /* 侧边栏滚动条优化 */
   .layout-sider :deep(.n-scrollbar-rail) {
     width: 0 !important; /* 隐藏滚动条轨道 */
   }
   .layout-sider :deep(.n-scrollbar-content) {
     padding-right: 0 !important; /* 移除滚动条内容的右侧padding */
   }
+
+  /* 菜单容器样式 */
+  .layout-container :deep(.n-layout-sider) {
+    flex-shrink: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .layout-container :deep(.n-menu.n-menu--vertical) {
+    flex: 1;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  /* 菜单图标样式 */
+  .layout-container :deep(.n-menu-item-content__icon) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -8px;
+    vertical-align: top;
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+
+  /* ==== 折叠菜单样式 ==== */
+
+  .layout-container :deep(.n-menu.n-menu--collapsed) {
+    width: 64px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item-content) {
+    justify-content: center !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    width: 64px;
+  }
+
+  /* 折叠菜单图标定位 */
+  .layout-container :deep(.n-menu.n-menu--collapsed .n-icon) {
+    margin-left: 38px !important; /* 精确调整位置以确保图标居中 */
+    margin-top: 4px !important; /* 精确调整位置以确保图标居中 */
+  }
+
+  .layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item) {
+    padding: 0 !important;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .layout-container
+    :deep(.n-menu.n-menu--collapsed .n-menu-item-content-header) {
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  /* 折叠菜单图标间距调整 */
+  .layout-container
+    :deep(.n-menu.n-menu--collapsed .n-menu-item-content__icon) {
+    margin-right: 0;
+  }
+
+  /* 折叠菜单选中状态 */
+  .layout-container
+    :deep(
+      .n-menu.n-menu--collapsed
+        .n-menu-item-content--child-active
+        .n-menu-item-content__icon
+    ) {
+    color: var(--n-item-color-active) !important;
+  }
+
+  .layout-container
+    :deep(.n-menu.n-menu--collapsed .n-menu-item-content--child-active) {
+    opacity: 0.85;
+    &::before {
+      background: rgba(251, 255, 253, 0.15); /* 半透明背景色 */
+      border-radius: 6px;
+    }
+  }
+
+  /* 折叠菜单图标颜色 */
+  :deep(.n-menu--collapsed .n-menu-item-content__icon) {
+    color: rgba(229, 231, 235, 0.9) !important;
+  }
+
+  /* ==== 其他辅助样式 ==== */
 
   /* 确保内容区域自适应 */
   .layout-container :deep(.n-layout) {
@@ -262,96 +348,8 @@
     flex-direction: column;
   }
 
-  /* 精确控制菜单容器 */
-  .layout-container :deep(.n-layout-sider) {
-    flex-shrink: 0;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* 精确覆盖Naive UI菜单样式 */
-  .layout-container :deep(.n-menu.n-menu--vertical) {
-    flex: 1;
-    min-height: 100vh;
-    overflow-y: auto;
-  }
-
-  /* 处理菜单折叠时的样式 */
-  .layout-container :deep(.n-menu.n-menu--collapsed) {
-    width: 64px !important;
-  }
-
-  /* 菜单折叠状态下的布局优化 */
-  .layout-container :deep(.n-menu.n-menu--collapsed) {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  /* 菜单折叠状态下的图标和文字居中对齐 */
-  .layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item-content) {
-    justify-content: center !important;
-    padding: 0 !important;
-    display: flex;
-    align-items: center;
-    width: 64px;
-  }
-
-  /* 折叠状态下精确定位图标 - 使用直接margin调整 */
-  .layout-container :deep(.n-menu.n-menu--collapsed .n-icon) {
-    margin-left: 38px !important; /* 精确调整位置以确保图标居中 */
-    margin-top: 4px !important; /* 精确调整位置以确保图标居中 */
-  }
-
-  /* 图标居中 - 精确控制 */
-  .layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item) {
-    padding: 0 !important;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-  }
-
-  /* 确保图标绝对居中 */
-  .layout-container
-    :deep(.n-menu.n-menu--collapsed .n-menu-item-content-header) {
-    margin: 0 auto;
-    padding: 0;
-  }
-
-  /* 调整菜单项的图标和文字间距 */
-  .layout-container :deep(.n-menu-item-content__icon) {
-    margin-right: 8px;
-  }
-
-  /* 菜单折叠状态下去掉图标和文字间距 */
-  .layout-container
-    :deep(.n-menu.n-menu--collapsed .n-menu-item-content__icon) {
-    margin-right: 0;
-  }
-
-  /* 折叠状态下突出显示选中的父级菜单项图标 */
-  .layout-container
-    :deep(
-      .n-menu.n-menu--collapsed
-        .n-menu-item-content--child-active
-        .n-menu-item-content__icon
-    ) {
-    color: var(--n-item-color-active) !important;
-  }
-
-  /* 折叠状态下调整选中父级菜单项的样式 */
-  .layout-container
-    :deep(.n-menu.n-menu--collapsed .n-menu-item-content--child-active) {
-    opacity: 0.85;
-    &::before {
-      background: rgba(251, 255, 253, 0.15); /* 半透明背景色 */
-      border-radius: 6px;
-    }
-  }
-
-  /* 仅针对折叠状态的图标，不影响其他功能 */
-  :deep(.n-menu--collapsed .n-menu-item-content__icon) {
-    color: rgba(229, 231, 235, 0.9) !important;
+  /* 彻底移除横向滚动条 */
+  .no-horizontal-scroll {
+    overflow-x: hidden !important;
   }
 </style>
