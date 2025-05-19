@@ -300,7 +300,8 @@
 
   /* 折叠状态下精确定位图标 - 使用直接margin调整 */
   .layout-container :deep(.n-menu.n-menu--collapsed .n-icon) {
-    margin-left: 33px !important; /* 精确调整位置以确保图标居中 */
+    margin-left: 38px !important; /* 精确调整位置以确保图标居中 */
+    margin-top: 4px !important; /* 精确调整位置以确保图标居中 */
   }
 
   /* 图标居中 - 精确控制 */
@@ -342,7 +343,15 @@
   /* 折叠状态下调整选中父级菜单项的样式 */
   .layout-container
     :deep(.n-menu.n-menu--collapsed .n-menu-item-content--child-active) {
-    background-color: var(--n-item-color-active-hover) !important;
     opacity: 0.85;
+    &::before {
+      background: rgba(251, 255, 253, 0.15); /* 半透明背景色 */
+      border-radius: 6px;
+    }
+  }
+
+  /* 仅针对折叠状态的图标，不影响其他功能 */
+  :deep(.n-menu--collapsed .n-menu-item-content__icon) {
+    color: rgba(229, 231, 235, 0.9) !important;
   }
 </style>
