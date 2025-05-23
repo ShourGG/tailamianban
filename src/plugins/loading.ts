@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-12 22:07:55
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-23 17:45:35
+ * @LastEditTime: 2025-05-23 17:53:24
  * @FilePath: \Robot_Admin\src\plugins\loading.ts
  * @Description: 项目启动时的加载动画
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -130,7 +130,9 @@ export function setupLoading() {
   document.head.appendChild(style)
 
   // 确保图片加载完成
-  const logo = document.querySelector(`.${CLASS.logo}`)
+  const logo = document.querySelector(
+    `.${CLASS.logo}`
+  ) as HTMLImageElement | null
   if (logo) {
     logo.onload = () => {
       logo.style.opacity = '1'
@@ -160,7 +162,9 @@ export function removeLoading() {
     title: 'app-loading-title',
   }
 
-  const loading = document.querySelector(`.${CLASS.loading}`)
+  const loading = document.querySelector(
+    `.${CLASS.loading}`
+  ) as HTMLElement | null
   if (!loading) return
 
   // 添加淡出动画
@@ -170,11 +174,13 @@ export function removeLoading() {
   // 动画结束后移除
   setTimeout(() => {
     loading.remove()
-    const styles = document.querySelectorAll('style')
+    const styles = document.querySelectorAll(
+      'style'
+    ) as NodeListOf<HTMLStyleElement>
     styles.forEach(style => {
       if (
-        style.textContent.includes('pulse') ||
-        style.textContent.includes('fadeIn')
+        style.textContent?.includes('pulse') ||
+        style.textContent?.includes('fadeIn')
       ) {
         style.remove()
       }
