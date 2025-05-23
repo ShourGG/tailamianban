@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-12 22:07:55
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-23 17:01:10
+ * @LastEditTime: 2025-05-23 17:45:35
  * @FilePath: \Robot_Admin\src\plugins\loading.ts
  * @Description: 项目启动时的加载动画
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -94,13 +94,13 @@ export function setupLoading() {
           "></span>
         </div>
         <h1 class="${CLASS.title}" style="
-          color: #1677ff;
-          font-size: 2.4rem;
+          color:#1677ff;
+          font-size: 1.6rem;
           font-weight: bold;
           letter-spacing: 1.5px;
           opacity: 0;
-          animation: fadeIn 0.6s ease-out 0.3s forwards;
-        ">ROBOT ADMIN</h1>
+          animation: fadeIn 0.3s ease-out 0.1s forwards;
+        ">Robot Admin</h1>
       </div>
     </div>
   `
