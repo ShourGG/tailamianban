@@ -40,6 +40,11 @@ export const useThemeStore = defineStore('theme', {
       )
     },
 
+    // 暗色模式背景色
+    darkModeBgColor(): string {
+      return '#1c1c1c'
+    },
+
     // 获取主题覆盖配置
     themeOverrides(): GlobalThemeOverrides {
       // 根据暗色/亮色模式使用不同的主题配置

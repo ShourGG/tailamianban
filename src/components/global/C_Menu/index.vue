@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 16:26:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-19 21:38:12
+ * @LastEditTime: 2025-05-23 15:44:28
  * @FilePath: \Robot_Admin\src\components\global\C_Menu\index.vue
  * @Description: 菜单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -115,9 +115,11 @@
   const options = computed<MenuOption[]>(() => normalizeOptions(props.data))
 
   // 菜单主题样式
-  const menuThemeOverrides = computed(
-    () => themeStore.themeOverrides.Menu || {}
-  )
+  const menuThemeOverrides = computed(() => ({
+    ...themeStore.themeOverrides.Menu,
+    color: themeStore.isDark ? themeStore.darkModeBgColor : undefined,
+    groupTextColor: themeStore.isDark ? '#fff' : undefined,
+  }))
 
   /**
    * * @description: 将菜单数据扁平化处理，方便查找

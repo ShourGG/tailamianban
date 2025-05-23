@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-19 17:13:42
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-19 23:14:24
+ * @LastEditTime: 2025-05-23 15:35:28
  * @FilePath: \Robot_Admin\src\components\global\C_MenuTop\index.vue
  * @Description: 菜单顶部区域
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -26,7 +26,7 @@
 
   const themeStore = useThemeStore()
   const menuBgColor = computed(() =>
-    themeStore.isDark ? '#18181c' : '#0d1425'
+    themeStore.isDark ? themeStore.darkModeBgColor : '#0d1425'
   )
 </script>
 

@@ -65,8 +65,7 @@
   }
 
   .layout-container :deep(.dark-theme) {
-    /* 使用naive-ui的默认暗色主题背景色 */
-    background-color: var(--n-color) !important;
+    background-color: #1c1c1c !important;
   }
 
   .layout-container.light-mode :deep(.n-layout .n-layout-scroll-container) {
@@ -75,7 +74,7 @@
 
   .layout-container.dark-mode :deep(.n-layout .n-layout-scroll-container),
   .layout-container.system-mode :deep(.n-layout .n-layout-scroll-container) {
-    background-color: #1c1c21 !important;
+    background-color: #121212 !important;
   }
 
   /* 主题切换时的透明度过渡 */
@@ -100,7 +99,7 @@
   }
 
   .layout-sider.dark-theme {
-    background-color: rgb(16, 16, 20);
+    background-color: #1c1c1c;
   }
 
   /* 侧边栏滚动条优化 */
