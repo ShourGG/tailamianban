@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-16 15:19:02
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-23 15:39:58
+ * @LastEditTime: 2025-05-23 15:54:35
  * @FilePath: \Robot_Admin\src\config\theme.ts
  * @Description: 主题配置
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -41,7 +41,6 @@ export interface GlobalThemeOverrides {
     infoColorHover?: string
     infoColorPressed?: string
     infoColorSuppl?: string
-    bodyColor?: string
     [key: string]: string | undefined
   }
 
@@ -138,9 +137,6 @@ const lightMenuConfig: GlobalThemeOverrides['Menu'] = {
  * 定义暗色主题下菜单组件的各种状态颜色
  */
 const darkMenuConfig: GlobalThemeOverrides['Menu'] = {
-  color: 'rgb(16, 16, 20)', // 菜单背景色 - 深灰色
-  scrollbarColor: 'rgb(16, 16, 20)', // 滚动条颜色
-  scrollbarColorHover: 'rgb(24, 24, 28)', // 滚动条悬停颜色
   itemTextColor: '#e5e7eb', // 菜单项文本颜色
   itemTextColorHover: '#f8fafc', // 菜单项悬停文本颜色
   itemTextColorActive: '#e5e7eb', // 菜单项激活文本颜色
@@ -201,7 +197,6 @@ export const darkThemeOverrides: GlobalThemeOverrides = {
     infoColorHover: primaryColorHover,
     infoColorPressed: primaryColorPressed,
     infoColorSuppl: primaryColorSuppl,
-    bodyColor: 'rgb(16, 16, 20)', // 暗色主题背景色
   },
   Menu: darkMenuConfig, // 暗色菜单配置
 }
