@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-12 22:07:55
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-13 09:25:41
+ * @LastEditTime: 2025-05-23 17:01:10
  * @FilePath: \Robot_Admin\src\plugins\loading.ts
  * @Description: 项目启动时的加载动画
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -26,36 +26,12 @@ export function setupLoading() {
     title: 'app-loading-title',
   }
 
-  // ====== 立即设置背景色防闪 ======
-  document.documentElement.style.backgroundColor = '#fff'
-  document.body.style.backgroundColor = '#fff'
+  // 检查是否已存在加载结构，避免重复
+  if (document.querySelector(`.${CLASS.loading}`)) return
 
-  // ====== 同步插入完整结构 ======
+  // ====== 内联关键结构到HTML ======
   const loadingHTML = `
-    <div class="${CLASS.loading}">
-      <div class="${CLASS.wrap}">
-        <div class="${CLASS.loading}-logo-container">
-          <img src="/src/assets/images/机器人.gif"
-               class="${CLASS.logo}"
-               alt="Loading" />
-        </div>
-        <div class="${CLASS.dots}">
-          ${Array.from({ length: 4 }, () => '<span></span>').join('')}
-        </div>
-        <h1 class="${CLASS.title}">ROBOT ADMIN</h1>
-      </div>
-    </div>
-  `
-
-  const loader = document.createElement('div')
-  loader.innerHTML = loadingHTML
-  document.body.appendChild(loader)
-
-  // ====== 添加样式 ======
-  const style = document.createElement('style')
-  style.textContent = `
-    /* 主容器样式 */
-    .${CLASS.loading} {
+    <div class="${CLASS.loading}" style="
       position: fixed;
       top: 0;
       left: 0;
@@ -66,75 +42,100 @@ export function setupLoading() {
       align-items: center;
       background: #fff;
       z-index: 9999;
-    }
+    ">
+      <div class="${CLASS.wrap}" style="
+        text-align: center;
+        transform: translateY(10%);
+        width: 100%;
+      ">
+        <div class="${CLASS.loading}-logo-container" style="
+          display: flex;
+          justify-content: center;
+          margin-bottom: 40px;
+        ">
+          <img src="/src/assets/images/机器人.gif"
+               class="${CLASS.logo}"
+               style="width: 280px; height: 280px;"
+               alt="Loading" />
+        </div>
+        <div class="${CLASS.dots}" style="
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin: 0 auto 30px;
+        ">
+          <span style="
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #1677ff;
+            animation: pulse 1.4s infinite ease-in-out;
+          "></span>
+          <span style="
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #1677ff;
+            animation: pulse 1.4s infinite ease-in-out 0.2s;
+          "></span>
+          <span style="
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #1677ff;
+            animation: pulse 1.4s infinite ease-in-out 0.4s;
+          "></span>
+          <span style="
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #1677ff;
+            animation: pulse 1.4s infinite ease-in-out 0.6s;
+          "></span>
+        </div>
+        <h1 class="${CLASS.title}" style="
+          color: #1677ff;
+          font-size: 2.4rem;
+          font-weight: bold;
+          letter-spacing: 1.5px;
+          opacity: 0;
+          animation: fadeIn 0.6s ease-out 0.3s forwards;
+        ">ROBOT ADMIN</h1>
+      </div>
+    </div>
+  `
 
-    /* 内容包裹层 */
-    .${CLASS.wrap} {
-      text-align: center;
-      transform: translateY(10%);
-      width: 100%;
-    }
+  // 插入内联结构 - 确保立即显示
+  document.body.insertAdjacentHTML('afterbegin', loadingHTML)
 
-    /* 机器人容器 */
-    .${CLASS.loading}-logo-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 40px;
+  // ====== 动态添加关键帧和细节样式 ======
+  const style = document.createElement('style')
+  style.textContent = `
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.8); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 1; }
     }
-
-    /* 超大机器人图片 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* 仅保留动态部分样式 */
+    .${CLASS.loading} {
+      z-index: 9999;
+    }
     .${CLASS.logo} {
-      width: 280px;
-      height: 280px;
+      animation: bounce 1s infinite ease-in-out;
     }
-
-    /* 点状动画 */
-    .${CLASS.dots} {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin: 0 auto 30px;
-    }
-
-    .${CLASS.dots} span {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #1677ff;
-      animation: pulse 1.4s infinite ease-in-out;
-    }
-
-    .${CLASS.dots} span:nth-child(2) { animation-delay: 0.2s; }
-    .${CLASS.dots} span:nth-child(3) { animation-delay: 0.4s; }
-    .${CLASS.dots} span:nth-child(4) { animation-delay: 0.6s; }
-
-    /* 标题 */
-  .${CLASS.title} {
-    color: #1677ff;
-    font-size: 2.4rem;
-    font-weight: bold;
-    letter-spacing: 1.5px;
-    opacity: 0;
-    animation: fadeIn 0.6s ease-out 0.3s forwards;
-  }
-
-  /* 新增淡入关键帧 */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
   `
   document.head.appendChild(style)
 
-  // ====== 移除逻辑 ======
-  const removeLoading = () => {
-    const loading = document.querySelector(`.${CLASS.loading}`)
-    if (loading) {
-      loading.remove()
+  // 确保图片加载完成
+  const logo = document.querySelector(`.${CLASS.logo}`)
+  if (logo) {
+    logo.onload = () => {
+      logo.style.opacity = '1'
     }
-    // 恢复默认背景色
-    document.documentElement.style.backgroundColor = ''
-    document.body.style.backgroundColor = ''
+    if (logo.complete) logo.style.opacity = '1'
   }
 
   // 监听加载完成事件
@@ -144,4 +145,43 @@ export function setupLoading() {
 
   // 设置最大等待时间
   setTimeout(removeLoading, 1000)
+}
+
+/**
+ * @description: 移除加载动画
+ * @return {*} {void}
+ */
+export function removeLoading() {
+  const CLASS = {
+    loading: 'app-loading',
+    wrap: 'app-loading-wrap',
+    logo: 'app-loading-logo',
+    dots: 'loading-dots',
+    title: 'app-loading-title',
+  }
+
+  const loading = document.querySelector(`.${CLASS.loading}`)
+  if (!loading) return
+
+  // 添加淡出动画
+  loading.style.transition = 'opacity 0.4s ease-out'
+  loading.style.opacity = '0'
+
+  // 动画结束后移除
+  setTimeout(() => {
+    loading.remove()
+    const styles = document.querySelectorAll('style')
+    styles.forEach(style => {
+      if (
+        style.textContent.includes('pulse') ||
+        style.textContent.includes('fadeIn')
+      ) {
+        style.remove()
+      }
+    })
+
+    // 恢复默认背景色
+    document.documentElement.style.backgroundColor = ''
+    document.body.style.backgroundColor = ''
+  }, 400)
 }
