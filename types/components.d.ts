@@ -8,7 +8,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    C_Footer: typeof import('./../src/components/global/C_Footer/index.vue')['default']
     C_Form: typeof import('./../src/components/global/C_Form/index.vue')['default']
+    C_Header: typeof import('./../src/components/global/C_Header/index.vue')['default']
     C_Icon: typeof import('./../src/components/global/C_Icon/index.vue')['default']
     C_Layout: typeof import('./../src/components/global/C_Layout/index.vue')['default']
     C_Menu: typeof import('./../src/components/global/C_Menu/index.vue')['default']

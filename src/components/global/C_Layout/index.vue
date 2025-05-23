@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 14:22:31
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-19 21:35:53
+ * @LastEditTime: 2025-05-23 19:25:17
  * @FilePath: \Robot_Admin\src\components\global\C_Layout\index.vue
  * @Description:
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -41,34 +41,13 @@
       </NLayoutSider>
 
       <NLayout>
-        <NLayoutHeader
-          bordered
-          position="absolute"
-          :class="[
-            'layout-header',
-            isLightTheme ? 'light-theme' : 'dark-theme',
-          ]"
-        >
-          <div class="header-content">
-            <C_Theme />
-            我是一些头部其他信息，做尝试
-          </div>
-        </NLayoutHeader>
+        <C_Header :isLightTheme="isLightTheme" />
 
         <NLayoutContent class="content-with-header">
           <RouterView class="main-content" />
         </NLayoutContent>
 
-        <NLayoutFooter
-          bordered
-          :class="[
-            'layout-footer',
-            isLightTheme ? 'light-theme' : 'dark-theme',
-          ]"
-        >
-          <!-- 底部内容 -->
-          Copyright MIT © 2025 by CHENY
-        </NLayoutFooter>
+        <C_Footer :isLightTheme="isLightTheme" />
       </NLayout>
     </NLayout>
   </div>
