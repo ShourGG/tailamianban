@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 14:22:31
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-23 19:25:17
+ * @LastEditTime: 2025-05-23 23:25:31
  * @FilePath: \Robot_Admin\src\components\global\C_Layout\index.vue
- * @Description:
+ * @Description: 布局组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
@@ -19,7 +19,6 @@
         collapse-mode="width"
         :collapsed-width="64"
         :width="240"
-        show-trigger
         :native-scrollbar="false"
         :collapsed="isCollapsed"
         @update:collapsed="handleCollapsedChange"
@@ -123,6 +122,11 @@
 
   // 在组件挂载后执行初始化
   onMounted(() => _disposeThemeEffect())
+
+  provide('menuCollapse', {
+    isCollapsed,
+    handleCollapsedChange,
+  })
 </script>
 
 <style scoped>

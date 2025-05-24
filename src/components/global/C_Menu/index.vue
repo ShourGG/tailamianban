@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 16:26:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-23 16:46:58
+ * @LastEditTime: 2025-05-24 02:17:32
  * @FilePath: \Robot_Admin\src\components\global\C_Menu\index.vue
  * @Description: 菜单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -32,13 +32,9 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    NIcon,
-    type MenuOption,
-    type MenuInst,
-    type DropdownProps,
-  } from 'naive-ui'
+  import { type MenuOption, type MenuInst, type DropdownProps } from 'naive-ui'
   import { useThemeStore } from '@/stores/theme'
+  import { normalizeMenuOptions } from '@/utils/d_menu'
 
   const route = useRoute()
   const router = useRouter()
@@ -79,47 +75,12 @@
   // 展开的菜单项
   const expandedKeys = ref<string[]>([])
 
-  /**
-   * * @description: 将菜单选项格式化为NMenu所需的格式
-   * ? @param {*} items 菜单选项数组
-   * ! @return {*} MenuOption[] 格式化后的菜单选项数组，用于NMenu组件
-   */
-  const normalizeOptions = (items: MenuOptions[]): MenuOption[] => {
-    return items.map(item => ({
-      // 确保key与路由path格式一致，以支持正确的选中状态
-      // 如果path已经包含/则直接使用，否则添加/前缀
-      key: item.path
-        ? item.path.startsWith('/')
-          ? item.path
-          : `/${item.path}`
-        : '',
-      label: item.meta?.title || '',
-      disabled: item.disabled || false,
-      icon: (() => {
-        const icon = item.meta?.icon || item.icon
-        if (!icon) return undefined
-
-        if (typeof icon === 'string') {
-          return () =>
-            h(NIcon, null, { default: () => h('span', { class: icon }) })
-        }
-        return typeof icon === 'function' ? icon() : icon
-      })(),
-      ...(item.type && { type: item.type }),
-      ...(item.children?.length && {
-        children: normalizeOptions(item.children),
-      }),
-    })) as MenuOption[]
-  }
-
-  const options = computed<MenuOption[]>(() => normalizeOptions(props.data))
+  const options = computed<MenuOption[]>(() => normalizeMenuOptions(props.data))
 
   // 菜单主题样式
-  const menuThemeOverrides = computed(() => ({
-    ...themeStore.themeOverrides.Menu,
-    color: themeStore.isDark ? themeStore.darkModeBgColor : undefined,
-    groupTextColor: themeStore.isDark ? '#fff' : undefined,
-  }))
+  const menuThemeOverrides = computed(
+    () => themeStore.themeOverrides.Menu || {}
+  )
 
   /**
    * * @description: 将菜单数据扁平化处理，方便查找

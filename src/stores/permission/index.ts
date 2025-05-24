@@ -9,7 +9,6 @@
  */
 
 import { getAuthMenuListApi } from '@/api/sys'
-import { getAllBreadcrumbList } from '@/utils/d_breadcrumb'
 import { getKeepAliveRouterName, getShowMenuList } from '@/utils/d_route'
 import type { DynamicRoute } from '@/router/dynamicRouter'
 
@@ -30,8 +29,6 @@ export const s_permissionStore = defineStore('permission', {
     showMenuListGet: state => getShowMenuList(state.authMenuList),
     // 需要缓存的菜单 name，用作页面 keepAlive
     keepAliveRouterGet: state => getKeepAliveRouterName(state.authMenuList),
-    // 面包屑导航列表
-    breadcrumbListGet: state => getAllBreadcrumbList(state.authMenuList),
   },
 
   actions: {
