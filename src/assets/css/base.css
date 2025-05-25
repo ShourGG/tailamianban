@@ -1,188 +1,108 @@
-/* ========================
-   设计系统变量
-   ======================== */
-   :root {
-    /* 基础色板 */
-    --color-white: #ffffff;
-    --color-black: #181818;
+/* ===========================================
+ * 设计系统 - 基础样式定义
+ * =========================================== */
 
-    /* 中性色阶 */
-    --color-gray-1: #f8f8f8;
-    --color-gray-2: #f2f2f2;
-    --color-gray-3: #ebebeb;
-    --color-gray-8: #282828;
+/* --------- 颜色变量 --------- */
+:root {
+  /* 基础色板 */
+  --color-white: #ffffff;
+  --color-black: #181818;
+  
+  /* 中性色阶 */
+  --color-gray-1: #f8f8f8;
+  --color-gray-2: #f2f2f2;
+  --color-gray-3: #ebebeb;
+  --color-gray-8: #282828;
+  
+  /* 主题色 - 与JS中的themeConstants保持一致 */
+  --color-primary: #2080f0;
+  --color-primary-hover: #4098fc;
+  --color-primary-pressed: #1060c9;
+  --color-primary-suppl: #4098fc;
+  
+  /* 语义化变量 (默认浅色模式) */
+  --color-bg: var(--color-white);
+  --color-bg-soft: var(--color-gray-1);
+  --color-bg-mute: var(--color-gray-2);
+  --color-border: rgba(0, 0, 0, 0.12);
+  --color-border-hover: rgba(0, 0, 0, 0.29);
+  --color-text: var(--color-black);
+  --color-text-light: rgba(60, 60, 60, 0.66);
+  
+  /* 间距 */
+  --section-gap: 1.25rem;
+}
 
-    /* 主题色 */
-    --color-primary: #2c3e50;
+/* --------- 重置与基础样式 --------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  transition: background-color 0.3s, border-color 0.3s;
+}
 
-    /* 语义化变量默认值 (浅色模式) */
-    --color-bg: var(--color-white);
-    --color-bg-soft: var(--color-gray-1);
-    --color-bg-mute: var(--color-gray-2);
-    --color-border: rgba(0, 0, 0, 0.12);
-    --color-border-hover: rgba(0, 0, 0, 0.29);
-    --color-text: var(--color-black);
-    --color-text-light: rgba(60, 60, 60, 0.66);
-    --section-gap: 1.25rem;
-  }
+html {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  /* ========================
-     主题切换系统
-     ======================== */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-bg: var(--color-black);
-      --color-bg-soft: #222;
-      --color-bg-mute: var(--color-gray-8);
-      --color-border: rgba(255, 255, 255, 0.12);
-      --color-border-hover: rgba(255, 255, 255, 0.29);
-      --color-text: var(--color-gray-3);
-      --color-text-light: rgba(235, 235, 235, 0.64);
-    }
-  }
+body {
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter var', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  overscroll-behavior-y: contain;
+}
 
-  .dark {
-    --color-bg: var(--color-black);
-    --color-bg-soft: #222;
-    --color-bg-mute: var(--color-gray-8);
-  }
+/* --------- 应用容器 --------- */
+#app {
+  min-width: 320px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  /* ========================
-     全局样式重置
-     ======================== */
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    transition: background-color 0.3s, border-color 0.3s;
-  }
+.global-config-provider {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
+/* --------- 表单元素重置 --------- */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+/* --------- 媒体元素重置 --------- */
+img,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  -webkit-user-drag: none;
+}
+
+/* --------- 组件样式覆盖 --------- */
+/* Tooltip组件尺寸调整 */
+.n-tooltip {
+  --n-padding: 4px 8px !important;
+  --n-font-size: 12px !important;
+  --n-max-width: 200px !important;
+}
+
+/* --------- 响应式调整 --------- */
+@media (max-width: 768px) {
   html {
-    height: 100%;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
   }
-
-  body {
-    min-height: 100vh;
-    background: var(--color-bg);
-    color: var(--color-text);
-    font-family:
-      'Inter var',
-      system-ui,
-      -apple-system,
-      'Segoe UI',
-      Roboto,
-      'Helvetica Neue',
-      sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-    overscroll-behavior-y: contain;
-  }
-
-  /* ========================
-     核心容器设置
-     ======================== */
-  #app {
-    min-width: 320px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  .global-config-provider {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  /* ========================
-     布局容器设置
-     ======================== */
-  .layout-container {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  .n-layout {
-    height: 100%;
-  }
-
-  .n-layout-sider {
-    height: 100vh;
-    overflow-y: auto;
-  }
-
-  .n-layout:not(.n-layout-sider) {
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* 主内容区域 */
-  .main-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-  }
-
-  /* 固定底部 */
-  .layout-footer {
-    position: sticky;
-    bottom: 0;
-    width: 100%;
-    z-index: 100;
-    background: var(--color-bg);
-    border-top: 1px solid var(--color-border);
-  }
-
-  /* ========================
-     元素重置与增强
-     ======================== */
-  button,
-  input,
-  select,
-  textarea {
-    font-family: inherit;
-    background: none;
-    border: none;
-    outline: none;
-  }
-
-  img,
-  video {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    -webkit-user-drag: none;
-  }
-
-
-
-  /* ========================
-     滚动条美化
-     ======================== */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-  }
-
-  /* ========================
-     响应式调整
-     ======================== */
-  @media (max-width: 768px) {
-    html {
-      font-size: 14px;
-    }
-  }
+}

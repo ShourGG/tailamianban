@@ -2,20 +2,20 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:07:28
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-12 21:25:03
+ * @LastEditTime: 2025-05-25 13:15:34
  * @FilePath: \Robot_Admin\src\views\login\index.vue
  * @Description: 登录页
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
-  <div class="login-container">
+  <div class="login-container bg-[#181818]">
     <div class="spline-background">
       <Spline
         scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
       />
     </div>
     <div class="login-wrapper">
-      <h3 class="login-title">{{ '用户登录' }}</h3>
+      <h3 class="login-title">{{ 'Robot Admin 管理系统' }}</h3>
       <C_Form
         class="login-form"
         :options="OPTIONS"

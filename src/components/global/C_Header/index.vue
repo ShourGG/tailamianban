@@ -8,13 +8,14 @@
       'h-100px px-20px flex flex-col items-center top-0 left-0 right-0 z-1000',
     ]"
   >
+    <!-- 顶部 - 上方 -->
     <div class="header-top h56px w-full">
       <div
         class="header-content w-full h-full flex items-center justify-between"
       >
         <!-- 左侧：折叠菜单 -->
         <div class="flex items-center">
-          <NTooltip placement="bottom-start">
+          <NTooltip>
             <template #trigger>
               <NButton
                 text
@@ -35,55 +36,87 @@
         </div>
 
         <!-- 中间：面包屑导航 -->
-        <div class="flex-1 min-w-0 mx-4">
-          <NBreadcrumb>
-            <NBreadcrumbItem
-              v-for="(item, index) in currentBreadcrumb"
-              :key="index"
-            >
-              <NDropdown
-                v-if="item.children?.length"
-                :options="item.children"
-                @select="router.push"
-              >
-                <div class="trigger">
-                  <span :class="[item.icon, 'vertical-top']"></span>
-                  {{ item.label }}
-                </div>
-              </NDropdown>
-              <RouterLink
-                v-else
-                :to="item.key"
-              >
-                <span :class="[item.icon, 'vertical-top mr-1']"></span
-                >{{ item.label }}
-              </RouterLink>
-            </NBreadcrumbItem>
-          </NBreadcrumb>
-        </div>
+        <C_Breadcrumb />
 
         <!-- 右侧：用户信息 -->
         <div class="w-350px flex items-center justify-end gap-4">
-          <C_Theme />
-          <div class="flex items-center gap-2">
-            <NAvatar
-              round
-              size="small"
-              src="/avatar.png"
-            />
-            <span>管理员</span>
-          </div>
+          <NTooltip
+            placement="bottom"
+            trigger="hover"
+          >
+            <template #trigger>
+              <NButton text>
+                <span class="i-mdi:search"></span>
+              </NButton>
+            </template>
+            <span> 搜索 </span>
+          </NTooltip>
+
+          <NTooltip
+            placement="bottom"
+            trigger="hover"
+          >
+            <template #trigger>
+              <NButton text>
+                <span class="i-mdi:fullscreen"></span>
+              </NButton>
+            </template>
+            <span> 全屏 </span>
+          </NTooltip>
+
+          <NTooltip
+            placement="bottom"
+            trigger="hover"
+          >
+            <template #trigger>
+              <NButton text>
+                <span class="i-mdi:language"></span>
+              </NButton>
+            </template>
+            <span> 切换语言 </span>
+          </NTooltip>
+
+          <NTooltip
+            placement="bottom"
+            trigger="hover"
+          >
+            <template #trigger>
+              <NButton text>
+                <span class="i-mdi:white-balance-sunny"></span>
+              </NButton>
+            </template>
+            <span> 主题模式 </span>
+          </NTooltip>
+
+          <NTooltip
+            placement="bottom"
+            trigger="hover"
+          >
+            <template #trigger>
+              <NButton text>
+                <span class="i-mdi:settings-transfer-outline"></span>
+              </NButton>
+            </template>
+            <span> 布局配置 </span>
+          </NTooltip>
+        </div>
+        <C_Theme />
+        <div class="flex items-center gap-2">
+          <NAvatar
+            round
+            size="small"
+            src="@/assets/images/avatar.jpg"
+          />
+          <span>CHENY</span>
         </div>
       </div>
     </div>
+    <!-- 头部 - 下方 -->
     <div class="header-bottom h44px bg-fuchsia w-full">111</div>
   </NLayoutHeader>
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
-
   defineOptions({ name: 'C_Header' })
 
   defineProps({
@@ -100,46 +133,4 @@
 
   const { isCollapsed, handleCollapsedChange } =
     inject<MenuCollapse>('menuCollapse')!
-
-  const route = useRoute()
-  const router = useRouter()
-
-  // 当前路径对应的面包屑
-  // const currentBreadcrumb = computed(() => {
-  //   return route.matched
-  //     .filter(record => record.meta?.title)
-  //     .map(record => ({
-  //       key: record.path,
-  //       label: record.meta.title,
-  //       icon: record.meta.icon,
-  //       children: record.children?.length
-  //         ? record.children.map(child => ({
-  //             key: child.path,
-  //             label: child.meta?.title,
-  //           }))
-  //         : [],
-  //     }))
-  // })
-  const currentBreadcrumb = computed(() => {
-    return route.matched
-      .filter(record => record.meta?.title)
-      .map(record => ({
-        key: record.path,
-        label: record.meta.title,
-        icon: record.meta.icon,
-        children: record.children?.length
-          ? record.children.map(child => ({
-              key: child.path,
-              label: child.meta?.title,
-              // 仅当存在孙子菜单时添加 children 属性
-              ...(child.children?.length && {
-                children: child.children.map(grandChild => ({
-                  key: grandChild.path,
-                  label: grandChild.meta?.title,
-                })),
-              }),
-            }))
-          : [],
-      }))
-  })
 </script>
