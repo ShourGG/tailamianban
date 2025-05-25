@@ -34,7 +34,7 @@ export default defineConfig({
     vue(),
     vueJsx(),
     vueDevTools(),
-    Icons({ autoInstall: true}),
+    Icons({ autoInstall: true }),
     AutoImport({
       imports: [
         'vue',

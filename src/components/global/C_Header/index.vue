@@ -104,6 +104,10 @@
 
   const headerActions = [
     {
+      type: 'component',
+      componentName: 'C_Notice',
+    },
+    {
       icon: 'i-mdi:search',
       tooltip: '搜索',
       action: () => {
@@ -128,6 +132,13 @@
     {
       type: 'component',
       componentName: 'C_Theme',
+    },
+    {
+      icon: 'i-mdi:sign-routes',
+      tooltip: '功能引导',
+      action: () => {
+        // 引导相关逻辑
+      },
     },
     {
       icon: 'i-mdi:settings-transfer-outline',

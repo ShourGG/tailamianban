@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-25 15:41:40
+ * @LastEditTime: 2025-05-25 23:36:54
  * @FilePath: \Robot_Admin\src\main.ts
  * @Description: 根入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -20,6 +20,7 @@ import {
   setupStore,
   setupNaiveUI,
   setupDynamicComponents,
+  PassiveScrollPlugin,
 } from '@/plugins'
 
 /**
@@ -32,6 +33,7 @@ async function bootstrap() {
 
   // 第二阶段：创建Vue实例，渲染路由
   const app = createApp(App)
+  app.use(PassiveScrollPlugin)
   app.use(router)
 
   // 第三阶段：Vue相关插件
