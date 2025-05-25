@@ -10,3 +10,4 @@
 export * from './loading'
 export * from './store'
 export * from './naive-ui'
+export * from './dynamic-components'

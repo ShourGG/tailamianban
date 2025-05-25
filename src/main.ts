@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-25 02:12:04
+ * @LastEditTime: 2025-05-25 15:41:40
  * @FilePath: \Robot_Admin\src\main.ts
  * @Description: 根入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -15,7 +15,12 @@ import '@/router/permission'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import { setupLoading, setupStore, setupNaiveUI } from '@/plugins'
+import {
+  setupLoading,
+  setupStore,
+  setupNaiveUI,
+  setupDynamicComponents,
+} from '@/plugins'
 
 /**
  * @description: 应用启动入口
@@ -32,6 +37,7 @@ async function bootstrap() {
   // 第三阶段：Vue相关插件
   setupStore(app)
   setupNaiveUI(app)
+  setupDynamicComponents(app)
 
   // 第四阶段：异步插件
   await router.isReady()

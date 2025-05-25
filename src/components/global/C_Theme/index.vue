@@ -2,29 +2,26 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-13 14:22:46
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-16 19:24:01
+ * @LastEditTime: 2025-05-25 16:09:11
  * @FilePath: \Robot_Admin\src\components\global\C_Theme\index.vue
  * @Description: 主题组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
-  <NDropdown
-    trigger="click"
-    :options="options"
-    @select="handleSelect"
+  <NTooltip
+    placement="bottom"
+    trigger="hover"
   >
-    <NButton text>
-      <template #icon>
-        <NIcon size="18">
-          <span
-            :class="currentIcon"
-            class="text-current"
-          />
-        </NIcon>
-      </template>
-      主题模式
-    </NButton>
-  </NDropdown>
+    <template #trigger>
+      <NButton
+        text
+        @click="cycleThemeMode"
+      >
+        <span :class="currentIcon"></span>
+      </NButton>
+    </template>
+    <span>{{ themeTooltip }}</span>
+  </NTooltip>
 </template>
 
 <script setup lang="ts">
@@ -33,50 +30,46 @@
 
   const themeStore = useThemeStore()
 
-  // 使用 UnoCSS 图标类名
+  // 当前图标
   const currentIcon = computed(() => {
     switch (themeStore.mode) {
       case 'light':
-        return 'i-ion:sunny-sharp'
+        return 'i-mdi:white-balance-sunny'
       case 'dark':
-        return 'i-ion:moon-sharp'
+        return 'i-mdi:moon-and-stars'
       default:
-        return 'i-ion:desktop-outline'
+        return 'i-mdi:sun-moon-stars'
     }
   })
 
-  // 下拉选项
-  const options = [
-    {
-      label: '浅色模式',
-      key: 'light',
-      icon: () => h('span', { class: 'i-ion:sunny-sharp text-4' }),
-    },
-    {
-      label: '深色模式',
-      key: 'dark',
-      icon: () => h('span', { class: 'i-ion:moon-sharp text-4' }),
-    },
-    {
-      label: '跟随系统',
-      key: 'system',
-      icon: () => h('span', { class: 'i-ion:desktop-outline text-4' }),
-    },
-  ]
+  // 提示文本
+  const themeTooltip = computed(() => {
+    switch (themeStore.mode) {
+      case 'light':
+        return '当前: 浅色模式 (点击切换)'
+      case 'dark':
+        return '当前: 深色模式 (点击切换)'
+      default:
+        return '当前: 跟随系统 (点击切换)'
+    }
+  })
 
-  // 选择处理 - 优化切换性能
-  const handleSelect = (key: string) => {
-    // 1. 添加加载状态
+  // 主题模式循环切换
+  const cycleThemeMode = () => {
+    // 添加加载状态
     const app = document.getElementById('app')
     if (app) {
       app.style.pointerEvents = 'none'
-      app.style.opacity = '0.99' // 触发GPU加速
+      app.style.opacity = '0.99'
     }
 
-    // 2. 执行主题切换
-    themeStore.setMode(key as ThemeMode)
+    // 按照 system -> light -> dark -> system 顺序循环
+    const modes: ThemeMode[] = ['system', 'light', 'dark']
+    const currentIndex = modes.indexOf(themeStore.mode)
+    const nextIndex = (currentIndex + 1) % modes.length
+    themeStore.setMode(modes[nextIndex])
 
-    // 3. 恢复交互
+    // 恢复交互
     setTimeout(() => {
       if (app) {
         app.style.pointerEvents = ''

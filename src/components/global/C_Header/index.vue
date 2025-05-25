@@ -38,74 +38,43 @@
         <!-- 中间：面包屑导航 -->
         <C_Breadcrumb />
 
-        <!-- 右侧：用户信息 -->
-        <div class="w-350px flex items-center justify-end gap-4">
-          <NTooltip
-            placement="bottom"
-            trigger="hover"
+        <!-- 右侧：操作区 -->
+        <div class="w-350px flex items-center justify-end gap-4 mr16px">
+          <template
+            v-for="(item, index) in headerActions"
+            :key="index"
           >
-            <template #trigger>
-              <NButton text>
-                <span class="i-mdi:search"></span>
-              </NButton>
-            </template>
-            <span> 搜索 </span>
-          </NTooltip>
+            <!-- 渲染自定义组件 -->
+            <DynamicComponent
+              v-if="item.type === 'component'"
+              :name="item.componentName"
+            />
 
-          <NTooltip
-            placement="bottom"
-            trigger="hover"
-          >
-            <template #trigger>
-              <NButton text>
-                <span class="i-mdi:fullscreen"></span>
-              </NButton>
-            </template>
-            <span> 全屏 </span>
-          </NTooltip>
-
-          <NTooltip
-            placement="bottom"
-            trigger="hover"
-          >
-            <template #trigger>
-              <NButton text>
-                <span class="i-mdi:language"></span>
-              </NButton>
-            </template>
-            <span> 切换语言 </span>
-          </NTooltip>
-
-          <NTooltip
-            placement="bottom"
-            trigger="hover"
-          >
-            <template #trigger>
-              <NButton text>
-                <span class="i-mdi:white-balance-sunny"></span>
-              </NButton>
-            </template>
-            <span> 主题模式 </span>
-          </NTooltip>
-
-          <NTooltip
-            placement="bottom"
-            trigger="hover"
-          >
-            <template #trigger>
-              <NButton text>
-                <span class="i-mdi:settings-transfer-outline"></span>
-              </NButton>
-            </template>
-            <span> 布局配置 </span>
-          </NTooltip>
+            <!-- 渲染普通图标按钮 -->
+            <NTooltip
+              v-else
+              placement="bottom"
+              trigger="hover"
+            >
+              <template #trigger>
+                <NButton
+                  text
+                  @click="item.action"
+                >
+                  <span :class="item.icon"></span>
+                </NButton>
+              </template>
+              <span>{{ item.tooltip }}</span>
+            </NTooltip>
+          </template>
         </div>
-        <C_Theme />
+
+        <!-- 右侧：用户信息 -->
         <div class="flex items-center gap-2">
           <NAvatar
             round
             size="small"
-            src="@/assets/images/avatar.jpg"
+            src="/robot-avatar.png"
           />
           <span>CHENY</span>
         </div>
@@ -118,7 +87,6 @@
 
 <script setup lang="ts">
   defineOptions({ name: 'C_Header' })
-
   defineProps({
     isLightTheme: {
       type: Boolean,
@@ -133,4 +101,52 @@
 
   const { isCollapsed, handleCollapsedChange } =
     inject<MenuCollapse>('menuCollapse')!
+
+  const headerActions = [
+    {
+      icon: 'i-mdi:search',
+      tooltip: '搜索',
+      action: () => {
+        // 搜索相关逻辑
+      },
+    },
+    {
+      icon: 'i-mdi:fullscreen',
+      tooltip: '全屏',
+      action: () => {
+        // 全屏切换逻辑
+        toggleFullscreen()
+      },
+    },
+    {
+      icon: 'i-mdi:language',
+      tooltip: '切换语言',
+      action: () => {
+        // 语言切换逻辑
+      },
+    },
+    {
+      type: 'component',
+      componentName: 'C_Theme',
+    },
+    {
+      icon: 'i-mdi:settings-transfer-outline',
+      tooltip: '布局配置',
+      action: () => {
+        // 布局配置逻辑
+      },
+    },
+  ]
+
+  /**
+   * * @description: 全屏切换函数示例
+   * ! @return {*} {void}
+   */
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen()
+    } else {
+      document.exitFullscreen()
+    }
+  }
 </script>
