@@ -8,7 +8,7 @@
       'h-100px px-20px flex flex-col items-center top-0 left-0 right-0 z-1000',
     ]"
   >
-    <!-- 顶部 - 上方 -->
+    <!--* 头部 - 上方 -->
     <div class="header-top h56px w-full">
       <div
         class="header-content w-full h-full flex items-center justify-between"
@@ -89,8 +89,11 @@
         </div>
       </div>
     </div>
-    <!-- 头部 - 下方 -->
-    <div class="header-bottom h44px bg-fuchsia w-full">111</div>
+
+    <!--* 头部 - 下方 -->
+    <div class="header-bottom h44px w-full flex items-end">
+      <C_TagsView />
+    </div>
   </NLayoutHeader>
 </template>
 
@@ -192,3 +195,11 @@
     }
   }
 </script>
+
+<style>
+  .header-bottom {
+    border-top: 1px solid #f2f2f3;
+    border-bottom: 1px solid #f2f2f3;
+    box-sizing: border-box;
+  }
+</style>

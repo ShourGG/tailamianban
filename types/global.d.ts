@@ -37,6 +37,15 @@ declare global {
     }
     children?: MenuOptions[]
   }
+
+  interface Tag {
+    path: string
+    title: string
+    icon?: string
+    meta?: {
+      affix?: boolean
+    }
+  }
 }
 
 export {}

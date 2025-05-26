@@ -1,79 +1,83 @@
 /*
- * @Author: ChenYu
+ * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2022-04-10 23:20:30
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-29 16:10:47
+ * @LastEditTime: 2025-05-26 17:02:09
  * @FilePath: \Robot_Admin\src\stores\app\index.ts
- * @Description: 应用相关仓储
+ * @Description: 应用相关存储
  * Copyright (c) ${2022} by ChenYu/天智AgileTeam, All Rights Reserved.
- */
-import { LANG, TAGS_VIEW } from '@/constant'
-import { getItem, setItem } from '@/hooks/useStorage'
-
-export interface I_Payload {
-  type: 'index' | 'other' | 'right'
-  index: number
-}
-
-/** TODO:
- *  1. 定义并导出容器
- *   参数1： 容器的 ID , 必须唯一， 将来 Pinia 会把所有的容器挂载到跟容器
- *   参数2： 选项对象
- *   返回值： 一个函数, 调用得到容器实例
  */
 
 export const s_appStore = defineStore('app', {
-  state: () => {
-    return {
-      language: getItem(LANG) || 'zh',
-      tagsViewList: getItem(TAGS_VIEW) || [],
-    }
-  },
-
-  getters: {},
+  state: () => ({
+    tagsViewList: [] as Tag[],
+    activeTag: '',
+  }),
 
   actions: {
-    setLanguage(lang: string) {
-      // 设置语言
-      setItem(LANG, lang)
-      this.language = lang
+    initTags(tags?: Tag[]) {
+      if (tags) {
+        this.tagsViewList = tags
+        this.ensureCurrentRouteTag()
+      } else {
+        this.tagsViewList = [
+          ...new Map(this.tagsViewList.map(tag => [tag.path, tag])).values(),
+        ]
+      }
     },
 
-    addTagesViewList(tag: { path: string }) {
-      // 处理重复
-      const isFind = this.tagsViewList.find(
-        (item: { path: string }) => item.path === tag.path
-      )
-      if (!isFind) {
+    ensureCurrentRouteTag() {
+      const route = useRoute()
+      if (route.path && !this.tagsViewList.some(t => t.path === route.path)) {
+        this.addTag({
+          path: route.path,
+          title: (route.meta.title as string) || 'Unnamed Page',
+          icon: route.meta.icon as string,
+          meta: { affix: route.meta.affix as boolean },
+        })
+      }
+    },
+
+    setActiveTag(path: string) {
+      this.activeTag = path
+    },
+
+    addTag(tag: Tag) {
+      if (!this.tagsViewList.some(item => item.path === tag.path)) {
         this.tagsViewList.push(tag)
-        setItem(TAGS_VIEW, this.tagsViewList)
+        this.setActiveTag(tag.path)
       }
     },
-    // 为指定的 tag 修改 title 用于中英文切换
-    changeTagesView({ index, tag }: { index: number; tag: { path: string } }) {
-      this.tagsViewList[index] = tag
-      setItem(TAGS_VIEW, this.tagsViewList)
-    },
-    /**
-     * @description: 删除 TagsView 相关操作
-     * @param {*} payload {type: other || right || 'index'}
-     */
-    removeTagsView(payload: I_Payload): void {
-      if (payload.type === 'index') {
-        this.tagsViewList.splice(payload.index, 1)
-      } else if (payload.type === 'other') {
-        this.tagsViewList.splice(
-          payload.index + 1,
-          this.tagsViewList.length - payload.index + 1
-        )
-        this.tagsViewList.splice(0, payload.index)
-      } else if (payload.type === 'right') {
-        this.tagsViewList.splice(
-          payload.index + 1,
-          this.tagsViewList.length - payload.index + 1
-        )
+
+    removeTag(index: number) {
+      if (index >= 0 && index < this.tagsViewList.length) {
+        return this.tagsViewList.splice(index, 1)[0]?.path
       }
-      setItem(TAGS_VIEW, this.tagsViewList)
+      return null
+    },
+
+    removeOtherTags(index: number) {
+      this.tagsViewList = [
+        this.tagsViewList[0],
+        this.tagsViewList[index],
+      ].filter(Boolean)
+    },
+
+    removeLeftTags(index: number) {
+      this.tagsViewList = [
+        this.tagsViewList[0],
+        ...this.tagsViewList.slice(index),
+      ]
+    },
+
+    removeRightTags(index: number) {
+      this.tagsViewList = this.tagsViewList.slice(0, index + 1)
+    },
+
+    removeAllTags() {
+      this.tagsViewList = this.tagsViewList.filter(tag => tag.meta?.affix)
     },
   },
+
+  persist: true,
 })

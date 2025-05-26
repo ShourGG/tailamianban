@@ -2,14 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 11:43:48
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-05 22:53:39
+ * @LastEditTime: 2025-05-26 13:41:25
  * @FilePath: \Robot_Admin\src\axios\request.ts
  * @Description: axios 二次封装
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
 import axios from 'axios'
-import { s_appStore } from '@/stores/app'
 import { s_userStore } from '@/stores/user'
 import { d_isCheckTimeout } from '@/utils/d_auth'
 import { createDiscreteApi } from 'naive-ui'
@@ -29,7 +28,6 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     const { token, logout } = s_userStore()
-    const { language } = s_appStore()
     if (token) {
       if (d_isCheckTimeout()) {
         logout()
@@ -37,7 +35,6 @@ service.interceptors.request.use(
       }
       config.headers.Authorization = `Bearer ${token}` // 注意空格
     }
-    config.headers['Accept-Language'] = language
     return config
   },
   error => Promise.reject(error)
