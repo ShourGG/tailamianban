@@ -70,14 +70,6 @@
         </div>
 
         <!-- 右侧：用户信息 -->
-        <!-- <div class="flex items-center gap-2">
-          <NAvatar
-            round
-            size="small"
-            src="/robot-avatar.png"
-          />
-          <span>CHENY</span>
-        </div> -->
         <div class="flex items-center gap-2">
           <NAvatar
             round
@@ -142,11 +134,8 @@
       },
     },
     {
-      icon: 'i-mdi:language',
-      tooltip: '切换语言',
-      action: () => {
-        // 语言切换逻辑
-      },
+      type: 'component',
+      componentName: 'C_Language',
     },
     {
       type: 'component',
@@ -180,6 +169,7 @@
     }
   }
 
+  // 用户菜单选项
   const userOptions = [
     {
       key: 'profile',

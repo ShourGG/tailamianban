@@ -15,7 +15,7 @@
         >
           <template #trigger>
             <div
-              class="notification-icon i-mdi:bell-outline w16px h16px vertical--8%"
+              class="notification-icon i-mdi:bell-outline w16px h16px vertical--6%"
             ></div>
           </template>
           消息通知
