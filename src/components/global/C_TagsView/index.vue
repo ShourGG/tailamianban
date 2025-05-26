@@ -2,14 +2,17 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-26 13:38:13
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-26 21:32:19
+ * @LastEditTime: 2025-05-26 22:27:59
  * @FilePath: \Robot_Admin\src\components\global\C_TagsView\index.vue
  * @Description: 标签页组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
-  <div class="tags-view-container">
+  <div
+    id="guide-tags-view"
+    class="tags-view-container"
+  >
     <NScrollbar x-scrollable>
       <NSpace>
         <NTag
@@ -184,7 +187,6 @@
     }
     closeContextMenu()
   }
-
   // 初始化标签
   onMounted(() => {
     // 从持久化存储初始化标签

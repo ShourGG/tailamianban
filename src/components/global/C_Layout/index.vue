@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 14:22:31
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-26 19:38:48
+ * @LastEditTime: 2025-05-26 22:21:46
  * @FilePath: \Robot_Admin\src\components\global\C_Layout\index.vue
  * @Description: 布局组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -28,8 +28,11 @@
           isLightTheme ? 'light-theme' : 'dark-theme',
         ]"
       >
-        <C_MenuTop />
-        <div class="menu-scroll-container">
+        <C_MenuTop id="guide-menu-top" />
+        <div
+          id="guide-menu"
+          class="menu-scroll-container"
+        >
           <C_Menu
             :data="menuData"
             mode="vertical"

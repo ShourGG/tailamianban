@@ -9,6 +9,7 @@
  */
 
 import './assets/css/main.css'
+import '@/styles/index.scss'
 import 'virtual:uno.css'
 import '@/router/permission'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'

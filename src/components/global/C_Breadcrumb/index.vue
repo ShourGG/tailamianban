@@ -1,5 +1,8 @@
 <template>
-  <div class="flex-1 min-w-0 mx-4">
+  <div
+    id="guide-breadcrumb"
+    class="flex-1 min-w-0 mx-4"
+  >
     <NBreadcrumb>
       <NBreadcrumbItem
         v-for="(item, index) in currentBreadcrumb"

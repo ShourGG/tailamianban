@@ -35,6 +35,7 @@
     "@splinetool/runtime": "^1.9.92",
     "@vueuse/core": "^13.1.0",
     "axios": "^1.9.0",
+    "driver.js": "^1.3.6",
     "echarts": "^5.6.0",
     "husky": "7.0.1",
     "motion-v": "^1.1.0-alpha.1",

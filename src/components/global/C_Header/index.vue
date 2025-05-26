@@ -14,7 +14,10 @@
         class="header-content w-full h-full flex items-center justify-between"
       >
         <!-- 左侧：折叠菜单 -->
-        <div class="flex items-center">
+        <div
+          id="guide-menu-collapse"
+          class="flex items-center"
+        >
           <NTooltip>
             <template #trigger>
               <NButton
@@ -39,7 +42,10 @@
         <C_Breadcrumb />
 
         <!-- 右侧：操作区 -->
-        <div class="w-350px flex items-center justify-end gap-4 mr16px">
+        <div
+          id="guide-actions"
+          class="w-350px flex items-center justify-end gap-4 mr16px"
+        >
           <template
             v-for="(item, index) in headerActions"
             :key="index"
@@ -145,11 +151,8 @@
       componentName: 'C_Theme',
     },
     {
-      icon: 'i-mdi:sign-routes',
-      tooltip: '功能引导',
-      action: () => {
-        // 引导相关逻辑
-      },
+      type: 'component',
+      componentName: 'C_Guide',
     },
     {
       icon: 'i-mdi:settings-transfer-outline',
