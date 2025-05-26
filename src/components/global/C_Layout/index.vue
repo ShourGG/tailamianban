@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 14:22:31
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-23 23:25:31
+ * @LastEditTime: 2025-05-26 19:38:48
  * @FilePath: \Robot_Admin\src\components\global\C_Layout\index.vue
  * @Description: 布局组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -129,6 +129,6 @@
   })
 </script>
 
-<style scoped>
-  @import './index.scss';
+<style scoped lang="scss">
+  @use './index.scss';
 </style>

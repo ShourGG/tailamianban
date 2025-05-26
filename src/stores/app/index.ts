@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2022-04-10 23:20:30
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-26 17:02:09
+ * @LastEditTime: 2025-05-26 19:45:24
  * @FilePath: \Robot_Admin\src\stores\app\index.ts
  * @Description: 应用相关存储
  * Copyright (c) ${2022} by ChenYu/天智AgileTeam, All Rights Reserved.
@@ -57,10 +57,14 @@ export const s_appStore = defineStore('app', {
     },
 
     removeOtherTags(index: number) {
-      this.tagsViewList = [
-        this.tagsViewList[0],
-        this.tagsViewList[index],
-      ].filter(Boolean)
+      if (index === 0) {
+        this.tagsViewList = [this.tagsViewList[0]].filter(Boolean)
+      } else {
+        this.tagsViewList = [
+          this.tagsViewList[0],
+          this.tagsViewList[index],
+        ].filter(Boolean)
+      }
     },
 
     removeLeftTags(index: number) {
