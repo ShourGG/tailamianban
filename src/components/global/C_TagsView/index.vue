@@ -2,10 +2,10 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-26 13:38:13
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-26 17:24:17
+ * @LastEditTime: 2025-05-26 21:32:19
  * @FilePath: \Robot_Admin\src\components\global\C_TagsView\index.vue
  * @Description: 标签页组件
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
@@ -22,9 +22,7 @@
           @contextmenu.prevent="e => showContextMenu(e, tag, index)"
         >
           <template #icon>
-            <NIcon>
-              <component :is="tag.icon || 'mdi:page-layout-body'" />
-            </NIcon>
+            <i :class="[tag.icon, 'w12px h12px']"></i>
           </template>
           {{ tag.title }}
         </NTag>
@@ -45,7 +43,6 @@
 <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { NSpace, NTag, NDropdown, NScrollbar, NIcon } from 'naive-ui'
   import { s_appStore } from '@/stores/app'
 
   // 初始化 store、路由和路由器
@@ -68,15 +65,16 @@
   const isActive = (tag: Tag) => tag.path === route.path
 
   /**
-   * 检查标签是否为固定标签（不可关闭）
-   * @param {Tag} tag - 要检查的标签
-   * @returns {boolean} 如果标签是固定标签则返回 true，否则返回 false
+   * * @description: 检查标签是否为固定标签
+   * ? @param {Tag} tag - 要检查的标签
+   * ! @returns {boolean} 如果标签是固定标签则返回 true，否则返回 false
    */
   const isAffix = (tag: Tag) => tag.meta?.affix
 
   /**
-   * 导航到指定的标签
-   * @param {Tag} tag - 要导航到的标签
+   * * @description: 导航到指定的标签
+   * ? @param {Tag} tag - 要导航到的标签
+   * ! @return {void}
    */
   const navigateToTag = (tag: Tag) => {
     if (tag.path !== route.path) {
@@ -85,8 +83,9 @@
   }
 
   /**
-   * 处理关闭标签的操作
-   * @param {number} index - 要关闭的标签索引
+   * * @description: 关闭指定的标签
+   * ? @param {number} index - 要关闭的标签索引
+   * ! @return {void}
    */
   const handleClose = (tag: Tag, index: number) => {
     if (isAffix(tag)) return
@@ -100,10 +99,11 @@
   }
 
   /**
-   * 显示上下文菜单
-   * @param {MouseEvent} event - 鼠标事件
-   * @param {Tag} tag - 右键点击的标签
-   * @param {number} index - 标签的索引
+   * * @description: 显示上下文菜单
+   * ? @param {MouseEvent} event - 鼠标事件
+   * ? @param {Tag} tag - 右键点击的标签
+   * ? @param {number} index - 标签的索引
+   * ! @return {void}
    */
   const showContextMenu = (event: MouseEvent, tag: Tag, index: number) => {
     event.preventDefault()
@@ -117,9 +117,7 @@
   /**
    * 关闭上下文菜单
    */
-  const closeContextMenu = () => {
-    contextMenuVisible.value = false
-  }
+  const closeContextMenu = () => (contextMenuVisible.value = false)
 
   /**
    * 计算上下文菜单选项
@@ -136,31 +134,32 @@
       type: 'option',
       label: '关闭其他',
       key: 'closeOthers',
-      icon: () => h('span', { class: 'i-mdi:close' }),
+      icon: () => h('span', { class: 'i-mdi:arrow-left-right-bold' }),
     },
     {
       type: 'option',
       label: '关闭左侧',
       key: 'closeLeft',
-      icon: () => h('span', { class: 'i-mdi:close' }),
+      icon: () => h('span', { class: 'i-mdi:align-horizontal-left' }),
     },
     {
       type: 'option',
       label: '关闭右侧',
       key: 'closeRight',
-      icon: () => h('span', { class: 'i-mdi:close' }),
+      icon: () => h('span', { class: 'i-mdi:align-horizontal-right' }),
     },
     {
       type: 'option',
       label: '关闭所有',
       key: 'closeAll',
-      icon: () => h('span', { class: 'i-mdi:close' }),
+      icon: () => h('span', { class: 'i-mdi:tally-mark-5' }),
     },
   ])
 
   /**
-   * 处理上下文菜单选项的选择
-   * @param {string} key - 选中的菜单项的 key
+   * * @description: 处理上下文菜单的选项选择
+   * ? @param {string} key - 选中的菜单项的 key
+   * ! @return {void}
    */
   const handleContextMenuSelect = (key: string) => {
     if (!selectedTag.value || selectedIndex.value === -1) return
@@ -245,9 +244,6 @@
   )
 </script>
 
-<style scoped>
-  .tags-view-container {
-    padding: 0 10px 0;
-    position: relative;
-  }
+<style lang="scss" scoped>
+  @use './index.scss';
 </style>
