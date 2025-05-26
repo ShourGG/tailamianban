@@ -70,13 +70,30 @@
         </div>
 
         <!-- 右侧：用户信息 -->
-        <div class="flex items-center gap-2">
+        <!-- <div class="flex items-center gap-2">
           <NAvatar
             round
             size="small"
             src="/robot-avatar.png"
           />
           <span>CHENY</span>
+        </div> -->
+        <div class="flex items-center gap-2">
+          <NAvatar
+            round
+            size="small"
+            src="/robot-avatar.png"
+          />
+          <NDropdown
+            size="small"
+            :options="userOptions"
+            @select="handleSelect"
+          >
+            <div class="flex items-center cursor-pointer">
+              <span>CHENY</span>
+              <span class="i-mdi:chevron-down"></span>
+            </div>
+          </NDropdown>
         </div>
       </div>
     </div>
@@ -86,6 +103,8 @@
 </template>
 
 <script setup lang="ts">
+  import { s_userStore } from '@/stores/user'
+
   defineOptions({ name: 'C_Header' })
   defineProps({
     isLightTheme: {
@@ -158,6 +177,28 @@
       document.documentElement.requestFullscreen()
     } else {
       document.exitFullscreen()
+    }
+  }
+
+  const userOptions = [
+    {
+      key: 'profile',
+      label: '个人中心',
+      icon: () => h('span', { class: 'i-mdi:account' }),
+    },
+    {
+      key: 'logout',
+      label: '退出登录',
+      icon: () => h('span', { class: 'i-mdi:logout' }),
+    },
+  ]
+
+  const handleSelect = (key: string) => {
+    if (key === 'profile') {
+      // router.push('/profile')
+      console.info('个人中心')
+    } else if (key === 'logout') {
+      s_userStore().logout()
     }
   }
 </script>
