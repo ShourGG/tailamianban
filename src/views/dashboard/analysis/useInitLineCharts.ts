@@ -1,10 +1,10 @@
 /*
  * @Author: GeekQiaQia
  * @Date: 2021-12-30 17:22:19
- * @LastEditTime: 2021-12-30 17:34:03
- * @LastEditors: GeekQiaQia
+ * @LastEditTime: 2025-05-27 18:32:53
+ * @LastEditors: ChenYu ycyplus@gmail.com
  * @Description:
- * @FilePath: /vue3.0-template-admin/src/views/Dashboard/useInitLineCharts.ts
+ * @FilePath: \Robot_Admin\src\views\dashboard\analysis\useInitLineCharts.ts
  */
 
 import * as echarts from 'echarts/core'

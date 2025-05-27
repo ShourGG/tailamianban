@@ -18,22 +18,21 @@
             type="primary"
             class="ml-3"
           >
-            <template #icon><div class="i-uil:refresh"></div></template>
+            <template #icon><div class="i-mdi:refresh"></div></template>
           </NButton>
           <NButton
             circle
             type="primary"
             class="ml-2"
           >
-            <template #icon><div class="i-uil:search"></div></template>
+            <template #icon><div class="i-mdi:search"></div></template>
           </NButton>
         </div>
       </NCol>
     </NRow>
 
-    <!-- 信息卡片区域 -->
+    <!-- 信息卡片+产品图表 -->
     <NRow :gutter="16">
-      <!-- 左侧卡片区域 -->
       <NCol
         :span="10"
         :xs="24"
@@ -61,7 +60,11 @@
                 ><h3>{{ card.value }}</h3></div
               >
               <div class="card-footer">
-                <div class="i-uil:arrow-up"></div>
+                <div
+                  :class="
+                    card.trend > 0 ? 'i-uil:arrow-up' : 'i-uil:arrow-down'
+                  "
+                ></div>
                 <span :class="card.trend > 0 ? 'text-success' : 'text-danger'"
                   >{{ Math.abs(card.trend) }}%</span
                 >
@@ -71,8 +74,6 @@
           </NCol>
         </NRow>
       </NCol>
-
-      <!-- 右侧产品图表 -->
       <NCol
         :span="14"
         :xs="24"
@@ -96,12 +97,11 @@
       </NCol>
     </NRow>
 
-    <!-- 第二行图表区域 -->
+    <!-- 收入 & 地区分布 -->
     <NRow
       :gutter="16"
       class="mt-4"
     >
-      <!-- 收入趋势图表 -->
       <NCol
         :span="16"
         :xs="24"
@@ -120,23 +120,16 @@
           <div class="chart-legend">
             <NRow>
               <NCol
+                v-for="legend in revenueLegend"
+                :key="legend.label"
                 :span="12"
                 :xs="24"
                 :md="12"
               >
-                <p class="legend-label">Current week</p>
+                <p class="legend-label">{{ legend.label }}</p>
                 <h2 class="legend-value">
-                  <span class="dot primary"></span><span>￥23,976</span>
-                </h2>
-              </NCol>
-              <NCol
-                :span="12"
-                :xs="24"
-                :md="12"
-              >
-                <p class="legend-label">Previous week</p>
-                <h2 class="legend-value">
-                  <span class="dot green"></span><span>￥23,976</span>
+                  <span :class="['dot', legend.dotClass]"></span>
+                  <span>{{ legend.value }}</span>
                 </h2>
               </NCol>
             </NRow>
@@ -147,8 +140,6 @@
           ></div>
         </NCard>
       </NCol>
-
-      <!-- 地区收入分布图 -->
       <NCol
         :span="8"
         :xs="24"
@@ -180,12 +171,11 @@
       </NCol>
     </NRow>
 
-    <!-- 第三行数据展示区域 -->
+    <!-- 第三行：表格、右统计区 -->
     <NRow
       :gutter="16"
       class="mt-4"
     >
-      <!-- 销售数据表格 -->
       <NCol
         :span="12"
         :xs="24"
@@ -213,8 +203,6 @@
           />
         </NCard>
       </NCol>
-
-      <!-- 右侧统计区域 -->
       <NCol
         :span="12"
         :xs="24"
@@ -223,12 +211,12 @@
         :xl="12"
       >
         <NRow :gutter="16">
-          <!-- 销售饼图 -->
           <NCol
             :span="12"
             :xs="24"
             :md="12"
           >
+            <!-- 销售饼图 -->
             <NCard
               hoverable
               class="chart-card sales-chart bottom-card"
@@ -247,22 +235,21 @@
                   :key="index"
                   class="legend-item"
                 >
-                  <span
-                    ><span :class="`color-box ${item.color}`"></span
-                    >{{ item.name }}</span
-                  >
+                  <span>
+                    <span :class="`color-box ${item.color}`"></span>
+                    {{ item.name }}
+                  </span>
                   <span>{{ item.value }}</span>
                 </div>
               </div>
             </NCard>
           </NCol>
-
-          <!-- 平均销售额和活动 -->
           <NCol
             :span="12"
             :xs="24"
             :md="12"
           >
+            <!-- 平均销售额 -->
             <NCard
               hoverable
               class="primary-card sale-size-card"
@@ -288,7 +275,7 @@
                 </NButton>
               </div>
             </NCard>
-
+            <!-- 活动 -->
             <NCard
               hoverable
               class="chart-card mt-4 activity-card"
@@ -325,7 +312,6 @@
   import { useInitPieChart } from './useInitPieCharts'
   import { useInitTreeMap } from './useInitTreeMap'
 
-  // 数据定义
   const pickDate = ref(null)
   const refProduct = ref<HTMLElement | null>(null)
   const refLineChart = ref<HTMLElement | null>(null)
@@ -334,12 +320,7 @@
   const tableRef = ref()
 
   const infoCards = [
-    {
-      title: 'Customers',
-      value: '37,258',
-      trend: 6.28,
-      icon: 'i-mdi:cart',
-    },
+    { title: 'Customers', value: '37,258', trend: 6.28, icon: 'i-mdi:cart' },
     {
       title: 'Orders',
       value: '3,258',
@@ -360,13 +341,17 @@
     },
   ]
 
+  const revenueLegend = [
+    { label: 'Current week', value: '￥23,976', dotClass: 'primary' },
+    { label: 'Previous week', value: '￥23,976', dotClass: 'green' },
+  ]
+
   const salesData = [
     { name: 'Union Ads', value: '￥26,000', color: 'yellow' },
     { name: 'Direct', value: '￥26,000', color: 'green' },
     { name: 'Search Engine', value: '￥26,000', color: 'deep-blue' },
     { name: 'Video Ads', value: '￥26,000', color: 'red' },
   ]
-
   const tableData = [
     {
       date: '2016-05-02',
@@ -432,8 +417,6 @@
       type: 'default' as const,
     },
   ]
-
-  // 表格列定义
   const columns = computed(() => [
     { title: '日期', key: 'date', width: 150, fixed: 'left' as const },
     { title: '姓名', key: 'name', width: 120 },
@@ -452,365 +435,5 @@
 </script>
 
 <style lang="scss">
-  // 变量定义
-  $primary-color: #2080f0;
-  $success-color: #0acf97;
-  $danger-color: #fa5c7c;
-  $muted-color: #98a6ad;
-  $bg-color: #fafbfe;
-
-  .dashboard {
-    color: #333;
-    padding: 20px;
-    background-color: $bg-color;
-
-    // 头部样式
-    .header {
-      margin-bottom: 20px;
-    }
-
-    .title-box {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: #6c757d;
-
-      .title {
-        font-size: 18px;
-        margin: 0;
-        line-height: 60px;
-        font-weight: 700;
-      }
-
-      .actions {
-        display: flex;
-        align-items: center;
-      }
-    }
-
-    // 卡片通用样式
-    .info-card,
-    .chart-card,
-    .data-card,
-    .primary-card {
-      margin-bottom: 16px;
-      display: flex;
-      flex-direction: column;
-
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-        flex-shrink: 0;
-
-        h4,
-        h5 {
-          color: $muted-color;
-          margin: 0;
-        }
-
-        &.with-action {
-          margin-bottom: 24px;
-        }
-      }
-    }
-
-    // 信息卡片样式
-    .info-card {
-      height: 170px; // 从170px减少到160px，与右侧产品图表更好对齐
-
-      .card-header {
-        .widget-icon {
-          color: $primary-color;
-          font-size: 18px;
-          background-color: rgba(127, 189, 243, 0.23);
-          height: 40px;
-          width: 40px;
-          border-radius: 4px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-      }
-
-      .card-middle {
-        flex: 1;
-        display: flex;
-        align-items: center;
-
-        h3 {
-          margin: 0;
-          color: #6c757d;
-          font-size: 24px;
-        }
-      }
-
-      .card-footer {
-        display: flex;
-        align-items: center;
-        color: $muted-color;
-        margin-top: auto;
-        padding-top: 8px; // 从10px减少到8px
-
-        .text-success,
-        .text-danger {
-          margin: 0 8px;
-        }
-
-        .text-success {
-          color: $success-color;
-        }
-
-        .text-danger {
-          color: $danger-color;
-        }
-      }
-    }
-
-    // 产品图表卡片
-    .product-chart {
-      height: 356px; // 从376px减少到356px，匹配左侧4个卡片的总高度 (160px * 2 + 16px间距 * 2)
-
-      .chart-container {
-        flex: 1;
-        height: 270px; // 相应调整图表容器高度
-
-        &.no-padding {
-          padding-top: 0; // 去掉顶部padding
-        }
-      }
-    }
-
-    // 第二行卡片
-    .revenue-chart {
-      height: 400px;
-
-      .chart-container {
-        flex: 1;
-        min-height: 260px;
-      }
-    }
-
-    .location-chart {
-      height: 400px; // 匹配左侧收入图表高度
-
-      .chart-container {
-        flex: 1;
-        min-height: 230px;
-        padding-top: 10px; // 增加图表顶部的间距
-      }
-
-      .chart-footer {
-        margin-top: auto;
-        padding-top: 10px;
-      }
-    }
-
-    // 底部卡片统一高度
-    .bottom-card {
-      height: 400px; // 统一底部卡片高度
-      overflow: hidden; // 防止内容溢出
-    }
-
-    // 图表卡片样式
-    .chart-card {
-      .chart-container {
-        flex: 1;
-        width: 100%;
-        min-height: 200px;
-
-        &.small {
-          min-height: 150px;
-          padding-top: 10px; // 增加图表顶部的间距
-        }
-      }
-
-      .chart-legend {
-        background-color: #f9f9fd;
-        padding: 16px;
-        border-radius: 4px;
-        margin-bottom: 16px;
-
-        .legend-label {
-          color: $muted-color;
-          text-align: center;
-          margin-bottom: 8px;
-        }
-
-        .legend-value {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          font-weight: 400;
-          margin: 0;
-
-          .dot {
-            width: 12px;
-            height: 12px;
-            display: inline-block;
-            border-radius: 50%;
-            margin-right: 8px;
-
-            &.primary {
-              background-color: $primary-color;
-            }
-            &.green {
-              background-color: green;
-            }
-          }
-        }
-      }
-
-      .chart-footer {
-        padding: 16px 0;
-
-        .location {
-          font-weight: 400;
-          margin-bottom: 8px;
-        }
-      }
-
-      .chart-legend-list {
-        margin-top: 10px;
-        padding: 0 10px;
-        overflow-y: auto; // 如果内容过多可以滚动
-        max-height: 150px; // 限制最大高度
-
-        .legend-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding-bottom: 8px;
-          margin-bottom: 8px;
-          border-bottom: 1px solid #f1f3fa;
-
-          .color-box {
-            width: 12px;
-            height: 12px;
-            display: inline-block;
-            margin-right: 8px;
-
-            &.yellow {
-              background-color: #f9c761;
-            }
-            &.green {
-              background-color: #93cb79;
-            }
-            &.deep-blue {
-              background-color: #5572c3;
-            }
-            &.red {
-              background-color: #ec6769;
-            }
-          }
-        }
-      }
-    }
-
-    // 销售图表特殊调整
-    .sales-chart {
-      .chart-container.small {
-        height: 160px; // 减小高度，为图例留出更多空间
-      }
-    }
-
-    // 蓝色卡片样式
-    .primary-card {
-      background-color: #46a0fc;
-
-      &.sale-size-card {
-        height: 170px; // 调整高度
-      }
-
-      .card-header h4 {
-        color: rgba(255, 255, 255, 0.8);
-      }
-
-      .avg-content {
-        text-align: center;
-        padding: 8px 0; // 减小内边距
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-
-        .badge-container {
-          margin: 8px 0; // 减小边距
-        }
-
-        .badge {
-          display: inline-block;
-          padding: 0.25em 0.4em;
-          font-size: 75%;
-          font-weight: 700;
-          line-height: 1;
-          text-align: center;
-          white-space: nowrap;
-          border-radius: 0.25rem;
-
-          &.badge-danger {
-            color: #fff;
-            background-color: $danger-color;
-          }
-        }
-
-        .value {
-          color: white;
-          font-weight: 400;
-          margin: 8px 0; // 减小边距
-        }
-
-        .subtitle {
-          color: #e3eaef;
-          font-size: 13px;
-          margin-bottom: 8px; // 减小边距
-        }
-      }
-    }
-
-    // 活动卡片
-    .activity-card {
-      height: 210px; // 增加高度，与销售卡片对齐
-
-      .timeline-container {
-        height: 130px; // 增加高度
-        overflow: auto;
-        padding: 0;
-      }
-    }
-
-    // 数据表格样式
-    .data-card {
-      .btn-link {
-        display: flex;
-        align-items: center;
-        color: $primary-color;
-        cursor: pointer;
-      }
-    }
-
-    // 辅助类
-    .text-nowrap {
-      white-space: nowrap;
-    }
-    .text-muted {
-      color: $muted-color;
-    }
-    .text-light {
-      color: rgba(255, 255, 255, 0.8);
-    }
-    .mt-4 {
-      margin-top: 16px;
-    }
-    .ml-1 {
-      margin-left: 4px;
-    }
-    .ml-2 {
-      margin-left: 8px;
-    }
-    .ml-3 {
-      margin-left: 12px;
-    }
-  }
+  @use './index.scss';
 </style>

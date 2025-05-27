@@ -1,10 +1,10 @@
 /*
  * @Author: GeekQiaQia
  * @Date: 2021-12-30 15:50:10
- * @LastEditTime: 2022-11-19 23:01:04
- * @LastEditors: ChenYu
+ * @LastEditTime: 2025-05-27 18:33:49
+ * @LastEditors: ChenYu ycyplus@gmail.com
  * @Description:
- * @FilePath: \vue3_vite3_element-plus_admin\src\views\analysis\useInitEcharts.ts
+ * @FilePath: \Robot_Admin\src\views\dashboard\analysis\useInitEcharts.ts
  */
 import * as echarts from 'echarts/core'
 import {
@@ -52,8 +52,14 @@ export const useInitChart = (chartDom: HTMLElement | undefined) => {
 
   option = {
     title: {
-      text: 'sells in every mounth',
+      text: 'sells in every month',
       subtext: 'zoom to show every details of data',
+    },
+    grid: {
+      top: 80,
+      right: 10,
+      bottom: 14,
+      left: 40,
     },
     xAxis: {
       data: dataAxis,
