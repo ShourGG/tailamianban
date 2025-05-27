@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-25 22:51:06
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-25 23:34:50
+ * @LastEditTime: 2025-05-27 22:44:27
  * @FilePath: \Robot_Admin\src\plugins\passive-scroll.ts
  * @Description: 消除控制台滚动警告
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -15,6 +15,14 @@ type Options = {
   debug?: boolean
 }
 
+const ALL_SCROLL_EVENTS = [
+  'wheel',
+  'mousewheel',
+  'touchmove',
+  'touchstart',
+  'touchend',
+]
+
 export const PassiveScrollPlugin = {
   /**
    * * @description: 消除控制台滚动警告插件
@@ -24,12 +32,11 @@ export const PassiveScrollPlugin = {
    */
   install(app: App, options: Options = {}) {
     if (typeof window === 'undefined') return
-
-    const { eventTypes = ['wheel', 'mousewheel'], debug = false } = options
+    const { eventTypes = ALL_SCROLL_EVENTS, debug = false } = options
     const originalAdd = EventTarget.prototype.addEventListener
 
     /**
-     * 添加时间源原型方法过滤
+     * * @description: 添加事件监听器
      */
     EventTarget.prototype.addEventListener = function (
       type: string,
@@ -37,13 +44,13 @@ export const PassiveScrollPlugin = {
       options?: boolean | AddEventListenerOptions
     ) {
       if (eventTypes.includes(type)) {
-        options =
-          typeof options === 'boolean'
-            ? { capture: options, passive: true }
-            : { ...options, passive: true }
-
+        if (typeof options === 'boolean') {
+          options = { capture: options, passive: true }
+        } else {
+          options = { ...options, passive: true }
+        }
         if (debug) {
-          console.error('[PassiveScroll] Applied to:', this, type)
+          console.warn('[PassiveScroll] Applied to:', this, type)
         }
       }
       return originalAdd.call(this, type, listener, options)

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-26 14:17:33
+ * @LastEditTime: 2025-05-27 22:35:11
  * @FilePath: \Robot_Admin\src\main.ts
  * @Description: 根入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -41,7 +41,6 @@ async function bootstrap() {
   const app = createApp(App)
   const pinia = createPinia()
   pinia.use(piniaPluginPersistedstate)
-  app.use(pinia) // 确保在其他插件之前使用 Pinia
 
   // 使用去除滚动警告的插件
   app.use(PassiveScrollPlugin)
