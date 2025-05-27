@@ -31,10 +31,11 @@
 /* 主内容区域 */
 .main-content {
   flex: 1; /* 填充剩余空间 */
-  padding: 20px; /* 内边距 */
+  padding: 16px; /* 内边距 */
   overflow-y: auto; /* 允许垂直滚动 */
   overflow-x: hidden; /* 禁用横向滚动 */
   width: 100%; /* 宽度自适应 */
+  border-radius: 8px;
 }
 
 /*
@@ -55,6 +56,7 @@
 /* 明亮模式下的滚动容器 */
 .layout-container.light-mode :deep(.n-layout .n-layout-scroll-container) {
   background-color: #f4f7f9 !important; /* 浅灰色背景 */
+  border-radius: 10px;
 }
 
 /* 暗黑/系统模式下的滚动容器 */

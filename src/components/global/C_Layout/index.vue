@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 14:22:31
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-26 22:21:46
+ * @LastEditTime: 2025-05-27 09:24:27
  * @FilePath: \Robot_Admin\src\components\global\C_Layout\index.vue
  * @Description: 布局组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -45,10 +45,12 @@
       <NLayout>
         <C_Header :isLightTheme="isLightTheme" />
 
-        <NLayoutContent class="content-with-header">
+        <NLayoutContent
+          class="content-with-header p16px"
+          :style="{ backgroundColor: isLightTheme ? '#ffffff' : '#1c1c1c' }"
+        >
           <RouterView class="main-content" />
         </NLayoutContent>
-
         <C_Footer :isLightTheme="isLightTheme" />
       </NLayout>
     </NLayout>
