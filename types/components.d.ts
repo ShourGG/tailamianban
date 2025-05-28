@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     C_Breadcrumb: typeof import('./../src/components/global/C_Breadcrumb/index.vue')['default']
+    C_Cascade: typeof import('./../src/components/global/C_Cascade/index.vue')['default']
     C_Footer: typeof import('./../src/components/global/C_Footer/index.vue')['default']
     C_Form: typeof import('./../src/components/global/C_Form/index.vue')['default']
     C_Guide: typeof import('./../src/components/global/C_Guide/index.vue')['default']

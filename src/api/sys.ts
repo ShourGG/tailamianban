@@ -2,13 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-01 14:11:38
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-06 15:17:55
+ * @LastEditTime: 2025-05-28 11:51:45
  * @FilePath: \Robot_Admin\src\api\sys.ts
  * @Description:
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 import request from '@/axios/request'
-import DynamicRouter from '@/assets/dynamicRouter.json'
+import DynamicRouter from '@/assets/data/dynamicRouter.json'
 // import type { DynamicRoute } from '@/router/dynamicRouter'
 
 export interface LoginResponse {

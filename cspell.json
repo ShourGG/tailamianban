@@ -17,6 +17,7 @@
   "words": [
     "antv",
     "APIFOX",
+    "ascade",
     "Attributify",
     "bunx",
     "chademo",
@@ -67,6 +68,7 @@
     "vite",
     "vsmarketplacebadge",
     "vueuse",
+    "vuex",
     "wangeditor"
   ],
   // flagWords - list of words to be always considered incorrect

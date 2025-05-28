@@ -93,7 +93,7 @@
         {
           "path": "area-cascade",
           "name": "demo-area-cascade",
-          "component": "/02-area-cascade/index",
+          "component": "/demo/02-area-cascade/index",
           "meta": {
             "icon": "i-mdi:multicast",
             "title": "级联选择器",

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-12 22:42:08
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-13 08:46:27
+ * @LastEditTime: 2025-05-28 14:48:40
  * @FilePath: \Robot_Admin\src\plugins\naive-ui.ts
  * @Description: naive-ui插件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -20,9 +20,9 @@ export const { notification } = createDiscreteApi(['notification'], {
 })
 
 /**
- * @description: naive-ui插件
- * @param {App} app
- * @return {*}  {void}
+ * * @description: naive-ui插件
+ * ? @param {App} app
+ * ! @return {*}  {void}
  */
 export function setupNaiveUI(app: App) {
   app.provide('notification', notification)
