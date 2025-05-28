@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-25 22:51:06
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-27 22:44:27
+ * @LastEditTime: 2025-05-28 15:29:48
  * @FilePath: \Robot_Admin\src\plugins\passive-scroll.ts
  * @Description: 消除控制台滚动警告
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.

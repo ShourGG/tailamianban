@@ -282,6 +282,6 @@
   const activeTab = ref('0')
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
   @import './index.scss';
 </style>

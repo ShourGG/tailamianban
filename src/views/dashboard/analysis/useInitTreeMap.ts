@@ -1,13 +1,15 @@
 /*
- * @Author: ChenYu
- * @Date: 2022-11-19 23:57:42
- * @LastEditors: ChenYu
- * @LastEditTime: 2022-12-11 10:55:09
- * @FilePath: \vue3_vite3_element-plus_admin\src\views\analysis\useInitTreeMap.ts
- * @Description: 旭日图和树图动态切换
- * Copyright (c) ${2022} by ChenYu/天智AgileTeam, All Rights Reserved.
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-05-28 09:48:05
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-05-28 15:45:15
+ * @FilePath: \Robot_Admin\src\views\dashboard\analysis\useInitTreeMap.ts
+ * @Description:
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
+
 import * as echarts from 'echarts/core'
+import { ref, onUnmounted } from 'vue'
 import {
   TreemapChart,
   type TreemapSeriesOption,
@@ -26,10 +28,29 @@ type EChartsOption = echarts.ComposeOption<
 let treemapOption: EChartsOption
 let sunburstOption: EChartsOption
 
-import data from './echarts-package-size.json'
+import data from '@/assets/data/echarts-package-size.json'
 
 export const useInitTreeMap = (chartDom: HTMLElement | undefined) => {
-  const myChart = echarts.init(chartDom as HTMLElement)
+  if (!chartDom) return
+
+  // 使用 ref 存储 interval ID，方便清理
+  const intervalId = ref<number>()
+  // 存储图表实例
+  const myChart = echarts.init(chartDom)
+
+  // 清理函数
+  const cleanup = () => {
+    if (intervalId.value) {
+      clearInterval(intervalId.value)
+      intervalId.value = undefined
+    }
+    myChart.dispose()
+  }
+
+  // 组件卸载时清理资源
+  onUnmounted(() => {
+    cleanup()
+  })
 
   treemapOption = {
     series: [
@@ -74,9 +95,11 @@ export const useInitTreeMap = (chartDom: HTMLElement | undefined) => {
 
   let currentOption = treemapOption
 
+  // 初始化图表
   myChart.setOption(currentOption)
 
-  setInterval(function () {
+  // 设置定时器并保存ID以便清理
+  intervalId.value = window.setInterval(() => {
     currentOption =
       currentOption === treemapOption ? sunburstOption : treemapOption
     myChart.setOption(currentOption)

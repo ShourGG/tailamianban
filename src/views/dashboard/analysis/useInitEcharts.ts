@@ -3,7 +3,7 @@
  * @Date: 2021-12-30 15:50:10
  * @LastEditTime: 2025-05-27 18:33:49
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @Description:
+ * @Description: 初始化echarts
  * @FilePath: \Robot_Admin\src\views\dashboard\analysis\useInitEcharts.ts
  */
 import * as echarts from 'echarts/core'
