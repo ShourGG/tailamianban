@@ -106,7 +106,7 @@
         {
           "path": "progress",
           "name": "demo-progress",
-          "component": "/03-progress/index",
+          "component": "/demo/03-progress/index",
           "meta": {
             "icon": "i-mdi:progress-helper",
             "title": "进度条",
