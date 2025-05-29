@@ -132,7 +132,7 @@
         {
           "path": "date",
           "name": "demo-date",
-          "component": "/05-date/index",
+          "component": "/demo/05-date/index",
           "meta": {
             "icon": "i-mdi:weather-date",
             "title": "日期选择器",
