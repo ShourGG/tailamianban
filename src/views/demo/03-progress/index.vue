@@ -113,7 +113,7 @@
           <h3>仪表盘进度条</h3>
           <p class="description">
             仪表盘形式展示进度，适用于系统性能监控、资源使用率等场景。直观展示当前状态，
-            类似汽车仪表盘的设计，适合监控类应用的数据展示。
+            仪表盘的设计，适合监控类应用的数据展示。
           </p>
         </div>
       </template>
@@ -143,8 +143,8 @@
   const multipleCirclePercentages = ref([30, 60])
 
   // 定时器引用，用于清理动画
-  let raceTimer: NodeJS.Timer | null = null
-  let doubleTimer: NodeJS.Timer | null = null
+  let raceTimer: number | null = null
+  let doubleTimer: number | null = null
 
   /**
    * 更新圈圈赛跑的进度百分比
@@ -187,63 +187,5 @@
 </script>
 
 <style lang="scss" scoped>
-  .progress-demo {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-
-    .demo-section {
-      .section-header {
-        h3 {
-          margin: 0 0 8px 0;
-          font-size: 16px;
-          font-weight: 600;
-        }
-
-        .description {
-          margin: 0;
-          color: var(--text-color-3);
-          font-size: 14px;
-          line-height: 1.6;
-        }
-      }
-
-      // 卡片内容区域 - 进度条居中展示
-      :deep(.n-card__content) {
-        padding: 24px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 200px;
-      }
-    }
-
-    // 圈圈赛跑指示器样式
-    .race-indicator {
-      text-align: center;
-
-      .race-title {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: var(--text-color-1);
-      }
-
-      .race-speeds {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        font-size: 14px;
-        color: var(--text-color-2);
-
-        span {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 4px;
-        }
-      }
-    }
-  }
+  @use './index.scss';
 </style>
