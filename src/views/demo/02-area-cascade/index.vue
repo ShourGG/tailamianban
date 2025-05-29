@@ -2,11 +2,114 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-28 11:26:23
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-28 14:58:28
+ * @LastEditTime: 2025-05-29 10:35:20
  * @FilePath: \Robot_Admin\src\views\demo\02-area-cascade\index.vue
  * @Description: 级联选择器示例
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
+
+<template>
+  <div class="cascade-demo">
+    <NH1>级联选择器组件场景示例</NH1>
+
+    <NSpace
+      vertical
+      :size="24"
+    >
+      <!-- 使用v-for循环渲染多个级联选择器 -->
+      <NCard
+        v-for="config in cascadeConfigs"
+        :key="config.id"
+        :title="config.title"
+        hoverable
+      >
+        <template #header-extra>
+          <NTag :type="config.tagType">
+            {{
+              config.id === 'city'
+                ? '地区选择'
+                : config.id === 'tech'
+                  ? '技术栈'
+                  : '组织架构'
+            }}
+          </NTag>
+        </template>
+
+        <NSpace vertical>
+          <!-- 描述信息 -->
+          <NText depth="2">
+            {{ config.description }}
+          </NText>
+
+          <!-- 级联选择器 -->
+          <C_Cascade
+            :data="config.data"
+            v-model="config.selected"
+            :placeholders="config.placeholders"
+            :type="config.type"
+            @change="val => handleChange(config, val)"
+          />
+
+          <!-- 操作按钮和结果展示 -->
+          <NSpace>
+            <NButton
+              type="primary"
+              @click="() => resetSelected(config)"
+            >
+              重置选择
+            </NButton>
+          </NSpace>
+
+          <!-- 选择结果展示 -->
+          <NAlert
+            v-if="config.selected.primary"
+            type="success"
+            :title="`当前选择的${config.title.replace('选择', '')}`"
+          >
+            <NSpace
+              vertical
+              :size="8"
+            >
+              <div>
+                <NTag
+                  size="small"
+                  :bordered="false"
+                  >{{ config.labels.primary }}</NTag
+                >
+                {{ config.selected.primary.label }}
+              </div>
+              <div v-if="config.selected.secondary">
+                <NTag
+                  size="small"
+                  :bordered="false"
+                  >{{ config.labels.secondary }}</NTag
+                >
+                {{ config.selected.secondary.label }}
+              </div>
+              <div v-if="config.selected.tertiary">
+                <NTag
+                  size="small"
+                  :bordered="false"
+                  >{{ config.labels.tertiary }}</NTag
+                >
+                {{ config.selected.tertiary.label }}
+              </div>
+            </NSpace>
+          </NAlert>
+
+          <NAlert
+            v-else
+            type="default"
+          >
+            <template #header> 尚未选择 </template>
+            请点击上方选择器进行选择
+          </NAlert>
+        </NSpace>
+      </NCard>
+    </NSpace>
+  </div>
+</template>
+
 <script setup lang="ts">
   import pcaCode from '@/assets/data/pca-code.json'
 
@@ -38,6 +141,8 @@
     selected: CascadeSelected
     placeholders: string[]
     type?: string
+    tagType?: 'default' | 'primary' | 'info' | 'success' | 'warning' | 'error'
+    description?: string
     labels: {
       primary: string // 第一级标签
       secondary: string // 第二级标签
@@ -222,6 +327,8 @@
       data: cityData,
       selected: {},
       placeholders: ['请选择省份', '请选择城市', '请选择区县'],
+      tagType: 'info',
+      description: '支持全国省市区三级联动选择，数据覆盖全国所有行政区域',
       labels: {
         primary: '省份',
         secondary: '城市',
@@ -235,6 +342,8 @@
       selected: {},
       placeholders: ['请选择技术方向', '请选择技术框架', '请选择具体版本'],
       type: 'primary',
+      tagType: 'warning',
+      description: '用于选择技术栈，包含前端、后端和数据库等技术分类',
       labels: {
         primary: '方向',
         secondary: '框架',
@@ -247,6 +356,8 @@
       data: orgData,
       selected: {},
       placeholders: ['请选择中心', '请选择部门', '请选择小组'],
+      tagType: 'success',
+      description: '企业组织架构选择器，支持多级部门层级选择',
       labels: {
         primary: '中心',
         secondary: '部门',
@@ -270,69 +381,6 @@
   }
 </script>
 
-<template>
-  <div class="cascade-demo">
-    <!-- 使用v-for循环渲染多个级联选择器 -->
-    <div
-      v-for="config in cascadeConfigs"
-      :key="config.id"
-      class="demo-section"
-    >
-      <h3>{{ config.title }}</h3>
-      <C_Cascade
-        :data="config.data"
-        v-model="config.selected"
-        :placeholders="config.placeholders"
-        :type="config.type"
-        @change="val => handleChange(config, val)"
-      />
-      <div class="mt-3">
-        <NButton
-          type="primary"
-          @click="() => resetSelected(config)"
-          >重置</NButton
-        >
-        <div class="mt-3">
-          <h4>当前选择的{{ config.title.replace('选择', '') }}：</h4>
-          <div v-if="config.selected.primary">
-            {{ config.labels.primary }}: {{ config.selected.primary.label }}
-          </div>
-          <div v-if="config.selected.secondary">
-            {{ config.labels.secondary }}: {{ config.selected.secondary.label }}
-          </div>
-          <div v-if="config.selected.tertiary">
-            {{ config.labels.tertiary }}: {{ config.selected.tertiary.label }}
-          </div>
-          <pre v-if="!config.selected.primary">未选择</pre>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
-<style scoped>
-  .cascade-demo {
-    padding: 20px;
-  }
-
-  .demo-section {
-    margin-bottom: 40px;
-    padding: 20px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-  }
-
-  .demo-section h3 {
-    margin-bottom: 20px;
-    color: #2d8cf0;
-  }
-
-  .mt-3 {
-    margin-top: 12px;
-  }
-
-  h4 {
-    margin: 16px 0;
-    color: #666;
-  }
+<style scoped lang="scss">
+  @use './index.scss';
 </style>

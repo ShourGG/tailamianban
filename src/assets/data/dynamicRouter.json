@@ -119,7 +119,7 @@
         {
           "path": "time",
           "name": "demo-time",
-          "component": "/04-time/index",
+          "component": "/demo/04-time/index",
           "meta": {
             "icon": "i-mdi:clock-time-eight-outline",
             "title": "时间选择器",

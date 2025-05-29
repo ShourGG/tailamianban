@@ -1,5 +1,6 @@
 <template>
   <div class="progress-demo">
+    <NH1>进度条组件场景示例</NH1>
     <!-- 基础线性进度条 - 最常用的进度展示方式 -->
     <NCard class="demo-section">
       <template #header>
@@ -113,7 +114,7 @@
           <h3>仪表盘进度条</h3>
           <p class="description">
             仪表盘形式展示进度，适用于系统性能监控、资源使用率等场景。直观展示当前状态，
-            仪表盘的设计，适合监控类应用的数据展示。
+            仪表盘的显示效果，适合监控类应用的数据展示。
           </p>
         </div>
       </template>
