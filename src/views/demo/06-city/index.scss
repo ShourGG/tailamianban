@@ -1,6 +1,5 @@
   .city-demo-page {
     padding: 24px;
-    background-color: #f7f8fa;
     min-height: 100vh;
 
     :deep(.n-h1) {
@@ -11,7 +10,6 @@
   .demo-card {
     height: 100%;
     transition: all 0.3s;
-    background-color: #fff;
 
     &:hover {
       transform: translateY(-2px);
@@ -26,17 +24,14 @@
       .card-title {
         font-size: 16px;
         font-weight: 600;
-        color: #18181c;
       }
     }
   }
 
   .custom-trigger-card {
-    background: linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%);
     transition: all 0.3s;
 
     &:hover {
-      background: linear-gradient(135deg, #e8f4fd 0%, #f0f9ff 100%);
       transform: translateY(-1px);
     }
   }

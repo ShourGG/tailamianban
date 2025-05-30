@@ -10,7 +10,6 @@
     border-radius: 3px;
     cursor: pointer;
     transition: all 0.3s;
-    background-color: #fff;
 
     &:hover {
       border-color: #1890ff;
@@ -18,7 +17,6 @@
 
     &__text {
       flex: 1;
-      color: #333;
       font-size: 14px;
     }
 
@@ -48,8 +46,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background-color: #fff;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid rgba(247, 247, 247, 0.514);
     flex-shrink: 0;
 
     .city-selector-search {
@@ -102,7 +99,7 @@
     display: flex;
     margin-bottom: 12px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid rgba(247, 247, 247, 0.514);
 
     &:last-child {
       border-bottom: none;
@@ -114,7 +111,6 @@
     &__name {
       flex-shrink: 0;
       width: 70px;
-      color: #666;
       font-weight: 500;
       font-size: 14px;
       line-height: 28px;
@@ -132,7 +128,6 @@
   .city-item {
     padding: 3px 10px;
     cursor: pointer;
-    color: #333;
     font-size: 13px;
     border-radius: 2px;
     transition: all 0.3s;

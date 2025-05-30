@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-26 13:38:13
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-26 22:27:59
+ * @LastEditTime: 2025-05-30 11:53:08
  * @FilePath: \Robot_Admin\src\components\global\C_TagsView\index.vue
  * @Description: 标签页组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -13,13 +13,21 @@
     id="guide-tags-view"
     class="tags-view-container"
   >
-    <NScrollbar x-scrollable>
-      <NSpace>
+    <div
+      class="tags-track"
+      ref="tagsTrack"
+      @wheel="handleWheel"
+    >
+      <div
+        class="tags-container"
+        ref="tagsContainer"
+      >
         <NTag
           v-for="(tag, index) in appStore.tagsViewList"
           :key="tag.path"
           :type="isActive(tag) ? 'primary' : 'default'"
           :closable="!isAffix(tag)"
+          :data-path="tag.path"
           @close.stop="handleClose(tag, index)"
           @click="navigateToTag(tag)"
           @contextmenu.prevent="e => showContextMenu(e, tag, index)"
@@ -29,8 +37,8 @@
           </template>
           {{ tag.title }}
         </NTag>
-      </NSpace>
-    </NScrollbar>
+      </div>
+    </div>
     <NDropdown
       v-if="contextMenuVisible"
       :show="contextMenuVisible"
@@ -74,6 +82,22 @@
    */
   const isAffix = (tag: Tag) => tag.meta?.affix
 
+  // 添加 ref
+  const tagsTrack = ref()
+  const tagsContainer = ref()
+
+  // 添加滚轮处理
+  const handleWheel = (e: WheelEvent) => {
+    // 完全阻止所有滚轮事件的默认行为和冒泡
+    e.preventDefault()
+    e.stopPropagation()
+
+    const container = tagsContainer.value
+    if (container) {
+      // 只进行水平滚动，速度适中
+      container.scrollLeft += e.deltaY * 0.3
+    }
+  }
   /**
    * * @description: 导航到指定的标签
    * ? @param {Tag} tag - 要导航到的标签
@@ -83,6 +107,24 @@
     if (tag.path !== route.path) {
       router.push(tag.path)
     }
+
+    // 无论是否切换路由，都要滚动到对应标签
+    nextTick(() => {
+      const container = tagsContainer.value
+      const targetTag = container?.querySelector(`[data-path="${tag.path}"]`)
+
+      if (targetTag && container) {
+        const containerRect = container.getBoundingClientRect()
+        const tagRect = targetTag.getBoundingClientRect()
+        const scrollLeft =
+          targetTag.offsetLeft - containerRect.width / 2 + tagRect.width / 2
+
+        container.scrollTo({
+          left: Math.max(0, scrollLeft),
+          behavior: 'smooth',
+        })
+      }
+    })
   }
 
   /**
