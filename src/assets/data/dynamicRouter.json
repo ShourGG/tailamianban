@@ -171,7 +171,7 @@
             {
               "path": "form",
               "name": "demo-form",
-              "component": "/07-form/index",
+              "component": "demo/07-form-module/form/index",
               "meta": {
                 "icon": "i-mdi:form-outline",
                 "title": "表单",
