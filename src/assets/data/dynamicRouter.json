@@ -145,7 +145,7 @@
         {
           "path": "city",
           "name": "demo-city",
-          "component": "/06-city/index",
+          "component": "/demo/06-city/index",
           "meta": {
             "icon": "i-mdi:city",
             "title": "城市选择器",
