@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-30 08:36:17
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-30 10:15:43
+ * @LastEditTime: 2025-05-30 13:39:17
  * @FilePath: \Robot_Admin\src\views\demo\06-city\index.vue
  * @Description: 城市选择器组件场景示例
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -147,7 +147,7 @@
                 <template #trigger="{ value }">
                   <NButton
                     type="primary"
-                    size="large"
+                    size="small"
                   >
                     <template #icon>
                       <NIcon>
@@ -162,7 +162,7 @@
               <NButton
                 @click="city3 = ''"
                 :disabled="!city3"
-                size="large"
+                size="small"
               >
                 清除
               </NButton>
