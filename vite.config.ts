@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-14 12:11:56
+ * @LastEditTime: 2025-05-31 12:33:40
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -31,7 +31,12 @@ export default defineConfig({
       owner: 'CHENY | 编号: 409322',
     }),
     Unocss(),
-    vue(),
+    vue({
+      script: {
+        defineModel: true,
+        propsDestructure: true,
+      },
+    }),
     vueJsx(),
     vueDevTools(),
     Icons({ autoInstall: true }),
@@ -52,12 +57,12 @@ export default defineConfig({
           ],
         },
       ],
-      dts: 'types/auto-imports.d.ts', // 生成类型声明文件
+      dts: 'src/types/auto-imports.d.ts', // 生成类型声明文件
       dirs: ['src/stores', 'src/composables', 'src/hooks'], // 自动导入自定义组合式函数
       vueTemplate: true, // 支持模板自动导入
     }),
     Components({
-      dts: 'types/components.d.ts', // 生成类型声明文件
+      dts: 'src/types/components.d.ts', // 生成类型声明文件
       dirs: ['src/components/global', 'src/components/local'], // 自动导入组件
       extensions: ['vue'], // 扩展名
       version: 3, // 明确指定 Vue 3.x 版本
@@ -96,6 +101,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       _views: fileURLToPath(new URL('./src/views', import.meta.url)),
     },
+  },
+  optimizeDeps: {
+    include: ['vue', 'naive-ui'],
   },
   server: {
     port: 1988,

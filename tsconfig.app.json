@@ -1,25 +1,58 @@
 {
+  // 继承 Vue 官方的 DOM 环境 TypeScript 配置
   "extends": "@vue/tsconfig/tsconfig.dom.json",
+
+  // 指定需要编译的文件和目录
   "include": [
-    "env.d.ts",
-    "src/**/*",
-    "src/**/*.vue",
-    "types/**/*.d.ts",
-    "src/assets/**/*.json"
+    "auto-imports.d.ts", // 自动导入插件生成的类型声明
+    "components.d.ts", // 组件自动导入的类型声明
+    "env.d.ts", // 环境变量类型声明
+    "src/**/*", // src 目录下所有文件
+    "src/**/*.vue", // Vue 单文件组件（虽然被上面包含，但明确声明更清晰）
+    "src/**/*.d.ts", // src 目录下的类型声明文件
+    "src/types/**/*" // 自定义类型文件目录
   ],
-  "exclude": ["src/**/__tests__/*"],
+
+  // 排除不需要编译的文件和目录
+  "exclude": [
+    "src/**/__tests__/*", // 测试文件
+    "types/**/*" // 旧的 types 目录（已迁移到 src/types）
+  ],
+
   "compilerOptions": {
-    "declaration": true,
-    "noImplicitAny": true,
-    "emitDeclarationOnly": true,
-    "outDir": "dist/types",
-    "composite": true,
-    "incremental": true,
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    // ==================== 编译输出配置 ====================
+    "declaration": true, // 生成 .d.ts 类型声明文件
+    "emitDeclarationOnly": true, // 只生成类型声明，不生成 JS 文件
+    "outDir": "dist/types", // 类型声明文件输出目录
+
+    // ==================== 增量编译配置 ====================
+    "composite": true, // 启用项目组合模式，支持增量构建
+    "incremental": true, // 启用增量编译，提高编译速度
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo", // 增量编译信息存储位置
+
+    // ==================== 模块解析配置 ====================
+    "moduleResolution": "node", // 使用 Node.js 模块解析策略
+    "allowImportingTsExtensions": false, // 禁止导入 .ts 扩展名（Vite 会处理）
+    "allowSyntheticDefaultImports": true, // 允许从没有默认导出的模块中合成默认导入
+    "esModuleInterop": true, // 启用 ES 模块与 CommonJS 模块的互操作性
+
+    // ==================== 路径映射配置 ====================
+    "baseUrl": ".", // 基础路径为项目根目录
     "paths": {
-      "@/*": ["./src/*"],
-      "_views/*": ["./src/views/*"]
+      "@/*": ["./src/*"], // @ 符号映射到 src 目录
+      "_views/*": ["./src/views/*"] // _views 映射到 src/views 目录
     },
-    "typeRoots": ["node_modules/@types", "./types"]
+
+    // ==================== Vue 框架配置 ====================
+    "jsx": "preserve", // 保留 JSX 语法，交给构建工具处理
+    "jsxImportSource": "vue", // 指定 JSX 的导入源为 Vue
+
+    // ==================== 类型检查配置 ====================
+    "strict": true, // 启用所有严格类型检查选项
+    "noUnusedLocals": false, // 允许未使用的局部变量（开发阶段友好）
+    "noUnusedParameters": false, // 允许未使用的参数（开发阶段友好）
+
+    // ==================== 性能优化配置 ====================
+    "skipLibCheck": true // 跳过库文件的类型检查，提高编译性能
   }
 }

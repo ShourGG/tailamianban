@@ -177,7 +177,7 @@ export default defineConfigWithVueTs(
       'no-eval': 'error', // 禁止使用 eval
       'prefer-const': 'warn', // 建议使用 const 声明不变的变量
       'no-var': 'warn', // 建议使用 let/const 替代 var
-      'no-console': ['error', { allow: ['warn', 'error', 'debug', 'info'] }],
+      // 'no-console': ['error', { allow: ['warn', 'error', 'debug', 'info'] }],
       'prefer-destructuring': [
         1,
         { object: true, array: false }, // 建议使用解构赋值

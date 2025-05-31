@@ -26,7 +26,10 @@
     "format": "prettier --write src/",
     "prepare": "husky install",
     "commit": "bunx cz",
-    "check-branch": "bash -c 'if [ -z \"$1\" ]; then echo \"请指定目标分支，用法: npm run check-branch -- 分支名\"; exit 1; fi; git diff --stat HEAD...$1 && git diff --quiet HEAD...$1 && echo \"✅ 代码完全一致\" || echo \"⚠️  存在差异\"; echo -e \"\\n[提交差异检查]\\n\"; git log --left-right --graph --oneline HEAD...$1' --"
+    "check-branch": "bash -c 'if [ -z \"$1\" ]; then echo \"请指定目标分支，用法: npm run check-branch -- 分支名\"; exit 1; fi; git diff --stat HEAD...$1 && git diff --quiet HEAD...$1 && echo \"✅ 代码完全一致\" || echo \"⚠️  存在差异\"; echo -e \"\\n[提交差异检查]\\n\"; git log --left-right --graph --oneline HEAD...$1' --",
+    "type:generate": "node scripts/type-manager.js",
+    "type:validate": "node scripts/type-validator.js",
+    "type:check": "bun run type:generate && bun run type:validate"
   },
   "dependencies": {
     "@commitlint/cli": "12.1.4",

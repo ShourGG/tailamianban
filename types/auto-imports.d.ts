@@ -7,11 +7,6 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
-  const NCheckboxGroup: typeof import('naive-ui')['NCheckboxGroup']
-  const NDatePicker: typeof import('naive-ui')['NDatePicker']
-  const NInput: typeof import('naive-ui')['NInput']
-  const NSelect: typeof import('naive-ui')['NSelect']
-  const NUpload: typeof import('naive-ui')['NUpload']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
@@ -72,7 +67,6 @@ declare global {
   const unref: typeof import('vue')['unref']
   const useAttrs: typeof import('vue')['useAttrs']
   const useClipboard: typeof import('@vueuse/core')['useClipboard']
-  const useCounterStore: typeof import('../src/stores/counter')['useCounterStore']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
   const useDebounceFn: typeof import('@vueuse/core')['useDebounceFn']
@@ -83,7 +77,6 @@ declare global {
   const useLocalStorage: typeof import('@vueuse/core')['useLocalStorage']
   const useMessage: typeof import('naive-ui')['useMessage']
   const useModel: typeof import('vue')['useModel']
-  const useMouse: typeof import('@vueuse/core')['useMouse']
   const useNotification: typeof import('naive-ui')['useNotification']
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']
