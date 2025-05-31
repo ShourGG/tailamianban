@@ -193,6 +193,7 @@ export default defineConfigWithVueTs(
       '**/*.d.ts',
       '**/auto-imports.d.ts',
       'src/views/**/components/*.vue',
+      'scripts/**/*',
     ],
   },
   //MARK: JSDoc 白名单覆盖规则

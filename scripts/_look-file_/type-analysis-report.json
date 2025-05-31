@@ -1,0 +1,81 @@
+{
+  "timestamp": "2025-05-31T07:47:34.340Z",
+  "summary": {
+    "sourceFiles": 102,
+    "typeDefinitions": 122,
+    "usageReferences": 348,
+    "unusedTypes": 32,
+    "duplicateDefinitions": 23,
+    "healthScore": 85
+  },
+  "issues": {
+    "critical": 23,
+    "warning": 32,
+    "info": 0
+  },
+  "details": {
+    "unusedTypes": [
+      "ObjectValues",
+      "GlobalComponents",
+      "ComponentCustomProperties",
+      "ImportMeta",
+      "Config",
+      "ThemeConfig",
+      "Size",
+      "Status",
+      "Variant",
+      "BaseProps",
+      "Optional",
+      "RequiredKeys",
+      "ValueOf",
+      "KeyOf",
+      "RecordType",
+      "Fn",
+      "AsyncFn",
+      "Nullable",
+      "Undefinable",
+      "Maybe",
+      "NonFunctionKeys",
+      "FunctionKeys",
+      "SubmitEventPayload",
+      "UploadEventPayload",
+      "EditorEventPayload",
+      "FormInstance",
+      "FormModel",
+      "FormRulesMap",
+      "FieldChangeCallback",
+      "ItemType",
+      "UserShortcuts",
+      "Theme"
+    ],
+    "duplicates": [
+      "Props",
+      "Emits",
+      "FormOption",
+      "LayoutConfig",
+      "GroupConfig",
+      "GroupWithItems",
+      "GlobalThemeOverrides",
+      "ThemeMode",
+      "GlobalComponents",
+      "LayoutType",
+      "GridLayoutConfig",
+      "InlineLayoutConfig",
+      "MenuOption",
+      "FieldRule",
+      "EChartsOption",
+      "CascadeItem",
+      "SelectOption",
+      "TooltipComponentOption",
+      "GridComponentOption",
+      "BarSeriesOption",
+      "LegendComponentOption",
+      "FormField",
+      "LoginResponse"
+    ]
+  },
+  "suggestions": [
+    "💡 发现 32 个未使用的类型定义，建议清理",
+    "⚠️ 发现 23 个重复的类型定义，建议合并"
+  ]
+}

@@ -1,6 +1,6 @@
 // 自动生成的类型索引文件
 // 请勿手动编辑
-// 生成时间: 2025-05-31T05:50:21.564Z
+// 生成时间: 2025-05-31T06:15:10.113Z
 
 /// <reference path="./auto-imports.d.ts" />
 /// <reference path="./components.d.ts" />
