@@ -2,13 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-31 11:01:16
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-31 11:07:01
+ * @LastEditTime: 2025-05-31 14:04:05
  * @FilePath: \Robot_Admin\src\types\global.d.ts
  * @Description: 全局命名空间和工具类型
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-import type { VNode, CSSProperties } from 'vue'
+import type { VNode, CSSProperties, DefineComponent } from 'vue'
 
 declare global {
   // =================== 应用全局命名空间 ===================
@@ -106,6 +106,20 @@ declare global {
   type FunctionKeys<T> = {
     [K in keyof T]: T[K] extends Function ? K : never
   }[keyof T]
+}
+
+// =================== 模块声明 ===================
+
+/** Vue 单文件组件模块声明 */
+declare module '*.vue' {
+  const component: DefineComponent<object, object, unknown>
+  export default component
+}
+
+/** Views 目录路径别名模块声明 */
+declare module '_views/*' {
+  const component: DefineComponent
+  export default component
 }
 
 export {}

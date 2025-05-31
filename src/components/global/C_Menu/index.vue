@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 16:26:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-24 02:17:32
+ * @LastEditTime: 2025-05-31 14:12:48
  * @FilePath: \Robot_Admin\src\components\global\C_Menu\index.vue
  * @Description: 菜单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -41,7 +41,7 @@
   const themeStore = useThemeStore()
 
   type MenuPropsWithData = {
-    data: MenuOptions[]
+    data: Menu.MenuOptions[]
     mode?: 'vertical' | 'horizontal'
     collapsed?: boolean
     collapsedWidth?: number
@@ -87,14 +87,14 @@
    * ? @param {*} items 菜单选项数组
    * ! @return {*} MenuOptions[] 扁平化后的菜单选项数组
    */
-  const _flattenMenu = (items: MenuOptions[]): MenuOptions[] => {
+  const _flattenMenu = (items: Menu.MenuOptions[]): Menu.MenuOptions[] => {
     return items.reduce(
       (acc, item) => [
         ...acc,
         item,
         ...(item.children ? _flattenMenu(item.children) : []),
       ],
-      [] as MenuOptions[]
+      [] as Menu.MenuOptions[]
     )
   }
 
@@ -120,7 +120,7 @@
    * ! @return {*} string[] 父级菜单项的key数组
    */
   const findParentKeys = (
-    items: MenuOptions[],
+    items: Menu.MenuOptions[],
     targetPath: string,
     parentKeys: string[] = []
   ): string[] => {

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-31 11:00:46
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-31 11:05:10
+ * @LastEditTime: 2025-05-31 14:01:08
  * @FilePath: \Robot_Admin\src\types\env.d.ts
  * @Description: 环境变量和模块声明
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
