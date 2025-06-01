@@ -7,7 +7,7 @@
  * @Description: 表单校验规则
  */
 
-import type { FormItemRule } from 'naive-ui'
+import type { FormItemRule } from 'naive-ui/es/form'
 
 export type FieldRule = Omit<FormItemRule, 'validator'> & {
   validator: NonNullable<FormItemRule['validator']>

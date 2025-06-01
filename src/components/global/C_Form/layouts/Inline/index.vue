@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-31 09:51:23
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-31 13:01:12
+ * @LastEditTime: 2025-06-02 01:29:26
  * @FilePath: \Robot_Admin\src\components\global\C_Form\layouts\Inline\index.vue
- * @Description: 内联布局组件 - 水平排列的表单布局
+ * @Description: 内联布局组件 - 统一宽度的水平表单布局
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
@@ -26,61 +26,15 @@
 
 <script setup lang="ts">
   import type { VNode, CSSProperties } from 'vue'
-
-  // ================= 类型定义 =================
-
-  /**
-   * 内联布局配置接口
-   */
-  interface InlineLayoutConfig {
-    gap?: number // 项目间距，默认16px
-    align?: 'start' | 'center' | 'end' // 垂直对齐方式，默认center
-  }
-
-  /**
-   * 表单项布局配置接口
-   */
-  interface FormItemLayoutConfig {
-    width?: string | number // 项目宽度
-    span?: number // 网格占用列数（内联布局中不使用，但保持接口一致性）
-    offset?: number // 网格偏移列数（内联布局中不使用）
-    group?: string // 分组标识（内联布局中不使用）
-    class?: string // 自定义CSS类名
-    style?: CSSProperties // 自定义内联样式
-  }
-
-  /**
-   * 表单选项接口
-   */
-  interface FormOption {
-    type: string
-    prop: string
-    label?: string
-    layout?: FormItemLayoutConfig
-    [key: string]: any // 允许其他属性
-  }
-
-  /**
-   * 布局配置接口
-   */
-  interface LayoutConfig {
-    type?: string
-    inline?: InlineLayoutConfig
-    [key: string]: any // 允许其他布局类型的配置
-  }
-
-  /**
-   * 组件属性接口
-   */
-  interface Props {
-    formItems: VNode[] // 表单项VNode数组
-    layoutConfig?: LayoutConfig // 布局配置
-    options?: FormOption[] // 表单选项配置数组
-  }
+  import type {
+    LayoutProps,
+    FormOption,
+    ItemLayoutConfig,
+  } from '@/types/modules/form'
 
   // ================= 组件属性 =================
 
-  const props = withDefaults(defineProps<Props>(), {
+  const props = withDefaults(defineProps<LayoutProps>(), {
     layoutConfig: () => ({}),
     options: () => [],
   })
@@ -88,30 +42,61 @@
   // ================= 计算属性 =================
 
   /**
-   * 获取项目间距
+   * * @description 获取统一项目宽度
+   * ? @function itemWidth 固定240px宽度，保证所有表单项统一视觉效果
+   * ! @return 项目宽度数值240
+   */
+  const itemWidth = computed((): number => 280)
+
+  /**
+   * * @description 获取项目间距
+   * ? @function gap 从内联布局配置中获取水平间距
+   * ! @return 间距数值，默认16px
    */
   const gap = computed((): number => {
     return props.layoutConfig?.inline?.gap ?? 16
   })
 
   /**
-   * 获取垂直对齐方式
+   * * @description 获取行间距
+   * ? @function rowGap 固定16px行间距
+   * ! @return 行间距数值16
+   */
+  const rowGap = computed((): number => 16)
+
+  /**
+   * * @description 获取垂直对齐方式
+   * ? @function align 从内联布局配置中获取对齐方式
+   * ! @return 对齐方式字符串，默认'center'
    */
   const align = computed((): 'start' | 'center' | 'end' => {
-    return props.layoutConfig?.inline?.align ?? 'center'
+    const alignValue = props.layoutConfig?.inline?.align
+    return alignValue === 'start' ||
+      alignValue === 'end' ||
+      alignValue === 'baseline' ||
+      alignValue === 'stretch'
+      ? alignValue === 'baseline' || alignValue === 'stretch'
+        ? 'center'
+        : alignValue
+      : 'center'
   })
 
   /**
-   * 容器样式
+   * * @description 容器样式计算
+   * ? @function containerStyle 根据配置生成flex容器的CSS样式
+   * ! @return CSSProperties对象，包含display、flexWrap、alignItems、gap、width属性
    */
   const containerStyle = computed((): CSSProperties => {
-    const gapValue = gap.value
-
     return {
       display: 'flex',
-      alignItems: align.value,
       flexWrap: 'wrap',
-      gap: `${gapValue}px`, // 使用现代CSS gap属性，更简洁
+      alignItems:
+        align.value === 'start'
+          ? 'flex-start'
+          : align.value === 'end'
+            ? 'flex-end'
+            : 'center',
+      gap: `${rowGap.value}px ${gap.value}px`,
       width: '100%',
     }
   })
@@ -119,13 +104,13 @@
   // ================= 方法 =================
 
   /**
-   * 获取表单项的唯一key
-   * @param item VNode实例
-   * @param index 索引
-   * @returns 唯一标识符
+   * * @description 获取表单项的唯一key
+   * ? @function getItemKey 为每个表单项生成唯一标识符，用于Vue的列表渲染
+   * ? @param item VNode实例
+   * ? @param index 表单项在数组中的索引
+   * ! @return 唯一标识符字符串
    */
   const getItemKey = (item: VNode, index: number): string => {
-    // 优先使用VNode的key，其次使用props中的prop，最后使用索引
     if (item.key != null) {
       return String(item.key)
     }
@@ -139,28 +124,25 @@
   }
 
   /**
-   * 获取表单项样式
-   * @param index 表单项索引
-   * @returns CSS样式对象
+   * * @description 获取表单项样式
+   * ? @function getItemStyle 根据表单项配置和全局配置生成单个表单项的CSS样式
+   * ? @param index 表单项在数组中的索引
+   * ! @return CSSProperties对象，包含宽度、布局、显示等样式属性
    */
   const getItemStyle = (index: number): CSSProperties => {
-    const option = props.options?.[index]
-    const layoutConfig = option?.layout
+    const option: FormOption | undefined = props.options?.[index]
+    const layoutConfig: ItemLayoutConfig | undefined = option?.layout
 
-    if (!layoutConfig) {
-      return {
-        display: 'inline-block',
-        verticalAlign: 'top',
-      }
-    }
-
+    // 基础样式，统一宽度
     const baseStyle: CSSProperties = {
-      display: 'inline-block',
-      verticalAlign: 'top',
+      width: `${itemWidth.value}px`,
+      flexShrink: 0, // 防止被压缩
+      display: 'flex',
+      flexDirection: 'column',
     }
 
-    // 处理宽度设置
-    if (layoutConfig.width !== undefined) {
+    // 如果单独设置了宽度，则覆盖统一宽度
+    if (layoutConfig?.width !== undefined) {
       baseStyle.width =
         typeof layoutConfig.width === 'number'
           ? `${layoutConfig.width}px`
@@ -168,7 +150,7 @@
     }
 
     // 合并自定义样式
-    if (layoutConfig.style) {
+    if (layoutConfig?.style) {
       Object.assign(baseStyle, layoutConfig.style)
     }
 
@@ -179,60 +161,67 @@
 <style scoped>
   .c-form-inline {
     width: 100%;
-    min-height: 0; /* 防止flex容器在某些情况下的最小高度问题 */
+    min-height: 0;
   }
 
   .c-form-inline-item {
-    /* 基础项目样式 */
-    flex-shrink: 0; /* 防止项目被压缩 */
-    min-width: 0; /* 允许项目缩小到内容宽度以下 */
+    min-width: 0;
+  }
+
+  /* 确保内部所有表单组件都占满容器宽度 */
+  .c-form-inline-item :deep(.n-form-item) {
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  .c-form-inline-item :deep(.n-form-item-blank) {
+    width: 100%;
+  }
+
+  .c-form-inline-item :deep(.n-input),
+  .c-form-inline-item :deep(.n-select),
+  .c-form-inline-item :deep(.n-date-picker),
+  .c-form-inline-item :deep(.n-time-picker),
+  .c-form-inline-item :deep(.n-input-number),
+  .c-form-inline-item :deep(.n-cascader),
+  .c-form-inline-item :deep(.n-color-picker),
+  .c-form-inline-item :deep(.n-auto-complete),
+  .c-form-inline-item :deep(.n-tree-select) {
+    width: 100% !important;
+  }
+
+  /* 单选框和复选框组保持自然宽度 */
+  .c-form-inline-item :deep(.n-radio-group),
+  .c-form-inline-item :deep(.n-checkbox-group) {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* 开关组件居左对齐 */
+  .c-form-inline-item :deep(.n-switch) {
+    width: auto;
   }
 
   /* ================= 响应式设计 ================= */
 
-  /* 平板设备 */
-  @media (max-width: 1024px) {
-    .c-form-inline-item {
-      min-width: 200px; /* 确保在平板上有合理的最小宽度 */
-    }
-  }
-
-  /* 移动设备 */
+  /* 移动设备 - 改为垂直布局 */
   @media (max-width: 768px) {
     .c-form-inline {
       flex-direction: column !important;
-      gap: 12px !important; /* 移动端使用更小的间距 */
+      gap: 12px !important;
     }
 
     .c-form-inline-item {
       width: 100% !important;
-      min-width: auto !important;
-      max-width: none !important;
     }
   }
 
   /* 小屏手机 */
   @media (max-width: 480px) {
     .c-form-inline {
-      gap: 8px !important; /* 更小的间距 */
-    }
-  }
-
-  /* ================= 辅助功能 ================= */
-
-  /* 减少动画的用户偏好 */
-  @media (prefers-reduced-motion: reduce) {
-    .c-form-inline,
-    .c-form-inline-item {
-      transition: none !important;
-    }
-  }
-
-  /* 高对比度模式支持 */
-  @media (prefers-contrast: high) {
-    .c-form-inline-item {
-      border: 1px solid currentColor;
-      padding: 4px;
+      gap: 8px !important;
     }
   }
 </style>

@@ -1,428 +1,416 @@
 /*
  * @Author: ChenYu ycyplus@gmail.com
- * @Date: 2025-05-31 11:02:02
+ * @Date: 2025-05-23 11:02:02
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-31 11:08:56
+ * @LastEditTime: 2025-06-01 13:58:39
  * @FilePath: \Robot_Admin\src\types\modules\form.d.ts
- * @Description: 表单相关类型
+ * @Description: 表单相关类型 - 统一管理所有表单相关的类型定义
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-// 文件路径: src/types/form.d.ts 或 src/components/global/C_Form/form.d.ts
-
 import type { VNode, DefineComponent, CSSProperties } from 'vue'
-import type { FormInst, FormRules, UploadFileInfo } from 'naive-ui'
+import type { FormInst, UploadFileInfo } from 'naive-ui'
 import type { FieldRule } from '@/utils/v_verify'
+import type Editor from 'wangeditor'
 
-declare global {
-  namespace Form {
-    // =================== 基础类型定义 ===================
+/**
+ * 支持的布局类型
+ * @description 定义表单支持的所有布局模式
+ */
+export type LayoutType =
+  | 'default'
+  | 'inline'
+  | 'grid'
+  | 'card'
+  | 'tabs'
+  | 'steps'
+  | 'dynamic'
+  | 'custom'
 
-    /**
-     * 支持的布局类型
-     */
-    type LayoutType = 'default' | 'inline' | 'grid' | 'card'
+/**
+ * 标签位置类型
+ * @description 表单标签的显示位置
+ */
+export type LabelPlacement = 'left' | 'top'
 
-    /**
-     * 支持的表单控件类型
-     */
-    type ComponentType =
-      | 'input'
-      | 'textarea'
-      | 'inputNumber'
-      | 'select'
-      | 'checkbox'
-      | 'radio'
-      | 'switch'
-      | 'slider'
-      | 'rate'
-      | 'datePicker'
-      | 'daterange'
-      | 'timePicker'
-      | 'cascader'
-      | 'colorPicker'
-      | 'upload'
-      | 'editor'
+/**
+ * 支持的表单控件类型
+ * @description 所有支持的表单输入控件类型
+ */
+export type ComponentType =
+  | 'input'
+  | 'textarea'
+  | 'inputNumber'
+  | 'select'
+  | 'checkbox'
+  | 'radio'
+  | 'switch'
+  | 'slider'
+  | 'rate'
+  | 'datePicker'
+  | 'daterange'
+  | 'timePicker'
+  | 'cascader'
+  | 'colorPicker'
+  | 'upload'
+  | 'editor'
 
-    /**
-     * 选项项接口（用于 select、checkbox、radio 等）
-     */
-    interface OptionItem {
-      value: string | number | boolean
-      label: string
-      disabled?: boolean
-      [key: string]: any
-    }
+/**
+ * 选项项接口
+ * @description 用于 select、checkbox、radio 等组件的选项配置
+ */
+export interface OptionItem {
+  value: string | number | boolean
+  label: string
+  disabled?: boolean
+  [key: string]: any
+}
 
-    // =================== 布局相关类型 ===================
+// =================== 布局配置类型 ===================
 
-    /**
-     * 表单项布局配置
-     */
-    interface ItemLayoutConfig {
-      /** 网格布局：占用列数 */
-      span?: number
-      /** 网格布局：偏移列数 */
-      offset?: number
-      /** 内联布局：项目宽度 */
-      width?: string | number
-      /** 卡片布局：所属分组 */
-      group?: string
-      /** 自定义CSS类名 */
-      class?: string
-      /** 自定义内联样式 */
-      style?: CSSProperties
-      /** 是否隐藏 */
-      hidden?: boolean
-    }
+/**
+ * 标签页配置接口
+ * @description 用于标签页布局的单个标签页配置
+ */
+export interface TabConfig {
+  key: string
+  title: string
+  description?: string
+  disabled?: boolean
+  icon?: string
+}
 
-    /**
-     * 网格布局配置
-     */
-    interface GridLayoutConfig {
-      /** 总列数，默认24 */
-      cols?: number
-      /** 水平间距，默认16 */
-      gutter?: number
-      /** 垂直间距，默认16 */
-      yGutter?: number
-    }
+/**
+ * 步骤配置接口
+ * @description 用于步骤布局的单个步骤配置
+ */
+export interface StepConfig {
+  key: string
+  title: string
+  description?: string
+  disabled?: boolean
+  icon?: string
+  required?: boolean
+}
 
-    /**
-     * 内联布局配置
-     */
-    interface InlineLayoutConfig {
-      /** 项目间距，默认16 */
-      gap?: number
-      /** 对齐方式，默认center */
-      align?: 'start' | 'center' | 'end' | 'baseline' | 'stretch'
-      /** 换行方式 */
-      wrap?: 'nowrap' | 'wrap' | 'wrap-reverse'
-    }
+/**
+ * 分组配置接口
+ * @description 用于卡片布局和自定义布局的分组配置
+ */
+export interface GroupConfig {
+  key: string
+  title: string
+  description?: string
+  icon?: string
+  color?: string
+  collapsible?: boolean
+  collapsed?: boolean
+  defaultExpanded?: boolean
+}
 
-    /**
-     * 卡片分组配置
-     */
-    interface CardGroup {
-      /** 分组唯一标识 */
-      key: string
-      /** 分组标题 */
-      title: string
-      /** 分组描述 */
-      description?: string
-      /** 是否可折叠 */
-      collapsible?: boolean
-      /** 默认是否展开 */
-      defaultExpanded?: boolean
-    }
+/**
+ * 动态字段配置接口
+ * @description 用于动态布局的字段配置
+ */
+export interface DynamicFieldConfig {
+  id: string
+  type: ComponentType | string
+  prop: string
+  label: string
+  visible: boolean
+  removable: boolean
+  created: number
+}
 
-    /**
-     * 卡片布局配置
-     */
-    interface CardLayoutConfig {
-      /** 分组配置列表 */
-      groups?: CardGroup[]
-      /** 卡片间距 */
-      spacing?: number
-      /** 是否显示边框 */
-      bordered?: boolean
-    }
+/**
+ * 表单项布局配置
+ * @description 单个表单项的布局相关配置
+ */
+export interface ItemLayoutConfig {
+  span?: number
+  offset?: number
+  width?: string | number
+  group?: string
+  tab?: string
+  step?: string
+  dynamic?: boolean
+  customRender?: boolean
+  enhanced?: boolean
+  class?: string
+  style?: CSSProperties | Record<string, any>
+  hidden?: boolean
+}
 
-    /**
-     * 完整布局配置
-     */
-    interface LayoutConfig {
-      /** 布局类型 */
-      type?: LayoutType
-      /** 网格布局配置 */
-      grid?: GridLayoutConfig
-      /** 内联布局配置 */
-      inline?: InlineLayoutConfig
-      /** 卡片布局配置 */
-      card?: CardLayoutConfig
-    }
+/**
+ * 网格布局配置
+ * @description 网格布局的详细配置选项
+ */
+export interface GridLayoutConfig {
+  cols?: number
+  gutter?: number
+  yGutter?: number
+}
 
-    // =================== 表单配置类型 ===================
+/**
+ * 内联布局配置
+ * @description 内联布局的详细配置选项
+ */
+export interface InlineLayoutConfig {
+  gap?: number
+  align?: 'start' | 'center' | 'end' | 'baseline' | 'stretch'
+  wrap?: 'nowrap' | 'wrap' | 'wrap-reverse'
+}
 
-    /**
-     * 表单配置项接口
-     */
-    interface FormOption {
-      /** 表单控件类型 */
-      type: ComponentType
-      /** 字段名（唯一标识） */
-      prop: string
-      /** 字段标签 */
-      label?: string
-      /** 默认值 */
-      value?: any
-      /** 占位符文本 */
-      placeholder?: string
-      /** 验证规则数组 */
-      rules?: FieldRule[]
-      /** 组件额外属性 */
-      attrs?: Record<string, any>
-      /** 子选项（select/checkbox/radio用） */
-      children?: OptionItem[]
-      /** 是否显示，默认true */
-      show?: boolean
-      /** 布局相关配置 */
-      layout?: ItemLayoutConfig
-      /** 字段说明/帮助文本 */
-      help?: string
-      /** 是否必填（UI显示用） */
-      required?: boolean
-      /** 字段分组（逻辑分组，不同于布局分组） */
-      group?: string
-      /** 依赖字段（当指定字段有值时才显示） */
-      dependsOn?: string | string[]
-      /** 依赖条件函数 */
-      showWhen?: (formModel: Record<string, any>) => boolean
-    }
+/**
+ * 卡片布局配置
+ * @description 卡片布局的详细配置选项
+ */
+export interface CardLayoutConfig {
+  groups?: GroupConfig[]
+  spacing?: number
+  bordered?: boolean
+}
 
-    // =================== 组件 Props 类型 ===================
+/**
+ * 标签页布局配置
+ * @description 标签页布局的详细配置选项
+ */
+export interface TabsLayoutConfig {
+  tabs?: TabConfig[]
+  placement?: 'top' | 'right' | 'bottom' | 'left'
+  defaultTab?: string
+}
 
-    /**
-     * C_Form 组件 Props
-     */
-    interface FormProps {
-      /** 表单配置项数组 */
-      options: FormOption[]
-      /** 双向绑定的表单数据 */
-      modelValue?: Record<string, any>
-      /** 布局类型 */
-      layoutType?: LayoutType
-      /** 布局配置 */
-      layoutConfig?: LayoutConfig
-      /** 是否在值改变时触发验证 */
-      validateOnValueChange?: boolean
-      /** 表单标签宽度 */
-      labelWidth?: string | number
-      /** 表单标签位置 */
-      labelPlacement?: 'left' | 'top'
-      /** 是否显示必填星号 */
-      showRequireMark?: boolean
-      /** 表单尺寸 */
-      size?: 'small' | 'medium' | 'large'
-      /** 是否禁用整个表单 */
-      disabled?: boolean
-      /** 是否只读模式 */
-      readonly?: boolean
-    }
+/**
+ * 步骤布局配置
+ * @description 步骤布局的详细配置选项
+ */
+export interface StepsLayoutConfig {
+  steps?: StepConfig[]
+  vertical?: boolean
+  size?: 'small' | 'medium'
+  defaultStep?: number
+  showStepHeader?: boolean
+  validateBeforeNext?: boolean
+  prevButtonText?: string
+  nextButtonText?: string
+}
 
-    /**
-     * 布局组件通用 Props
-     */
-    interface LayoutProps {
-      /** 表单项 VNode 数组 */
-      formItems: VNode[]
-      /** 布局配置 */
-      layoutConfig?: LayoutConfig
-      /** 原始表单配置选项 */
-      options?: FormOption[]
-    }
-
-    // =================== 事件类型定义 ===================
-
-    /**
-     * 表单提交事件参数
-     */
-    interface SubmitEventPayload {
-      /** 表单数据模型 */
-      model: Record<string, any>
-      /** 表单实例 */
-      form: FormInst
-    }
-
-    /**
-     * 文件上传相关事件参数
-     */
-    interface UploadEventPayload {
-      file: UploadFileInfo
-      fileList: UploadFileInfo[]
-      event?: Event
-    }
-
-    /**
-     * 编辑器事件参数
-     */
-    interface EditorEventPayload {
-      /** 编辑器实例 */
-      editor: any
-      /** 字段名 */
-      prop: string
-      /** HTML 内容 */
-      html: string
-    }
-
-    // =================== 组件实例类型 ===================
-
-    /**
-     * C_Form 组件实例暴露的方法
-     */
-    interface FormInstance {
-      /** 验证整个表单 */
-      validate(): Promise<void>
-      /** 验证指定字段 */
-      validateField(field: string | string[]): Promise<void>
-      /** 清除验证状态 */
-      clearValidation(field?: string | string[]): void
-      /** 获取表单数据副本 */
-      getModel(): Record<string, any>
-      /** 设置多个字段值 */
-      setFields(fields: Record<string, any>): void
-      /** 重置表单 */
-      resetFields(): void
-      /** 设置单个字段值 */
-      setFieldValue(
-        field: string,
-        value: any,
-        shouldValidate?: boolean
-      ): Promise<void>
-      /** 获取指定字段值 */
-      getFieldValue(field: string): any
-      /** 批量设置字段值 */
-      setFieldsValue(
-        fields: Record<string, any>,
-        shouldValidate?: boolean
-      ): Promise<void>
-      /** 表单引用 */
-      formRef: FormInst | null
-      /** 表单数据模型 */
-      formModel: Record<string, any>
-      /** 初始化表单 */
-      initialize(): void
-    }
-
-    // =================== 布局组件类型 ===================
-
-    /**
-     * 默认布局组件类型
-     */
-    type DefaultLayoutComponent = DefineComponent<LayoutProps>
-
-    /**
-     * 内联布局组件类型
-     */
-    type InlineLayoutComponent = DefineComponent<LayoutProps>
-
-    /**
-     * 网格布局组件类型
-     */
-    type GridLayoutComponent = DefineComponent<LayoutProps>
-
-    /**
-     * 卡片布局组件类型
-     */
-    type CardLayoutComponent = DefineComponent<LayoutProps>
-
-    // =================== 工具类型 ===================
-
-    /**
-     * 表单数据模型类型（泛型）
-     */
-    type FormModel<T = Record<string, any>> = T
-
-    /**
-     * 表单验证规则映射
-     */
-    type FormRulesMap = Record<string, FieldRule[]>
-
-    /**
-     * 字段值变化回调
-     */
-    type FieldChangeCallback = (
-      field: string,
-      value: any,
-      formModel: Record<string, any>
-    ) => void
-
-    /**
-     * 表单配置构建器类型
-     */
-    interface FormConfigBuilder {
-      /** 添加输入框 */
-      addInput(
-        prop: string,
-        label: string,
-        options?: Partial<FormOption>
-      ): FormConfigBuilder
-      /** 添加选择器 */
-      addSelect(
-        prop: string,
-        label: string,
-        options: OptionItem[],
-        config?: Partial<FormOption>
-      ): FormConfigBuilder
-      /** 添加复选框组 */
-      addCheckbox(
-        prop: string,
-        label: string,
-        options: OptionItem[],
-        config?: Partial<FormOption>
-      ): FormConfigBuilder
-      /** 添加单选框组 */
-      addRadio(
-        prop: string,
-        label: string,
-        options: OptionItem[],
-        config?: Partial<FormOption>
-      ): FormConfigBuilder
-      /** 添加日期选择器 */
-      addDatePicker(
-        prop: string,
-        label: string,
-        options?: Partial<FormOption>
-      ): FormConfigBuilder
-      /** 添加上传组件 */
-      addUpload(
-        prop: string,
-        label: string,
-        options?: Partial<FormOption>
-      ): FormConfigBuilder
-      /** 设置布局 */
-      setLayout(
-        layoutType: LayoutType,
-        config?: LayoutConfig
-      ): FormConfigBuilder
-      /** 构建配置 */
-      build(): FormOption[]
-    }
+/**
+ * 动态布局配置
+ * @description 动态布局的详细配置选项
+ */
+export interface DynamicLayoutConfig {
+  grid?: {
+    cols?: number
+    gutter?: number
+  }
+  controls?: {
+    showControls?: boolean
+    showItemControls?: boolean
+    showStats?: boolean
+  }
+  dynamic?: {
+    allowAdd?: boolean
+    allowRemove?: boolean
+    allowToggle?: boolean
+    maxFields?: number
   }
 }
 
-// =================== 模块声明 ===================
-
 /**
- * 布局组件模块声明
+ * 自定义渲染布局配置
+ * @description 自定义渲染布局的详细配置选项
  */
-declare module './layouts/Default/index.vue' {
-  const component: Form.DefaultLayoutComponent
-  export default component
-}
-
-declare module './layouts/Inline/index.vue' {
-  const component: Form.InlineLayoutComponent
-  export default component
-}
-
-declare module './layouts/Grid/index.vue' {
-  const component: Form.GridLayoutComponent
-  export default component
-}
-
-declare module './layouts/Card/index.vue' {
-  const component: Form.CardLayoutComponent
-  export default component
+export interface CustomLayoutConfig {
+  groups?: GroupConfig[]
+  rendering?: {
+    mode?: 'basic' | 'enhanced'
+    animations?: boolean
+    tooltips?: boolean
+  }
+  display?: {
+    showIntro?: boolean
+    showModeSwitch?: boolean
+    showGroupActions?: boolean
+    showStats?: boolean
+  }
 }
 
 /**
- * C_Form 主组件声明
+ * 完整布局配置
+ * @description 包含所有布局类型的配置选项
  */
-declare module '@/components/global/C_Form/index.vue' {
-  import type { DefineComponent } from 'vue'
-  const component: DefineComponent<Form.FormProps>
-  export default component
+export interface LayoutConfig {
+  type?: LayoutType
+  grid?: GridLayoutConfig
+  inline?: InlineLayoutConfig
+  card?: CardLayoutConfig
+  tabs?: TabsLayoutConfig
+  steps?: StepsLayoutConfig
+  dynamic?: DynamicLayoutConfig
+  custom?: CustomLayoutConfig
 }
 
-export {}
+// =================== 表单配置类型 ===================
+
+/**
+ * 表单配置项接口
+ * @description 单个表单项的完整配置
+ */
+export interface FormOption {
+  type: ComponentType | string
+  prop: string
+  label?: string
+  value?: any
+  placeholder?: string
+  rules?: FieldRule[]
+  attrs?: Record<string, any>
+  children?: OptionItem[]
+  show?: boolean
+  layout?: ItemLayoutConfig
+  help?: string
+  required?: boolean
+  dependsOn?: string | string[]
+  showWhen?: (formModel: Record<string, any>) => boolean
+}
+
+// =================== 组件 Props 类型 ===================
+
+/**
+ * C_Form 组件 Props
+ * @description 表单组件的属性接口
+ */
+export interface FormProps {
+  options: FormOption[]
+  modelValue?: Record<string, any>
+  layoutType?: LayoutType
+  layoutConfig?: LayoutConfig
+  validateOnValueChange?: boolean
+  labelPlacement?: LabelPlacement
+  labelWidth?: string | number
+  showRequireMark?: boolean
+  size?: 'small' | 'medium' | 'large'
+  disabled?: boolean
+  readonly?: boolean
+}
+
+/**
+ * 布局组件通用 Props
+ * @description 所有布局组件的通用属性接口
+ */
+export interface LayoutProps {
+  formItems: VNode[]
+  layoutConfig?: LayoutConfig
+  options?: FormOption[]
+}
+
+// =================== 事件类型定义 ===================
+
+/**
+ * 表单提交事件参数
+ */
+export interface SubmitEventPayload {
+  model: Record<string, any>
+  form: FormInst
+}
+
+/**
+ * 文件上传相关事件参数
+ */
+export interface UploadEventPayload {
+  file: UploadFileInfo
+  fileList: UploadFileInfo[]
+  event?: Event
+}
+
+/**
+ * 编辑器事件参数
+ */
+export interface EditorEventPayload {
+  editor: Editor
+  prop: string
+  html: string
+}
+
+// =================== 组件实例类型 ===================
+
+/**
+ * C_Form 组件实例暴露的方法
+ * @description 表单组件实例对外暴露的所有方法
+ */
+export interface FormInstance {
+  validate(): Promise<void>
+  validateField(field: string | string[]): Promise<void>
+  validateStep(stepIndex: number): Promise<boolean>
+  validateTab(tabKey: string): Promise<boolean>
+  validateDynamicFields(): Promise<boolean>
+  validateCustomGroup(groupKey: string): Promise<boolean>
+  clearValidation(field?: string | string[]): void
+  getModel(): Record<string, any>
+  setFields(fields: Record<string, any>): void
+  resetFields(): void
+  setFieldValue(
+    field: string,
+    value: any,
+    shouldValidate?: boolean
+  ): Promise<void>
+  getFieldValue(field: string): any
+  setFieldsValue(
+    fields: Record<string, any>,
+    shouldValidate?: boolean
+  ): Promise<void>
+  formRef: FormInst | null
+  formModel: Record<string, any>
+  initialize(): void
+  layoutType: LayoutType
+  isStepsLayout: boolean
+}
+
+// =================== 布局组件类型 ===================
+
+/**
+ * 布局组件定义类型
+ */
+export type LayoutComponent = DefineComponent<LayoutProps>
+
+// =================== 工具类型 ===================
+
+/**
+ * 表单数据模型类型（泛型）
+ */
+export type FormModel<T = Record<string, any>> = T
+
+/**
+ * 表单验证规则映射
+ */
+export type FormRulesMap = Record<string, FieldRule[]>
+
+/**
+ * 字段值变化回调
+ */
+export type FieldChangeCallback = (
+  field: string,
+  value: any,
+  formModel: Record<string, any>
+) => void
+
+/**
+ * 渲染模式类型
+ */
+export type RenderMode = 'basic' | 'enhanced'
+
+/**
+ * 对齐方式类型
+ */
+export type AlignType = 'start' | 'center' | 'end'
+
+/**
+ * 步骤尺寸类型
+ */
+export type StepSize = 'small' | 'medium'
+
+/**
+ * 标签页位置类型
+ */
+export type TabsPlacement = 'top' | 'right' | 'bottom' | 'left'

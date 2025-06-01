@@ -1,49 +1,174 @@
 <template>
-  <div class="demo-page">
-    <div class="page-header">
-      <h1>表单布局演示</h1>
-      <p>基于优化验证规则的组件化布局系统</p>
-    </div>
+  <div class="form-demo-container">
+    <!-- 页面标题 -->
+    <header class="demo-header">
+      <h1>C_Form 完整布局演示</h1>
+      <p
+        >展示所有8种布局类型：默认、内联、网格、卡片、标签页、步骤、动态、自定义渲染</p
+      >
+    </header>
 
-    <!-- 布局控制 -->
+    <!-- 布局控制面板 -->
     <NCard
-      title="布局控制"
+      title="布局控制面板"
       class="mb-4"
     >
-      <NSpace>
-        <span>布局类型:</span>
-        <NSelect
-          v-model:value="currentLayout"
-          :options="layoutOptions"
-          style="width: 150px"
-        />
-        <span>标签位置:</span>
-        <NSelect
-          v-model:value="labelPlacement"
-          :options="labelPlacementOptions"
-          style="width: 120px"
-        />
-        <span>实时验证:</span>
-        <NSwitch v-model:value="validateOnChange" />
-        <NButton
-          type="primary"
-          size="small"
-          @click="fillTestData"
+      <NSpace
+        vertical
+        :size="16"
+      >
+        <!-- 基础控制 -->
+        <NSpace :size="12">
+          <span>布局:</span>
+          <NSelect
+            v-model:value="currentLayout"
+            :options="layoutOptions"
+            style="width: 150px"
+          />
+          <span>标签:</span>
+          <NSelect
+            v-model:value="labelPlacement"
+            :options="labelPlacementOptions"
+            style="width: 120px"
+          />
+          <span>验证:</span>
+          <NSwitch v-model:value="validateOnChange" />
+        </NSpace>
+
+        <!-- 操作按钮 -->
+        <NSpace :size="8">
+          <NButton
+            type="primary"
+            size="small"
+            @click="fillTestData"
+            >填充测试</NButton
+          >
+          <NButton
+            type="info"
+            size="small"
+            @click="previewData"
+            >预览数据</NButton
+          >
+          <NButton
+            type="warning"
+            size="small"
+            @click="clearAllData"
+            >清空数据</NButton
+          >
+          <NButton
+            type="success"
+            size="small"
+            @click="validateForm"
+            >验证表单</NButton
+          >
+        </NSpace>
+
+        <!-- 布局特定控制 -->
+        <NSpace
+          v-if="hasLayoutSpecificConfig"
+          :size="12"
         >
-          填充测试数据
-        </NButton>
-        <NButton
-          type="info"
-          size="small"
-          @click="previewData"
-        >
-          预览数据
-        </NButton>
+          <NDivider vertical />
+          <span>布局配置:</span>
+
+          <!-- 网格布局 -->
+          <template v-if="currentLayout === 'grid'">
+            <span>列数:</span>
+            <NInputNumber
+              v-model:value="gridCols"
+              :min="12"
+              :max="24"
+              :step="6"
+              style="width: 80px"
+            />
+            <span>间距:</span>
+            <NInputNumber
+              v-model:value="gridGutter"
+              :min="8"
+              :max="32"
+              :step="4"
+              style="width: 80px"
+            />
+          </template>
+
+          <!-- 内联布局 -->
+          <template v-if="currentLayout === 'inline'">
+            <span>间距:</span>
+            <NInputNumber
+              v-model:value="inlineGap"
+              :min="8"
+              :max="32"
+              :step="4"
+              style="width: 80px"
+            />
+          </template>
+
+          <!-- 动态布局 -->
+          <template v-if="currentLayout === 'dynamic'">
+            <span>最大字段:</span>
+            <NInputNumber
+              v-model:value="dynamicMaxFields"
+              :min="10"
+              :max="50"
+              style="width: 80px"
+            />
+            <span>字段数:</span>
+            <NBadge
+              :value="dynamicFields.length"
+              type="primary"
+            />
+
+            <NDivider vertical />
+            <NButton
+              type="primary"
+              size="small"
+              @click="addDynamicField"
+            >
+              <template #icon><div class="i-carbon-add" /></template>
+              添加字段
+            </NButton>
+            <NButton
+              type="warning"
+              size="small"
+              @click="removeDynamicField"
+              :disabled="dynamicFields.length === 0"
+            >
+              <template #icon><div class="i-carbon-subtract" /></template>
+              移除字段
+            </NButton>
+            <NButton
+              type="error"
+              size="small"
+              @click="clearDynamicFields"
+              >清空字段</NButton
+            >
+          </template>
+        </NSpace>
       </NSpace>
     </NCard>
 
-    <!-- 表单展示 -->
-    <NCard :title="`${getCurrentLayoutName()} 布局示例`">
+    <!-- 表单主体 -->
+    <NCard :title="getLayoutTitle()">
+      <template #header-extra>
+        <NBadge
+          :value="formOptions.length"
+          type="info"
+        >
+          <div class="i-carbon-form text-16px" />
+        </NBadge>
+      </template>
+
+      <!-- 布局说明 -->
+      <NAlert
+        :title="currentLayoutDescription.title"
+        :type="currentLayoutDescription.type"
+        class="mb-4"
+        show-icon
+      >
+        {{ currentLayoutDescription.content }}
+      </NAlert>
+
+      <!-- 表单组件 -->
       <C_Form
         ref="formRef"
         :options="formOptions"
@@ -56,385 +181,494 @@
         @validate-success="handleValidateSuccess"
         @validate-error="handleValidateError"
       >
-        <template #action="{ validate, reset, clearValidation }">
+        <!-- 操作按钮 -->
+        <template #action="{ validate, reset }">
           <NSpace>
             <NButton
               type="primary"
-              @click="submitForm(validate as () => Promise<void>)"
-              :loading="loading"
+              @click="submitForm(validate)"
+              :loading="submitLoading"
+              >提交表单</NButton
             >
-              提交表单
-            </NButton>
-            <NButton @click="resetForm(reset as () => void)">重置</NButton>
-            <NButton
-              type="info"
-              @click="validateSingleField"
-            >
-              验证用户名
-            </NButton>
-            <NButton
-              type="warning"
-              @click="(clearValidation as () => void)()"
-            >
-              清除验证
-            </NButton>
+            <NButton @click="resetForm(reset)">重置表单</NButton>
           </NSpace>
         </template>
       </C_Form>
+    </NCard>
+
+    <!-- 表单状态信息 -->
+    <NCard
+      title="表单状态"
+      class="mt-4"
+    >
+      <NDescriptions
+        :column="2"
+        bordered
+        size="small"
+      >
+        <NDescriptionsItem label="当前布局">
+          <NTag :type="getLayoutTagType()">{{ getLayoutName() }}</NTag>
+        </NDescriptionsItem>
+        <NDescriptionsItem label="字段数量">
+          <NBadge :value="formOptions.length" />
+        </NDescriptionsItem>
+        <NDescriptionsItem label="已填字段">
+          <NBadge
+            :value="filledFieldsCount"
+            type="success"
+          />
+        </NDescriptionsItem>
+        <NDescriptionsItem label="验证状态">
+          <NTag :type="lastValidateResult ? 'success' : 'error'">
+            {{ lastValidateResult ? '通过' : '失败' }}
+          </NTag>
+        </NDescriptionsItem>
+        <NDescriptionsItem
+          v-if="currentLayout === 'dynamic'"
+          label="动态字段"
+        >
+          <NTag type="primary">{{ dynamicFields.length }}</NTag>
+        </NDescriptionsItem>
+      </NDescriptions>
     </NCard>
 
     <!-- 数据预览弹窗 -->
     <NModal
       v-model:show="showPreview"
       preset="card"
-      title="表单数据"
-      size="large"
+      title="表单数据预览"
+      class="w50%"
     >
-      <NCode
-        :code="JSON.stringify(formData, null, 2)"
-        language="json"
-      />
+      <template #header-extra>
+        <NSpace>
+          <NButton
+            size="small"
+            @click="copyData"
+            >复制数据</NButton
+          >
+          <NButton
+            size="small"
+            @click="downloadData"
+            >下载JSON</NButton
+          >
+        </NSpace>
+      </template>
+
+      <NTabs
+        type="line"
+        animated
+      >
+        <NTabPane
+          name="formatted"
+          tab="格式化显示"
+        >
+          <NCode
+            :code="JSON.stringify(formData, null, 2)"
+            language="json"
+            show-line-numbers
+          />
+        </NTabPane>
+        <NTabPane
+          name="table"
+          tab="表格显示"
+        >
+          <NTable striped>
+            <thead>
+              <tr>
+                <th>字段名</th>
+                <th>字段值</th>
+                <th>类型</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="[key, value] in Object.entries(formData)"
+                :key="key"
+              >
+                <td
+                  ><NTag size="small">{{ key }}</NTag></td
+                >
+                <td>{{ formatValue(value) }}</td>
+                <td
+                  ><NTag
+                    type="info"
+                    size="small"
+                    >{{ getValueType(value) }}</NTag
+                  ></td
+                >
+              </tr>
+            </tbody>
+          </NTable>
+        </NTabPane>
+      </NTabs>
     </NModal>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { PRESET_RULES, RULE_COMBOS, customRule } from '@/utils/v_verify'
+  import { ref, computed, watch } from 'vue'
+  import type {
+    LayoutType,
+    FormInstance,
+    FormOption,
+  } from '@/types/modules/form'
+  import {
+    layoutOptions,
+    labelPlacementOptions,
+    layoutDescriptions,
+    layoutTagTypes,
+    createBaseFields,
+    createExtendedFields,
+    testData,
+    dynamicFieldTypes,
+    createLayoutConfig,
+  } from './data'
 
   const message = useMessage()
 
-  // 响应式数据 - 明确类型定义
-  const formRef = ref()
-  const loading = ref(false)
-  const showPreview = ref(false)
-  const currentLayout = ref<'default' | 'inline' | 'grid' | 'card'>('default')
-  const validateOnChange = ref(false)
-  const labelPlacement = ref<'left' | 'top'>('left')
+  // ================= 响应式状态 =================
+  const formRef = ref<FormInstance | null>(null)
   const formData = ref<Record<string, any>>({})
+  const showPreview = ref(false)
+  const submitLoading = ref(false)
+  const lastValidateResult = ref(true)
 
-  // 布局配置 - 明确类型定义
-  const layoutOptions: Array<{
-    label: string
-    value: 'default' | 'inline' | 'grid' | 'card'
-  }> = [
-    { label: '默认布局', value: 'default' },
-    { label: '内联布局', value: 'inline' },
-    { label: '网格布局', value: 'grid' },
-    { label: '卡片布局', value: 'card' },
-  ]
+  // 布局控制状态
+  const currentLayout = ref<LayoutType>('default')
+  const labelPlacement = ref<'left' | 'top'>('left')
+  const validateOnChange = ref(false)
 
-  // 标签位置配置 - 明确类型定义
-  const labelPlacementOptions: Array<{ label: string; value: 'left' | 'top' }> =
-    [
-      { label: '左侧', value: 'left' },
-      { label: '顶部', value: 'top' },
-    ]
+  // 布局特定配置
+  const gridCols = ref(24)
+  const gridGutter = ref(16)
+  const inlineGap = ref(16)
+  const dynamicMaxFields = ref(20)
 
-  const currentLayoutConfig = computed(() => {
-    switch (currentLayout.value) {
-      case 'inline':
-        return {
-          inline: { gap: 16, align: 'center' as const },
-        }
-      case 'grid':
-        return {
-          grid: { cols: 24, gutter: 16 },
-        }
-      case 'card':
-        return {
-          card: {
-            groups: [
-              { key: 'basic', title: '基础信息', description: '用户基本信息' },
-              { key: 'profile', title: '个人档案', description: '详细资料' },
-              { key: 'settings', title: '系统设置', description: '配置选项' },
-            ],
-          },
-        }
-      default:
-        return {}
+  // 动态字段状态
+  const dynamicFields = ref<any[]>([])
+  const dynamicFieldCounter = ref(0)
+
+  // ================= 计算属性 =================
+  const hasLayoutSpecificConfig = computed(() =>
+    ['grid', 'inline', 'dynamic'].includes(currentLayout.value)
+  )
+
+  const currentLayoutConfig = computed(() =>
+    createLayoutConfig(currentLayout.value, {
+      grid: { cols: gridCols.value, gutter: gridGutter.value },
+      inline: { gap: inlineGap.value, align: 'center' },
+      dynamic: { maxFields: dynamicMaxFields.value, useExternalControl: true },
+    })
+  )
+
+  const currentLayoutDescription = computed(
+    () => layoutDescriptions[currentLayout.value]
+  )
+
+  const formOptions = computed<FormOption[]>(() => {
+    let baseFields = createBaseFields()
+
+    // 为某些布局添加额外字段
+    if (['card', 'tabs', 'dynamic', 'custom'].includes(currentLayout.value)) {
+      baseFields.push(...createExtendedFields())
     }
+
+    // 添加动态字段
+    if (currentLayout.value === 'dynamic' && dynamicFields.value.length > 0) {
+      baseFields.push(...dynamicFields.value)
+    }
+
+    // 根据布局类型过滤字段
+    if (currentLayout.value === 'inline') {
+      baseFields = baseFields.filter(
+        field => !['editor', 'textarea', 'upload'].includes(field.type)
+      )
+    }
+
+    return baseFields.map(field => ({
+      ...field,
+      layout: { ...field.layout, ...getFieldLayout(field.prop) },
+    }))
   })
 
-  // 表单配置
-  const formOptions = [
-    {
-      type: 'input',
-      prop: 'username',
-      label: '用户名',
-      placeholder: '请输入用户名',
-      rules: RULE_COMBOS.username('用户名'),
-      layout: { span: 12, width: '200px', group: 'basic' },
-    },
-    {
-      type: 'input',
-      prop: 'email',
-      label: '邮箱',
-      placeholder: '请输入邮箱',
-      rules: RULE_COMBOS.email('邮箱'),
-      layout: { span: 12, width: '200px', group: 'basic' },
-    },
-    {
-      type: 'input',
-      prop: 'phone',
-      label: '手机号',
-      placeholder: '请输入手机号',
-      rules: RULE_COMBOS.mobile('手机号'),
-      layout: { span: 12, width: '200px', group: 'basic' },
-    },
-    {
-      type: 'inputNumber',
-      prop: 'age',
-      label: '年龄',
-      placeholder: '请输入年龄',
-      rules: [
-        PRESET_RULES.required('年龄'),
-        PRESET_RULES.range('年龄', 18, 65),
-      ],
-      attrs: { min: 1, max: 120 },
-      layout: { span: 12, width: '150px', group: 'basic' },
-    },
-    {
-      type: 'select',
-      prop: 'gender',
-      label: '性别',
-      placeholder: '请选择性别',
-      rules: [PRESET_RULES.required('性别')],
-      children: [
-        { value: 'male', label: '男' },
-        { value: 'female', label: '女' },
-        { value: 'other', label: '其他' },
-      ],
-      layout: { span: 12, group: 'profile' },
-    },
-    {
-      type: 'checkbox',
-      prop: 'hobbies',
-      label: '爱好',
-      rules: [
-        customRule(
-          (value: any[]) => value && value.length > 0,
-          '请至少选择一个爱好'
-        ),
-      ],
-      children: [
-        { value: 'reading', label: '阅读' },
-        { value: 'music', label: '音乐' },
-        { value: 'sports', label: '运动' },
-        { value: 'travel', label: '旅行' },
-      ],
-      layout: { span: 24, group: 'profile' },
-    },
-    {
-      type: 'datePicker',
-      prop: 'birthday',
-      label: '生日',
-      placeholder: '请选择生日',
-      rules: [
-        PRESET_RULES.required('生日'),
-        customRule((value: any) => {
-          if (!value) return true
-          const birthYear = new Date(value).getFullYear()
-          const currentYear = new Date().getFullYear()
-          return currentYear - birthYear >= 18
-        }, '必须年满18岁'),
-      ],
-      attrs: { type: 'date' },
-      layout: { span: 12, group: 'profile' },
-    },
-    {
-      type: 'textarea',
-      prop: 'bio',
-      label: '个人简介',
-      placeholder: '介绍一下自己...',
-      rules: [PRESET_RULES.length('个人简介', 10, 200)],
-      attrs: { rows: 3, maxlength: 200, showCount: true },
-      layout: { span: 24, group: 'profile' },
-    },
-    {
-      type: 'input',
-      prop: 'password',
-      label: '密码',
-      placeholder: '请输入密码',
-      rules: RULE_COMBOS.password('密码'),
-      attrs: { type: 'password', showPasswordOn: 'mousedown' },
-      layout: { span: 12, group: 'settings' },
-    },
-    {
-      type: 'input',
-      prop: 'confirmPassword',
-      label: '确认密码',
-      placeholder: '请再次输入密码',
-      rules: RULE_COMBOS.confirmPassword(
-        '确认密码',
-        () => formData.value.password
-      ),
-      attrs: { type: 'password', showPasswordOn: 'mousedown' },
-      layout: { span: 12, group: 'settings' },
-    },
-    {
-      type: 'switch',
-      prop: 'notifications',
-      label: '接收通知',
-      value: true,
-      layout: { span: 12, group: 'settings' },
-    },
-    {
-      type: 'rate',
-      prop: 'satisfaction',
-      label: '满意度',
-      value: 0,
-      rules: [customRule((value: number) => value > 0, '请给出满意度评分')],
-      attrs: { allowHalf: true },
-      layout: { span: 12, group: 'settings' },
-    },
-  ]
+  const filledFieldsCount = computed(
+    () =>
+      Object.values(formData.value).filter(value => {
+        if (Array.isArray(value)) return value.length > 0
+        if (typeof value === 'string') return value.trim() !== ''
+        if (typeof value === 'number') return value !== 0
+        if (typeof value === 'boolean') return true
+        return value != null
+      }).length
+  )
 
-  // 方法
-  const getCurrentLayoutName = (): string => {
+  // ================= 工具方法 =================
+  const getFieldLayout = (fieldName: string) => {
+    const layoutConfigs = {
+      grid: () => ({ span: fieldName === 'address' ? 24 : 12 }),
+      card: () => ({ group: getFieldGroup(fieldName) }),
+      tabs: () => ({ tab: getFieldTab(fieldName) }),
+      steps: () => ({ step: getFieldStep(fieldName) }),
+      custom: () => ({ group: getFieldGroup(fieldName) }),
+    }
     return (
-      layoutOptions.find(opt => opt.value === currentLayout.value)?.label ||
-      '未知'
+      layoutConfigs[currentLayout.value as keyof typeof layoutConfigs]?.() || {}
     )
   }
 
-  const fillTestData = (): void => {
-    const testData = {
-      username: 'testuser123',
-      email: 'test@example.com',
-      phone: '13800138000',
-      age: 25,
-      gender: 'male',
-      hobbies: ['reading', 'music'],
-      birthday: new Date('1998-01-01').getTime(),
-      bio: '这是一段测试的个人简介，用于演示表单验证功能。',
-      password: 'Test123456',
-      confirmPassword: 'Test123456',
-      notifications: true,
-      satisfaction: 4,
+  const getFieldGroup = (field: string) => {
+    if (
+      [
+        'username',
+        'realName',
+        'age',
+        'gender',
+        'email',
+        'phone',
+        'address',
+      ].includes(field)
+    )
+      return 'basic'
+    if (['password', 'confirmPassword'].includes(field)) return 'advanced'
+    return 'preferences'
+  }
+
+  const getFieldTab = (field: string) => {
+    if (['username', 'realName', 'age', 'gender'].includes(field))
+      return 'personal'
+    if (['email', 'phone', 'address'].includes(field)) return 'contact'
+    if (['password', 'confirmPassword'].includes(field)) return 'security'
+    return 'preferences'
+  }
+
+  const getFieldStep = (field: string) => {
+    if (['username', 'realName', 'age', 'gender'].includes(field))
+      return 'step1'
+    if (['email', 'phone', 'address'].includes(field)) return 'step2'
+    if (['password', 'confirmPassword'].includes(field)) return 'step3'
+    return 'step4'
+  }
+
+  const getLayoutName = () =>
+    layoutOptions.find(opt => opt.value === currentLayout.value)?.label ||
+    '未知'
+  const getLayoutTitle = () => `${getLayoutName()} - 演示`
+  const getLayoutTagType = () => layoutTagTypes[currentLayout.value]
+
+  const formatValue = (value: any): string => {
+    if (Array.isArray(value)) return `[${value.join(', ')}]`
+    if (typeof value === 'object' && value !== null)
+      return JSON.stringify(value)
+    if (typeof value === 'string') return `"${value}"`
+    return String(value)
+  }
+
+  const getValueType = (value: any): string => {
+    if (Array.isArray(value)) return 'Array'
+    if (value === null) return 'null'
+    return typeof value
+  }
+
+  // ================= 数据操作方法 =================
+  const fillTestData = () => {
+    let data = { ...testData.base }
+    if (['card', 'tabs', 'dynamic', 'custom'].includes(currentLayout.value)) {
+      data = { ...data, ...testData.extended }
     }
-    formRef.value?.setFieldsValue(testData)
+    Object.assign(formData.value, data)
     message.success('已填充测试数据')
   }
 
-  const previewData = (): void => {
+  const clearAllData = () => {
+    formData.value = {}
+    formRef.value?.resetFields()
+    if (currentLayout.value === 'dynamic') resetDynamicFields()
+    message.info('已清空所有数据')
+  }
+
+  const previewData = () => {
     showPreview.value = true
   }
 
-  const submitForm = async (validate: () => Promise<void>): Promise<void> => {
+  const copyData = async () => {
     try {
-      loading.value = true
-      await validate()
-      message.success('表单验证通过，提交成功！')
-      if (import.meta.env.DEV) {
-        console.log('表单数据:', formData.value)
-      }
-    } catch (error: any) {
-      if (import.meta.env.DEV) {
-        console.error('验证失败:', error)
-      }
-      message.error('表单验证失败，请检查输入')
-    } finally {
-      loading.value = false
+      await navigator.clipboard.writeText(
+        JSON.stringify(formData.value, null, 2)
+      )
+      message.success('数据已复制到剪贴板')
+    } catch {
+      message.error('复制失败，请手动复制')
     }
   }
 
-  const resetForm = (reset: () => void): void => {
+  const downloadData = () => {
+    const dataStr = JSON.stringify(formData.value, null, 2)
+    const blob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `form-data-${currentLayout.value}-${Date.now()}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    message.success('数据文件已下载')
+  }
+
+  // ================= 表单操作方法 =================
+  const validateForm = async () => {
+    try {
+      await formRef.value?.validate()
+      lastValidateResult.value = true
+      message.success('表单验证通过')
+    } catch {
+      lastValidateResult.value = false
+      message.error('表单验证失败')
+    }
+  }
+
+  const submitForm = async (validate: () => Promise<void>) => {
+    try {
+      submitLoading.value = true
+      await validate()
+      lastValidateResult.value = true
+      message.success('表单提交成功！')
+    } catch {
+      lastValidateResult.value = false
+      message.error('表单验证失败，请检查输入')
+    } finally {
+      submitLoading.value = false
+    }
+  }
+
+  const resetForm = (reset: () => void) => {
     reset()
+    lastValidateResult.value = true
+    if (currentLayout.value === 'dynamic') resetDynamicFields()
     message.info('表单已重置')
   }
 
-  const validateSingleField = async (): Promise<void> => {
-    try {
-      if (!formRef.value) {
-        message.error('表单组件未就绪')
-        return
-      }
-
-      // 类型安全的组件方法调用
-      const formInstance = formRef.value as {
-        validate?: (fields?: string[]) => Promise<void>
-        validateField?: (field: string) => Promise<void>
-        validateFields?: (fields: string[]) => Promise<void>
-      }
-
-      // 方式1: 尝试使用组件的 validate 方法验证特定字段
-      if (typeof formInstance.validate === 'function') {
-        await formInstance.validate(['username'])
-        message.success('用户名验证通过')
-        return
-      }
-
-      // 方式2: 尝试使用组件的 validateField 方法
-      if (typeof formInstance.validateField === 'function') {
-        await formInstance.validateField('username')
-        message.success('用户名验证通过')
-        return
-      }
-
-      // 方式3: 如果组件有 validateFields 方法
-      if (typeof formInstance.validateFields === 'function') {
-        await formInstance.validateFields(['username'])
-        message.success('用户名验证通过')
-        return
-      }
-
-      // 如果以上方法都不可用，提示用户
-      message.warning('当前组件不支持单字段验证，请使用整表验证')
-    } catch (error: any) {
-      message.error('用户名验证失败')
-      if (import.meta.env.DEV) {
-        console.error('验证错误:', error)
-      }
+  // ================= 动态字段管理 =================
+  const createDynamicField = (counter: number) => {
+    const randomType =
+      dynamicFieldTypes[Math.floor(Math.random() * dynamicFieldTypes.length)]
+    return {
+      type: randomType,
+      prop: `dynamic_field_${counter}`,
+      label: `动态字段 ${counter}`,
+      placeholder: `请输入动态字段 ${counter}`,
+      layout: { span: 12, dynamic: true },
+      id: `dynamic_${counter}`,
+      created: Date.now(),
     }
   }
 
-  const handleSubmit = (payload: {
-    model: Record<string, any>
-    form: any
-  }): void => {
-    if (import.meta.env.DEV) {
-      console.log('表单提交事件:', payload)
+  const addDynamicField = () => {
+    if (dynamicFields.value.length >= dynamicMaxFields.value) {
+      message.warning(`已达到最大字段数量限制: ${dynamicMaxFields.value}`)
+      return
     }
+
+    dynamicFieldCounter.value++
+    const newField = createDynamicField(dynamicFieldCounter.value)
+    dynamicFields.value.push(newField)
+
+    const defaultValues: Record<string, any> = {
+      switch: false,
+      rate: 0,
+      inputNumber: 0,
+    }
+    formData.value[newField.prop] = defaultValues[newField.type] || ''
+
+    message.success(`已添加动态字段: ${newField.label}`)
+  }
+
+  const removeDynamicField = () => {
+    const removedField = dynamicFields.value.pop()
+    if (removedField) {
+      delete formData.value[removedField.prop]
+      message.warning(`已移除动态字段: ${removedField.label}`)
+    }
+  }
+
+  // 静默重置动态字段（切换布局时使用）
+  const resetDynamicFields = () => {
+    dynamicFields.value.forEach(field => delete formData.value[field.prop])
+    dynamicFields.value = []
+    dynamicFieldCounter.value = 0
+  }
+
+  // 主动清空动态字段（用户点击按钮时使用）
+  const clearDynamicFields = () => {
+    resetDynamicFields()
+    message.error('已清空所有动态字段')
+  }
+
+  // ================= 事件处理 =================
+  const handleSubmit = (payload: any) => {
+    console.log('表单提交事件:', payload)
     message.success('表单提交成功（事件回调）')
   }
 
-  const handleValidateSuccess = (model: Record<string, any>): void => {
-    if (import.meta.env.DEV) {
-      console.log('验证成功:', model)
-    }
+  const handleValidateSuccess = (model: Record<string, any>) => {
+    lastValidateResult.value = true
+    console.log('验证成功:', model)
   }
 
-  const handleValidateError = (errors: any): void => {
-    if (import.meta.env.DEV) {
-      console.error('验证失败:', errors)
-    }
+  const handleValidateError = (errors: any) => {
+    lastValidateResult.value = false
+    console.error('验证失败:', errors)
   }
+
+  // ================= 监听器 =================
+  watch(currentLayout, () => {
+    formData.value = {}
+    lastValidateResult.value = true
+    resetDynamicFields() // 静默重置，不显示提示
+    message.info(`已切换到${getLayoutName()}`)
+  })
 </script>
 
 <style scoped>
-  .demo-page {
-    max-width: 1000px;
+  .form-demo-container {
     margin: 0 auto;
     padding: 20px;
   }
 
-  .page-header {
+  .demo-header {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 32px;
   }
 
-  .page-header h1 {
+  .demo-header h1 {
     margin: 0 0 8px 0;
     color: var(--text-color-1);
+    font-size: 28px;
+    font-weight: 600;
   }
 
-  .page-header p {
+  .demo-header p {
     margin: 0;
     color: var(--text-color-2);
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .mb-4 {
     margin-bottom: 16px;
+  }
+  .mt-4 {
+    margin-top: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .form-demo-container {
+      padding: 12px;
+    }
+    .demo-header h1 {
+      font-size: 20px;
+    }
+    .demo-header p {
+      font-size: 14px;
+    }
   }
 </style>

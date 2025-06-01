@@ -1,6 +1,11 @@
 <!--
  * @Author: ChenYu ycyplus@gmail.com
- * @Description: 默认布局组件 - 垂直排列
+ * @Date: 2025-05-31 16:58:59
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-01 21:54:14
+ * @FilePath: \Robot_Admin\src\components\global\C_Form\layouts\Default\index.vue
+ * @Description:  
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
 -->
 
 <template>

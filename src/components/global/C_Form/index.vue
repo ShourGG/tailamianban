@@ -1,7 +1,10 @@
 <!--
  * @Author: ChenYu ycyplus@gmail.com
- * @Description: 表单组件 - 基于优化验证规则的多布局表单组件
+ * @Date: 2025-05-23 11:58:59
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-01 21:00:01
  * @FilePath: \Robot_Admin\src\components\global\C_Form\index.vue
+ * @Description: 通用表单组件 - 支持多种布局和动态渲染
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
@@ -12,18 +15,37 @@
     :rules="formRules"
     :validate-on-rule-change="false"
     :label-placement="labelPlacement"
+    :label-width="labelWidth"
+    :show-require-mark="showRequireMark"
+    :size="size"
+    :disabled="disabled"
+    :readonly="readonly"
     v-bind="$attrs"
   >
-    <!-- 动态布局组件渲染 - 只有布局组件使用动态组件系统 -->
+    <!-- 动态布局组件渲染 -->
     <DynamicComponent
       :name="layoutComponentName"
       :form-items="formItems"
       :layout-config="mergedLayoutConfig"
-      :options="options"
+      :options="visibleOptions"
+      @tab-change="handleTabChange"
+      @step-change="handleStepChange"
+      @step-before-change="handleStepBeforeChange"
+      @step-validate="handleStepValidate"
+      @field-add="handleFieldAdd"
+      @field-remove="handleFieldRemove"
+      @field-toggle="handleFieldToggle"
+      @fields-clear="handleFieldsClear"
+      @render-mode-change="handleRenderModeChange"
+      @group-toggle="handleGroupToggle"
+      @group-reset="handleGroupReset"
     />
 
-    <!-- 表单操作按钮区域 -->
-    <NFormItem class="mt20px">
+    <!-- 表单操作按钮区域（只在非步骤布局中显示） -->
+    <NFormItem
+      v-if="!isStepsLayout"
+      class="mt-5"
+    >
       <slot
         name="action"
         :form="formRef"
@@ -49,189 +71,82 @@
 </template>
 
 <script lang="ts" setup>
-  import { type FormInst, type FormRules, type UploadFileInfo } from 'naive-ui'
-  import Editor from 'wangeditor'
-  import { _mergeRules, type FieldRule } from '@/utils/v_verify'
-
-  // ================= 类型定义 =================
-
-  /**
-   * * @description: 支持的布局类型枚举
-   * ? @type {'default' | 'inline' | 'grid' | 'card'}
-   */
-  type LayoutType = 'default' | 'inline' | 'grid' | 'card'
-
-  /**
-   * * @description: 标签位置类型
-   * ? @type {'left' | 'top'}
-   */
-  type LabelPlacement = 'left' | 'top'
-
-  /**
-   * * @description: 表单配置项接口
-   * ! @interface FormOption
-   */
-  interface FormOption {
-    type: string // 表单控件类型
-    prop: string // 字段名（唯一标识）
-    label?: string // 字段标签
-    value?: any // 默认值
-    placeholder?: string // 占位符文本
-    rules?: FieldRule[] // 验证规则数组
-    attrs?: Record<string, unknown> // 组件额外属性
-    children?: Array<{
-      // 子选项（select/checkbox/radio用）
-      value: string | number | boolean
-      label: string
-    }>
-    show?: boolean // 是否显示（默认true）
-    layout?: {
-      // 布局相关配置
-      span?: number // 网格：占用列数
-      offset?: number // 网格：偏移列数
-      width?: string | number // 内联：项目宽度
-      group?: string // 卡片：所属分组
-      class?: string // 自定义CSS类名
-      style?: Record<string, any> // 自定义内联样式
-    }
-  }
-
-  /**
-   * * @description: 布局配置接口
-   * ! @interface LayoutConfig
-   */
-  interface LayoutConfig {
-    type?: LayoutType
-    grid?: {
-      cols?: number // 总列数（默认24）
-      gutter?: number // 间距（默认16）
-    }
-    inline?: {
-      gap?: number // 项目间距（默认16）
-      align?: 'start' | 'center' | 'end' // 对齐方式（默认center）
-    }
-    card?: {
-      groups?: Array<{
-        // 分组配置
-        key: string // 分组标识
-        title: string // 分组标题
-        description?: string // 分组描述
-      }>
-    }
-  }
-
-  /**
-   * * @description: 组件属性接口
-   * ! @interface Props
-   */
-  interface Props {
-    options: FormOption[] // 表单配置项数组
-    modelValue?: Record<string, any> // 双向绑定的表单数据
-    layoutType?: LayoutType // 布局类型
-    layoutConfig?: LayoutConfig // 布局配置
-    validateOnValueChange?: boolean // 是否在值改变时触发验证
-    labelPlacement?: LabelPlacement // 标签位置：left-左侧（默认），top-顶部
-  }
+  import type { FormInst, FormRules } from 'naive-ui/es/form'
+  import { _mergeRules } from '@/utils/v_verify'
+  import type {
+    FormProps,
+    FormOption,
+    LayoutType,
+    LayoutConfig,
+    OptionItem,
+    ComponentType,
+    SubmitEventPayload,
+    EditorEventPayload,
+    DynamicFieldConfig,
+    RenderMode,
+    FormModel,
+  } from '@/types/modules/form'
 
   // ================= 组件属性定义 =================
 
-  const props = withDefaults(defineProps<Props>(), {
+  const props = withDefaults(defineProps<FormProps>(), {
     layoutType: 'default',
     layoutConfig: () => ({}),
     validateOnValueChange: false,
     labelPlacement: 'left',
+    labelWidth: 'auto',
+    showRequireMark: true,
+    size: 'medium',
+    disabled: false,
+    readonly: false,
   })
 
-  /**
-   * * @description: 组件事件定义
-   * ? @emits 定义组件对外发送的事件
-   */
+  // ================= 组件事件定义 =================
+
   const emit = defineEmits<{
-    (e: 'submit', payload: { model: Record<string, any>; form: FormInst }): void
-    (e: 'update:modelValue', model: Record<string, any>): void
-    (e: 'validate-success', model: Record<string, any>): void
-    (e: 'validate-error', errors: any): void
-    (e: 'editor-mounted', editor: Editor, prop: string): void
-    (e: 'on-preview', file: any): void
-    (e: 'on-remove', file: any): void
-    (e: 'before-remove', file: any): Promise<boolean>
-    (e: 'on-exceed', data: any): void
-    (e: 'on-success', data: any): void
+    submit: [payload: SubmitEventPayload]
+    'update:modelValue': [model: FormModel]
+    'validate-success': [model: FormModel]
+    'validate-error': [errors: any]
+    'editor-mounted': [payload: EditorEventPayload]
+    'on-preview': [file: any]
+    'on-remove': [file: any]
+    'before-remove': [file: any]
+    'on-exceed': [data: any]
+    'on-success': [data: any]
+    'tab-change': [tabKey: string]
+    'step-change': [stepIndex: number, stepKey: string]
+    'step-before-change': [currentStep: number, targetStep: number]
+    'step-validate': [stepIndex: number]
+    'field-add': [fieldConfig: DynamicFieldConfig]
+    'field-remove': [fieldId: string]
+    'field-toggle': [fieldId: string, visible: boolean]
+    'fields-clear': []
+    'render-mode-change': [mode: RenderMode]
+    'group-toggle': [groupKey: string, collapsed: boolean]
+    'group-reset': [groupKey: string]
   }>()
 
   // ================= 响应式状态管理 =================
 
-  const formRef = ref<FormInst | null>(null) // Naive UI 表单实例引用
-  const formModel = reactive<Record<string, any>>({}) // 表单数据模型
-  const formRules = reactive<FormRules>({}) // 表单验证规则
-  const editorInstances = new Map<string, Editor>() // 富文本编辑器实例缓存
+  const formRef = ref<FormInst | null>(null)
+  const formModel = reactive<FormModel>({})
+  const formRules = reactive<FormRules>({})
 
-  // ================= 布局组件动态映射（只优化这部分）=================
+  // ================= 常量映射 =================
 
-  /**
-   * * @description: 布局类型到动态组件名称的映射
-   * ? @constant 利用动态组件系统加载布局组件
-   */
-  const layoutComponentMap = {
+  const LAYOUT_COMPONENT_MAP: Record<LayoutType, string> = {
     default: 'Default',
     inline: 'Inline',
     grid: 'Grid',
     card: 'Card',
+    tabs: 'Tabs',
+    steps: 'Steps',
+    dynamic: 'Dynamic',
+    custom: 'Custom',
   } as const
 
-  // ================= 计算属性 =================
-
-  /**
-   * * @description: 当前激活的布局组件名称
-   * ? @computed 根据layoutType动态返回对应的组件名称
-   * ! @return {string} 布局组件名称
-   */
-  const layoutComponentName = computed(() => {
-    return layoutComponentMap[props.layoutType] || layoutComponentMap.default
-  })
-
-  /**
-   * * @description: 合并后的布局配置
-   * ? @computed 将布局类型和布局配置合并
-   * ! @return {LayoutConfig} 完整的布局配置对象
-   */
-  const mergedLayoutConfig = computed(() => {
-    return {
-      type: props.layoutType,
-      ...props.layoutConfig,
-    }
-  })
-
-  /**
-   * * @description: 生成表单项VNode数组
-   * ? @computed 将配置项转换为可渲染的Vue节点
-   * ! @return {VNode[]} 表单项Vue节点数组
-   */
-  const formItems = computed(() => {
-    return props.options
-      .filter(item => item.show !== false)
-      .map(item => {
-        return h(
-          resolveComponent('NFormItem'),
-          {
-            label: item.label,
-            path: item.prop,
-            key: item.prop,
-          },
-          {
-            default: () => renderFormItem(item),
-          }
-        )
-      })
-  })
-
-  // ================= 组件类型映射（保持原来的方式）=================
-
-  /**
-   * * @description: 基础组件映射表
-   * ? @constant 映射表单控件类型到Naive UI组件
-   */
-  const componentMap = {
+  const COMPONENT_MAP: Partial<Record<ComponentType, any>> = {
     input: resolveComponent('NInput'),
     textarea: resolveComponent('NInput'),
     inputNumber: resolveComponent('NInputNumber'),
@@ -245,11 +160,7 @@
     colorPicker: resolveComponent('NColorPicker'),
   } as const
 
-  /**
-   * * @description: 需要特殊处理的组件类型
-   * ? @constant 这些组件需要额外的渲染逻辑
-   */
-  const specialTypes = [
+  const SPECIAL_TYPES: readonly ComponentType[] = [
     'select',
     'checkbox',
     'radio',
@@ -257,22 +168,72 @@
     'editor',
   ] as const
 
-  // ================= 表单项渲染核心逻辑（保持原来的逻辑）=================
+  const DEFAULT_VALUES: Record<ComponentType, any> = {
+    input: '',
+    textarea: '',
+    editor: '',
+    select: null,
+    datePicker: null,
+    daterange: null,
+    timePicker: null,
+    cascader: null,
+    colorPicker: null,
+    checkbox: [],
+    upload: [],
+    radio: '',
+    inputNumber: 0,
+    slider: 0,
+    rate: 0,
+    switch: false,
+  } as const
+
+  // ================= 计算属性 =================
+
+  const layoutComponentName = computed(
+    () => LAYOUT_COMPONENT_MAP[props.layoutType] || LAYOUT_COMPONENT_MAP.default
+  )
+
+  const mergedLayoutConfig = computed<LayoutConfig>(() => ({
+    type: props.layoutType,
+    ...props.layoutConfig,
+  }))
+
+  const isStepsLayout = computed(() => props.layoutType === 'steps')
+
+  const visibleOptions = computed(() =>
+    props.options.filter(item => item.show !== false)
+  )
+
+  const formItems = computed(() =>
+    visibleOptions.value.map(item =>
+      h(
+        resolveComponent('NFormItem'),
+        {
+          label: item.label,
+          path: item.prop,
+          key: item.prop,
+        },
+        {
+          default: () => renderFormItem(item),
+        }
+      )
+    )
+  )
+
+  // ================= 核心渲染逻辑 =================
 
   /**
-   * * @description: 渲染表单项的主入口函数
-   * ? @param {FormOption} item 表单项配置
-   * ! @return {VNode | null} 渲染后的Vue节点或null
+   * * @description 渲染表单项主函数
+   * ? @param item 表单项配置
+   * ! @return 渲染的VNode或null
    */
-  const renderFormItem = (item: FormOption) => {
+  const renderFormItem = (item: FormOption): VNode | null => {
     try {
-      // 特殊组件使用专门的渲染函数
-      if (specialTypes.includes(item.type as any)) {
+      if (SPECIAL_TYPES.includes(item.type as ComponentType)) {
         return renderSpecialComponent(item)
       }
 
-      // 基础组件通过映射表渲染
-      const Component = componentMap[item.type as keyof typeof componentMap]
+      const Component = COMPONENT_MAP[item.type as ComponentType]
       if (!Component) {
         console.warn(`[C_Form] 未支持的组件类型: ${item.type}`)
         return null
@@ -289,11 +250,11 @@
   }
 
   /**
-   * * @description: 渲染需要特殊处理的组件
-   * ? @param {FormOption} item 表单项配置
-   * ! @return {VNode | null} 渲染后的Vue节点或null
+   * * @description 渲染特殊组件
+   * ? @param item 表单项配置
+   * ! @return 渲染的VNode或null
    */
-  const renderSpecialComponent = (item: FormOption) => {
+  const renderSpecialComponent = (item: FormOption): VNode | null => {
     const baseProps = getBaseProps(item)
 
     switch (item.type) {
@@ -301,9 +262,10 @@
         return h(resolveComponent('NSelect'), {
           ...baseProps,
           options:
-            item.children?.map(child => ({
+            item.children?.map((child: OptionItem) => ({
               value: child.value,
               label: child.label,
+              disabled: child.disabled,
             })) || [],
           ...item.attrs,
         })
@@ -319,10 +281,11 @@
                 {},
                 {
                   default: () =>
-                    item.children?.map(child =>
+                    item.children?.map((child: OptionItem) =>
                       h(resolveComponent('NCheckbox'), {
                         value: child.value,
                         label: child.label,
+                        disabled: child.disabled,
                         key: String(child.value),
                       })
                     ) || [],
@@ -342,11 +305,12 @@
                 {},
                 {
                   default: () =>
-                    item.children?.map(child =>
+                    item.children?.map((child: OptionItem) =>
                       h(
                         resolveComponent('NRadio'),
                         {
                           value: child.value,
+                          disabled: child.disabled,
                           key: String(child.value),
                         },
                         { default: () => child.label }
@@ -361,10 +325,7 @@
         return renderUploadComponent(item)
 
       case 'editor':
-        return h('div', {
-          id: `editor-${item.prop}`,
-          class: 'min-h-96 w-full border rounded',
-        })
+        return renderEditorComponent(item)
 
       default:
         return null
@@ -372,18 +333,45 @@
   }
 
   /**
-   * * @description: 渲染文件上传组件
-   * ? @param {FormOption} item 表单项配置
-   * ! @return {VNode} 上传组件的Vue节点
+   * * @description 渲染富文本编辑器组件
+   * ? @param item 表单项配置
+   * ! @return 编辑器组件VNode
    */
-  const renderUploadComponent = (item: FormOption) => {
+  const renderEditorComponent = (item: FormOption): VNode => {
+    return h(resolveComponent('C_Editor'), {
+      editorId: `editor-${item.prop}`, // 添加必需的editorId属性
+      modelValue: formModel[item.prop] || '',
+      placeholder: item.placeholder,
+      disabled: props.disabled,
+      readonly: props.readonly,
+      'onUpdate:modelValue': (value: string) => {
+        formModel[item.prop] = value
+        handleFieldChange(item.prop)
+      },
+      'onEditor-mounted': (editor: any) => {
+        emit('editor-mounted', {
+          editor,
+          prop: item.prop,
+          html: formModel[item.prop] || '',
+        })
+      },
+      ...item.attrs,
+    })
+  }
+
+  /**
+   * * @description 渲染文件上传组件
+   * ? @param item 表单项配置
+   * ! @return 上传组件VNode
+   */
+  const renderUploadComponent = (item: FormOption): VNode => {
     const currentInstance = getCurrentInstance()
 
     return h(
       resolveComponent('NUpload'),
       {
         fileList: formModel[item.prop] || [],
-        'onUpdate:fileList': (fileList: UploadFileInfo[]) => {
+        'onUpdate:fileList': (fileList: any[]) => {
           formModel[item.prop] = fileList
           handleFieldChange(item.prop)
         },
@@ -408,9 +396,9 @@
   }
 
   /**
-   * * @description: 获取表单项的基础属性
-   * ? @param {FormOption} item 表单项配置
-   * ! @return {Record<string, any>} 基础属性对象
+   * * @description 获取表单项基础属性
+   * ? @param item 表单项配置
+   * ! @return 基础属性对象
    */
   const getBaseProps = (item: FormOption): Record<string, any> => {
     const baseProps: Record<string, any> = {
@@ -421,12 +409,10 @@
       },
     }
 
-    // textarea类型特殊处理
     if (item.type === 'textarea') {
       baseProps.type = 'textarea'
     }
 
-    // 添加占位符
     if (item.placeholder) {
       baseProps.placeholder = item.placeholder
     }
@@ -434,116 +420,60 @@
     return baseProps
   }
 
-  // ================= 字段变化处理 =================
+  // ================= 工具函数 =================
 
   /**
-   * * @description: 处理字段值变化
-   * ? @param {string} field 字段名
-   * ! @return {void}
+   * * @description 获取组件类型的默认值
+   * ? @param type 组件类型
+   * ! @return 默认值
+   */
+  const getDefaultValue = (type: ComponentType): any => {
+    return DEFAULT_VALUES[type] ?? null
+  }
+
+  /**
+   * * @description 处理字段值变化
+   * ? @param field 字段名
    */
   const handleFieldChange = (field: string): void => {
     if (props.validateOnValueChange) {
-      // 延迟验证，避免输入过程中频繁提示
       nextTick(() => {
-        validateField(field).catch(() => {
-          // 静默处理验证失败，让用户继续输入
-        })
+        validateField(field).catch(() => {})
       })
     }
   }
 
-  // ================= 工具函数 =================
+  // ================= 初始化逻辑 =================
 
   /**
-   * * @description: 根据组件类型获取默认值
-   * ? @param {string} type 组件类型
-   * ! @return {any} 对应类型的默认值
-   */
-  const getDefaultValue = (type: string): any => {
-    const defaultValueMap: Record<string, any> = {
-      input: '',
-      textarea: '',
-      editor: '',
-      select: null,
-      datePicker: null,
-      daterange: null,
-      timePicker: null,
-      cascader: null,
-      colorPicker: null,
-      checkbox: [],
-      upload: [],
-      radio: '',
-      inputNumber: 0,
-      slider: 0,
-      rate: 0,
-      switch: false,
-    }
-    return defaultValueMap[type] ?? null
-  }
-
-  /**
-   * * @description: 初始化表单数据和验证规则
-   * ? @function 根据配置项设置默认值和验证规则
-   * ! @return {void}
+   * * @description 初始化表单数据和验证规则
    */
   const initialize = (): void => {
     try {
       // 清空现有规则
       Object.keys(formRules).forEach(key => delete formRules[key])
 
+      // 初始化表单数据和验证规则
       props.options.forEach(item => {
-        // 设置表单项的值：优先使用配置的value，否则使用默认值
         formModel[item.prop] =
-          item.value !== undefined ? item.value : getDefaultValue(item.type)
+          item.value !== undefined
+            ? item.value
+            : getDefaultValue(item.type as ComponentType)
 
-        // 设置验证规则 - 使用统一的验证规则系统
-        if (item.rules && item.rules.length > 0) {
+        if (item.rules?.length) {
           formRules[item.prop] = _mergeRules(item.rules)
         }
       })
-
-      // 在下一个tick初始化富文本编辑器
-      nextTick(() => initEditors())
     } catch (error) {
       console.error('[C_Form] 初始化失败:', error)
     }
   }
 
-  /**
-   * * @description: 初始化富文本编辑器实例
-   * ? @function 只处理type为'editor'的表单项
-   * ! @return {void}
-   */
-  const initEditors = (): void => {
-    props.options
-      .filter(item => item.type === 'editor')
-      .forEach(item => {
-        const container = document.getElementById(`editor-${item.prop}`)
-        if (container && !editorInstances.has(item.prop)) {
-          try {
-            const editor = new Editor(container)
-            editor.config.placeholder = item.placeholder || ''
-            editor.config.onchange = (html: string) => {
-              formModel[item.prop] = html
-              handleFieldChange(item.prop)
-            }
-            editor.create()
-            editor.txt.html(String(formModel[item.prop] ?? ''))
-            editorInstances.set(item.prop, editor)
-            emit('editor-mounted', editor, item.prop)
-          } catch (error) {
-            console.error(`[C_Form] 初始化编辑器失败 (${item.prop}):`, error)
-          }
-        }
-      })
-  }
-
   // ================= 验证相关方法 =================
 
   /**
-   * * @description: 验证整个表单
-   * ? @async 异步验证所有表单项
-   * ! @return {Promise<void>} 验证结果Promise
+   * * @description 验证整个表单
+   * ! @return Promise<void>
    */
   const validate = async (): Promise<void> => {
     if (!formRef.value) {
@@ -560,10 +490,9 @@
   }
 
   /**
-   * * @description: 验证指定字段
-   * ? @async 异步验证单个或多个字段
-   * @param {string | string[]} field 字段名或字段名数组
-   * ! @return {Promise<void>} 验证结果Promise
+   * * @description 验证指定字段
+   * ? @param field 字段名或字段名数组
+   * ! @return Promise<void>
    */
   const validateField = async (field: string | string[]): Promise<void> => {
     if (!formRef.value) {
@@ -575,20 +504,16 @@
   }
 
   /**
-   * * @description: 清除验证状态
-   * ? @param {string | string[]} field 字段名或字段名数组，不传则清除所有
-   * ! @return {void}
+   * * @description 清除验证状态
+   * ? @param field 字段名或字段名数组，不传则清除所有
    */
   const clearValidation = (field?: string | string[]): void => {
     if (!formRef.value) return
 
     if (field) {
-      // Naive UI 的 restoreValidation 不支持指定字段
-      // 作为替代方案，我们可以通过重新设置表单项值来间接清除验证状态
       const fields = Array.isArray(field) ? field : [field]
       fields.forEach(fieldName => {
         if (formModel[fieldName] !== undefined) {
-          // 通过重新赋值同样的值来触发清除验证状态
           const currentValue = formModel[fieldName]
           formModel[fieldName] = currentValue
         }
@@ -598,12 +523,127 @@
     }
   }
 
-  // ================= 事件处理方法 =================
+  /**
+   * * @description 通用字段验证方法
+   * ? @param filterFn 字段过滤函数
+   * ? @param context 错误上下文
+   * ! @return 验证结果
+   */
+  const validateByFilter = async (
+    filterFn: (option: FormOption) => boolean,
+    context: string
+  ): Promise<boolean> => {
+    try {
+      const fields = props.options.filter(filterFn).map(option => option.prop)
+
+      if (fields.length === 0) return true
+      await validateField(fields)
+      return true
+    } catch (error) {
+      console.warn(`[C_Form] ${context}验证失败:`, error)
+      return false
+    }
+  }
 
   /**
-   * * @description: 处理表单提交事件
-   * ? @async 先验证后提交
-   * ! @return {Promise<void>}
+   * * @description 验证指定步骤
+   * ? @param stepIndex 步骤索引
+   * ! @return 验证结果
+   */
+  const validateStep = async (stepIndex: number): Promise<boolean> => {
+    const stepKey = props.layoutConfig?.steps?.steps?.[stepIndex]?.key
+    if (!stepKey) return true
+
+    return validateByFilter(
+      option => option.layout?.step === stepKey,
+      `步骤 ${stepIndex} `
+    )
+  }
+
+  /**
+   * * @description 验证指定标签页
+   * ? @param tabKey 标签页标识
+   * ! @return 验证结果
+   */
+  const validateTab = async (tabKey: string): Promise<boolean> => {
+    return validateByFilter(
+      option => option.layout?.tab === tabKey,
+      `标签页 ${tabKey} `
+    )
+  }
+
+  /**
+   * * @description 验证动态字段
+   * ! @return 验证结果
+   */
+  const validateDynamicFields = async (): Promise<boolean> => {
+    return validateByFilter(
+      option => Boolean(option.layout?.dynamic),
+      '动态字段 '
+    )
+  }
+
+  /**
+   * * @description 验证自定义分组
+   * ? @param groupKey 分组标识
+   * ! @return 验证结果
+   */
+  const validateCustomGroup = async (groupKey: string): Promise<boolean> => {
+    return validateByFilter(
+      option => option.layout?.group === groupKey,
+      `自定义分组 ${groupKey} `
+    )
+  }
+
+  // ================= 事件处理方法 =================
+
+  const handleTabChange = (tabKey: string): void => emit('tab-change', tabKey)
+  const handleStepChange = (stepIndex: number, stepKey: string): void =>
+    emit('step-change', stepIndex, stepKey)
+  const handleStepBeforeChange = async (
+    currentStep: number,
+    targetStep: number
+  ): Promise<boolean> => {
+    emit('step-before-change', currentStep, targetStep)
+    return true
+  }
+
+  const handleStepValidate = async (stepIndex: number): Promise<boolean> => {
+    try {
+      const currentStepKey = props.layoutConfig?.steps?.steps?.[stepIndex]?.key
+      if (!currentStepKey) return true
+
+      const stepFields = props.options
+        .filter(option => option.layout?.step === currentStepKey)
+        .map(option => option.prop)
+
+      if (stepFields.length === 0) return true
+
+      await validateField(stepFields)
+      emit('step-validate', stepIndex)
+      return true
+    } catch (error) {
+      console.warn(`[C_Form] 步骤 ${stepIndex} 验证失败:`, error)
+      return false
+    }
+  }
+
+  const handleFieldAdd = (fieldConfig: DynamicFieldConfig): void =>
+    emit('field-add', fieldConfig)
+  const handleFieldRemove = (fieldId: string): void =>
+    emit('field-remove', fieldId)
+  const handleFieldToggle = (fieldId: string, visible: boolean): void =>
+    emit('field-toggle', fieldId, visible)
+  const handleFieldsClear = (): void => emit('fields-clear')
+  const handleRenderModeChange = (mode: RenderMode): void =>
+    emit('render-mode-change', mode)
+  const handleGroupToggle = (groupKey: string, collapsed: boolean): void =>
+    emit('group-toggle', groupKey, collapsed)
+  const handleGroupReset = (groupKey: string): void =>
+    emit('group-reset', groupKey)
+
+  /**
+   * * @description 处理表单提交
    */
   const handleSubmit = async (): Promise<void> => {
     try {
@@ -615,172 +655,112 @@
   }
 
   /**
-   * * @description: 处理表单重置事件
-   * ? @function 清除验证状态并重置所有字段值
-   * ! @return {void}
+   * * @description 处理表单重置
    */
   const handleReset = (): void => {
     try {
-      // 清除验证状态
       clearValidation()
 
-      // 重置表单值
       props.options.forEach(item => {
         const defaultValue =
-          item.value !== undefined ? item.value : getDefaultValue(item.type)
-        formModel[item.prop] = defaultValue
+          item.value !== undefined
+            ? item.value
+            : getDefaultValue(item.type as ComponentType)
 
-        // 重置富文本编辑器内容
-        const editor = editorInstances.get(item.prop)
-        if (editor) {
-          editor.txt.html(String(defaultValue ?? ''))
-        }
+        formModel[item.prop] = defaultValue
       })
     } catch (error) {
       console.error('[C_Form] 重置表单失败:', error)
     }
   }
 
-  // ================= 对外暴露的API方法 =================
+  // ================= 对外API =================
 
   const resetFields = (): void => handleReset()
-
-  /**
-   * * @description: 设置多个字段的值
-   * ? @param {Record<string, any>} fields 字段值对象
-   * ! @return {void}
-   */
-  const setFields = (fields: Record<string, any>): void => {
+  const setFields = (fields: FormModel): void => {
     Object.assign(formModel, fields)
   }
+  const getModel = (): FormModel => ({ ...formModel })
 
-  /**
-   * * @description: 获取表单数据的副本
-   * ? @function 返回当前表单数据的浅拷贝
-   * ! @return {Record<string, any>} 表单数据对象
-   */
-  const getModel = (): Record<string, any> => ({ ...formModel })
-
-  /**
-   * * @description: 设置单个字段值并可选择是否立即验证
-   * ? @async 支持异步验证
-   * @param {string} field 字段名
-   * @param {any} value 字段值
-   * @param {boolean} shouldValidate 是否立即验证
-   * ! @return {Promise<void>}
-   */
   const setFieldValue = async (
     field: string,
     value: any,
     shouldValidate: boolean = false
   ): Promise<void> => {
     formModel[field] = value
-
     if (shouldValidate) {
       await validateField(field)
     }
   }
 
-  /**
-   * * @description: 获取指定字段的值
-   * ? @param {string} field 字段名
-   * ! @return {any} 字段值
-   */
-  const getFieldValue = (field: string): any => {
-    return formModel[field]
-  }
+  const getFieldValue = (field: string): any => formModel[field]
 
-  /**
-   * * @description: 批量设置字段值并可选择是否立即验证
-   * ? @async 支持异步验证
-   * @param {Record<string, any>} fields 字段值对象
-   * @param {boolean} shouldValidate 是否立即验证
-   * ! @return {Promise<void>}
-   */
   const setFieldsValue = async (
-    fields: Record<string, any>,
+    fields: FormModel,
     shouldValidate: boolean = false
   ): Promise<void> => {
     Object.assign(formModel, fields)
-
     if (shouldValidate) {
       await validate()
     }
   }
 
-  // ================= 生命周期管理 =================
+  // ================= 生命周期 =================
 
   onMounted(() => {
-    // 初始化表单
     initialize()
 
-    // 监听配置变化，重新初始化
     watch(
       () => props.options,
-      () => {
-        initialize()
-      },
+      () => initialize(),
       { deep: true }
     )
 
-    // 监听外部传入的数据变化
     watch(
       () => props.modelValue,
       val => {
-        if (val) {
-          Object.assign(formModel, val)
-        }
+        if (val) Object.assign(formModel, val)
       },
       { immediate: true, deep: true }
     )
 
-    // 同步内部数据到外部
-    watch(
-      formModel,
-      val => {
-        emit('update:modelValue', { ...val })
-      },
-      { deep: true }
-    )
-  })
-
-  onBeforeUnmount(() => {
-    // 清理富文本编辑器实例，防止内存泄漏
-    editorInstances.forEach(editor => {
-      try {
-        editor.destroy()
-      } catch (error) {
-        console.warn('[C_Form] 销毁编辑器失败:', error)
-      }
+    watch(formModel, val => emit('update:modelValue', { ...val }), {
+      deep: true,
     })
-    editorInstances.clear()
   })
 
-  // ================= 组件暴露接口 =================
+  // ================= 组件暴露 =================
 
-  /**
-   * * @description: 对外暴露的组件方法和属性
-   * ? @defineExpose 使父组件可以通过ref访问这些方法
-   */
   defineExpose({
-    // 验证相关
     validate,
     validateField,
+    validateStep,
+    validateTab,
+    validateDynamicFields,
+    validateCustomGroup,
     clearValidation,
-
-    // 数据操作
     getModel,
     setFields,
     resetFields,
     setFieldValue,
     getFieldValue,
     setFieldsValue,
-
-    // 组件实例
     formRef,
     formModel,
-
-    // 初始化
     initialize,
+    layoutType: toRef(props, 'layoutType'),
+    isStepsLayout: isStepsLayout,
   })
 </script>
+
+<style scoped>
+  .mt-5 {
+    margin-top: 1.25rem;
+  }
+
+  @media (max-width: 768px) {
+    .mt-5 {
+      margin-top: 1rem;
+    }
+  }
+</style>
