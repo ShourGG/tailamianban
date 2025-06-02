@@ -1,5 +1,5 @@
 import router from './index'
-import { createDiscreteApi } from 'naive-ui'
+import { createDiscreteApi } from 'naive-ui/es'
 import type { RouteRecordRaw } from 'vue-router'
 import { s_permissionStore } from '@/stores/permission'
 

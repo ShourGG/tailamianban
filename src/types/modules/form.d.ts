@@ -2,14 +2,14 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-23 11:02:02
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-01 13:58:39
+ * @LastEditTime: 2025-06-02 22:39:56
  * @FilePath: \Robot_Admin\src\types\modules\form.d.ts
  * @Description: 表单相关类型 - 统一管理所有表单相关的类型定义
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
 import type { VNode, DefineComponent, CSSProperties } from 'vue'
-import type { FormInst, UploadFileInfo } from 'naive-ui'
+import type { FormInst, UploadFileInfo } from 'naive-ui/es'
 import type { FieldRule } from '@/utils/v_verify'
 import type Editor from 'wangeditor'
 

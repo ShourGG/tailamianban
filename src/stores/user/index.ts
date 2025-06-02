@@ -1,9 +1,18 @@
+/*
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-05-23 15:09:59
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-02 22:40:12
+ * @FilePath: \Robot_Admin\src\stores\user\index.ts
+ * @Description: 用户状态管理 - 统一管理用户登录状态、信息和相关操作
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
+ */
 import { defineStore } from 'pinia'
 import { TOKEN } from '@/constant'
 import { setItem, getItem, removeAllItem } from '@/hooks/useStorage'
 import router from '@/router'
 import { d_setTimeStamp } from '@/utils/d_auth'
-import { createDiscreteApi } from 'naive-ui'
+import { createDiscreteApi } from 'naive-ui/es'
 import { s_appStore } from '@/stores/app/index'
 const { notification } = createDiscreteApi(['notification'])
 

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 14:22:31
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-27 09:24:27
+ * @LastEditTime: 2025-06-02 22:42:38
  * @FilePath: \Robot_Admin\src\components\global\C_Layout\index.vue
  * @Description: 布局组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -57,7 +57,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { type LayoutSiderInst } from 'naive-ui'
+  import { type LayoutSiderInst } from 'naive-ui/es'
   import { s_permissionStore } from '@/stores/permission'
   import { useThemeStore } from '@/stores/theme'
 

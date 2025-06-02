@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 11:43:48
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-27 08:30:21
+ * @LastEditTime: 2025-06-02 22:43:08
  * @FilePath: \Robot_Admin\src\axios\request.ts
  * @Description: axios 二次封装
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -11,7 +11,7 @@
 import axios from 'axios'
 import { s_userStore } from '@/stores/user'
 import { d_isCheckTimeout } from '@/utils/d_auth'
-import { createDiscreteApi } from 'naive-ui'
+import { createDiscreteApi } from 'naive-ui/es'
 
 const { VITE_BASE_URL } = import.meta.env
 const { message } = createDiscreteApi(['message'])

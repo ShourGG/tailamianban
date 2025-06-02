@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-29 08:55:05
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-29 10:37:55
+ * @LastEditTime: 2025-06-02 22:37:37
  * @FilePath: \Robot_Admin\src\views\demo\04-time\index.vue
  * @Description: 时间选择器组件场景示例
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -235,7 +235,7 @@
 </template>
 
 <script lang="ts" setup>
-  import type { TimePickerProps } from 'naive-ui'
+  import type { TimePickerProps } from 'naive-ui/es'
 
   /**
    * 响应式数据 - 使用对象统一管理结果

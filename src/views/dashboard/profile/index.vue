@@ -150,7 +150,7 @@
     type DataTableColumns,
     type DataTableRowData,
     useThemeVars,
-  } from 'naive-ui'
+  } from 'naive-ui/es'
 
   import { useImage } from '@/hooks/useImage'
 

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 01:02:12
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-26 14:58:52
+ * @LastEditTime: 2025-06-02 22:40:45
  * @FilePath: \Robot_Admin\src\router\permission.ts
  * @Description: 路由权限控制
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -11,7 +11,7 @@ import router from '@/router'
 import { s_userStore } from '@/stores/user'
 import { initDynamicRouter } from '@/router/dynamicRouter'
 import { s_permissionStore } from '@/stores/permission'
-import { createDiscreteApi } from 'naive-ui'
+import { createDiscreteApi } from 'naive-ui/es'
 import { setupNProgress } from '@/plugins/nprogress'
 
 const { message } = createDiscreteApi(['message'])

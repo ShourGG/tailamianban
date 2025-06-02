@@ -131,7 +131,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { useThemeVars } from 'naive-ui'
+  import { useThemeVars } from 'naive-ui/es'
   import { changeColor } from 'seemly'
 
   // 获取主题变量，用于设置进度条颜色

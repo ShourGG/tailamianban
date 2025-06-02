@@ -2,12 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-24 01:46:23
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-24 02:11:15
+ * @LastEditTime: 2025-06-02 22:39:12
  * @FilePath: \Robot_Admin\src\utils\d_menu.ts
  * @Description: 处理菜单的工具函数
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
-import { NIcon, type MenuOption } from 'naive-ui'
+import type { MenuOptions } from '@/types/modules/menu'
+import { NIcon, type MenuOption } from 'naive-ui/es'
 
 /**
  * * @description: 将菜单选项格式化为NMenu所需的格式

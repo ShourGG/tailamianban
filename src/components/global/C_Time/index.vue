@@ -2,7 +2,7 @@
  * @Author: ChenYu
  * @Date: 2025-05-29 08:20:16
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-29 09:54:26
+ * @LastEditTime: 2025-06-02 22:41:31
  * @FilePath: \Robot_Admin\src\components\global\C_Time\index.vue
  * @Description: 基于 NaiveUI 的时间选择器组件化二次封装
  * 支持多种时间选择模式：时间段选择、单个时间选择、时分秒选择等
@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts" setup>
-  import type { TimePickerProps } from 'naive-ui'
+  import type { TimePickerProps } from 'naive-ui/es'
 
   /**
    * 组件属性接口定义

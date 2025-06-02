@@ -2,13 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 16:15:44
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-04-29 16:32:13
+ * @LastEditTime: 2025-06-02 22:41:25
  * @FilePath: \Robot_Admin\src\hooks\useDownload\index.ts
  * @Description: 下载文件 hook 封装 - 支持 Excel 导出
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-import { createDiscreteApi } from 'naive-ui'
+import { createDiscreteApi } from 'naive-ui/es'
 
 const { notification } = createDiscreteApi(['notification'])
 

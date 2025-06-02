@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-30 08:36:17
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-30 13:39:17
+ * @LastEditTime: 2025-06-02 22:35:15
  * @FilePath: \Robot_Admin\src\views\demo\06-city\index.vue
  * @Description: 城市选择器组件场景示例
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -556,7 +556,7 @@
 </template>
 
 <script setup lang="ts">
-  import { type SelectOption } from 'naive-ui'
+  import { type SelectOption } from 'naive-ui/es/select'
   import provinceData from '@/assets/data/province.json'
 
   // 各种样式的数据

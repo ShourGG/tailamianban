@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-16 17:00:47
+ * @LastEditTime: 2025-06-02 22:43:22
  * @FilePath: \Robot_Admin\src\App.vue
  * @Description: 根入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-  import { zhCN, dateZhCN } from 'naive-ui' // 中文语言包
+  import { zhCN, dateZhCN } from 'naive-ui/es' // 中文语言包
   import { useThemeStore } from '@/stores/theme'
   import { onMounted } from 'vue'
 
