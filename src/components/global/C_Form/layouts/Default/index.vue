@@ -4,7 +4,7 @@
  * @LastEditors: ChenYu ycyplus@gmail.com
  * @LastEditTime: 2025-06-01 21:54:14
  * @FilePath: \Robot_Admin\src\components\global\C_Form\layouts\Default\index.vue
- * @Description:  
+ * @Description:  卡片布局 - 基础默认布局
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
 -->
 

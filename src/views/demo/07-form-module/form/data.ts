@@ -422,7 +422,7 @@ export const getFieldCreator = (layoutType: LayoutType) => {
  */
 export const testData = {
   base: {
-    username: 'demo cheny',
+    username: 'cheny_888',
     realName: 'CHENY',
     age: 28,
     gender: 'male',
