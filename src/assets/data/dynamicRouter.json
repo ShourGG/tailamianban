@@ -174,7 +174,7 @@
               "component": "demo/07-form-module/form/index",
               "meta": {
                 "icon": "i-mdi:form-outline",
-                "title": "表单",
+                "title": "多场景表单",
                 "hidden": false,
                 "full": false,
                 "affix": false,
@@ -184,10 +184,10 @@
             {
               "path": "form-modal",
               "name": "demo-form-modal",
-              "component": "/08-form-modal/index",
+              "component": "/demo/08-form-modal/index",
               "meta": {
                 "icon": "i-mdi:form-dropdown",
-                "title": "模态框表单",
+                "title": "多模态表单",
                 "hidden": false,
                 "full": false,
                 "affix": false,
