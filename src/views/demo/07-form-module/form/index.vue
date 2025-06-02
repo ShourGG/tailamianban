@@ -1,11 +1,6 @@
 <template>
   <div class="form-demo">
-    <!-- 页面标题 -->
-    <div class="header">
-      <h1>C_Form 完整布局演示</h1>
-      <p>展示所有8种布局类型的完整功能和配置选项</p>
-    </div>
-
+    <NH1>城市选择器组件场景示例 - 展示所有8种布局类型的完整功能和配置选项</NH1>
     <!-- 控制面板 -->
     <div class="control-panel">
       <div class="panel-title">
