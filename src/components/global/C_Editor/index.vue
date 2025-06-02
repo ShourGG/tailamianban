@@ -2,23 +2,24 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-01 13:27:49
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-01 15:58:12
+ * @LastEditTime: 2025-06-02 21:44:26
  * @FilePath: \Robot_Admin\src\components\global\C_Editor\index.vue
- * @Description: 富文本编辑器组件 
+ * @Description: 富文本编辑器组件（修复版）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
 -->
 
 <template>
+  <!-- 编辑器容器 -->
   <div
     ref="editorContainer"
     :id="editorId"
-    class="min-h-96 w-full border rounded"
+    v-show="isInitialized"
+    class="w-full"
   ></div>
 </template>
 
 <script setup lang="ts">
   import E from 'wangeditor'
-
   /**
    * * @description 编辑器组件属性接口
    * ! @interface Props
@@ -34,6 +35,8 @@
     disabled?: boolean
     /** 是否只读 */
     readonly?: boolean
+    /** 编辑器高度 */
+    height?: number
   }
 
   /**
@@ -53,6 +56,7 @@
     placeholder: '',
     disabled: false,
     readonly: false,
+    height: 240, // 🎯 默认高度240px
   })
 
   const emit = defineEmits<Emits>()
@@ -78,6 +82,9 @@
       const editorConfig = editor.config as any
       editorConfig.placeholder = props.placeholder
 
+      // 🎯 设置编辑器高度限制
+      editorConfig.height = props.height - 50 // 减去工具栏高度
+
       // 监听内容变化
       editorConfig.onchange = (html: string) => {
         emit('update:modelValue', html)
@@ -87,24 +94,27 @@
       // 创建编辑器
       editor.create()
 
-      // 设置初始内容
-      if (props.modelValue) {
-        editor.txt.html(props.modelValue)
-      }
+      // 🎯 编辑器创建后立即稳定化
+      nextTick(() => {
+        // 设置初始内容
+        if (props.modelValue) {
+          editor.txt.html(props.modelValue)
+        }
 
-      // 设置只读状态（创建后设置）
-      if (props.readonly) {
-        editor.disable()
-      }
+        // 设置只读状态
+        if (props.readonly) {
+          editor.disable()
+        }
 
-      // 保存实例
-      editorInstance.value = editor
-      isInitialized.value = true
+        // 保存实例并标记为已初始化
+        editorInstance.value = editor
+        isInitialized.value = true
 
-      // 触发挂载事件
-      emit('editor-mounted', editor)
+        // 触发挂载事件
+        emit('editor-mounted', editor)
 
-      console.log(`[EditorComponent] 编辑器初始化成功: ${props.editorId}`)
+        console.log(`[EditorComponent] 编辑器初始化成功: ${props.editorId}`)
+      })
     } catch (error) {
       console.error(
         `[EditorComponent] 编辑器初始化失败: ${props.editorId}`,
@@ -228,11 +238,11 @@
   // ================= 生命周期 =================
 
   onMounted(() => {
-    // 确保DOM完全挂载后再初始化
+    // 🎯 延迟初始化，确保页面布局稳定
     nextTick(() => {
       setTimeout(() => {
         initializeEditor()
-      }, 100)
+      }, 200) // 增加延迟时间
     })
   })
 

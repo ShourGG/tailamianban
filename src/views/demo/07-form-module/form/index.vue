@@ -15,7 +15,11 @@
       <!-- 控制卡片网格 -->
       <div class="control-grid">
         <!-- 布局类型 -->
-        <div class="control-card">
+        <NCard
+          hoverable
+          class="control-card"
+          :bordered="false"
+        >
           <div class="card-title">布局类型</div>
           <div class="layout-buttons">
             <button
@@ -30,10 +34,14 @@
               {{ layout.label }}
             </button>
           </div>
-        </div>
+        </NCard>
 
         <!-- 表单配置 -->
-        <div class="control-card">
+        <NCard
+          hoverable
+          class="control-card"
+          :bordered="false"
+        >
           <div class="card-title">表单配置</div>
           <div class="config-section">
             <div class="section-label">基础配置</div>
@@ -85,10 +93,14 @@
               >
             </div>
           </div>
-        </div>
+        </NCard>
 
         <!-- 网格配置 -->
-        <div class="control-card">
+        <NCard
+          hoverable
+          class="control-card"
+          :bordered="false"
+        >
           <div class="card-title">网格配置</div>
           <div class="config-item">
             <span>栅格列数</span>
@@ -110,19 +122,27 @@
               <span>{{ gridGutter }}px</span>
             </div>
           </div>
-        </div>
+        </NCard>
 
         <!-- 实时统计 -->
-        <div class="control-card">
+        <NCard
+          hoverable
+          class="control-card"
+          :bordered="false"
+        >
           <div class="card-title">实时统计</div>
           <div class="stat-display">
             <div class="stat-number">{{ formOptions.length }}</div>
             <div class="stat-label">当前布局包含的字段总数</div>
           </div>
-        </div>
+        </NCard>
 
         <!-- 内联配置 -->
-        <div class="control-card">
+        <NCard
+          hoverable
+          class="control-card"
+          :bordered="false"
+        >
           <div class="card-title">内联配置</div>
           <div class="config-item">
             <span>元素间距</span>
@@ -143,10 +163,14 @@
               <button>左对齐</button>
             </div>
           </div>
-        </div>
+        </NCard>
 
         <!-- 动态字段 -->
-        <div class="control-card">
+        <NCard
+          hoverable
+          class="control-card"
+          :bordered="false"
+        >
           <div class="card-title">动态字段</div>
           <div class="config-item">
             <span>当前字段</span>
@@ -165,10 +189,14 @@
               >移除</button
             >
           </div>
-        </div>
+        </NCard>
 
         <!-- 验证规则 -->
-        <div class="control-card">
+        <NCard
+          hoverable
+          class="control-card"
+          :bordered="false"
+        >
           <div class="card-title">验证规则</div>
           <div class="config-item">
             <span>必填字段</span>
@@ -185,10 +213,14 @@
               {{ lastValidateResult ? '通过' : '失败' }}
             </span>
           </div>
-        </div>
+        </NCard>
 
         <!-- 性能监控 -->
-        <div class="control-card">
+        <NCard
+          hoverable
+          class="control-card"
+          :bordered="false"
+        >
           <div class="card-title">性能监控</div>
           <div class="config-item">
             <span>渲染时间</span>
@@ -198,7 +230,7 @@
             <span>内存使用</span>
             <span class="perf-value">{{ memoryUsage }}MB</span>
           </div>
-        </div>
+        </NCard>
       </div>
 
       <!-- 布局特定配置 -->
@@ -206,7 +238,10 @@
         v-if="hasLayoutSpecificConfig"
         class="layout-specific-config"
       >
-        <div class="control-card full-width">
+        <NCard
+          class="control-card full-width"
+          :bordered="false"
+        >
           <div class="card-title">{{ getLayoutName() }}专属配置</div>
           <div class="layout-config-content">
             <!-- 网格配置 -->
@@ -299,12 +334,15 @@
               </div>
             </template>
           </div>
-        </div>
+        </NCard>
       </div>
     </div>
 
     <!-- 表单区域 -->
-    <div class="form-section">
+    <NCard
+      class="form-section"
+      :bordered="false"
+    >
       <div class="form-header">
         <h3>{{ getLayoutTitle() }}</h3>
         <span class="field-badge">{{ formOptions.length }} 字段</span>
@@ -349,33 +387,48 @@
           </div>
         </template>
       </C_Form>
-    </div>
+    </NCard>
 
     <!-- 状态监控 -->
     <div class="status-section">
       <div class="panel-title">状态监控面板</div>
       <div class="status-cards">
-        <div class="status-card completed">
+        <NCard
+          class="status-card completed"
+          :bordered="false"
+        >
           <div class="number">{{ filledFieldsCount }}</div>
           <div class="label">已填写字段</div>
-        </div>
-        <div class="status-card pending">
+        </NCard>
+        <NCard
+          class="status-card pending"
+          :bordered="false"
+        >
           <div class="number">{{ pendingFieldsCount }}</div>
           <div class="label">待填写字段</div>
-        </div>
-        <div class="status-card completion">
+        </NCard>
+        <NCard
+          class="status-card completion"
+          :bordered="false"
+        >
           <div class="number">{{ dataCompletionPercentage }}%</div>
           <div class="label">完成率</div>
-        </div>
-        <div class="status-card errors">
+        </NCard>
+        <NCard
+          class="status-card errors"
+          :bordered="false"
+        >
           <div class="number">{{ errorCount }}</div>
           <div class="label">验证错误</div>
-        </div>
+        </NCard>
       </div>
 
       <!-- 详细统计 -->
       <div class="status-details">
-        <div class="validation-detail">
+        <NCard
+          class="validation-detail"
+          :bordered="false"
+        >
           <div class="validation-header">
             <h3 class="validation-title">表单验证详情</h3>
             <span
@@ -401,9 +454,12 @@
           >
             重新验证
           </button>
-        </div>
+        </NCard>
 
-        <div class="quick-stats">
+        <NCard
+          class="quick-stats"
+          :bordered="false"
+        >
           <h3 class="stats-title">快速统计</h3>
           <div class="stat-row">
             <span class="stat-label">字符串字段</span>
@@ -425,7 +481,7 @@
             <span class="stat-label">动态字段</span>
             <span class="stat-value">{{ dynamicFields.length }}</span>
           </div>
-        </div>
+        </NCard>
       </div>
     </div>
 
@@ -435,8 +491,9 @@
       class="modal-overlay"
       @click="showPreview = false"
     >
-      <div
+      <NCard
         class="modal-content"
+        :bordered="false"
         @click.stop
       >
         <div class="modal-header">
@@ -495,7 +552,7 @@
             </table>
           </div>
         </div>
-      </div>
+      </NCard>
     </div>
   </div>
 </template>
@@ -1081,880 +1138,5 @@
 </script>
 
 <style lang="scss" scoped>
-  // ========================================
-  // SCSS 变量定义 - 统一设计系统
-  // ========================================
-
-  // 颜色主题变量
-  $primary-color: #2080f0; // 主要品牌色
-  $primary-dark: #1c7ed6; // 主色深色变体
-  $success-color: #18a058; // 成功状态色
-  $success-dark: #16a085; // 成功色深色变体
-  $warning-color: #f0a020; // 警告状态色
-  $danger-color: #d03050; // 危险状态色
-  $info-color: #0ea5e9; // 信息状态色
-
-  // 中性色系
-  $white: #ffffff;
-  $gray-50: #f8f9fa;
-  $gray-100: #f5f5f5;
-  $gray-200: #e9ecef;
-  $gray-300: #e0e0e0;
-  $gray-400: #ddd;
-  $gray-500: #999;
-  $gray-600: #666;
-  $gray-700: #333;
-  $gray-800: #6b7280;
-  $gray-900: #4b5563;
-
-  // 状态卡片渐变色
-  $gradient-completed: #667eea; // 已完成渐变色
-  $gradient-pending: #f093fb; // 待处理渐变色
-  $gradient-completion: #4facfe; // 完成率渐变色
-  $gradient-errors: #43e97b; // 错误数渐变色
-
-  // 间距系统
-  $spacing-xs: 4px;
-  $spacing-sm: 8px;
-  $spacing-md: 12px;
-  $spacing-lg: 16px;
-  $spacing-xl: 20px;
-  $spacing-2xl: 24px;
-  $spacing-3xl: 32px;
-
-  // 字体大小系统
-  $font-xs: 10px;
-  $font-sm: 11px;
-  $font-base: 12px;
-  $font-md: 13px;
-  $font-lg: 14px;
-  $font-xl: 16px;
-  $font-2xl: 18px;
-  $font-3xl: 20px;
-  $font-4xl: 28px;
-
-  // 圆角系统
-  $radius-sm: 3px;
-  $radius-base: 4px;
-  $radius-md: 6px;
-  $radius-lg: 8px;
-  $radius-xl: 10px;
-  $radius-2xl: 12px;
-  $radius-full: 50%;
-
-  // 字体族
-  $font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  $font-family-mono: 'Courier New', monospace;
-
-  // 动画时长
-  $transition-fast: 0.2s;
-  $transition-normal: 0.3s;
-
-  // 断点系统
-  $breakpoint-mobile: 480px;
-  $breakpoint-tablet: 768px;
-
-  // ========================================
-  // SCSS 混合宏 - 复用样式模式
-  // ========================================
-
-  // 卡片样式混合
-  @mixin card-style($padding: $spacing-xl) {
-    background: $white;
-    border: 1px solid $gray-300;
-    border-radius: $radius-lg;
-    padding: $padding;
-  }
-
-  // 按钮基础样式混合
-  @mixin button-base(
-    $padding: $spacing-sm $spacing-md,
-    $font-size: $font-base
-  ) {
-    padding: $padding;
-    border: none;
-    border-radius: $radius-base;
-    font-size: $font-size;
-    cursor: pointer;
-    transition: all $transition-fast;
-  }
-
-  // 输入框样式混合
-  @mixin input-style(
-    $padding: $spacing-xs $spacing-sm,
-    $font-size: $font-base
-  ) {
-    padding: $padding;
-    border: 1px solid $gray-400;
-    border-radius: $radius-base;
-    font-size: $font-size;
-    background: $white;
-  }
-
-  // 标签样式混合
-  @mixin badge-style($padding: 2px $spacing-sm, $font-size: $font-xs) {
-    padding: $padding;
-    border-radius: $radius-xl;
-    font-size: $font-size;
-    font-weight: 500;
-  }
-
-  // 网格布局混合
-  @mixin grid-layout($columns, $gap: $spacing-lg) {
-    display: grid;
-    grid-template-columns: repeat($columns, 1fr);
-    gap: $gap;
-  }
-
-  // Flex 居中对齐混合
-  @mixin flex-center($direction: row, $gap: 0) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: $direction;
-    gap: $gap;
-  }
-
-  // Flex 两端对齐混合
-  @mixin flex-between($align: center) {
-    display: flex;
-    justify-content: space-between;
-    align-items: $align;
-  }
-
-  // ========================================
-  // 主容器样式 - 整体布局容器
-  // ========================================
-  .form-demo {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: $spacing-2xl;
-    background: $gray-100;
-    font-family: $font-family-base;
-  }
-
-  // ========================================
-  // 页面标题区域 - 顶部标题和描述
-  // ========================================
-  .header {
-    text-align: center;
-    margin-bottom: $spacing-3xl;
-
-    h1 {
-      margin: 0 0 $spacing-sm;
-      font-size: $font-4xl;
-      font-weight: 600;
-      color: $gray-700;
-    }
-
-    p {
-      margin: 0;
-      color: $gray-600;
-      font-size: $font-xl;
-    }
-  }
-
-  // ========================================
-  // 控制面板区域 - 表单配置和操作控制
-  // ========================================
-  .control-panel {
-    margin-bottom: $spacing-2xl;
-
-    .panel-title {
-      font-size: $font-3xl;
-      font-weight: 600;
-      color: $gray-700;
-      margin-bottom: $spacing-xl;
-
-      .subtitle {
-        font-size: $font-lg;
-        color: $gray-500;
-        font-weight: normal;
-      }
-    }
-
-    // 控制网格 - 2x4 响应式布局
-    .control-grid {
-      @include grid-layout(4, $spacing-lg);
-    }
-
-    // 布局特定配置区域
-    .layout-specific-config {
-      margin-top: $spacing-lg;
-
-      .control-card.full-width {
-        grid-column: 1 / -1;
-
-        .layout-config-content {
-          display: flex;
-          flex-direction: column;
-          gap: $spacing-lg;
-        }
-      }
-    }
-
-    // 带徽章的输入框组合
-    .input-with-badge {
-      @include flex-center($gap: $spacing-sm);
-
-      .number-input {
-        @include input-style($spacing-xs $spacing-sm, $font-base);
-        width: 80px;
-      }
-
-      .badge {
-        @include badge-style();
-        color: $white;
-
-        &.primary {
-          background: $primary-color;
-        }
-      }
-    }
-  }
-
-  // ========================================
-  // 控制卡片样式 - 各种配置控制卡片
-  // ========================================
-  .control-card {
-    @include card-style();
-
-    .card-title {
-      font-size: $font-lg;
-      font-weight: 600;
-      color: $gray-700;
-      margin-bottom: $spacing-lg;
-    }
-
-    // 布局选择按钮组
-    .layout-buttons {
-      @include grid-layout(2, $spacing-sm);
-
-      .layout-btn {
-        @include button-base($spacing-sm $spacing-md, $font-base);
-        border: 1px solid $gray-400;
-        border-radius: $radius-md;
-        background: $white;
-        color: $gray-700;
-
-        &:hover {
-          border-color: $primary-color;
-        }
-
-        &.active {
-          background: $primary-color;
-          border-color: $primary-color;
-          color: $white;
-        }
-      }
-    }
-
-    // 配置区域
-    .config-section {
-      margin-bottom: $spacing-lg;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      .section-label {
-        font-size: $font-base;
-        color: $gray-600;
-        margin-bottom: $spacing-md;
-        font-weight: 500;
-      }
-
-      .config-item {
-        @include flex-between();
-        margin-bottom: $spacing-md;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-
-        span {
-          font-size: $font-md;
-          color: $gray-600;
-        }
-      }
-    }
-
-    // 按钮组样式
-    .button-group {
-      display: flex;
-      gap: $spacing-xs;
-
-      button {
-        @include button-base($spacing-xs $spacing-sm, $font-sm);
-        border: 1px solid $gray-400;
-        background: $white;
-        color: $gray-700;
-
-        &.active {
-          background: $primary-color;
-          border-color: $primary-color;
-          color: $white;
-        }
-      }
-    }
-
-    // 自定义开关组件
-    .switch {
-      width: 40px;
-      height: 20px;
-      background: $gray-400;
-      border-radius: $radius-xl;
-      position: relative;
-      cursor: pointer;
-      transition: background $transition-normal;
-
-      &.active {
-        background: $primary-color;
-      }
-
-      &::after {
-        content: '';
-        width: 16px;
-        height: 16px;
-        background: $white;
-        border-radius: $radius-full;
-        position: absolute;
-        top: 2px;
-        left: 2px;
-        transition: transform $transition-normal;
-      }
-
-      &.active::after {
-        transform: translateX(20px);
-      }
-    }
-
-    // 范围输入组合
-    .range-group {
-      @include flex-center($gap: $spacing-sm);
-
-      input {
-        width: 80px;
-      }
-
-      span {
-        font-size: $font-sm;
-        color: $gray-500;
-        min-width: 32px;
-      }
-    }
-
-    // 快速操作按钮组
-    .action-buttons {
-      @include grid-layout(2, $spacing-sm);
-
-      .action-btn {
-        @include button-base($spacing-sm $spacing-md, $font-sm);
-        color: $gray-700;
-
-        &.fill {
-          background: $success-color;
-          color: $white;
-        }
-        &.preview {
-          background: $primary-color;
-          color: $white;
-        }
-        &.clear {
-          background: $warning-color;
-          color: $white;
-        }
-        &.validate {
-          background: $success-color;
-          color: $white;
-        }
-      }
-    }
-
-    // 统计数据显示
-    .stat-display {
-      text-align: center;
-
-      .stat-number {
-        font-size: 24px;
-        font-weight: bold;
-        color: $primary-color;
-        margin-bottom: $spacing-xs;
-      }
-
-      .stat-label {
-        font-size: $font-sm;
-        color: $gray-500;
-        line-height: 1.3;
-      }
-    }
-
-    // 字段操作按钮组
-    .field-actions {
-      display: flex;
-      gap: $spacing-sm;
-      margin-top: $spacing-sm;
-
-      button {
-        @include button-base($spacing-xs $spacing-md, $font-sm);
-        border: 1px solid $gray-400;
-        background: $white;
-        color: $gray-700;
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-      }
-    }
-
-    // 计数显示样式
-    .field-count {
-      font-weight: bold;
-      color: $primary-color;
-    }
-
-    .required-count {
-      font-weight: bold;
-      color: $danger-color;
-    }
-
-    // 状态徽章
-    .status-badge {
-      @include badge-style();
-
-      &.success {
-        background: #f0f9ff;
-        color: #166534;
-      }
-
-      &.error {
-        background: #fef2f2;
-        color: #991b1b;
-      }
-    }
-
-    // 性能值显示
-    .perf-value {
-      font-weight: 500;
-      font-size: $font-base;
-
-      &.success {
-        color: $success-color;
-      }
-    }
-  }
-
-  // ========================================
-  // 通用选择和输入组件样式
-  // ========================================
-  select {
-    @include input-style();
-  }
-
-  // ========================================
-  // 表单区域样式 - C_Form 组件容器
-  // ========================================
-  .form-section {
-    @include card-style($spacing-2xl);
-    margin-bottom: $spacing-2xl;
-
-    .form-header {
-      @include flex-between();
-      margin-bottom: $spacing-lg;
-      padding-bottom: $spacing-lg;
-      border-bottom: 1px solid #f0f0f0;
-
-      h3 {
-        margin: 0;
-        font-size: $font-2xl;
-        font-weight: 600;
-        color: $gray-700;
-      }
-
-      .field-badge {
-        @include badge-style($spacing-xs $spacing-md, $font-base);
-        background: $primary-color;
-        color: $white;
-      }
-    }
-
-    .layout-info {
-      background: #f0f9ff;
-      border: 1px solid $info-color;
-      border-radius: $radius-md;
-      padding: $spacing-md;
-      margin-bottom: $spacing-xl;
-      color: #0369a1;
-      font-size: $font-lg;
-    }
-
-    // 表单操作按钮区域
-    .form-actions {
-      @include flex-center($gap: $spacing-md);
-      margin-top: $spacing-2xl;
-
-      .submit-btn {
-        @include button-base($spacing-md $spacing-2xl, $font-lg);
-        @include flex-center($gap: $spacing-sm);
-        background: $success-color;
-        color: $white;
-
-        &:hover:not(:disabled) {
-          background: $success-dark;
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        // 加载动画
-        .loading {
-          width: 14px;
-          height: 14px;
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          border-top: 2px solid $white;
-          border-radius: $radius-full;
-          animation: spin 1s linear infinite;
-        }
-      }
-
-      .reset-btn {
-        @include button-base($spacing-md $spacing-2xl, $font-lg);
-        background: $gray-800;
-        color: $white;
-
-        &:hover {
-          background: $gray-900;
-        }
-      }
-    }
-  }
-
-  // 加载动画关键帧
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
-  // ========================================
-  // 状态监控区域 - 数据统计和验证状态
-  // ========================================
-  .status-section {
-    margin-top: $spacing-3xl;
-
-    // 状态卡片网格
-    .status-cards {
-      @include grid-layout(4, $spacing-lg);
-      margin-top: $spacing-lg;
-
-      .status-card {
-        @include card-style();
-        text-align: center;
-
-        .number {
-          font-size: 28px;
-          font-weight: bold;
-          margin-bottom: $spacing-sm;
-        }
-
-        .label {
-          font-size: $font-lg;
-          color: $gray-600;
-        }
-
-        // 不同状态的数字颜色
-        &.completed .number {
-          color: $gradient-completed;
-        }
-        &.pending .number {
-          color: $gradient-pending;
-        }
-        &.completion .number {
-          color: $gradient-completion;
-        }
-        &.errors .number {
-          color: $gradient-errors;
-        }
-      }
-    }
-
-    // 状态详细信息
-    .status-details {
-      @include grid-layout(2, $spacing-2xl);
-      grid-template-columns: 2fr 1fr;
-      margin-top: $spacing-2xl;
-
-      .validation-detail {
-        @include card-style($spacing-2xl);
-
-        .validation-header {
-          @include flex-between();
-          margin-bottom: $spacing-lg;
-
-          .validation-title {
-            font-size: $font-2xl;
-            font-weight: 600;
-            color: $gray-700;
-            margin: 0;
-          }
-
-          .validation-status {
-            @include badge-style($spacing-sm $spacing-lg, $font-base);
-
-            &.success {
-              background: #dcfce7;
-              color: #166534;
-            }
-
-            &.error {
-              background: #fef2f2;
-              color: #991b1b;
-            }
-          }
-        }
-
-        .validation-message {
-          color: $gray-600;
-          font-size: $font-lg;
-          margin-bottom: $spacing-xl;
-          line-height: 1.6;
-        }
-
-        .validate-btn {
-          @include button-base($spacing-md $spacing-xl, $font-lg);
-          background: $primary-color;
-          color: $white;
-
-          &:hover:not(:disabled) {
-            background: $primary-dark;
-          }
-
-          &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-          }
-        }
-      }
-
-      .quick-stats {
-        @include card-style($spacing-2xl);
-
-        .stats-title {
-          font-size: $font-2xl;
-          font-weight: 600;
-          color: $gray-700;
-          margin: 0 0 $spacing-xl 0;
-        }
-
-        .stat-row {
-          @include flex-between();
-          padding: $spacing-md 0;
-          border-bottom: 1px solid #f3f4f6;
-
-          &:last-child {
-            border-bottom: none;
-          }
-
-          .stat-label {
-            font-size: $font-lg;
-            color: $gray-600;
-            font-weight: 500;
-          }
-
-          .stat-value {
-            font-size: $font-lg;
-            font-weight: 600;
-            color: $gray-700;
-          }
-        }
-      }
-    }
-  }
-
-  // ========================================
-  // 数据预览弹窗 - 表单数据查看和导出
-  // ========================================
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    @include flex-center();
-    z-index: 1000;
-
-    .modal-content {
-      background: $white;
-      border-radius: $radius-lg;
-      width: 90%;
-      max-width: 800px;
-      max-height: 90vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-
-      .modal-header {
-        @include flex-between();
-        padding: $spacing-xl;
-        border-bottom: 1px solid $gray-300;
-
-        h3 {
-          margin: 0;
-          font-size: $font-2xl;
-          font-weight: 600;
-          color: $gray-700;
-        }
-
-        .modal-actions {
-          display: flex;
-          gap: $spacing-sm;
-
-          .modal-btn {
-            @include button-base($spacing-sm $spacing-md, $font-base);
-            border: 1px solid $gray-400;
-            background: $white;
-            color: $gray-700;
-
-            &:hover {
-              border-color: $primary-color;
-              color: $primary-color;
-            }
-
-            &.close {
-              background: $gray-100;
-            }
-          }
-        }
-      }
-
-      .modal-tabs {
-        flex: 1;
-        overflow: auto;
-        padding: $spacing-xl;
-
-        .tab-content {
-          margin-bottom: $spacing-2xl;
-
-          h4 {
-            margin: 0 0 $spacing-md 0;
-            font-size: $font-lg;
-            font-weight: 600;
-            color: $gray-700;
-          }
-
-          // JSON 代码显示
-          .json-display {
-            background: $gray-50;
-            border: 1px solid $gray-200;
-            border-radius: $radius-base;
-            padding: $spacing-lg;
-            font-family: $font-family-mono;
-            font-size: $font-base;
-            line-height: 1.5;
-            overflow: auto;
-            max-height: 300px;
-          }
-
-          // 数据表格
-          .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid $gray-300;
-            border-radius: $radius-base;
-            overflow: hidden;
-
-            th,
-            td {
-              padding: $spacing-md;
-              text-align: left;
-              border-bottom: 1px solid #f0f0f0;
-            }
-
-            th {
-              background: $gray-50;
-              font-weight: 600;
-              color: $gray-700;
-              font-size: $font-md;
-            }
-
-            td {
-              font-size: $font-base;
-              color: $gray-600;
-            }
-
-            // 字段标签样式
-            .field-tag {
-              @include badge-style(2px $spacing-sm, $font-sm);
-              background: #e3f2fd;
-              color: #1976d2;
-            }
-
-            // 类型标签样式
-            .type-tag {
-              @include badge-style(2px $spacing-sm, $font-sm);
-              background: #f3e5f5;
-              color: #7b1fa2;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // ========================================
-  // 响应式设计 - 移动端和平板适配
-  // ========================================
-  @media (max-width: $breakpoint-tablet) {
-    .control-panel {
-      .control-grid {
-        @include grid-layout(2);
-      }
-    }
-
-    .status-section {
-      .status-cards {
-        @include grid-layout(2);
-      }
-
-      .status-details {
-        @include grid-layout(1);
-      }
-    }
-  }
-
-  @media (max-width: $breakpoint-mobile) {
-    .form-demo {
-      padding: $spacing-lg;
-    }
-
-    .control-panel {
-      .control-grid {
-        @include grid-layout(1);
-      }
-    }
-
-    .status-section {
-      .status-cards {
-        @include grid-layout(1);
-      }
-    }
-
-    .form-section {
-      .form-actions {
-        flex-direction: column;
-
-        .submit-btn,
-        .reset-btn {
-          width: 100%;
-        }
-      }
-    }
-  }
+  @use './index.scss';
 </style>
