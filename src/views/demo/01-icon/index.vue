@@ -14,6 +14,8 @@
 
 <!-- MARK: 第三种方式不推荐，需要在本地维护或剥离svg path, 然后通过组件或传递使用，传递svg-path -->
 
+<!-- MARK: 第四种方式重点推荐（动态渲染），<Icon :icon="iconName"/>  -->
+
 <!-- TAG: 具体参考 C_Icon 组件代码 -->
 
 <template>
