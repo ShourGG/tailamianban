@@ -1,50 +1,71 @@
+/**
+ * 表单选择器组件场景示例样式文件
+ *
+ * 主要包含：
+ * - 页面整体布局容器
+ * - 头部统计信息区域
+ * - 卡片网格布局
+ * - 侧边栏固定布局
+ * - 气泡弹窗内容样式
+ * - 响应式布局适配
+ */
+
 .demo-container {
-  padding: 24px;
+  padding: 24px; /* 页面整体内边距 */
 
+  /* ===== 头部区域样式 ===== */
   .header {
-    margin-bottom: 30px;
+    margin-bottom: 30px; /* 头部与下方内容的间距 */
 
+    /* 主标题样式 */
     .main-title {
-      font-weight: 550;
+      font-weight: 550; /* 中等粗细字体 */
       display: flex;
-      gap: 12px;
+      gap: 12px; /* 标题元素间距 */
     }
 
+    /* 面板标题样式 */
     .panel-title {
       font-size: 20px;
       font-weight: 550;
-      color: #333;
+      color: #333; /* 深灰色文字 */
       margin-bottom: 20px;
     }
 
+    /* 副标题样式 */
     .subtitle {
       font-size: 14px;
-      color: #999;
-      font-weight: normal;
+      color: #999; /* 浅灰色文字 */
+      font-weight: normal; /* 正常字重 */
     }
 
+    /* ===== 统计信息概览区域 ===== */
     .stats-overview {
       margin-bottom: 16px;
 
+      /* 统计项容器居中对齐 */
       .n-space {
         justify-content: center;
       }
 
+      /* 统计卡片样式 */
       .n-statistic {
-        padding: 16px 24px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
+        padding: 16px 24px; /* 内边距：上下16px 左右24px */
+        border-radius: 12px; /* 圆角 */
+        background: rgba(255, 255, 255, 0.05); /* 半透明白色背景 */
+        border: 1px solid rgba(255, 255, 255, 0.1); /* 半透明边框 */
+        transition: all 0.3s ease; /* 所有属性0.3秒缓动过渡 */
         position: relative;
         overflow: hidden;
 
+        /* 悬停效果 */
         &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-          background: rgba(255, 255, 255, 0.08);
+          transform: translateY(-2px); /* 向上移动2px */
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+          background: rgba(255, 255, 255, 0.08); /* 悬停时背景更亮 */
         }
 
+        /* 顶部彩色条效果 - 默认隐藏 */
         &::before {
           content: '';
           position: absolute;
@@ -52,24 +73,28 @@
           left: 0;
           right: 0;
           height: 2px;
-          background: linear-gradient(90deg, #18a058, #2080f0, #f0a020);
-          opacity: 0;
+          background: linear-gradient(90deg, #18a058, #2080f0, #f0a020); /* 绿蓝橙渐变 */
+          opacity: 0; /* 默认透明 */
           transition: opacity 0.3s ease;
         }
 
+        /* 悬停时显示顶部彩色条 */
         &:hover::before {
           opacity: 1;
         }
 
+        /* 统计图标前缀样式 */
         .n-statistic__prefix {
           margin-right: 8px;
           position: relative;
 
+          /* 图标基础样式 */
           i {
             font-size: 1.2rem;
             transition: transform 0.3s ease;
           }
 
+          /* 图标后方光晕效果 - 默认隐藏 */
           &::after {
             content: '';
             position: absolute;
@@ -79,20 +104,23 @@
             height: 20px;
             background: radial-gradient(
               circle,
-              rgba(24, 160, 88, 0.2) 0%,
-              transparent 70%
+              rgba(24, 160, 88, 0.2) 0%, /* 中心绿色半透明 */
+              transparent 70% /* 边缘透明 */
             );
             border-radius: 50%;
-            transform: translate(-50%, -50%) scale(0);
+            transform: translate(-50%, -50%) scale(0); /* 初始缩放为0 */
             transition: transform 0.3s ease;
           }
         }
 
+        /* 悬停时的图标动效 */
         &:hover .n-statistic__prefix {
+          /* 图标放大 */
           i {
             transform: scale(1.1);
           }
 
+          /* 显示光晕效果 */
           &::after {
             transform: translate(-50%, -50%) scale(1);
           }
@@ -101,56 +129,65 @@
     }
   }
 
+  /* ===== 卡片网格布局 ===== */
   .cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); /* 自适应网格，最小宽度380px */
+    gap: 24px; /* 网格间距 */
     margin-bottom: 40px;
 
     .card-wrapper {
+      /* 容器卡片样式 */
       .container-card {
-        height: 100%;
+        height: 100%; /* 充满容器高度 */
         transition: all 0.3s ease;
-        cursor: pointer;
+        cursor: pointer; /* 指针样式 */
         position: relative;
         border-radius: 12px;
         overflow: hidden;
 
+        /* 顶部彩色条装饰 - 默认隐藏 */
         &::before {
           content: '';
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
-          height: 3px;
+          height: 3px; /* 比统计卡片的条更粗 */
           background: linear-gradient(90deg, #18a058, #2080f0, #f0a020);
           opacity: 0;
           transition: opacity 0.3s ease;
-          z-index: 1;
+          z-index: 1; /* 确保在最上层 */
         }
 
+        /* 卡片悬停效果 */
         &:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+          transform: translateY(-4px); /* 向上移动4px */
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); /* 较大阴影 */
 
+          /* 显示顶部彩色条 */
           &::before {
             opacity: 1;
           }
         }
 
+        /* ===== 卡片头部样式 ===== */
         .card-header {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 16px; /* 图标与内容间距 */
 
+          /* 图标包装器 */
           .icon-wrapper {
             position: relative;
 
+            /* 卡片图标样式 */
             .card-icon {
-              font-size: 2rem;
+              font-size: 2rem; /* 较大的图标尺寸 */
               transition: transform 0.3s ease;
             }
 
+            /* 图标背景光晕效果 */
             &::after {
               content: '';
               position: absolute;
@@ -160,7 +197,7 @@
               height: 40px;
               background: radial-gradient(
                 circle,
-                rgba(32, 128, 240, 0.1) 0%,
+                rgba(32, 128, 240, 0.1) 0%, /* 蓝色半透明中心 */
                 transparent 70%
               );
               border-radius: 50%;
@@ -169,72 +206,85 @@
             }
           }
 
+          /* 头部悬停时的图标动效 */
           &:hover .icon-wrapper {
+            /* 图标放大 */
             .card-icon {
               transform: scale(1.1);
             }
 
+            /* 显示背景光晕 */
             &::after {
               transform: translate(-50%, -50%) scale(1);
             }
           }
         }
 
+        /* ===== 卡片主体内容 ===== */
         .card-body {
-          padding: 16px 0;
+          padding: 16px 0; /* 上下内边距 */
 
+          /* 卡片描述文字 */
           .card-description {
             margin: 0 0 16px 0;
-            line-height: 1.6;
-            opacity: 0.8;
+            line-height: 1.6; /* 行高1.6倍 */
+            opacity: 0.8; /* 稍微透明 */
           }
 
+          /* 功能特性标签区域 */
           .card-features {
             margin-bottom: 20px;
           }
 
+          /* 卡片统计信息区域 */
           .card-stats {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr; /* 三等分布局 */
             gap: 16px;
             padding: 16px;
             border-radius: 8px;
             border: 1px solid;
-            border-color: var(--n-border-color);
-            background: rgba(255, 255, 255, 0.02);
+            border-color: var(--n-border-color); /* 使用主题边框颜色 */
+            background: rgba(255, 255, 255, 0.02); /* 极淡的背景 */
             transition: background 0.3s ease;
 
+            /* 悬停时背景稍微变亮 */
             &:hover {
               background: rgba(255, 255, 255, 0.05);
             }
 
+            /* 单个统计项样式 */
             .stat-item {
               display: flex;
-              flex-direction: column;
-              align-items: center;
-              gap: 8px;
+              flex-direction: column; /* 垂直排列 */
+              align-items: center; /* 居中对齐 */
+              gap: 8px; /* 标签与值的间距 */
 
+              /* 统计项标签 */
               .stat-label {
-                font-size: 0.8rem;
-                opacity: 0.7;
+                font-size: 0.8rem; /* 较小字体 */
+                opacity: 0.7; /* 半透明 */
               }
             }
           }
         }
 
+        /* ===== 浮动按钮样式 ===== */
         .card-float-btn {
           position: absolute;
           top: 16px;
           right: 16px;
-          z-index: 10;
+          z-index: 10; /* 确保在最上层 */
 
+          /* 浮动按钮样式 */
           .n-button {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* 按钮阴影 */
             transition: all 0.3s ease;
 
+            /* 按钮悬停效果 */
             &:hover {
-              transform: scale(1.05) rotate(15deg);
-              box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+              transform: scale(1.05) rotate(15deg); /* 放大并旋转15度 */
+              box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2); /* 更大阴影 */
             }
           }
         }
@@ -242,32 +292,37 @@
     }
   }
 
+  /* ===== 侧边栏固定布局 ===== */
   .sidebar {
-    position: fixed;
-    right: 0;
-    top: 80px;
-    height: calc(100vh - 80px);
-    width: 360px;
+    position: fixed; /* 固定定位 */
+    right: 0; /* 贴右边 */
+    top: 80px; /* 距离顶部80px */
+    height: calc(100vh - 80px); /* 高度为视窗高度减去顶部距离 */
+    width: 360px; /* 默认宽度 */
     transition: all 0.3s ease;
-    z-index: 1000;
+    z-index: 1000; /* 高层级确保在最上方 */
 
+    /* 折叠状态样式 */
     &.collapsed {
-      width: 0;
-      overflow: hidden;
+      width: 0; /* 宽度为0 */
+      overflow: hidden; /* 隐藏溢出内容 */
     }
 
+    /* 侧边栏卡片样式 */
     .sidebar-card {
-      height: 100%;
-      border-radius: 0;
-      border-left: 3px solid var(--n-primary-color);
+      height: 100%; /* 充满侧边栏高度 */
+      border-radius: 0; /* 移除圆角，贴合边缘 */
+      border-left: 3px solid var(--n-primary-color); /* 左侧主题色边框 */
 
+      /* 侧边栏头部 */
       .sidebar-header {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-between; /* 两端对齐 */
         align-items: center;
-        background: rgba(255, 255, 255, 0.02);
+        background: rgba(255, 255, 255, 0.02); /* 淡背景 */
         padding: 16px 20px;
 
+        /* 头部信息区域 */
         .header-info {
           display: flex;
           align-items: center;
@@ -276,55 +331,65 @@
     }
   }
 
+  /* ===== 气泡弹窗内容样式 ===== */
   .popover-content {
     padding: 20px;
-    min-width: 350px;
+    min-width: 350px; /* 最小宽度 */
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02); /* 淡背景 */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* 淡边框 */
 
+    /* 气泡弹窗头部 */
     .popover-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
       padding-bottom: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* 底部分割线 */
 
+      /* 标题样式 */
       h4 {
-        margin: 0;
+        margin: 0; /* 移除默认margin */
       }
     }
   }
 
-  // 响应式
+  /* ===== 响应式布局适配 ===== */
+
+  /* 大屏幕适配 (≤1400px) */
   @media (max-width: 1400px) {
     .cards-grid {
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* 减小最小宽度 */
     }
   }
 
+  /* 中等屏幕适配 (≤1200px) */
   @media (max-width: 1200px) {
     .cards-grid {
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* 进一步减小最小宽度 */
     }
   }
 
+  /* 移动端适配 (≤768px) */
   @media (max-width: 768px) {
-    padding: 16px;
+    padding: 16px; /* 减小页面内边距 */
 
+    /* 卡片网格移动端布局 */
     .cards-grid {
-      grid-template-columns: 1fr;
-      gap: 16px;
+      grid-template-columns: 1fr; /* 单列布局 */
+      gap: 16px; /* 减小网格间距 */
     }
 
+    /* 侧边栏移动端适配 */
     .sidebar {
-      width: 100vw;
-      top: 60px;
+      width: 100vw; /* 全屏宽度 */
+      top: 60px; /* 减小顶部距离 */
     }
 
+    /* 主标题移动端样式 */
     .header .main-title {
-      font-size: 2rem;
+      font-size: 2rem; /* 较大字体适配移动端 */
     }
   }
 }

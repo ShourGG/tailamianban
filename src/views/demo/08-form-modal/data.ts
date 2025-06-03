@@ -22,6 +22,7 @@ export interface ContainerCard {
   title: string
   description: string
   icon: string
+  iconColor: string
   tagType: StatusType
   features: string[]
   actionText: string
@@ -36,6 +37,7 @@ interface ContainerConfigItem {
   title: string
   description: string
   icon: string
+  iconColor: string
   tagType: StatusType
   features: string[]
   actionText: string
@@ -163,7 +165,8 @@ export const containerConfig: Record<ContainerType, ContainerConfigItem> = {
     layout: 'grid',
     title: '模态框表单',
     description: '适用于新增/编辑单个实体，快速配置操作，空间有限时的最佳选择',
-    icon: 'i-carbon-popup',
+    icon: 'mdi:book-information-variant',
+    iconColor: '#2080f0',
     tagType: 'info',
     features: ['空间有限', '聚焦操作', '网格布局', '快进快出'],
     actionText: '打开模态框',
@@ -176,7 +179,8 @@ export const containerConfig: Record<ContainerType, ContainerConfigItem> = {
     layout: 'default',
     title: '抽屉表单',
     description: '适用于详情查看+编辑，多步骤数据录入，信息展示更加丰富',
-    icon: 'i-carbon-side-panel-open',
+    icon: 'mdi:this-side-up-outline',
+    iconColor: '#18a058',
     tagType: 'success',
     features: ['空间充足', '详情编辑', '默认布局', '信息丰富'],
     actionText: '打开抽屉',
@@ -189,7 +193,8 @@ export const containerConfig: Record<ContainerType, ContainerConfigItem> = {
     layout: 'default',
     title: '侧边栏表单',
     description: '适用于实时筛选器，快速操作面板，不干扰主要工作流程',
-    icon: 'i-carbon-side-panel-close',
+    icon: 'mdi:page-layout-sidebar-right',
+    iconColor: '#f0a020',
     tagType: 'warning',
     features: ['紧凑布局', '实时筛选', '辅助操作', '不干扰主流程'],
     actionText: '侧边栏',
@@ -202,7 +207,8 @@ export const containerConfig: Record<ContainerType, ContainerConfigItem> = {
     layout: 'inline',
     title: '浮动表单',
     description: '适用于快速编辑单个字段，简单配置项调整，轻量级交互',
-    icon: 'i-carbon-floating-ip',
+    icon: 'mdi:format-float-center',
+    iconColor: '#d03050',
     tagType: 'error',
     features: ['轻量级', '内联布局', '快速编辑', '即时反馈'],
     actionText: '切换浮动表单',
@@ -215,7 +221,8 @@ export const containerConfig: Record<ContainerType, ContainerConfigItem> = {
     layout: 'steps',
     title: '步骤向导表单',
     description: '适用于复杂流程分步引导，用户注册，项目创建向导',
-    icon: 'i-carbon-workflow',
+    icon: 'mdi:debug-step-over',
+    iconColor: '#d03050',
     tagType: 'success',
     features: ['分步引导', '流程清晰', '复杂配置', '进度跟踪'],
     actionText: '启动向导',
@@ -320,7 +327,8 @@ export const containerCards: ContainerCard[] = (
     key,
     title: config.title,
     description: config.description,
-    icon: `${config.icon} text-3xl`,
+    icon: config.icon,
+    iconColor: config.iconColor,
     tagType: config.tagType,
     features: config.features,
     actionText: config.actionText,
@@ -345,7 +353,7 @@ export const headerStats = [
     label: '容器类型',
     value: Object.keys(containerConfig).length,
     type: 'info' as StatusType,
-    icon: 'i-carbon-container mr-1',
+    icon: 'mdi:open-container-initiative',
   },
   {
     label: '表单字段',
@@ -354,12 +362,12 @@ export const headerStats = [
       0
     ),
     type: 'success' as StatusType,
-    icon: 'i-carbon-form mr-1',
+    icon: 'mdi:form-dropdown',
   },
   {
     label: '布局模式',
     value: new Set(Object.values(layoutTypes)).size,
     type: 'warning' as StatusType,
-    icon: 'i-carbon-layout mr-1',
+    icon: 'mdi:page-layout-sidebar-left',
   },
 ] as const

@@ -146,4 +146,10 @@ video {
   }
 }
 
-
+/* 这里全局设置一下图标统一的样式 */
+svg {
+  display: inline-block ;
+  vertical-align: middle ;
+  width: 1.2em ;
+  height: 1.2em ;
+}

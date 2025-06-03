@@ -27,6 +27,7 @@ declare module 'vue' {
     C_TagsView: typeof import('./../components/global/C_TagsView/index.vue')['default']
     C_Theme: typeof import('./../components/global/C_Theme/index.vue')['default']
     C_Time: typeof import('./../components/global/C_Time/index.vue')['default']
+    Icon: typeof import('@iconify/vue')['Icon']
     NAlert: typeof import('naive-ui')['NAlert']
     NAvatar: typeof import('naive-ui')['NAvatar']
     NBadge: typeof import('naive-ui')['NBadge']

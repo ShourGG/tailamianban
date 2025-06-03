@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-18 10:03:23
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-14 14:27:40
+ * @LastEditTime: 2025-06-03 17:45:03
  * @FilePath: \Robot_Admin\unocss.config.ts
  * @Description: unocss 主配置文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -30,12 +30,9 @@ export default defineConfig({
         display: 'inline-block',
         'vertical-align': 'middle',
       },
-      // collections: {  //! 不需要显式引入
-      //   mdi: () => mdiIcons,
-      // },
     }),
   ],
   transformers: [transformerDirectives()],
-  shortcuts: shortcutsArr,
+  shortcuts: {shortcutsArr},
   safelist: iconSafelist,
 })

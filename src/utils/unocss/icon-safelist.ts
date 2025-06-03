@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-27 14:12:17
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-16 14:54:35
+ * @LastEditTime: 2025-06-03 16:51:38
  * @FilePath: \Robot_Admin\src\utils\unocss\icon-safelist.ts
  * @Description: 处理动态加载图标的白名单，配合unocss.config，解决按需加载无法动态的情况
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.

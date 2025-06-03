@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-31 12:33:40
+ * @LastEditTime: 2025-06-03 17:31:56
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -87,6 +87,14 @@ export default defineConfig({
         IconsResolver({
           prefix: 'icon',
         }),
+        componentName => {
+          if (componentName === 'Icon') {
+            return {
+              name: 'Icon',
+              from: '@iconify/vue',
+            }
+          }
+        },
       ],
       // 新增 globs 配置进行文件过滤
       globs: [

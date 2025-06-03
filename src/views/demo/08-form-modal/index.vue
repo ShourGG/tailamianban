@@ -15,7 +15,7 @@
             :value="stat.value"
           >
             <template #prefix>
-              <i :class="stat.icon"></i>
+              <Icon :icon="stat.icon" />
             </template>
           </NStatistic>
         </NSpace>
@@ -37,10 +37,11 @@
           <template #header>
             <div class="card-header">
               <div class="icon-wrapper">
-                <i
-                  :class="card.icon"
+                <Icon
+                  :icon="card.icon"
                   class="card-icon"
-                ></i>
+                  :style="{ color: card.iconColor }"
+                />
               </div>
               <div class="header-content">
                 <h3 class="card-title">{{ card.title }}</h3>
@@ -368,9 +369,23 @@
     headerStats,
   } from './data'
 
+  /**
+   *
+   * @description: 消息提示实例
+   * ? @type {MessageApi} 用于显示操作成功、失败等提示信息
+   */
   const message = useMessage()
 
-  // 统一状态管理
+  /**
+   *
+   * @description: 统一容器状态管理
+   * ? @type {Record<ContainerType, boolean>} 管理所有容器的显示/隐藏状态
+   * * modal: 模态框显示状态
+   * * drawer: 抽屉显示状态
+   * * sidebar: 侧边栏折叠状态（true为折叠）
+   * * popover: 气泡卡片显示状态
+   * * wizard: 向导弹窗显示状态
+   */
   const containerState = reactive({
     modal: false,
     drawer: false,
@@ -379,25 +394,81 @@
     wizard: false,
   })
 
-  // 表单引用
+  /**
+   *
+   * @description: 模态框表单引用
+   * ? @type {Ref<FormInstance | undefined>} 用于访问模态框内的表单实例
+   */
   const modalFormRef = ref<FormInstance>()
+
+  /**
+   *
+   * @description: 抽屉表单引用
+   * ? @type {Ref<FormInstance | undefined>} 用于访问抽屉内的表单实例
+   */
   const drawerFormRef = ref<FormInstance>()
+
+  /**
+   *
+   * @description: 侧边栏表单引用
+   * ? @type {Ref<FormInstance | undefined>} 用于访问侧边栏内的表单实例
+   */
   const sidebarFormRef = ref<FormInstance>()
+
+  /**
+   *
+   * @description: 气泡卡片表单引用
+   * ? @type {Ref<FormInstance | undefined>} 用于访问气泡卡片内的表单实例
+   */
   const popoverFormRef = ref<FormInstance>()
+
+  /**
+   *
+   * @description: 向导表单引用
+   * ? @type {Ref<FormInstance | undefined>} 用于访问向导弹窗内的表单实例
+   */
   const wizardFormRef = ref<FormInstance>()
 
-  // 表单数据
+  /**
+   *
+   * @description: 各容器表单数据集合
+   * ? @type {Record<ContainerType, any>} 存储所有容器的表单数据
+   * * 使用reactive包装以实现响应式数据绑定
+   */
   const formData = reactive(createDefaultFormData())
 
-  // 工具函数
+  /**
+   *
+   * @description: 根据字段数量获取徽章类型
+   * ? @param {number} fields 表单字段数量
+   * ! @return {'default' | 'success' | 'warning'} 徽章类型
+   * * 0-2个字段：default（默认）
+   * * 3-4个字段：success（成功）
+   * * 5个及以上：warning（警告）
+   */
   const getBadgeType = (fields: number): 'default' | 'success' | 'warning' => {
     if (fields <= 2) return 'default'
     if (fields <= 4) return 'success'
     return 'warning'
   }
 
+  /**
+   *
+   * @description: 获取容器状态类型
+   * ? @param {ContainerType} key 容器类型标识
+   * ! @return {string} 状态类型字符串
+   * * 从配置文件中获取对应容器的状态类型
+   */
   const getStatusType = (key: ContainerType) => containerConfig[key].statusType
 
+  /**
+   *
+   * @description: 获取容器状态文本
+   * ? @param {ContainerType} key 容器类型标识
+   * ! @return {string} 状态描述文本
+   * * 根据当前容器状态返回对应的状态描述
+   * * 侧边栏特殊处理：使用collapsed状态
+   */
   const getStatusText = (key: ContainerType): string => {
     const config = containerConfig[key]
     const state =
@@ -405,6 +476,14 @@
     return config.getStatusText(state)
   }
 
+  /**
+   *
+   * @description: 获取操作按钮文本
+   * ? @param {ContainerCard} card 容器卡片配置对象
+   * ! @return {string} 按钮显示文本
+   * * 侧边栏特殊处理：根据折叠状态显示"展开"或"收起"
+   * * 其他容器：直接返回配置的操作文本
+   */
   const getActionText = (card: ContainerCard): string => {
     if (card.key === 'sidebar') {
       return containerState.sidebar ? '展开侧边栏' : '收起侧边栏'
@@ -412,7 +491,14 @@
     return card.actionText
   }
 
-  // 处理卡片点击事件
+  /**
+   *
+   * @description: 处理卡片点击事件
+   * ? @param {ContainerType} key 容器类型标识
+   * ! @return {void}
+   * * 侧边栏：切换折叠/展开状态
+   * * 其他容器：打开对应的容器
+   */
   const handleCardAction = (key: ContainerType): void => {
     if (key === 'sidebar') {
       toggleContainer('sidebar') // 侧边栏需要切换状态
@@ -421,7 +507,15 @@
     }
   }
 
-  // 统一容器控制
+  /**
+   *
+   * @description: 统一容器显示状态控制
+   * ? @param {ContainerType} type 容器类型标识
+   * ? @param {boolean} [state] 可选的目标状态，不传则切换当前状态
+   * ! @return {void}
+   * * 侧边栏：控制折叠/展开状态
+   * * 其他容器：控制显示/隐藏状态
+   */
   const toggleContainer = (type: ContainerType, state?: boolean): void => {
     if (type === 'sidebar') {
       containerState.sidebar = state ?? !containerState.sidebar
@@ -430,8 +524,24 @@
     }
   }
 
-  // 统一表单提交
+  /**
+   *
+   * @description: 统一表单提交处理
+   * ? @param {ContainerType} type 容器类型标识
+   * ! @return {Promise<void>} 异步提交结果
+   * * 1. 获取对应的表单引用
+   * * 2. 执行表单验证
+   * * 3. 验证通过后提交数据
+   * * 4. 显示成功提示并关闭容器（侧边栏除外）
+   * * 5. 验证失败时显示错误提示
+   */
   const submitForm = async (type: ContainerType): Promise<void> => {
+    /**
+     *
+     * @description: 表单引用映射表
+     * ? @type {Record<ContainerType, Ref<FormInstance | undefined>>}
+     * * 将容器类型映射到对应的表单引用
+     */
     const formRefMap: Record<ContainerType, Ref<FormInstance | undefined>> = {
       modal: modalFormRef,
       drawer: drawerFormRef,
@@ -457,7 +567,15 @@
     }
   }
 
-  // 验证并提交
+  /**
+   *
+   * @description: 验证并提交表单
+   * ? @param {ContainerType} type 容器类型标识
+   * ? @param {() => Promise<void>} validate 验证函数
+   * ! @return {Promise<void>} 异步验证提交结果
+   * * 先执行传入的验证函数，验证通过后调用统一提交方法
+   * * 主要用于自定义表单操作按钮的验证流程
+   */
   const validateAndSubmit = async (
     type: ContainerType,
     validate: () => Promise<void>
@@ -470,7 +588,14 @@
     }
   }
 
-  // 清空表单数据
+  /**
+   *
+   * @description: 清空指定容器的表单数据
+   * ? @param {ContainerType} type 容器类型标识
+   * ! @return {void}
+   * * 将对应容器的表单数据重置为空对象
+   * * 显示清空成功的提示信息
+   */
   const clearFormData = (type: ContainerType): void => {
     formData[type] = {}
     message.info('已清空表单数据')
