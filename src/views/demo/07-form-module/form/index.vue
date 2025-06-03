@@ -1,6 +1,6 @@
 <template>
   <div class="form-demo">
-    <NH1>城市选择器组件场景示例 - 展示所有8种布局类型的完整功能和配置选项</NH1>
+    <NH1>表单选择器组件场景示例 - 展示所有8种布局类型的完整功能和配置选项</NH1>
     <!-- 控制面板 -->
     <div class="control-panel">
       <div class="panel-title">

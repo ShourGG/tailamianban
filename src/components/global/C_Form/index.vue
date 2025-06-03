@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-23 11:58:59
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-01 21:00:01
+ * @LastEditTime: 2025-06-03 14:27:03
  * @FilePath: \Robot_Admin\src\components\global\C_Form\index.vue
  * @Description: 通用表单组件 - 支持多种布局和动态渲染
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -16,7 +16,6 @@
     :validate-on-rule-change="false"
     :label-placement="labelPlacement"
     :label-width="labelWidth"
-    :show-require-mark="showRequireMark"
     :size="size"
     :disabled="disabled"
     :readonly="readonly"
@@ -95,7 +94,6 @@
     validateOnValueChange: false,
     labelPlacement: 'left',
     labelWidth: 'auto',
-    showRequireMark: true,
     size: 'medium',
     disabled: false,
     readonly: false,
@@ -212,6 +210,7 @@
           label: item.label,
           path: item.prop,
           key: item.prop,
+          required: !!item.rules?.length,
         },
         {
           default: () => renderFormItem(item),
