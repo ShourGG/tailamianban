@@ -28,14 +28,14 @@
     .panel-title {
       font-size: 20px;
       font-weight: 550;
-      color: #333; /* 深灰色文字 */
+      color: var(--n-text-color); /* 使用主题文本颜色 */
       margin-bottom: 20px;
     }
 
     /* 副标题样式 */
     .subtitle {
       font-size: 14px;
-      color: #999; /* 浅灰色文字 */
+      color: var(--n-text-color-3); /* 使用主题次要文本颜色 */
       font-weight: normal; /* 正常字重 */
     }
 
@@ -50,19 +50,19 @@
 
       /* 统计卡片样式 */
       .n-statistic {
-        padding: 16px 24px; /* 内边距：上下16px 左右24px */
-        border-radius: 12px; /* 圆角 */
-        background: rgba(255, 255, 255, 0.05); /* 半透明白色背景 */
-        border: 1px solid rgba(255, 255, 255, 0.1); /* 半透明边框 */
-        transition: all 0.3s ease; /* 所有属性0.3秒缓动过渡 */
+        padding: 16px 24px;
+        border-radius: 12px;
+        background: var(--n-card-color); /* 使用主题卡片背景色 */
+        border: 1px solid var(--n-border-color); /* 使用主题边框色 */
+        transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
 
         /* 悬停效果 */
         &:hover {
-          transform: translateY(-2px); /* 向上移动2px */
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* 阴影效果 */
-          background: rgba(255, 255, 255, 0.08); /* 悬停时背景更亮 */
+          transform: translateY(-2px);
+          box-shadow: var(--n-box-shadow); /* 使用主题阴影 */
+          background: var(--n-card-color-hover); /* 使用主题卡片悬停背景色 */
         }
 
         /* 顶部彩色条效果 - 默认隐藏 */
@@ -73,7 +73,11 @@
           left: 0;
           right: 0;
           height: 2px;
-          background: linear-gradient(90deg, #18a058, #2080f0, #f0a020); /* 绿蓝橙渐变 */
+          background: linear-gradient(90deg,
+            var(--n-success-color),
+            var(--n-primary-color),
+            var(--n-warning-color)
+          ); /* 使用主题色渐变 */
           opacity: 0; /* 默认透明 */
           transition: opacity 0.3s ease;
         }
@@ -104,8 +108,8 @@
             height: 20px;
             background: radial-gradient(
               circle,
-              rgba(24, 160, 88, 0.2) 0%, /* 中心绿色半透明 */
-              transparent 70% /* 边缘透明 */
+              color-mix(in srgb, var(--n-success-color) 20%, transparent) 0%,
+              transparent 70%
             );
             border-radius: 50%;
             transform: translate(-50%, -50%) scale(0); /* 初始缩放为0 */
@@ -154,7 +158,11 @@
           left: 0;
           right: 0;
           height: 3px; /* 比统计卡片的条更粗 */
-          background: linear-gradient(90deg, #18a058, #2080f0, #f0a020);
+          background: linear-gradient(90deg,
+            var(--n-success-color),
+            var(--n-primary-color),
+            var(--n-warning-color)
+          );
           opacity: 0;
           transition: opacity 0.3s ease;
           z-index: 1; /* 确保在最上层 */
@@ -163,7 +171,7 @@
         /* 卡片悬停效果 */
         &:hover {
           transform: translateY(-4px); /* 向上移动4px */
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); /* 较大阴影 */
+          box-shadow: var(--n-box-shadow-hover); /* 使用主题悬停阴影 */
 
           /* 显示顶部彩色条 */
           &::before {

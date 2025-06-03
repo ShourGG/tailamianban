@@ -1,35 +1,27 @@
 // ========================================
-// SCSS 变量定义 - 统一设计系统
+// SCSS 变量定义 - 精简版
 // ========================================
 
-
 // 颜色主题变量
-$primary-color: #2080f0; // 主要品牌色
-$primary-dark: #1c7ed6; // 主色深色变体
-$success-color: #18a058; // 成功状态色
-$success-dark: #16a085; // 成功色深色变体
-$warning-color: #f0a020; // 警告状态色
-$danger-color: #d03050; // 危险状态色
-$info-color: #0ea5e9; // 信息状态色
+$primary-color: #2080f0;
+$primary-dark: #1c7ed6;
+$success-color: #18a058;
+$success-dark: #16a085;
+$warning-color: #f0a020;
+$danger-color: #d03050;
+$info-color: #0ea5e9;
 
 // 中性色系
-$white: #ffffff;
-$gray-50: #f8f9fa;
-$gray-100: #f5f5f5;
-$gray-200: #e9ecef;
 $gray-300: #e0e0e0;
 $gray-400: #ddd;
 $gray-500: #999;
-$gray-600: #666;
-$gray-700: #333;
-$gray-800: #6b7280;
-$gray-900: #4b5563;
 
-// 状态卡片渐变色
-$gradient-completed: #667eea; // 已完成渐变色
-$gradient-pending: #f093fb; // 待处理渐变色
-$gradient-completion: #4facfe; // 完成率渐变色
-$gradient-errors: #43e97b; // 错误数渐变色
+// 渐变色
+$gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+$gradient-warning: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+$gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+$gradient-info: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
 
 // 间距系统
 $spacing-xs: 4px;
@@ -38,9 +30,8 @@ $spacing-md: 12px;
 $spacing-lg: 16px;
 $spacing-xl: 20px;
 $spacing-2xl: 24px;
-$spacing-3xl: 32px;
 
-// 字体大小系统
+// 字体大小
 $font-xs: 10px;
 $font-sm: 11px;
 $font-base: 12px;
@@ -49,85 +40,43 @@ $font-lg: 14px;
 $font-xl: 16px;
 $font-2xl: 18px;
 $font-3xl: 20px;
-$font-4xl: 28px;
 
-// 圆角系统
+// 圆角
 $radius-sm: 3px;
 $radius-base: 4px;
 $radius-md: 6px;
 $radius-lg: 8px;
 $radius-xl: 10px;
-$radius-2xl: 12px;
 $radius-full: 50%;
 
 // 字体族
 $font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 $font-family-mono: 'Courier New', monospace;
 
-// 动画时长
+// 动画
 $transition-fast: 0.2s;
 $transition-normal: 0.3s;
 
-// 断点系统
+// 断点
 $breakpoint-mobile: 480px;
 $breakpoint-tablet: 768px;
 
+// 优化变量
+$card-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+$card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.08);
+$card-border: rgba(229, 231, 235, 0.8);
+
 // ========================================
-// SCSS 混合宏 - 复用样式模式
+// 混合宏
 // ========================================
 
-// 卡片样式混合
-@mixin card-style($padding: $spacing-xl) {
-  background: $white;
-  border: 1px solid $gray-300;
-  border-radius: $radius-lg;
-  padding: $padding;
-}
-
-// 按钮基础样式混合
-@mixin button-base($padding: $spacing-sm $spacing-md, $font-size: $font-base) {
-  padding: $padding;
-  border: none;
-  border-radius: $radius-base;
-  font-size: $font-size;
-  cursor: pointer;
-  transition: all $transition-fast;
-}
-
-// 输入框样式混合
-@mixin input-style($padding: $spacing-xs $spacing-sm, $font-size: $font-base) {
-  padding: $padding;
-  border: 1px solid $gray-400;
-  border-radius: $radius-base;
-  font-size: $font-size;
-  background: $white;
-}
-
-// 标签样式混合
-@mixin badge-style($padding: 2px $spacing-sm, $font-size: $font-xs) {
-  padding: $padding;
-  border-radius: $radius-xl;
-  font-size: $font-size;
-  font-weight: 500;
-}
-
-// 网格布局混合
-@mixin grid-layout($columns, $gap: $spacing-lg) {
-  display: grid;
-  grid-template-columns: repeat($columns, 1fr);
-  gap: $gap;
-}
-
-// Flex 居中对齐混合
-@mixin flex-center($direction: row, $gap: 0) {
+@mixin flex-center($gap: 0) {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: $direction;
   gap: $gap;
 }
 
-// Flex 两端对齐混合
 @mixin flex-between($align: center) {
   display: flex;
   justify-content: space-between;
@@ -135,209 +84,451 @@ $breakpoint-tablet: 768px;
 }
 
 // ========================================
-// 主容器样式 - 整体布局容器
+// 主容器样式
 // ========================================
 .form-demo {
-  padding: $spacing-2xl;
+  padding: $spacing-xl;
   font-family: $font-family-base;
   box-sizing: border-box;
 }
 
 // ========================================
-// 页面标题区域 - 顶部标题和描述
+// 页面标题区域
 // ========================================
 .header {
-  margin-bottom: $spacing-3xl;
+  margin-bottom: $spacing-2xl;
 
   h1 {
     margin: 0 0 $spacing-sm;
-    font-size: $font-4xl;
+    font-size: $font-3xl;
     font-weight: 600;
-    color: $gray-700;
   }
 
   p {
     margin: 0;
-    color: $gray-600;
-    font-size: $font-xl;
+    font-size: $font-lg;
   }
 }
 
 // ========================================
-// 控制面板区域 - 表单配置和操作控制
+// 控制面板区域
 // ========================================
 .control-panel {
-  margin-bottom: $spacing-2xl;
+  margin-bottom: $spacing-xl;
 
   .panel-title {
-    font-size: $font-3xl;
-    font-weight: 600;
-    color: $gray-700;
-    margin-bottom: $spacing-xl;
+    font-size: $font-2xl;
+    font-weight: 700;
+    margin-bottom: $spacing-lg;
+    text-align: center;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 2px;
+      background: $gradient-primary;
+      border-radius: $radius-full;
+    }
 
     .subtitle {
-      font-size: $font-lg;
-      color: $gray-500;
-      font-weight: normal;
+      display: block;
+      font-size: $font-md;
+      font-weight: 400;
+      margin-top: $spacing-xs;
     }
   }
 
-  // 控制网格 - 2x4 响应式布局
+  // 4列网格布局
   .control-grid {
-    @include grid-layout(4, $spacing-lg);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $spacing-md;
+    margin-bottom: $spacing-lg;
   }
 
   // 布局特定配置区域
   .layout-specific-config {
-    margin-top: $spacing-lg;
+    margin-top: $spacing-xl;
 
     :deep(.control-card.full-width) {
       grid-column: 1 / -1;
 
+      .card-title {
+        color: $primary-color;
+        font-size: $font-lg;
+        margin-bottom: $spacing-lg;
+
+        &::before {
+          content: '⚙️';
+          margin-right: $spacing-sm;
+        }
+      }
+
       .layout-config-content {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: $spacing-lg;
       }
     }
   }
 
-  // 带徽章的输入框组合
+  // 输入框组合样式
   .input-with-badge {
-    @include flex-center($gap: $spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-md;
+    border: 1px solid $card-border;
 
     .number-input {
-      @include input-style($spacing-xs $spacing-sm, $font-base);
-      width: 80px;
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: $spacing-xs;
+      font-size: $font-base;
+      font-weight: 500;
+
+      &:focus {
+        outline: none;
+      }
     }
 
     .badge {
-      @include badge-style();
-      color: $white;
+      padding: $spacing-xs $spacing-sm;
+      border-radius: $radius-sm;
+      font-size: $font-xs;
+      font-weight: 600;
 
       &.primary {
-        background: $primary-color;
+        background: $gradient-primary;
+        color: white;
       }
     }
   }
 }
 
 // ========================================
-// 控制卡片样式 - 各种配置控制卡片（使用 NCard）
+// 控制卡片样式 - 根据实际布局优化
 // ========================================
 :deep(.control-card) {
-  // 覆盖 NCard 默认样式，应用自定义样式
   .n-card {
-    background: $white;
-    border: 1px solid $gray-300;
-    border-radius: $radius-lg;
-    box-shadow: none;
-    padding: $spacing-xl;
+    border: 1px solid $card-border !important;
+    border-radius: $radius-md !important;
+    box-shadow: $card-shadow !important;
+    padding: $spacing-lg !important;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 200px !important; // 强制最小高度
+    justify-content: space-between !important; // 内容两端对齐
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: $gradient-primary;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $card-shadow-hover;
+      border-color: rgba(102, 126, 234, 0.2);
+
+      &::before {
+        opacity: 1;
+      }
+    }
   }
 
+  // 卡片标题
   .card-title {
-    font-size: $font-lg;
-    font-weight: 600;
-    color: $gray-700;
-    margin-bottom: $spacing-lg;
+    font-size: $font-md !important;
+    font-weight: 600 !important;
+    margin-bottom: $spacing-md !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: $spacing-xs !important;
+    flex-shrink: 0 !important;
+
+    &::before {
+      content: '';
+      width: 12px;
+      height: 12px;
+      border-radius: $radius-sm;
+      background: $gradient-primary;
+    }
   }
 
-  // 布局选择按钮组
+  // 布局按钮区域 - 针对第1个卡片（布局类型）
   .layout-buttons {
-    @include grid-layout(2, $spacing-sm);
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: $spacing-md !important;
+    flex: 1 !important;
+    align-content: center !important; // 垂直居中
+    padding: $spacing-xl 0 !important; // 增加上下内边距
 
     .layout-btn {
-      @include button-base($spacing-sm $spacing-md, $font-base);
-      border: 1px solid $gray-400;
+      padding: $spacing-xl $spacing-md !important; // 增加垂直内边距
+      border: 2px solid transparent;
       border-radius: $radius-md;
-      background: $white;
-      color: $gray-700;
+      font-size: $font-sm;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      min-height: 50px !important; // 设置最小高度
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: $gradient-primary;
+        transition: left 0.3s ease;
+        z-index: -1;
+      }
 
       &:hover {
-        border-color: $primary-color;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+
+        &::before {
+          left: 0;
+        }
       }
 
       &.active {
-        background: $primary-color;
-        border-color: $primary-color;
-        color: $white;
+        background: $gradient-primary;
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 2px 12px rgba(102, 126, 234, 0.4);
+
+        &::before {
+          left: 0;
+        }
       }
     }
   }
 
-  // 配置区域
+  // 配置区域 - 针对第2个卡片（表单配置）及其他配置类卡片
   .config-section {
-    margin-bottom: $spacing-lg;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    margin-bottom: $spacing-lg !important;
 
     .section-label {
-      font-size: $font-base;
-      color: $gray-600;
-      margin-bottom: $spacing-md;
-      font-weight: 500;
+      font-size: $font-xs !important;
+      margin-bottom: $spacing-lg !important;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: relative;
+      padding-left: $spacing-sm;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2px;
+        height: 8px;
+        background: $gradient-primary;
+        border-radius: $radius-full;
+      }
     }
 
     .config-item {
-      @include flex-between();
-      margin-bottom: $spacing-md;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: $spacing-lg !important; // 增加内边距
+      margin-bottom: $spacing-lg !important; // 增加间距
+      border-radius: $radius-sm;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
 
-      &:last-child {
-        margin-bottom: 0;
+      &:hover {
+        border-color: $card-border;
       }
 
       span {
-        font-size: $font-md;
-        color: $gray-600;
+        font-size: $font-sm;
+        font-weight: 500;
       }
     }
   }
 
-  // 按钮组样式
+  // 直接在卡片根部的config-item（如网格配置卡片）
+  .config-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: $spacing-lg !important;
+    margin-bottom: $spacing-lg !important;
+    border-radius: $radius-sm;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $card-border;
+    }
+
+    span {
+      font-size: $font-sm;
+      font-weight: 500;
+    }
+  }
+
+  // 操作按钮区域 - 针对表单配置卡片
+  .action-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-xs;
+    margin-top: auto; // 推到底部
+
+    .action-btn {
+      padding: $spacing-sm;
+      border: none;
+      border-radius: $radius-sm;
+      font-weight: 600;
+      font-size: $font-xs;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      &.fill {
+        background: $gradient-success;
+        color: white;
+      }
+
+      &.preview {
+        background: $gradient-info;
+        color: white;
+      }
+
+      &.clear {
+        background: $gradient-warning;
+        color: white;
+      }
+
+      &.validate {
+        background: $gradient-primary;
+        color: white;
+      }
+    }
+  }
+
+  // 统计显示区域 - 针对实时统计卡片
+  .stat-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: $spacing-xl;
+    border-radius: $radius-md;
+    border: 1px solid rgba(32, 128, 240, 0.2);
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: 800;
+      background: $gradient-primary;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: $spacing-sm;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: $font-sm;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+  }
+
+  // 按钮组
   .button-group {
     display: flex;
     gap: $spacing-xs;
+    padding: $spacing-xs;
+    border-radius: $radius-md;
 
     button {
-      @include button-base($spacing-xs $spacing-sm, $font-sm);
-      border: 1px solid $gray-400;
-      background: $white;
-      color: $gray-700;
+      flex: 1;
+      padding: $spacing-xs $spacing-sm;
+      border: none;
+      border-radius: $radius-sm;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: $font-xs;
 
       &.active {
-        background: $primary-color;
-        border-color: $primary-color;
-        color: $white;
+        color: $primary-color;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        font-weight: 600;
+      }
+
+      &:hover:not(.active) {
+        opacity: 0.8;
       }
     }
   }
 
-  // 自定义开关组件
+  // 开关组件
   .switch {
     width: 40px;
     height: 20px;
-    background: $gray-400;
-    border-radius: $radius-xl;
+    background: $gray-300;
+    border-radius: $radius-full;
     position: relative;
     cursor: pointer;
-    transition: background $transition-normal;
+    transition: all 0.2s ease;
 
     &.active {
-      background: $primary-color;
+      background: $gradient-primary;
     }
 
     &::after {
       content: '';
       width: 16px;
       height: 16px;
-      background: $white;
       border-radius: $radius-full;
       position: absolute;
       top: 2px;
       left: 2px;
-      transition: transform $transition-normal;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
 
     &.active::after {
@@ -347,182 +538,234 @@ $breakpoint-tablet: 768px;
 
   // 范围输入组合
   .range-group {
-    @include flex-center($gap: $spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-md;
+    border: 1px solid $card-border;
 
-    input {
-      width: 80px;
+    input[type="range"] {
+      flex: 1;
+      height: 4px;
+      background: $gray-300;
+      border-radius: $radius-full;
+      outline: none;
+
+      &::-webkit-slider-thumb {
+        width: 14px;
+        height: 14px;
+        background: $gradient-primary;
+        border-radius: $radius-full;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 1px 3px rgba(102, 126, 234, 0.3);
+      }
     }
 
     span {
-      font-size: $font-sm;
-      color: $gray-500;
-      min-width: 32px;
+      font-size: $font-xs;
+      font-weight: 600;
+      min-width: 30px;
+      text-align: center;
+      padding: $spacing-xs;
+      border-radius: $radius-sm;
     }
   }
 
-  // 快速操作按钮组
-  .action-buttons {
-    @include grid-layout(2, $spacing-sm);
-
-    .action-btn {
-      @include button-base($spacing-sm $spacing-md, $font-sm);
-      color: $gray-700;
-
-      &.fill {
-        background: $success-color;
-        color: $white;
-      }
-      &.preview {
-        background: $primary-color;
-        color: $white;
-      }
-      &.clear {
-        background: $warning-color;
-        color: $white;
-      }
-      &.validate {
-        background: $success-color;
-        color: $white;
-      }
-    }
-  }
-
-  // 统计数据显示
-  .stat-display {
-    text-align: center;
-
-    .stat-number {
-      font-size: 24px;
-      font-weight: bold;
-      color: $primary-color;
-      margin-bottom: $spacing-xs;
-    }
-
-    .stat-label {
-      font-size: $font-sm;
-      color: $gray-500;
-      line-height: 1.3;
-    }
-  }
-
-  // 字段操作按钮组
+  // 字段操作按钮
   .field-actions {
     display: flex;
-    gap: $spacing-sm;
-    margin-top: $spacing-sm;
+    gap: $spacing-xs;
+    margin-top: auto;
+    padding-top: $spacing-md;
 
     button {
-      @include button-base($spacing-xs $spacing-md, $font-sm);
-      border: 1px solid $gray-400;
-      background: $white;
-      color: $gray-700;
+      flex: 1;
+      padding: $spacing-md $spacing-sm;
+      border: 1px solid $gray-300;
+      border-radius: $radius-sm;
+      font-weight: 500;
+      font-size: $font-sm;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        border-color: $primary-color;
+        color: $primary-color;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+      }
 
       &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
       }
     }
   }
 
-  // 计数显示样式
+  // 数值显示
+  .field-count,
+  .required-count {
+    font-weight: 700;
+    font-size: $font-lg;
+    padding: $spacing-sm $spacing-md;
+    border-radius: $radius-md;
+    border: 2px solid;
+    margin: $spacing-sm 0;
+    display: inline-block;
+    min-width: 40px;
+    text-align: center;
+  }
+
   .field-count {
-    font-weight: bold;
     color: $primary-color;
+    border-color: $primary-color;
   }
 
   .required-count {
-    font-weight: bold;
     color: $danger-color;
+    border-color: $danger-color;
   }
 
   // 状态徽章
   .status-badge {
-    @include badge-style();
+    padding: $spacing-xs $spacing-md;
+    border-radius: $radius-full;
+    font-weight: 600;
+    font-size: $font-sm;
 
     &.success {
-      background: #f0f9ff;
-      color: #166534;
+      background: $gradient-success;
+      color: white;
     }
 
     &.error {
-      background: #fef2f2;
-      color: #991b1b;
+      background: $gradient-danger;
+      color: white;
     }
   }
 
   // 性能值显示
   .perf-value {
-    font-weight: 500;
-    font-size: $font-base;
+    font-weight: 600;
+    font-size: $font-md;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-sm;
 
     &.success {
       color: $success-color;
+      background: rgba(24, 160, 88, 0.1);
     }
   }
 }
 
 // ========================================
-// 通用选择和输入组件样式
+// 个性化图标
 // ========================================
-select {
-  @include input-style();
+:deep(.control-card) {
+  &:nth-child(1) .card-title::before {
+    content: '🎨';
+    background: $gradient-primary;
+  }
+
+  &:nth-child(2) .card-title::before {
+    content: '⚙️';
+    background: $gradient-success;
+  }
+
+  &:nth-child(3) .card-title::before {
+    content: '📐';
+    background: $gradient-warning;
+  }
+
+  &:nth-child(4) .card-title::before {
+    content: '📊';
+    background: $gradient-info;
+  }
+
+  &:nth-child(5) .card-title::before {
+    content: '📏';
+    background: $gradient-danger;
+  }
+
+  &:nth-child(6) .card-title::before {
+    content: '🔧';
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  &:nth-child(7) .card-title::before {
+    content: '✅';
+    background: $gradient-success;
+  }
+
+  &:nth-child(8) .card-title::before {
+    content: '⚡';
+    background: $gradient-warning;
+  }
 }
 
 // ========================================
-// 表单区域样式 - C_Form 组件容器（使用 NCard）
+// 表单区域样式
 // ========================================
 :deep(.form-section) {
-  margin-bottom: $spacing-2xl;
+  margin-bottom: $spacing-xl;
 
-  // 覆盖 NCard 默认样式
   .n-card {
-    background: $white;
     border: 1px solid $gray-300;
-    border-radius: $radius-lg;
+    border-radius: $radius-md;
     box-shadow: none;
-    padding: $spacing-2xl;
+    padding: $spacing-xl;
   }
 
   .form-header {
     @include flex-between();
     margin-bottom: $spacing-lg;
-    padding-bottom: $spacing-lg;
+    padding-bottom: $spacing-md;
     border-bottom: 1px solid #f0f0f0;
 
     h3 {
       margin: 0;
-      font-size: $font-2xl;
+      font-size: $font-xl;
       font-weight: 600;
-      color: $gray-700;
     }
 
     .field-badge {
-      @include badge-style($spacing-xs $spacing-md, $font-base);
+      padding: $spacing-xs $spacing-sm;
+      border-radius: $radius-xl;
+      font-size: $font-sm;
+      font-weight: 500;
       background: $primary-color;
-      color: $white;
+      color: white;
     }
   }
 
   .layout-info {
     background: #f0f9ff;
     border: 1px solid $info-color;
-    border-radius: $radius-md;
+    border-radius: $radius-sm;
     padding: $spacing-md;
-    margin-bottom: $spacing-xl;
+    margin-bottom: $spacing-lg;
     color: #0369a1;
-    font-size: $font-lg;
+    font-size: $font-md;
   }
 
-  // 表单操作按钮区域
   .form-actions {
-    @include flex-center($gap: $spacing-md);
-    margin-top: $spacing-2xl;
+    @include flex-center($spacing-md);
+    margin-top: $spacing-xl;
 
     .submit-btn {
-      @include button-base($spacing-md $spacing-2xl, $font-lg);
-      @include flex-center($gap: $spacing-sm);
+      padding: $spacing-md $spacing-xl;
+      border: none;
+      border-radius: $radius-base;
+      font-size: $font-md;
+      cursor: pointer;
+      transition: all $transition-fast;
+      @include flex-center($spacing-sm);
       background: $success-color;
-      color: $white;
+      color: white;
 
       &:hover:not(:disabled) {
         background: $success-dark;
@@ -533,30 +776,30 @@ select {
         cursor: not-allowed;
       }
 
-      // 加载动画
       .loading {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
         border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top: 2px solid $white;
+        border-top: 2px solid currentColor;
         border-radius: $radius-full;
         animation: spin 1s linear infinite;
       }
     }
 
     .reset-btn {
-      @include button-base($spacing-md $spacing-2xl, $font-lg);
-      background: $gray-800;
-      color: $white;
+      padding: $spacing-md $spacing-xl;
+      border: none;
+      border-radius: $radius-base;
+      font-size: $font-md;
+      cursor: pointer;
+      transition: all $transition-fast;
+      background: $gray-500;
+      color: white;
 
-      &:hover {
-        background: $gray-900;
-      }
     }
   }
 }
 
-// 加载动画关键帧
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -567,84 +810,81 @@ select {
 }
 
 // ========================================
-// 状态监控区域 - 数据统计和验证状态
+// 状态监控区域
 // ========================================
 .status-section {
-  margin-top: $spacing-3xl;
+  margin-top: $spacing-2xl;
 
-  // 状态卡片网格（使用 NCard）
   .status-cards {
-    @include grid-layout(4, $spacing-lg);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $spacing-md;
     margin-top: $spacing-lg;
 
     :deep(.status-card) {
       text-align: center;
 
-      // 覆盖 NCard 默认样式
       .n-card {
-        background: $white;
         border: 1px solid $gray-300;
-        border-radius: $radius-lg;
+        border-radius: $radius-md;
         box-shadow: none;
-        padding: $spacing-xl;
+        padding: $spacing-lg;
       }
 
       .number {
-        font-size: 28px;
+        font-size: 24px;
         font-weight: bold;
-        margin-bottom: $spacing-sm;
+        margin-bottom: $spacing-xs;
       }
 
       .label {
-        font-size: $font-lg;
-        color: $gray-600;
+        font-size: $font-md;
       }
 
-      // 不同状态的数字颜色
       &.completed .number {
-        color: $gradient-completed;
+        color: #667eea;
       }
       &.pending .number {
-        color: $gradient-pending;
+        color: #f093fb;
       }
       &.completion .number {
-        color: $gradient-completion;
+        color: #4facfe;
       }
       &.errors .number {
-        color: $gradient-errors;
+        color: #43e97b;
       }
     }
   }
 
-  // 状态详细信息（使用 NCard）
   .status-details {
-    @include grid-layout(2, $spacing-2xl);
+    display: grid;
     grid-template-columns: 2fr 1fr;
-    margin-top: $spacing-2xl;
+    gap: $spacing-xl;
+    margin-top: $spacing-xl;
 
     :deep(.validation-detail) {
-      // 覆盖 NCard 默认样式
       .n-card {
-        background: $white;
         border: 1px solid $gray-300;
-        border-radius: $radius-lg;
+        border-radius: $radius-md;
         box-shadow: none;
-        padding: $spacing-2xl;
+        padding: $spacing-xl;
       }
 
       .validation-header {
         @include flex-between();
-        margin-bottom: $spacing-lg;
+        margin-bottom: $spacing-md;
 
         .validation-title {
-          font-size: $font-2xl;
+          font-size: $font-xl;
           font-weight: 600;
-          color: $gray-700;
           margin: 0;
         }
 
         .validation-status {
-          @include badge-style($spacing-sm $spacing-lg, $font-base);
+          padding: $spacing-sm $spacing-md;
+          border-radius: $radius-xl;
+          font-size: $font-sm;
+          font-weight: 500;
 
           &.success {
             background: #dcfce7;
@@ -659,16 +899,20 @@ select {
       }
 
       .validation-message {
-        color: $gray-600;
-        font-size: $font-lg;
-        margin-bottom: $spacing-xl;
-        line-height: 1.6;
+        font-size: $font-md;
+        margin-bottom: $spacing-lg;
+        line-height: 1.5;
       }
 
       .validate-btn {
-        @include button-base($spacing-md $spacing-xl, $font-lg);
+        padding: $spacing-md $spacing-lg;
+        border: none;
+        border-radius: $radius-base;
+        font-size: $font-md;
+        cursor: pointer;
+        transition: all $transition-fast;
         background: $primary-color;
-        color: $white;
+        color: white;
 
         &:hover:not(:disabled) {
           background: $primary-dark;
@@ -682,25 +926,22 @@ select {
     }
 
     :deep(.quick-stats) {
-      // 覆盖 NCard 默认样式
       .n-card {
-        background: $white;
         border: 1px solid $gray-300;
-        border-radius: $radius-lg;
+        border-radius: $radius-md;
         box-shadow: none;
-        padding: $spacing-2xl;
+        padding: $spacing-xl;
       }
 
       .stats-title {
-        font-size: $font-2xl;
+        font-size: $font-xl;
         font-weight: 600;
-        color: $gray-700;
-        margin: 0 0 $spacing-xl 0;
+        margin: 0 0 $spacing-lg 0;
       }
 
       .stat-row {
         @include flex-between();
-        padding: $spacing-md 0;
+        padding: $spacing-sm 0;
         border-bottom: 1px solid #f3f4f6;
 
         &:last-child {
@@ -708,15 +949,13 @@ select {
         }
 
         .stat-label {
-          font-size: $font-lg;
-          color: $gray-600;
+          font-size: $font-md;
           font-weight: 500;
         }
 
         .stat-value {
-          font-size: $font-lg;
+          font-size: $font-md;
           font-weight: 600;
-          color: $gray-700;
         }
       }
     }
@@ -724,7 +963,7 @@ select {
 }
 
 // ========================================
-// 数据预览弹窗 - 表单数据查看和导出（使用 NCard）
+// 数据预览弹窗
 // ========================================
 .modal-overlay {
   position: fixed;
@@ -742,10 +981,8 @@ select {
     max-height: 90vh;
     overflow: hidden;
 
-    // 覆盖 NCard 默认样式
     .n-card {
-      background: $white;
-      border-radius: $radius-lg;
+      border-radius: $radius-md;
       box-shadow: none;
       border: none;
       overflow: hidden;
@@ -758,25 +995,27 @@ select {
 
     .modal-header {
       @include flex-between();
-      padding: $spacing-xl;
+      padding: $spacing-lg;
       border-bottom: 1px solid $gray-300;
 
       h3 {
         margin: 0;
-        font-size: $font-2xl;
+        font-size: $font-xl;
         font-weight: 600;
-        color: $gray-700;
       }
 
       .modal-actions {
         display: flex;
-        gap: $spacing-sm;
+        gap: $spacing-xs;
 
         .modal-btn {
-          @include button-base($spacing-sm $spacing-md, $font-base);
+          padding: $spacing-xs $spacing-sm;
+          border: none;
+          border-radius: $radius-base;
+          font-size: $font-sm;
+          cursor: pointer;
+          transition: all $transition-fast;
           border: 1px solid $gray-400;
-          background: $white;
-          color: $gray-700;
 
           &:hover {
             border-color: $primary-color;
@@ -784,7 +1023,7 @@ select {
           }
 
           &.close {
-            background: $gray-100;
+            background: $gray-300;
           }
         }
       }
@@ -793,68 +1032,65 @@ select {
     .modal-tabs {
       flex: 1;
       overflow: auto;
-      padding: $spacing-xl;
+      padding: $spacing-lg;
 
       .tab-content {
-        margin-bottom: $spacing-2xl;
+        margin-bottom: $spacing-lg;
 
         h4 {
-          margin: 0 0 $spacing-md 0;
-          font-size: $font-lg;
+          margin: 0 0 $spacing-sm 0;
+          font-size: $font-md;
           font-weight: 600;
-          color: $gray-700;
         }
 
-        // JSON 代码显示
         .json-display {
-          background: $gray-50;
-          border: 1px solid $gray-200;
-          border-radius: $radius-base;
-          padding: $spacing-lg;
+          border: 1px solid $gray-300;
+          border-radius: $radius-sm;
+          padding: $spacing-md;
           font-family: $font-family-mono;
-          font-size: $font-base;
-          line-height: 1.5;
+          font-size: $font-sm;
+          line-height: 1.4;
           overflow: auto;
-          max-height: 300px;
+          max-height: 250px;
         }
 
-        // 数据表格
         .data-table {
           width: 100%;
           border-collapse: collapse;
           border: 1px solid $gray-300;
-          border-radius: $radius-base;
+          border-radius: $radius-sm;
           overflow: hidden;
 
           th,
           td {
-            padding: $spacing-md;
+            padding: $spacing-sm;
             text-align: left;
             border-bottom: 1px solid #f0f0f0;
           }
 
           th {
-            background: $gray-50;
             font-weight: 600;
-            color: $gray-700;
-            font-size: $font-md;
+            font-size: $font-sm;
           }
 
           td {
-            font-size: $font-base;
-            color: $gray-600;
+            font-size: $font-sm;
           }
 
-          // 字段标签样式
           .field-tag {
-            @include badge-style(2px $spacing-sm, $font-sm);
+            padding: 2px $spacing-xs;
+            border-radius: $radius-xl;
+            font-size: $font-xs;
+            font-weight: 500;
             background: #e3f2fd;
             color: #1976d2;
           }
 
-          // 类型标签样式
           .type-tag {
-            @include badge-style(2px $spacing-sm, $font-sm);
+            padding: 2px $spacing-xs;
+            border-radius: $radius-xl;
+            font-size: $font-xs;
+            font-weight: 500;
             background: #f3e5f5;
             color: #7b1fa2;
           }
@@ -865,40 +1101,46 @@ select {
 }
 
 // ========================================
-// 响应式设计 - 移动端和平板适配
+// 响应式设计
 // ========================================
 @media (max-width: $breakpoint-tablet) {
   .control-panel {
     .control-grid {
-      @include grid-layout(2);
+      grid-template-columns: repeat(2, 1fr);
+      gap: $spacing-md;
     }
   }
 
   .status-section {
     .status-cards {
-      @include grid-layout(2);
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .status-details {
-      @include grid-layout(1);
+      grid-template-columns: 1fr;
     }
   }
 }
 
 @media (max-width: $breakpoint-mobile) {
   .form-demo {
-    padding: $spacing-lg;
+    padding: $spacing-md;
   }
 
   .control-panel {
     .control-grid {
-      @include grid-layout(1);
+      grid-template-columns: 1fr;
+      gap: $spacing-sm;
+    }
+
+    .panel-title {
+      font-size: $font-xl;
     }
   }
 
   .status-section {
     .status-cards {
-      @include grid-layout(1);
+      grid-template-columns: 1fr;
     }
   }
 
@@ -912,7 +1154,84 @@ select {
       }
     }
   }
+
+  :deep(.control-card) {
+    .action-buttons {
+      grid-template-columns: 1fr;
+    }
+
+    .layout-buttons {
+      grid-template-columns: 1fr;
+      gap: $spacing-xs;
+    }
+  }
+}
+
+// ========================================
+// 最终暗色主题修复 - 针对 html.dark
+// ========================================
+
+// 使用最高优先级选择器，确保覆盖所有样式
+html.dark {
+
+  // 全局文字颜色强制覆盖
+  * {
+    color: white !important;
+  }
+
+  // 但是保持某些特殊元素的颜色（避免破坏组件库样式）
+  input,
+  textarea,
+  select,
+  button,
+  .n-button,
+  .n-input,
+  .n-select,
+  svg,
+  path {
+    color: initial !important; // 让这些元素使用组件库的默认颜色
+  }
+
+  // 特别处理渐变文字（如果有的话）
+  .stat-number {
+    -webkit-text-fill-color: transparent !important; // 保持渐变效果
+  }
+
+  // 占位符文字
+  input::placeholder,
+  textarea::placeholder {
+    color: #888 !important;
+  }
+
+  // 如果你想要更精细的控制，可以只针对问题区域
+  .control-panel,
+  .form-section,
+  .status-section {
+    * {
+      color: white !important;
+    }
+  }
 }
 
 
+html.dark {
+
+  // 方案1：针对所有可能的选择器组件（最全面）
+  *[class*="select"],
+  *[class*="dropdown"],
+  *[class*="picker"],
+  *[class*="option"],
+  *[class*="menu"],
+  .n-select,
+  .n-dropdown,
+  .n-base-select,
+  .n-base-dropdown,
+  .el-select,
+  .ant-select,
+  .v-select {
+    * {
+      color: white !important;
+    }
+  }
+}
 
