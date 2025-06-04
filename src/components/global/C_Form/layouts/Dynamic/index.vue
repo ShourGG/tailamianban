@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-31 22:33:33
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-01 15:48:14
+ * @LastEditTime: 2025-06-04 22:56:46
  * @FilePath: \Robot_Admin\src\components\global\C_Form\layouts\Dynamic\index.vue
  * @Description: 表单组件 - 动态布局
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -36,7 +36,7 @@
             @click="handleAddField"
           >
             <template #icon>
-              <div class="i-carbon-add text-14px"></div>
+              <div class="i-mdi:tooltip-add-outline text-14px"></div>
             </template>
             添加字段
           </NButton>
@@ -48,7 +48,7 @@
             @click="handleRemoveField"
           >
             <template #icon>
-              <div class="i-carbon-subtract text-14px"></div>
+              <div class="i-mdi:invoice-text-remove-outline text-14px"></div>
             </template>
             移除字段
           </NButton>
@@ -59,7 +59,7 @@
             @click="handleToggleAllVisibility"
           >
             <template #icon>
-              <div class="i-carbon-view-off text-14px"></div>
+              <div class="i-mdi:database-view-off-outline text-14px"></div>
             </template>
             {{ allVisible ? '隐藏部分' : '显示全部' }}
           </NButton>
@@ -70,7 +70,7 @@
             @click="handleClearAllDynamic"
           >
             <template #icon>
-              <div class="i-carbon-clean text-14px"></div>
+              <div class="i-mdi:vacuum-cleaner text-14px"></div>
             </template>
             清空动态
           </NButton>
