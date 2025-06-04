@@ -678,9 +678,9 @@
   // ==================== 工具函数 ====================
 
   /**
-   * 检查字段值是否已填写
-   * @param value 字段值
-   * @returns 是否已填写
+   * * @description: 检查字段值是否已填写
+   * ? @param {any} value 字段值
+   * ! @return {boolean} 是否已填写
    */
   const isFieldFilled = (value: any): boolean => {
     if (value === null || value === undefined) return false
@@ -692,17 +692,17 @@
   }
 
   /**
-   * 检查是否为扩展布局类型
-   * @param layout 布局类型
-   * @returns 是否为扩展布局
+   * * @description: 检查是否为扩展布局类型
+   * ? @param {string} layout 布局类型
+   * ! @return {boolean} 是否为扩展布局
    */
   const isExtendedLayout = (layout: string): boolean =>
     ['card', 'tabs', 'dynamic', 'custom'].includes(layout)
 
   /**
-   * 获取字段的布局配置
-   * @param fieldName 字段名称
-   * @returns 布局配置对象
+   * * @description: 获取字段的布局配置
+   * ? @param {string} fieldName 字段名称
+   * ! @return {ItemLayoutConfig} 布局配置对象
    */
   const getFieldLayout = (fieldName: string): ItemLayoutConfig => {
     const layoutMap: Record<string, () => ItemLayoutConfig> = {
@@ -733,9 +733,9 @@
   }
 
   /**
-   * 根据字段名获取所属分组
-   * @param field 字段名
-   * @returns 分组名称
+   * * @description: 根据字段名获取所属分组
+   * ? @param {string} field 字段名
+   * ! @return {string} 分组名称
    */
   const getFieldGroup = (field: string): string => {
     for (const [group, fields] of Object.entries(fieldGroupMap)) {
@@ -752,9 +752,9 @@
   }
 
   /**
-   * 根据字段名获取所属标签页
-   * @param field 字段名
-   * @returns 标签页名称
+   * * @description: 根据字段名获取所属标签页
+   * ? @param {string} field 字段名
+   * ! @return {string} 标签页名称
    */
   const getFieldTab = (field: string): string => {
     for (const [tab, fields] of Object.entries(fieldTabMap)) {
@@ -771,9 +771,9 @@
   }
 
   /**
-   * 根据字段名获取所属步骤
-   * @param field 字段名
-   * @returns 步骤名称
+   * * @description: 根据字段名获取所属步骤
+   * ? @param {string} field 字段名
+   * ! @return {string} 步骤名称
    */
   const getFieldStep = (field: string): string => {
     for (const [step, fields] of Object.entries(fieldStepMap)) {
@@ -785,25 +785,25 @@
   // ==================== 布局相关工具函数 ====================
 
   /**
-   * 获取当前布局的显示名称
-   * @returns 布局名称
+   * * @description: 获取当前布局的显示名称
+   * ! @return {string} 布局名称
    */
   const getLayoutName = (): string =>
     layoutOptions.find((opt: LayoutOption) => opt.value === currentLayout.value)
       ?.label || '未知'
 
   /**
-   * 获取当前布局的完整标题
-   * @returns 布局标题
+   * * @description: 获取当前布局的完整标题
+   * ! @return {string} 布局标题
    */
   const getLayoutTitle = (): string => `${getLayoutName()} - 演示`
 
   // ==================== 数据格式化工具函数 ====================
 
   /**
-   * 格式化值用于显示
-   * @param value 原始值
-   * @returns 格式化后的字符串
+   * * @description: 格式化值用于显示
+   * ? @param {any} value 原始值
+   * ! @return {string} 格式化后的字符串
    */
   const formatValue = (value: any): string => {
     if (Array.isArray(value)) return `[${value.join(', ')}]`
@@ -814,9 +814,9 @@
   }
 
   /**
-   * 获取值的类型
-   * @param value 值
-   * @returns 类型字符串
+   * * @description: 获取值的类型
+   * ? @param {any} value 值
+   * ! @return {string} 类型字符串
    */
   const getValueType = (value: any): string => {
     if (Array.isArray(value)) return 'Array'
@@ -827,7 +827,7 @@
   // ==================== 数据操作方法 ====================
 
   /**
-   * 填充测试数据到表单
+   * * @description: 填充测试数据到表单
    */
   const fillTestData = (): void => {
     let data: Record<string, any> = { ...testData.base }
@@ -854,10 +854,10 @@
   }
 
   /**
-   * 根据字段类型生成测试值
-   * @param type 字段类型
-   * @param index 字段索引
-   * @returns 测试值
+   * * @description: 根据字段类型生成测试值
+   * ? @param {ComponentType | string} type 字段类型
+   * ? @param {number} index 字段索引
+   * ! @return {any} 测试值
    */
   const getTestValueForField = (
     type: ComponentType | string,
@@ -878,7 +878,7 @@
   }
 
   /**
-   * 清空所有表单数据
+   * * @description: 清空所有表单数据
    */
   const clearAllData = (): void => {
     const emptyData: Record<string, any> = {}
@@ -888,7 +888,7 @@
   }
 
   /**
-   * 显示数据预览弹窗
+   * * @description: 显示数据预览弹窗
    */
   const previewData = (): void => {
     showPreview.value = true
@@ -897,7 +897,7 @@
   // ==================== 数据导出功能 ====================
 
   /**
-   * 复制数据到剪贴板
+   * * @description: 复制数据到剪贴板
    */
   const copyData = async (): Promise<void> => {
     try {
@@ -911,7 +911,7 @@
   }
 
   /**
-   * 下载数据为JSON文件
+   * * @description: 下载数据为JSON文件
    */
   const downloadData = (): void => {
     const dataStr = JSON.stringify(formData.value, null, 2)
@@ -928,7 +928,7 @@
   }
 
   /**
-   * 验证表单数据
+   * * @description: 验证表单数据
    */
   const validateForm = async (): Promise<void> => {
     try {
@@ -946,9 +946,9 @@
   // ==================== 动态字段管理 ====================
 
   /**
-   * 创建新的动态字段
-   * @param counter 字段计数器
-   * @returns 动态字段对象
+   * * @description: 创建新的动态字段
+   * ? @param {number} counter 字段计数器
+   * ! @return {DynamicField} 动态字段对象
    */
   const createDynamicField = (counter: number): DynamicField => {
     // 随机选择字段类型
@@ -971,10 +971,10 @@
   }
 
   /**
-   * 为字段添加特定配置
-   * @param field 基础字段
-   * @param type 字段类型
-   * @returns 配置完整的字段
+   * * @description: 为字段添加特定配置
+   * ? @param {DynamicField} field 基础字段
+   * ? @param {ComponentType} type 字段类型
+   * ! @return {DynamicField} 配置完整的字段
    */
   const addFieldSpecificConfig = (
     field: DynamicField,
@@ -1010,7 +1010,7 @@
   }
 
   /**
-   * 添加动态字段
+   * * @description: 添加动态字段
    */
   const addDynamicField = (): void => {
     if (dynamicFields.value.length >= dynamicMaxFields.value) {
@@ -1033,9 +1033,9 @@
   }
 
   /**
-   * 根据字段类型获取默认值
-   * @param type 字段类型
-   * @returns 默认值
+   * * @description: 根据字段类型获取默认值
+   * ? @param {string} type 字段类型
+   * ! @return {any} 默认值
    */
   const getDefaultValueForFieldType = (type: string): any => {
     const defaultValues: Record<string, any> = {
@@ -1052,7 +1052,7 @@
   }
 
   /**
-   * 移除最后一个动态字段
+   * * @description: 移除最后一个动态字段
    */
   const removeDynamicField = (): void => {
     if (dynamicFields.value.length === 0) {
@@ -1069,7 +1069,7 @@
   }
 
   /**
-   * 清空所有动态字段
+   * * @description: 清空所有动态字段
    */
   const clearDynamicFields = (): void => {
     const formDataValue = formData.value as Record<string, any>
@@ -1082,8 +1082,8 @@
   // ==================== 表单操作方法 ====================
 
   /**
-   * 提交表单
-   * @param validate 验证函数
+   * * @description: 提交表单
+   * ? @param {() => Promise<void>} validate 验证函数
    */
   const submitForm = async (validate: () => Promise<void>): Promise<void> => {
     try {
@@ -1102,8 +1102,8 @@
   }
 
   /**
-   * 重置表单
-   * @param reset 重置函数
+   * * @description: 重置表单
+   * ? @param {() => void} reset 重置函数
    */
   const resetForm = (reset: () => void): void => {
     reset()
@@ -1115,8 +1115,8 @@
   // ==================== 事件处理器 ====================
 
   /**
-   * 处理表单提交事件
-   * @param payload 提交的数据
+   * * @description: 处理表单提交事件
+   * ? @param {any} payload 提交的数据
    */
   const handleSubmit = (payload: any): void => {
     console.log('表单提交事件:', payload)
@@ -1124,8 +1124,8 @@
   }
 
   /**
-   * 处理验证成功事件
-   * @param model 表单数据
+   * * @description: 处理验证成功事件
+   * ? @param {FormModel} model 表单数据
    */
   const handleValidateSuccess = (model: FormModel): void => {
     lastValidateResult.value = true
@@ -1134,8 +1134,8 @@
   }
 
   /**
-   * 处理验证失败事件
-   * @param errors 错误信息
+   * * @description: 处理验证失败事件
+   * ? @param {any} errors 错误信息
    */
   const handleValidateError = (errors: any): void => {
     lastValidateResult.value = false
@@ -1146,7 +1146,7 @@
   // ==================== 计算属性 ====================
 
   /**
-   * 当前布局的描述信息
+   * * @description: 当前布局的描述信息
    */
   const currentLayoutDescription = computed(
     (): LayoutDescription =>
@@ -1154,14 +1154,14 @@
   )
 
   /**
-   * 是否有布局特定配置
+   * * @description: 是否有布局特定配置
    */
   const hasLayoutSpecificConfig = computed((): boolean =>
     ['grid', 'inline', 'dynamic'].includes(currentLayout.value)
   )
 
   /**
-   * 当前布局配置对象
+   * * @description: 当前布局配置对象
    */
   const currentLayoutConfig = computed(
     (): LayoutConfig =>
@@ -1176,7 +1176,7 @@
   )
 
   /**
-   * 表单字段选项数组
+   * * @description: 表单字段选项数组
    */
   const formOptions = computed((): FormOption[] => {
     // 获取字段创建器
@@ -1232,7 +1232,7 @@
   // ==================== 统计计算属性 ====================
 
   /**
-   * 已填写字段数量
+   * * @description: 已填写字段数量
    */
   const filledFieldsCount = computed((): number => {
     const formDataValue = formData.value as Record<string, any>
@@ -1243,14 +1243,14 @@
   })
 
   /**
-   * 待填写字段数量
+   * * @description: 待填写字段数量
    */
   const pendingFieldsCount = computed((): number =>
     Math.max(0, formOptions.value.length - filledFieldsCount.value)
   )
 
   /**
-   * 数据完成百分比
+   * * @description: 数据完成百分比
    */
   const dataCompletionPercentage = computed((): number => {
     if (formOptions.value.length === 0) return 0
@@ -1260,7 +1260,7 @@
   })
 
   /**
-   * 必填字段数量
+   * * @description: 必填字段数量
    */
   const requiredFieldsCount = computed(
     (): number =>
@@ -1274,9 +1274,9 @@
   // ==================== 字段类型统计 ====================
 
   /**
-   * 统计指定类型的字段数量
-   * @param types 字段类型数组
-   * @returns 字段数量
+   * * @description: 统计指定类型的字段数量
+   * ? @param {string[]} types 字段类型数组
+   * ! @return {number} 字段数量
    */
   const getFieldCountByTypes = (types: string[]) =>
     formOptions.value.filter(field => types.includes(field.type)).length
@@ -1302,7 +1302,7 @@
   // ==================== 监听器 ====================
 
   /**
-   * 监听布局变化，重置相关状态
+   * * @description: 监听布局变化，重置相关状态
    */
   watch(currentLayout, (newLayout: LayoutType, oldLayout: LayoutType) => {
     // 清空表单数据
@@ -1326,7 +1326,7 @@
   // ==================== 生命周期 ====================
 
   /**
-   * 组件挂载后初始化
+   * * @description: 组件挂载后初始化
    */
   onMounted(() => {
     // 模拟性能监控数据更新
