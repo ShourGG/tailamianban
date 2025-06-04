@@ -173,16 +173,16 @@
             <span class="field-count">{{ dynamicFields.length }}</span>
           </div>
           <div class="field-actions">
-            <button
+            <NButton
               @click="addDynamicField"
               :disabled="dynamicFields.length >= dynamicMaxFields"
             >
               添加 ({{ dynamicFields.length }}/{{ dynamicMaxFields }})
-            </button>
-            <button
+            </NButton>
+            <NButton
               @click="removeDynamicField"
               :disabled="dynamicFields.length === 0"
-              >移除</button
+              >移除</NButton
             >
           </div>
         </NCard>

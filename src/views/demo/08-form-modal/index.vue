@@ -134,7 +134,7 @@
                   @click.stop="toggleContainer('popover')"
                 >
                   <template #icon>
-                    <i class="i-carbon-settings"></i>
+                    <i class="i-mdi:file-settings-cog"></i>
                   </template>
                 </NButton>
               </template>
@@ -203,16 +203,6 @@
         v-model="formData.modal"
         @submit="submitForm('modal')"
       />
-      <template #action>
-        <NSpace justify="end">
-          <NButton @click="toggleContainer('modal', false)">取消</NButton>
-          <NButton
-            type="primary"
-            @click="submitForm('modal')"
-            >确认</NButton
-          >
-        </NSpace>
-      </template>
     </NModal>
 
     <!-- 抽屉 -->
@@ -235,6 +225,7 @@
           :layout-type="layoutTypes.drawer"
           v-model="formData.drawer"
           @submit="submitForm('drawer')"
+          :showDefaultActions="false"
         />
         <template #footer>
           <NSpace justify="end">
@@ -261,7 +252,7 @@
         <template #header>
           <div class="sidebar-header">
             <div class="header-info">
-              <i class="i-carbon-filter mr-2"></i>
+              <i class="i-mdi:air-filter mr-2"></i>
               <span>筛选条件</span>
               <NTag
                 type="warning"
@@ -277,7 +268,7 @@
               @click="toggleContainer('sidebar')"
             >
               <template #icon>
-                <i class="i-carbon-close"></i>
+                <i class="i-mdi:close-octagon"></i>
               </template>
             </NButton>
           </div>
@@ -296,7 +287,7 @@
             >
               <NButton @click="clearFormData('sidebar')">
                 <template #icon>
-                  <i class="i-carbon-clean"></i>
+                  <i class="i-mdi:vacuum-cleaner"></i>
                 </template>
                 清空
               </NButton>
@@ -305,7 +296,7 @@
                 @click="validateAndSubmit('sidebar', validate)"
               >
                 <template #icon>
-                  <i class="i-carbon-search"></i>
+                  <i class="i-mdi:briefcase-search-outline"></i>
                 </template>
                 应用筛选
               </NButton>

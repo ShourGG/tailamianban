@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-23 11:58:59
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-03 14:27:03
+ * @LastEditTime: 2025-06-04 19:57:45
  * @FilePath: \Robot_Admin\src\components\global\C_Form\index.vue
  * @Description: 通用表单组件 - 支持多种布局和动态渲染
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -42,7 +42,7 @@
 
     <!-- 表单操作按钮区域（只在非步骤布局中显示） -->
     <NFormItem
-      v-if="!isStepsLayout"
+      v-if="!isStepsLayout && props.showDefaultActions"
       class="mt-5"
     >
       <slot
@@ -97,6 +97,7 @@
     size: 'medium',
     disabled: false,
     readonly: false,
+    showDefaultActions: true,
   })
 
   // ================= 组件事件定义 =================

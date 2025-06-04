@@ -293,6 +293,7 @@ export interface FormProps {
   size?: 'small' | 'medium' | 'large'
   disabled?: boolean
   readonly?: boolean
+  showDefaultActions?: boolean
 }
 
 /**

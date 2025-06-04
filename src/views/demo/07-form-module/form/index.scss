@@ -75,7 +75,6 @@ $transition: 0.2s ease;
   font-size: map.get($font, xs);
   cursor: pointer;
   transition: all $transition;
-  color: white !important;
   background: $bg;
 
   &:hover:not(:disabled) {
@@ -147,7 +146,7 @@ $transition: 0.2s ease;
     }
   }
 
-  // 响应式网格布局 - 防止溢出优化
+  // 响应式网格布局 
   .control-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -222,7 +221,7 @@ $transition: 0.2s ease;
 }
 
 // ========================================
-// 控制卡片 - 大幅精简版
+// 控制卡片 
 // ========================================
 :deep(.control-card) {
   width: 100%;
@@ -458,6 +457,9 @@ $transition: 0.2s ease;
       &.validate { background: $gradient-primary; }
     }
   }
+  .action-buttons {
+    color: white !important;
+  }
 
   // 开关组件
   .switch {
@@ -533,7 +535,7 @@ $transition: 0.2s ease;
   }
 
   .field-count {
-    color: $primary;
+    color: $primary ;
     border-color: $primary;
   }
 
@@ -565,7 +567,7 @@ $transition: 0.2s ease;
     border-radius: map.get($radius, sm);
 
     &.success {
-      color: $success;
+      color: $success ;
       background: rgba(24, 160, 88, 0.1);
     }
   }
@@ -674,7 +676,7 @@ $transition: 0.2s ease;
 }
 
 // ========================================
-// 状态监控区域 - 精简版
+// 状态监控区域 
 // ========================================
 .status-section {
   margin-top: map.get($space, 2xl);
