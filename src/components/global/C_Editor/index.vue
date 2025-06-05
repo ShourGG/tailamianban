@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-01 13:27:49
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-02 21:44:26
+ * @LastEditTime: 2025-06-05 11:05:43
  * @FilePath: \Robot_Admin\src\components\global\C_Editor\index.vue
- * @Description: 富文本编辑器组件（修复版）
+ * @Description: 富文本编辑器组件（简化主题版）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
 -->
 
@@ -15,11 +15,14 @@
     :id="editorId"
     v-show="isInitialized"
     class="w-full"
+    :class="{ 'editor-dark': isDark }"
   ></div>
 </template>
 
 <script setup lang="ts">
   import E from 'wangeditor'
+  import { useThemeStore } from '@/stores/theme' // 引入主题 store
+
   /**
    * * @description 编辑器组件属性接口
    * ! @interface Props
@@ -56,7 +59,7 @@
     placeholder: '',
     disabled: false,
     readonly: false,
-    height: 240, // 🎯 默认高度240px
+    height: 240,
   })
 
   const emit = defineEmits<Emits>()
@@ -66,6 +69,12 @@
   const editorContainer = ref<HTMLElement | null>(null)
   const editorInstance = ref<any>(null)
   const isInitialized = ref<boolean>(false)
+
+  // 引入主题 store
+  const themeStore = useThemeStore()
+
+  // 获取当前是否为暗色主题
+  const isDark = computed(() => themeStore.isDark)
 
   // ================= 编辑器初始化 =================
 
@@ -235,6 +244,43 @@
     }
   )
 
+  // ================= 防溢出处理 =================
+
+  /**
+   * * @description 处理编辑器聚焦时的溢出问题
+   */
+  const handleEditorFocus = (): void => {
+    if (!editorContainer.value) return
+
+    const container = editorContainer.value.closest(
+      '.form-demo'
+    ) as HTMLElement | null
+    if (container) {
+      // 添加聚焦类名
+      container.classList.add('editor-focused')
+
+      // 确保容器宽度稳定
+      const containerWidth = container.scrollWidth
+      container.style.maxWidth = `${containerWidth}px`
+    }
+  }
+
+  /**
+   * * @description 处理编辑器失焦
+   */
+  const handleEditorBlur = (): void => {
+    if (!editorContainer.value) return
+
+    const container = editorContainer.value.closest(
+      '.form-demo'
+    ) as HTMLElement | null
+    if (container) {
+      // 移除聚焦类名和固定宽度
+      container.classList.remove('editor-focused')
+      container.style.maxWidth = ''
+    }
+  }
+
   // ================= 生命周期 =================
 
   onMounted(() => {
@@ -242,11 +288,23 @@
     nextTick(() => {
       setTimeout(() => {
         initializeEditor()
-      }, 200) // 增加延迟时间
+
+        // 添加防溢出事件监听
+        if (editorContainer.value) {
+          editorContainer.value.addEventListener('focusin', handleEditorFocus)
+          editorContainer.value.addEventListener('focusout', handleEditorBlur)
+        }
+      }, 200)
     })
   })
 
   onBeforeUnmount(() => {
+    // 清理事件监听器
+    if (editorContainer.value) {
+      editorContainer.value.removeEventListener('focusin', handleEditorFocus)
+      editorContainer.value.removeEventListener('focusout', handleEditorBlur)
+    }
+
     destroyEditor()
   })
 
@@ -257,7 +315,76 @@
     destroyEditor,
     setContent,
     getContent,
+    handleEditorFocus,
+    handleEditorBlur,
     editorInstance: readonly(editorInstance),
     isInitialized: readonly(isInitialized),
   })
 </script>
+
+<style scoped>
+  /* 暗色主题样式 */
+  .editor-dark :deep(.w-e-toolbar) {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+  }
+
+  .editor-dark :deep(.w-e-toolbar .w-e-menu .w-e-menu-item) {
+    color: #e5e7eb !important;
+  }
+
+  .editor-dark :deep(.w-e-toolbar .w-e-menu .w-e-menu-item:hover) {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+  }
+
+  .editor-dark :deep(.w-e-toolbar .w-e-menu .w-e-menu-item.w-e-active) {
+    background-color: #2080f0 !important;
+    color: #ffffff !important;
+  }
+
+  .editor-dark :deep(.w-e-text-container) {
+    background-color: #111827 !important;
+    border-color: #374151 !important;
+  }
+
+  .editor-dark :deep(.w-e-text-container .w-e-text) {
+    background-color: #303033 !important;
+    color: #e5e7eb !important;
+  }
+
+  .editor-dark :deep(.w-e-text-container .w-e-text:focus) {
+    background-color: #111827 !important;
+    color: #e5e7eb !important;
+  }
+
+  /* 防止宽度溢出的样式 */
+  :deep(.w-e-toolbar),
+  :deep(.w-e-text-container) {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  :deep(.w-e-text) {
+    max-width: 100% !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* 编辑器过渡效果 */
+  :deep(.w-e-toolbar),
+  :deep(.w-e-text-container),
+  :deep(.w-e-text) {
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease !important;
+  }
+
+  /* 编辑器聚焦时的特殊处理 */
+  .editor-focused {
+    overflow: hidden !important;
+    max-width: 100% !important;
+  }
+</style>
