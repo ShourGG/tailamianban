@@ -1,11 +1,11 @@
 <!--
  * @Author: ChenYu ycyplus@gmail.com
- * @Date: 2025-05-23 11:58:59
+ * @Date: 2025-05-10 13:21:30
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-04 19:57:45
+ * @LastEditTime: 2025-06-08 20:51:51
  * @FilePath: \Robot_Admin\src\components\global\C_Form\index.vue
- * @Description: 通用表单组件 - 支持多种布局和动态渲染
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
+ * @Description: 表单组件
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
 -->
 
 <template>
@@ -21,12 +21,14 @@
     :readonly="readonly"
     v-bind="$attrs"
   >
-    <!-- 动态布局组件渲染 -->
+    <!-- 动态组件渲染 -->
     <DynamicComponent
       :name="layoutComponentName"
       :form-items="formItems"
       :layout-config="mergedLayoutConfig"
       :options="visibleOptions"
+      :form-data="formModel"
+      :show-default-actions="shouldShowDefaultActions"
       @tab-change="handleTabChange"
       @step-change="handleStepChange"
       @step-before-change="handleStepBeforeChange"
@@ -38,11 +40,14 @@
       @render-mode-change="handleRenderModeChange"
       @group-toggle="handleGroupToggle"
       @group-reset="handleGroupReset"
+      @validate-success="(model: FormModel) => emit('validate-success', model)"
+      @validate-error="(errors: unknown) => emit('validate-error', errors)"
+      @fields-change="handleFieldsChange"
     />
 
-    <!-- 表单操作按钮区域（只在非步骤布局中显示） -->
+    <!-- 表单操作按钮区域（只在特定布局中显示） -->
     <NFormItem
-      v-if="!isStepsLayout && props.showDefaultActions"
+      v-if="shouldShowDefaultActions"
       class="mt-5"
     >
       <slot
@@ -106,7 +111,8 @@
     submit: [payload: SubmitEventPayload]
     'update:modelValue': [model: FormModel]
     'validate-success': [model: FormModel]
-    'validate-error': [errors: any]
+    'validate-error': [errors: unknown]
+    'fields-change': [fields: FormOption[]] // 🎯 添加字段变化事件
     'editor-mounted': [payload: EditorEventPayload]
     'on-preview': [file: any]
     'on-remove': [file: any]
@@ -177,14 +183,19 @@
     timePicker: null,
     cascader: null,
     colorPicker: null,
-    checkbox: [],
+    checkbox: null,
     upload: [],
     radio: '',
-    inputNumber: 0,
-    slider: 0,
-    rate: 0,
-    switch: false,
+    inputNumber: null,
+    slider: null,
+    rate: null,
+    switch: null,
   } as const
+
+  const LAYOUTS_WITH_OWN_CONTROLS: readonly LayoutType[] = [
+    'steps',
+    'custom',
+  ] as const
 
   // ================= 计算属性 =================
 
@@ -197,7 +208,17 @@
     ...props.layoutConfig,
   }))
 
-  const isStepsLayout = computed(() => props.layoutType === 'steps')
+  const shouldShowDefaultActions = computed(() => {
+    if (props.showDefaultActions === false) {
+      return false
+    }
+
+    if (LAYOUTS_WITH_OWN_CONTROLS.includes(props.layoutType)) {
+      return false
+    }
+
+    return true
+  })
 
   const visibleOptions = computed(() =>
     props.options.filter(item => item.show !== false)
@@ -222,11 +243,6 @@
 
   // ================= 核心渲染逻辑 =================
 
-  /**
-   * * @description 渲染表单项主函数
-   * ? @param item 表单项配置
-   * ! @return 渲染的VNode或null
-   */
   const renderFormItem = (item: FormOption): VNode | null => {
     try {
       if (SPECIAL_TYPES.includes(item.type as ComponentType)) {
@@ -249,11 +265,6 @@
     }
   }
 
-  /**
-   * * @description 渲染特殊组件
-   * ? @param item 表单项配置
-   * ! @return 渲染的VNode或null
-   */
   const renderSpecialComponent = (item: FormOption): VNode | null => {
     const baseProps = getBaseProps(item)
 
@@ -332,14 +343,9 @@
     }
   }
 
-  /**
-   * * @description 渲染富文本编辑器组件
-   * ? @param item 表单项配置
-   * ! @return 编辑器组件VNode
-   */
   const renderEditorComponent = (item: FormOption): VNode => {
     return h(resolveComponent('C_Editor'), {
-      editorId: `editor-${item.prop}`, // 添加必需的editorId属性
+      editorId: `editor-${item.prop}`,
       modelValue: formModel[item.prop] || '',
       placeholder: item.placeholder,
       disabled: props.disabled,
@@ -359,11 +365,6 @@
     })
   }
 
-  /**
-   * * @description 渲染文件上传组件
-   * ? @param item 表单项配置
-   * ! @return 上传组件VNode
-   */
   const renderUploadComponent = (item: FormOption): VNode => {
     const currentInstance = getCurrentInstance()
 
@@ -395,11 +396,6 @@
     )
   }
 
-  /**
-   * * @description 获取表单项基础属性
-   * ? @param item 表单项配置
-   * ! @return 基础属性对象
-   */
   const getBaseProps = (item: FormOption): Record<string, any> => {
     const baseProps: Record<string, any> = {
       value: formModel[item.prop],
@@ -422,19 +418,10 @@
 
   // ================= 工具函数 =================
 
-  /**
-   * * @description 获取组件类型的默认值
-   * ? @param type 组件类型
-   * ! @return 默认值
-   */
   const getDefaultValue = (type: ComponentType): any => {
     return DEFAULT_VALUES[type] ?? null
   }
 
-  /**
-   * * @description 处理字段值变化
-   * ? @param field 字段名
-   */
   const handleFieldChange = (field: string): void => {
     if (props.validateOnValueChange) {
       nextTick(() => {
@@ -445,9 +432,6 @@
 
   // ================= 初始化逻辑 =================
 
-  /**
-   * * @description 初始化表单数据和验证规则
-   */
   const initialize = (): void => {
     try {
       // 清空现有规则
@@ -471,10 +455,6 @@
 
   // ================= 验证相关方法 =================
 
-  /**
-   * * @description 验证整个表单
-   * ! @return Promise<void>
-   */
   const validate = async (): Promise<void> => {
     if (!formRef.value) {
       throw new Error('[C_Form] 表单引用不存在')
@@ -489,11 +469,6 @@
     }
   }
 
-  /**
-   * * @description 验证指定字段
-   * ? @param field 字段名或字段名数组
-   * ! @return Promise<void>
-   */
   const validateField = async (field: string | string[]): Promise<void> => {
     if (!formRef.value) {
       throw new Error('[C_Form] 表单引用不存在')
@@ -503,10 +478,6 @@
     await formRef.value.validate(fields as any)
   }
 
-  /**
-   * * @description 清除验证状态
-   * ? @param field 字段名或字段名数组，不传则清除所有
-   */
   const clearValidation = (field?: string | string[]): void => {
     if (!formRef.value) return
 
@@ -523,12 +494,6 @@
     }
   }
 
-  /**
-   * * @description 通用字段验证方法
-   * ? @param filterFn 字段过滤函数
-   * ? @param context 错误上下文
-   * ! @return 验证结果
-   */
   const validateByFilter = async (
     filterFn: (option: FormOption) => boolean,
     context: string
@@ -545,11 +510,6 @@
     }
   }
 
-  /**
-   * * @description 验证指定步骤
-   * ? @param stepIndex 步骤索引
-   * ! @return 验证结果
-   */
   const validateStep = async (stepIndex: number): Promise<boolean> => {
     const stepKey = props.layoutConfig?.steps?.steps?.[stepIndex]?.key
     if (!stepKey) return true
@@ -560,11 +520,6 @@
     )
   }
 
-  /**
-   * * @description 验证指定标签页
-   * ? @param tabKey 标签页标识
-   * ! @return 验证结果
-   */
   const validateTab = async (tabKey: string): Promise<boolean> => {
     return validateByFilter(
       option => option.layout?.tab === tabKey,
@@ -572,10 +527,6 @@
     )
   }
 
-  /**
-   * * @description 验证动态字段
-   * ! @return 验证结果
-   */
   const validateDynamicFields = async (): Promise<boolean> => {
     return validateByFilter(
       option => Boolean(option.layout?.dynamic),
@@ -583,11 +534,6 @@
     )
   }
 
-  /**
-   * * @description 验证自定义分组
-   * ? @param groupKey 分组标识
-   * ! @return 验证结果
-   */
   const validateCustomGroup = async (groupKey: string): Promise<boolean> => {
     return validateByFilter(
       option => option.layout?.group === groupKey,
@@ -597,9 +543,17 @@
 
   // ================= 事件处理方法 =================
 
+  // 🎯 关键修复：添加字段变化事件处理
+  const handleFieldsChange = (fields: FormOption[]): void => {
+    console.log('🎯 C_Form 收到字段变化事件，转发给父组件:', fields)
+    emit('fields-change', fields)
+  }
+
   const handleTabChange = (tabKey: string): void => emit('tab-change', tabKey)
+
   const handleStepChange = (stepIndex: number, stepKey: string): void =>
     emit('step-change', stepIndex, stepKey)
+
   const handleStepBeforeChange = async (
     currentStep: number,
     targetStep: number
@@ -630,21 +584,24 @@
 
   const handleFieldAdd = (fieldConfig: DynamicFieldConfig): void =>
     emit('field-add', fieldConfig)
+
   const handleFieldRemove = (fieldId: string): void =>
     emit('field-remove', fieldId)
+
   const handleFieldToggle = (fieldId: string, visible: boolean): void =>
     emit('field-toggle', fieldId, visible)
+
   const handleFieldsClear = (): void => emit('fields-clear')
+
   const handleRenderModeChange = (mode: RenderMode): void =>
     emit('render-mode-change', mode)
+
   const handleGroupToggle = (groupKey: string, collapsed: boolean): void =>
     emit('group-toggle', groupKey, collapsed)
+
   const handleGroupReset = (groupKey: string): void =>
     emit('group-reset', groupKey)
 
-  /**
-   * * @description 处理表单提交
-   */
   const handleSubmit = async (): Promise<void> => {
     try {
       await validate()
@@ -654,9 +611,6 @@
     }
   }
 
-  /**
-   * * @description 处理表单重置
-   */
   const handleReset = (): void => {
     try {
       clearValidation()
@@ -677,9 +631,11 @@
   // ================= 对外API =================
 
   const resetFields = (): void => handleReset()
+
   const setFields = (fields: FormModel): void => {
     Object.assign(formModel, fields)
   }
+
   const getModel = (): FormModel => ({ ...formModel })
 
   const setFieldValue = async (
@@ -749,18 +705,6 @@
     formModel,
     initialize,
     layoutType: toRef(props, 'layoutType'),
-    isStepsLayout: isStepsLayout,
+    shouldShowDefaultActions,
   })
 </script>
-
-<style scoped>
-  .mt-5 {
-    margin-top: 1.25rem;
-  }
-
-  @media (max-width: 768px) {
-    .mt-5 {
-      margin-top: 1rem;
-    }
-  }
-</style>

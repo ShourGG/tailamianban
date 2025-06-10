@@ -1,57 +1,94 @@
 <!--
  * @Author: ChenYu ycyplus@gmail.com
- * @Date: 2025-05-31 16:58:59
+ * @Date: 2025-06-04 19:20:15
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-01 22:35:45
+ * @LastEditTime: 2025-06-09 00:19:13
  * @FilePath: \Robot_Admin\src\components\global\C_Form\layouts\Card\index.vue
- * @Description: 表单组件 - 卡片布局（重构版）- 简洁高效，支持垂直/水平布局
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
+ * @Description: 表单组件 - 卡片组件
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
 -->
 
 <template>
-  <div
-    class="c-form-card"
-    :class="layoutClass"
-  >
-    <!-- 布局切换按钮（仅多卡片时显示） -->
-    <div
-      v-if="hasGroups"
-      class="layout-toggle"
+  <div class="c-form-card">
+    <!-- 布局配置面板 -->
+    <NCard
+      v-if="hasGroups && showLayoutConfig"
+      class="layout-config-panel"
+      :bordered="false"
     >
-      <NButtonGroup>
-        <NButton
-          :type="currentDirection === 'vertical' ? 'primary' : 'default'"
-          @click="toggleLayout('vertical')"
-          size="small"
-        >
-          <template #icon>
-            <i class="i-mdi-view-agenda" />
-          </template>
-          垂直布局
-        </NButton>
-        <NButton
-          :type="currentDirection === 'horizontal' ? 'primary' : 'default'"
-          @click="toggleLayout('horizontal')"
-          size="small"
-        >
-          <template #icon>
-            <i class="i-mdi-view-column" />
-          </template>
-          水平布局
-        </NButton>
-      </NButtonGroup>
-    </div>
+      <template #header>
+        <div class="flex items-center gap-2">
+          <div class="i-mdi-cog text-lg" />
+          <span>布局配置</span>
+        </div>
+      </template>
+
+      <div class="config-controls">
+        <div class="config-item">
+          <span>卡片间距</span>
+          <div class="flex items-center gap-2">
+            <NSlider
+              v-model:value="cardGap"
+              :min="12"
+              :max="32"
+              :step="4"
+              class="w-24"
+            />
+            <span class="text-xs min-w-12">{{ cardGap }}px</span>
+          </div>
+        </div>
+
+        <div class="config-item">
+          <span>显示图标</span>
+          <NSwitch
+            v-model:value="showIcons"
+            size="small"
+          />
+        </div>
+
+        <div class="config-item">
+          <span>可折叠</span>
+          <NSwitch
+            v-model:value="collapsible"
+            size="small"
+          />
+        </div>
+
+        <div class="config-item">
+          <span>布局方向</span>
+          <NRadioGroup
+            v-model:value="currentDirection"
+            size="small"
+          >
+            <NRadio value="vertical">垂直</NRadio>
+            <NRadio value="horizontal">水平</NRadio>
+          </NRadioGroup>
+        </div>
+      </div>
+    </NCard>
 
     <!-- 表单内容区域 -->
-    <div class="form-content">
-      <!-- 无分组配置时的单一卡片模式 -->
+    <div
+      class="form-content"
+      :class="layoutClass"
+      :style="{ gap: `${cardGap}px` }"
+    >
+      <!-- 无分组时的单卡片模式 -->
       <NCard
-        hoverable
         v-if="!hasGroups"
-        title="表单信息"
-        :bordered="true"
         class="single-card"
+        hoverable
       >
+        <template #header>
+          <div class="flex items-center gap-3">
+            <div
+              v-if="showIcons"
+              class="i-mdi-form-select text-lg text-blue-500"
+            />
+            <span>表单信息</span>
+          </div>
+        </template>
+
         <template
           v-for="item in formItems"
           :key="item.key"
@@ -60,31 +97,148 @@
         </template>
       </NCard>
 
-      <!-- 有分组配置时的多卡片模式 -->
+      <!-- 有分组时的多卡片模式 -->
       <template v-else>
         <NCard
-          hoverable
           v-for="group in groupsWithItems"
           :key="group.config.key"
-          :title="group.config.title"
-          :bordered="true"
-          class="card-item"
+          class="group-card"
+          :class="[
+            `${group.config.key}-card`,
+            { collapsed: collapsible && collapsedGroups[group.config.key] },
+          ]"
+          hoverable
         >
-          <!-- 分组描述信息 -->
-          <template v-if="group.config.description">
-            <p class="card-description">{{ group.config.description }}</p>
+          <template #header>
+            <div class="card-header">
+              <div class="header-info">
+                <div
+                  v-if="showIcons && group.config.icon"
+                  :class="[group.config.icon, 'card-icon']"
+                />
+                <div
+                  v-else-if="showIcons"
+                  :class="[getDefaultIcon(group.config.key), 'card-icon']"
+                />
+
+                <div class="header-text">
+                  <h3>{{ group.config.title }}</h3>
+                  <p v-if="group.config.description">{{
+                    group.config.description
+                  }}</p>
+                </div>
+              </div>
+
+              <div class="header-actions">
+                <!-- 统计信息 -->
+                <div class="field-stats">
+                  <NBadge
+                    :value="group.items.length"
+                    type="info"
+                    show-zero
+                  />
+                  <NBadge
+                    :value="`${getFilledCount(group)}/${group.items.length}`"
+                    :type="
+                      getFilledCount(group) === group.items.length
+                        ? 'success'
+                        : 'warning'
+                    "
+                  />
+                </div>
+
+                <!-- 折叠按钮 -->
+                <NButton
+                  v-if="collapsible"
+                  quaternary
+                  circle
+                  size="small"
+                  @click="toggleGroup(group.config.key)"
+                >
+                  <template #icon>
+                    <div
+                      :class="
+                        collapsedGroups[group.config.key]
+                          ? 'i-mdi-chevron-down'
+                          : 'i-mdi-chevron-up'
+                      "
+                    />
+                  </template>
+                </NButton>
+              </div>
+            </div>
           </template>
 
-          <!-- 分组内的表单项 -->
-          <template
-            v-for="item in group.items"
-            :key="item.key"
+          <div
+            v-show="!collapsedGroups[group.config.key]"
+            class="card-content"
           >
-            <component :is="item" />
-          </template>
+            <!-- 进度指示器 -->
+            <div
+              v-if="showProgress"
+              class="progress-section"
+            >
+              <NProgress
+                :percentage="getGroupProgress(group)"
+                :color="getGroupProgress(group) === 100 ? '#52c41a' : '#1890ff'"
+                :show-indicator="false"
+                class="mb-4"
+              />
+            </div>
+
+            <!-- 表单项 -->
+            <template
+              v-for="item in group.items"
+              :key="item.key"
+            >
+              <component :is="item" />
+            </template>
+          </div>
         </NCard>
       </template>
     </div>
+
+    <!-- 统一操作面板 -->
+    <NCard
+      v-if="hasGroups && showActionPanel"
+      class="action-panel"
+      :bordered="false"
+    >
+      <div class="action-content">
+        <div class="status-summary">
+          <div class="status-item">
+            <span class="label">完成进度:</span>
+            <div class="progress-display">
+              <NProgress
+                :percentage="totalProgress"
+                :show-indicator="false"
+                :color="totalProgress === 100 ? '#52c41a' : '#1890ff'"
+                class="flex-1"
+              />
+              <span class="text-sm min-w-12">{{ totalProgress }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <NButton
+            v-if="collapsible"
+            @click="toggleAllGroups"
+          >
+            <template #icon>
+              <div
+                :class="
+                  allCollapsed
+                    ? 'i-mdi-unfold-more-horizontal'
+                    : 'i-mdi-unfold-less-horizontal'
+                "
+              />
+            </template>
+            {{ allCollapsed ? '展开全部' : '折叠全部' }}
+          </NButton>
+        </div>
+      </div>
+    </NCard>
   </div>
 </template>
 
@@ -92,100 +246,82 @@
   import type { VNode } from 'vue'
 
   /**
-   * * @description: 分组配置接口
-   * ! @interface GroupConfig
+   * 分组配置接口
    */
   interface GroupConfig {
-    key: string // 分组唯一标识
-    title: string // 分组标题
-    description?: string // 分组描述文本
+    key: string
+    title: string
+    description?: string
+    icon?: string
   }
 
   /**
-   * * @description: 分组数据接口
-   * ! @interface GroupWithItems
+   * 分组数据接口
    */
   interface GroupWithItems {
-    config: GroupConfig // 分组配置
-    items: VNode[] // 分组内的表单项
+    config: GroupConfig
+    items: VNode[]
   }
 
   /**
-   * * @description: 组件属性接口定义
-   * ! @interface Props
+   * 组件属性接口
    */
   interface Props {
-    formItems: VNode[] // 表单项VNode数组
+    formItems: VNode[]
     layoutConfig?: {
-      // 布局配置对象
       card?: {
-        groups?: GroupConfig[] // 分组配置数组
-        direction?: 'vertical' | 'horizontal' // 布局方向：垂直 | 水平
+        groups?: GroupConfig[]
+        direction?: 'vertical' | 'horizontal'
+        showLayoutConfig?: boolean
+        showActionPanel?: boolean
+        showProgress?: boolean
       }
     }
     options?: Array<{
-      // 表单项配置数组
       layout?: {
-        group?: string // 所属分组标识
+        group?: string
       }
+      prop?: string
     }>
+    formData?: Record<string, any>
   }
 
-  const props = defineProps<Props>()
+  const props = withDefaults(defineProps<Props>(), {
+    layoutConfig: () => ({}),
+    options: () => [],
+    formData: () => ({}),
+  })
 
   // ================= 响应式状态 =================
-
-  /**
-   * * @description: 当前布局方向
-   * ? @ref 可切换的布局方向状态
-   * ! @type {'vertical' | 'horizontal'} 布局方向
-   */
+  const cardGap = ref(20)
+  const showIcons = ref(true)
+  const collapsible = ref(true)
+  const showProgress = ref(true)
   const currentDirection = ref<'vertical' | 'horizontal'>('vertical')
+  const collapsedGroups = ref<Record<string, boolean>>({})
 
   // ================= 计算属性 =================
-
-  /**
-   * * @description: 分组配置数组
-   * ? @computed 从布局配置中提取分组信息
-   * ! @return {GroupConfig[]} 分组配置数组
-   */
   const groups = computed((): GroupConfig[] => {
     return props.layoutConfig?.card?.groups || []
   })
 
-  /**
-   * * @description: 是否有分组配置
-   * ? @computed 判断是否配置了分组
-   * ! @return {boolean} 是否有分组配置
-   */
   const hasGroups = computed((): boolean => {
     return groups.value.length > 0
   })
 
-  /**
-   * * @description: 布局方向
-   * ? @computed 获取当前布局方向
-   * ! @return {string} 布局方向
-   */
-  const layoutDirection = computed((): string => {
-    return currentDirection.value
+  const showLayoutConfig = computed((): boolean => {
+    return props.layoutConfig?.card?.showLayoutConfig ?? true
   })
 
-  /**
-   * * @description: 布局CSS类
-   * ? @computed 根据配置生成布局类名
-   * ! @return {string} CSS类名
-   */
+  const showActionPanel = computed((): boolean => {
+    return props.layoutConfig?.card?.showActionPanel ?? true
+  })
+
   const layoutClass = computed((): string => {
     if (!hasGroups.value) return 'layout-single'
-    return `layout-${layoutDirection.value}`
+    return `layout-${currentDirection.value}`
   })
 
-  /**
-   * * @description: 包含表单项的分组数据
-   * ? @computed 将表单项按分组归类，只返回有内容的分组
-   * ! @return {GroupWithItems[]} 分组数据数组
-   */
   const groupsWithItems = computed((): GroupWithItems[] => {
     if (!hasGroups.value) return []
 
@@ -217,168 +353,94 @@
       .filter(group => group.items.length > 0)
   })
 
-  // ================= 方法 =================
+  const allCollapsed = computed(() => {
+    const groupKeys = Object.keys(collapsedGroups.value)
+    return (
+      groupKeys.length > 0 && groupKeys.every(key => collapsedGroups.value[key])
+    )
+  })
 
-  /**
-   * * @description: 切换布局方向
-   * ? @method 用户点击按钮时切换布局
-   * ! @param {'vertical' | 'horizontal'} direction 目标布局方向
-   */
-  const toggleLayout = (direction: 'vertical' | 'horizontal'): void => {
-    currentDirection.value = direction
+  const totalProgress = computed(() => {
+    if (!props.options || props.options.length === 0) return 0
+
+    const filledCount = props.options.filter(option => {
+      const value = props.formData?.[option.prop || '']
+      return isFieldFilled(value)
+    }).length
+
+    return Math.round((filledCount / props.options.length) * 100)
+  })
+
+  // ================= 工具函数 =================
+  const isFieldFilled = (value: any): boolean => {
+    if (value === null || value === undefined) return false
+    if (Array.isArray(value)) return value.length > 0
+    if (typeof value === 'string') return value.trim() !== ''
+    return true
+  }
+
+  const getFilledCount = (group: GroupWithItems): number => {
+    if (!props.options) return 0
+
+    const groupFields = props.options.filter(
+      option => option.layout?.group === group.config.key
+    )
+
+    return groupFields.filter(option => {
+      const value = props.formData?.[option.prop || '']
+      return isFieldFilled(value)
+    }).length
+  }
+
+  const getGroupProgress = (group: GroupWithItems): number => {
+    if (group.items.length === 0) return 0
+    const filledCount = getFilledCount(group)
+    return Math.round((filledCount / group.items.length) * 100)
+  }
+
+  const getDefaultIcon = (groupKey: string): string => {
+    const iconMap: Record<string, string> = {
+      basic: 'i-mdi-account',
+      contact: 'i-mdi-phone',
+      preferences: 'i-mdi-cog',
+      settings: 'i-mdi-cog',
+      info: 'i-mdi-information',
+      default: 'i-mdi-form-select',
+    }
+    return iconMap[groupKey] || iconMap.default
+  }
+
+  // ================= 操作方法 =================
+  const toggleGroup = (groupKey: string): void => {
+    collapsedGroups.value[groupKey] = !collapsedGroups.value[groupKey]
+  }
+
+  const toggleAllGroups = (): void => {
+    const shouldCollapse = !allCollapsed.value
+    groups.value.forEach(group => {
+      collapsedGroups.value[group.key] = shouldCollapse
+    })
   }
 
   // ================= 生命周期 =================
-
-  /**
-   * * @description: 组件挂载时初始化
-   * ? @lifecycle 根据配置设置初始布局方向
-   */
   onMounted(() => {
-    // 从配置中获取初始布局方向
-    const configDirection = props.layoutConfig?.card?.direction
-    if (configDirection) {
-      currentDirection.value = configDirection
+    // 初始化配置
+    const config = props.layoutConfig?.card
+    if (config?.direction) {
+      currentDirection.value = config.direction
     }
+
+    if (config?.showProgress !== undefined) {
+      showProgress.value = config.showProgress
+    }
+
+    // 初始化折叠状态
+    groups.value.forEach(group => {
+      collapsedGroups.value[group.key] = false
+    })
   })
 </script>
 
-<style scoped>
-  /* ================= 基础容器 ================= */
-  .c-form-card {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* ================= 布局切换按钮 ================= */
-  .layout-toggle {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 24px;
-    padding: 8px;
-    flex-shrink: 0; /* 防止按钮区域被压缩 */
-  }
-
-  /* ================= 表单内容区域 ================= */
-  .form-content {
-    flex: 1;
-  }
-
-  /* ================= 单卡片布局 ================= */
-  .layout-single .form-content {
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* ================= 垂直布局（默认） ================= */
-  .layout-vertical .form-content {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  /* ================= 水平布局 - 核心优化 ================= */
-  .layout-horizontal .form-content {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 24px;
-  }
-
-  /* 水平布局中的卡片 - 平分宽度 */
-  .layout-horizontal .card-item {
-    flex: 1;
-    min-width: 0; /* 允许弹性收缩 */
-  }
-
-  /* 2个卡片时 */
-  .layout-horizontal:has(.card-item:nth-child(2):last-child) .card-item {
-    flex-basis: calc(50% - 12px); /* 50% 减去一半的gap */
-  }
-
-  /* 3个卡片时 */
-  .layout-horizontal:has(.card-item:nth-child(3):last-child) .card-item {
-    flex-basis: calc(33.333% - 16px); /* 33.33% 减去gap的比例 */
-  }
-
-  /* 4个卡片时 */
-  .layout-horizontal:has(.card-item:nth-child(4):last-child) .card-item {
-    flex-basis: calc(25% - 18px); /* 25% 减去gap的比例 */
-  }
-
-  /* ================= 卡片基础样式 ================= */
-  .single-card,
-  .card-item {
-    margin-bottom: 0;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  }
-
-  /* ================= 悬浮效果 ================= */
-  .single-card:hover,
-  .card-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  }
-
-  /* ================= 分组描述样式 ================= */
-  .card-description {
-    margin: 0 0 16px 0;
-    color: var(--text-color-2);
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  /* ================= 响应式设计 ================= */
-
-  /* 中等屏幕 - 3个及以上卡片改为2列 */
-  @media (max-width: 1200px) {
-    .layout-horizontal .form-content {
-      gap: 20px;
-    }
-
-    .layout-horizontal:has(.card-item:nth-child(3)) .card-item {
-      flex-basis: calc(50% - 10px);
-    }
-
-    /* 奇数个卡片时，最后一个占满宽度 */
-    .layout-horizontal:has(.card-item:nth-child(3):last-child)
-      .card-item:last-child,
-    .layout-horizontal:has(.card-item:nth-child(5):last-child)
-      .card-item:last-child {
-      flex-basis: 100%;
-    }
-  }
-
-  /* 小屏幕 - 改为垂直布局 */
-  @media (max-width: 768px) {
-    .layout-horizontal .form-content {
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .layout-horizontal .card-item {
-      flex-basis: auto;
-    }
-
-    .layout-toggle {
-      margin-bottom: 16px;
-      padding: 4px;
-    }
-
-    .single-card:hover,
-    .card-item:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  /* 超小屏幕 - 隐藏布局切换按钮 */
-  @media (max-width: 480px) {
-    .layout-toggle {
-      display: none;
-    }
-  }
+<style scoped lang="scss">
+  @use './index.scss';
 </style>

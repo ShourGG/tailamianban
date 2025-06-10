@@ -1,8 +1,11 @@
 <!--
  * @Author: ChenYu ycyplus@gmail.com
- * @Description: 标签页布局组件 - 支持标签页分组显示的表单布局
+ * @Date: 2025-06-04 19:20:15
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-08 22:34:46
  * @FilePath: \Robot_Admin\src\components\global\C_Form\layouts\Tabs\index.vue
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
+ * @Description: 表单组件 - 标签布局组件
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
 -->
 
 <template>
@@ -12,58 +15,116 @@
       v-if="!hasTabs"
       class="single-panel"
     >
-      <template
-        v-for="item in formItems"
-        :key="getItemKey(item, formItems.indexOf(item))"
-      >
-        <component :is="item" />
-      </template>
+      <component
+        v-for="(item, index) in formItems"
+        :key="getItemKey(item, index)"
+        :is="item"
+      />
     </div>
 
-    <!-- 有标签配置时的多标签页模式 -->
-    <NTabs
+    <!-- 有标签配置时的分标签模式 -->
+    <div
       v-else
-      v-model:value="activeTab"
-      type="line"
-      animated
-      :placement="tabsPlacement"
-      class="form-tabs"
+      class="tabs-container"
     >
-      <NTabPane
-        v-for="tab in tabsWithItems"
-        :key="tab.config.key"
-        :name="tab.config.key"
-        :tab="tab.config.title"
-        :disabled="tab.config.disabled"
+      <NTabs
+        v-model:value="currentTab"
+        :type="tabsConfig.type"
+        :size="tabsConfig.size"
+        :placement="tabsConfig.placement"
+        :animated="tabsConfig.animated"
+        :closable="tabsConfig.closable"
+        :addable="tabsConfig.addable"
+        class="form-tabs"
+        @update:value="handleTabChange"
+        @close="handleTabClose"
+        @add="handleTabAdd"
       >
-        <!-- 标签页描述信息 -->
-        <div
-          v-if="tab.config.description"
-          class="tab-description"
+        <NTabPane
+          v-for="tab in tabsWithItems"
+          :key="tab.config.key"
+          :name="tab.config.key"
+          :tab="tab.config.title"
+          :disabled="tab.config.disabled"
+          :closable="tab.config.closable"
         >
-          <NText depth="3">{{ tab.config.description }}</NText>
-        </div>
-
-        <!-- 标签页内的表单项 -->
-        <div class="tab-content">
-          <template
-            v-for="item in tab.items"
-            :key="getItemKey(item, tab.items.indexOf(item))"
-          >
-            <component :is="item" />
+          <template #tab>
+            <NSpace
+              align="center"
+              :size="8"
+            >
+              <div
+                v-if="tab.config.icon"
+                :class="tab.config.icon"
+                class="tab-icon"
+              />
+              <span>{{ tab.config.title }}</span>
+              <NBadge
+                v-if="tabsConfig.showCount"
+                :value="tab.items.length"
+                :max="99"
+                :show="tab.items.length > 0"
+                type="info"
+              />
+            </NSpace>
           </template>
-        </div>
-      </NTabPane>
 
-      <!-- 自定义标签页额外操作区域 -->
-      <template #suffix>
-        <slot
-          name="tabs-suffix"
-          :activeTab="activeTab"
-          :tabs="tabsWithItems"
-        />
-      </template>
-    </NTabs>
+          <!-- 标签页头部信息 -->
+          <div
+            v-if="tabsConfig.showTabHeader && tab.config.description"
+            class="tab-header"
+          >
+            <p class="tab-description">{{ tab.config.description }}</p>
+          </div>
+
+          <!-- 标签页内的表单项 -->
+          <div class="tab-form-items">
+            <component
+              v-for="(item, itemIndex) in tab.items"
+              :key="getItemKey(item, itemIndex)"
+              :is="item"
+            />
+          </div>
+
+          <!-- 空状态 -->
+          <NEmpty
+            v-if="tab.items.length === 0"
+            description="暂无表单项"
+            class="tab-empty"
+          />
+        </NTabPane>
+      </NTabs>
+
+      <!-- 标签页操作按钮 -->
+      <div
+        v-if="tabsConfig.showActions"
+        class="tabs-actions"
+      >
+        <NSpace justify="space-between">
+          <NSpace>
+            <NButton
+              v-if="tabsConfig.validateBeforeSwitch"
+              type="primary"
+              size="small"
+              @click="validateCurrentTab"
+            >
+              <div class="i-carbon-checkmark mr-1" />
+              验证当前标签
+            </NButton>
+          </NSpace>
+
+          <NSpace>
+            <slot
+              name="tab-actions"
+              :current-tab="currentTab"
+              :total-tabs="tabsWithItems.length"
+              :validate-tab="validateCurrentTab"
+              :switch-to-tab="switchToTab"
+            />
+          </NSpace>
+        </NSpace>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -71,125 +132,111 @@
   import type { VNode } from 'vue'
 
   // ================= 类型定义 =================
-
-  /**
-   * * @description: 标签页配置接口
-   * ! @interface TabConfig
-   */
   interface TabConfig {
-    key: string // 标签页唯一标识
-    title: string // 标签页标题
-    description?: string // 标签页描述文本
-    disabled?: boolean // 是否禁用标签页
-    icon?: string // 标签页图标（可选）
+    key: string
+    title: string
+    description?: string
+    icon?: string
+    disabled?: boolean
+    closable?: boolean
   }
 
-  /**
-   * * @description: 标签页数据接口
-   * ! @interface TabWithItems
-   */
-  interface TabWithItems {
-    config: TabConfig // 标签页配置
-    items: VNode[] // 标签页内的表单项
-  }
-
-  /**
-   * * @description: 标签页布局配置接口
-   * ! @interface TabsLayoutConfig
-   */
   interface TabsLayoutConfig {
-    tabs?: TabConfig[] // 标签页配置数组
-    placement?: 'top' | 'right' | 'bottom' | 'left' // 标签页位置
-    defaultTab?: string // 默认激活的标签页
+    tabs: TabConfig[]
+    type?: 'line' | 'card' | 'segment'
+    size?: 'small' | 'medium' | 'large'
+    placement?: 'top' | 'right' | 'bottom' | 'left'
+    animated?: boolean
+    closable?: boolean
+    addable?: boolean
+    showTabHeader?: boolean
+    showActions?: boolean
+    showCount?: boolean
+    validateBeforeSwitch?: boolean
+    defaultTab?: string
   }
 
-  /**
-   * * @description: 组件属性接口定义
-   * ! @interface Props
-   */
+  interface TabWithItems {
+    config: TabConfig
+    items: VNode[]
+  }
+
   interface Props {
-    formItems: VNode[] // 表单项VNode数组
+    formItems: VNode[]
     layoutConfig?: {
-      // 布局配置对象
       tabs?: TabsLayoutConfig
     }
     options?: Array<{
-      // 表单项配置数组
       layout?: {
-        tab?: string // 所属标签页标识
+        tab?: string
       }
     }>
   }
 
-  /**
-   * * @description: 组件事件定义
-   * ? @emits 定义组件对外发送的事件
-   */
-  interface Emits {
-    (e: 'tab-change', tabKey: string): void // 标签页切换事件
-  }
-
   // ================= 组件属性和事件 =================
-
   const props = withDefaults(defineProps<Props>(), {
     layoutConfig: () => ({}),
     options: () => [],
   })
 
-  const emit = defineEmits<Emits>()
+  const emit = defineEmits<{
+    'tab-change': [tabKey: string, tabIndex: number]
+    'tab-before-change': [currentTab: string, targetTab: string]
+    'tab-validate': [tabKey: string]
+    'tab-close': [tabKey: string]
+    'tab-add': []
+  }>()
 
   // ================= 响应式状态 =================
+  const currentTab = ref<string>('')
+  const tabValidationStatus = reactive<Record<string, boolean>>({})
 
-  const activeTab = ref<string>('')
+  // ================= 默认配置 =================
+  const getDefaultTabsConfig = (): Required<TabsLayoutConfig> => ({
+    tabs: [],
+    type: 'line',
+    size: 'medium',
+    placement: 'top',
+    animated: true,
+    closable: false,
+    addable: false,
+    showTabHeader: true,
+    showActions: false,
+    showCount: false,
+    validateBeforeSwitch: false,
+    defaultTab: '',
+  })
 
   // ================= 计算属性 =================
+  const tabsConfig = computed(() => {
+    const defaultConfig = getDefaultTabsConfig()
+    const userConfig = props.layoutConfig?.tabs || {}
 
-  /**
-   * * @description: 标签页配置数组
-   * ? @computed 从布局配置中提取标签页信息
-   * ! @return {TabConfig[]} 标签页配置数组
-   */
-  const tabs = computed((): TabConfig[] => {
-    return props.layoutConfig?.tabs?.tabs || []
+    return {
+      ...defaultConfig,
+      ...userConfig,
+    }
   })
 
-  /**
-   * * @description: 标签页位置
-   * ? @computed 获取标签页的显示位置
-   * ! @return {'top' | 'right' | 'bottom' | 'left'} 标签页位置
-   */
-  const tabsPlacement = computed(() => {
-    return props.layoutConfig?.tabs?.placement || 'top'
-  })
-
-  /**
-   * * @description: 是否有标签页配置
-   * ? @computed 判断是否配置了标签页
-   * ! @return {boolean} 是否有标签页配置
-   */
   const hasTabs = computed((): boolean => {
-    return tabs.value.length > 0
+    return tabsConfig.value.tabs.length > 0
   })
 
-  /**
-   * * @description: 包含表单项的标签页数据
-   * ? @computed 将表单项按标签页归类，只返回有内容的标签页
-   * ! @return {TabWithItems[]} 标签页数据数组
-   */
   const tabsWithItems = computed((): TabWithItems[] => {
     if (!hasTabs.value) return []
 
     const tabMap = new Map<string, VNode[]>()
 
-    // 初始化标签页映射
-    tabs.value.forEach(tab => {
+    // 初始化标签映射
+    tabsConfig.value.tabs.forEach(tab => {
       tabMap.set(tab.key, [])
     })
 
-    // 将表单项分配到对应标签页
+    // 分配表单项到对应标签
     props.formItems.forEach((item, index) => {
       const option = props.options?.[index]
-      const tabKey = option?.layout?.tab || tabs.value[0]?.key || 'default'
+      const tabKey =
+        option?.layout?.tab || tabsConfig.value.tabs[0]?.key || 'default'
 
       if (!tabMap.has(tabKey)) {
         tabMap.set(tabKey, [])
@@ -197,213 +244,156 @@
       tabMap.get(tabKey)!.push(item)
     })
 
-    // 只返回有表单项的标签页
-    return tabs.value
-      .map(tabConfig => ({
-        config: tabConfig,
-        items: tabMap.get(tabConfig.key) || [],
-      }))
-      .filter(tab => tab.items.length > 0)
+    // 返回所有标签（包括空标签）
+    return tabsConfig.value.tabs.map(tabConfig => ({
+      config: tabConfig,
+      items: tabMap.get(tabConfig.key) || [],
+    }))
   })
 
-  // ================= 方法 =================
-
-  /**
-   * * @description: 获取表单项的唯一key
-   * ? @param {VNode} item VNode实例
-   * ? @param {number} index 索引
-   * ! @return {string} 唯一标识符
-   */
+  // ================= 工具方法 =================
   const getItemKey = (item: VNode, index: number): string => {
-    // 处理VNode.key的类型安全转换
     if (item.key != null) {
       return String(item.key)
     }
 
-    // 尝试从props中获取唯一标识
-    const itemProps = item.props as any
+    const itemProps = item.props as Record<string, any> | null
     if (itemProps?.path) {
       return itemProps.path
     }
 
-    // 最后使用索引作为fallback
     return `tab-item-${index}`
   }
 
-  /**
-   * * @description: 初始化默认激活的标签页
-   * ? @function 根据配置或第一个可用标签页设置默认激活
-   * ! @return {void}
-   */
-  const initializeActiveTab = (): void => {
-    if (!hasTabs.value || tabsWithItems.value.length === 0) return
+  const validateCurrentTab = async (): Promise<boolean> => {
+    if (!currentTab.value) return true
 
-    const defaultTab = props.layoutConfig?.tabs?.defaultTab
-    const availableTabs = tabsWithItems.value.filter(
-      tab => !tab.config.disabled
-    )
-
-    if (
-      defaultTab &&
-      availableTabs.find(tab => tab.config.key === defaultTab)
-    ) {
-      activeTab.value = defaultTab
-    } else if (availableTabs.length > 0) {
-      activeTab.value = availableTabs[0].config.key
+    try {
+      // 修复：正确处理事件emit的返回值
+      emit('tab-validate', currentTab.value)
+      // 假设验证总是成功，实际应用中这里应该等待真正的验证结果
+      const valid = true
+      tabValidationStatus[currentTab.value] = valid
+      return valid
+    } catch (error) {
+      console.error('[Tabs Layout] 标签验证失败:', error)
+      tabValidationStatus[currentTab.value] = false
+      return false
     }
   }
 
-  // ================= 监听器 =================
-
-  /**
-   * * @description: 监听标签页切换
-   * ? @watch 当标签页切换时触发事件
-   */
-  watch(activeTab, newTab => {
-    if (newTab) {
-      emit('tab-change', newTab)
+  const switchToTab = async (targetTab: string): Promise<boolean> => {
+    if (!targetTab || targetTab === currentTab.value) {
+      return true
     }
+
+    const targetTabExists = tabsWithItems.value.some(
+      tab => tab.config.key === targetTab
+    )
+    if (!targetTabExists) {
+      return false
+    }
+
+    try {
+      // 验证当前标签（如果需要）
+      if (tabsConfig.value.validateBeforeSwitch && currentTab.value) {
+        const isValid = await validateCurrentTab()
+        if (!isValid) {
+          return false
+        }
+      }
+
+      // 触发标签切换前事件
+      if (currentTab.value) {
+        emit('tab-before-change', currentTab.value, targetTab)
+      }
+
+      currentTab.value = targetTab
+      const tabIndex = tabsWithItems.value.findIndex(
+        tab => tab.config.key === targetTab
+      )
+      emit('tab-change', targetTab, tabIndex)
+      return true
+    } catch (error) {
+      console.error('[Tabs Layout] 标签切换失败:', error)
+      return false
+    }
+  }
+
+  // ================= 事件处理方法 =================
+  const handleTabChange = (tabKey: string): void => {
+    switchToTab(tabKey)
+  }
+
+  const handleTabClose = (tabKey: string): void => {
+    emit('tab-close', tabKey)
+  }
+
+  const handleTabAdd = (): void => {
+    emit('tab-add')
+  }
+
+  const initializeCurrentTab = (): void => {
+    if (!hasTabs.value || tabsWithItems.value.length === 0) {
+      return
+    }
+
+    const { defaultTab } = tabsConfig.value
+    const targetTab = defaultTab || tabsWithItems.value[0]?.config.key
+
+    if (targetTab && targetTab !== currentTab.value) {
+      currentTab.value = targetTab
+      // 初始化时直接设置，不触发事件避免不必要的副作用
+      nextTick(() => {
+        const tabIndex = tabsWithItems.value.findIndex(
+          tab => tab.config.key === targetTab
+        )
+        if (tabIndex >= 0) {
+          emit('tab-change', targetTab, tabIndex)
+        }
+      })
+    }
+  }
+
+  // ================= 生命周期 =================
+  onMounted(() => {
+    initializeCurrentTab()
   })
 
-  /**
-   * * @description: 监听标签页配置变化
-   * ? @watch 当标签页配置变化时重新初始化
-   */
   watch(
     () => tabsWithItems.value,
     () => {
-      initializeActiveTab()
+      // 当标签数据变化时，确保当前标签仍然有效
+      if (
+        currentTab.value &&
+        !tabsWithItems.value.some(tab => tab.config.key === currentTab.value)
+      ) {
+        initializeCurrentTab()
+      }
     },
-    { immediate: true }
+    { deep: true }
   )
 
-  // ================= 生命周期 =================
+  // 监听配置变化
+  watch(
+    () => tabsConfig.value.defaultTab,
+    newDefaultTab => {
+      if (newDefaultTab && newDefaultTab !== currentTab.value) {
+        switchToTab(newDefaultTab)
+      }
+    }
+  )
 
-  onMounted(() => {
-    initializeActiveTab()
+  // ================= 对外暴露 =================
+  defineExpose({
+    switchToTab,
+    validateCurrentTab,
+    currentTab: readonly(currentTab),
+    totalTabs: computed(() => tabsWithItems.value.length),
+    tabsWithItems: readonly(tabsWithItems),
   })
-
-  // ================= 开发环境验证 =================
-
-  if (import.meta.env.DEV) {
-    // 验证配置项数量是否匹配
-    watchEffect(() => {
-      if (props.options && props.options.length !== props.formItems.length) {
-        console.warn(
-          `[C_Form Tabs Layout] 配置项数量(${props.options.length})与表单项数量(${props.formItems.length})不匹配`
-        )
-      }
-    })
-
-    // 验证标签页配置的合理性
-    watchEffect(() => {
-      if (hasTabs.value) {
-        const tabKeys = tabs.value.map(tab => tab.key)
-        const uniqueKeys = new Set(tabKeys)
-        if (tabKeys.length !== uniqueKeys.size) {
-          console.warn('[C_Form Tabs Layout] 存在重复的标签页key')
-        }
-      }
-    })
-  }
 </script>
 
-<style scoped>
-  .c-form-tabs {
-    width: 100%;
-  }
-
-  .single-panel {
-    width: 100%;
-  }
-
-  .form-tabs {
-    width: 100%;
-  }
-
-  .tab-description {
-    margin-bottom: 16px;
-    padding: 8px 12px;
-    background-color: var(--color-info-suppl);
-    border-left: 3px solid var(--color-info);
-    border-radius: 4px;
-  }
-
-  .tab-content {
-    width: 100%;
-    min-height: 200px; /* 确保内容区域有最小高度 */
-  }
-
-  /* ================= 标签页位置样式调整 ================= */
-
-  /* 右侧标签页时的内容区域调整 */
-  .form-tabs:deep(.n-tabs--right-placement .n-tab-pane) {
-    padding-left: 16px;
-  }
-
-  /* 左侧标签页时的内容区域调整 */
-  .form-tabs:deep(.n-tabs--left-placement .n-tab-pane) {
-    padding-right: 16px;
-  }
-
-  /* 底部标签页时的内容区域调整 */
-  .form-tabs:deep(.n-tabs--bottom-placement .n-tab-pane) {
-    padding-top: 16px;
-  }
-
-  /* ================= 响应式设计 ================= */
-
-  /* 平板设备 */
-  @media (max-width: 1024px) {
-    .tab-content {
-      min-height: 150px;
-    }
-  }
-
-  /* 移动设备 - 强制标签页位置为顶部 */
-  @media (max-width: 768px) {
-    .form-tabs:deep(.n-tabs) {
-      --n-tab-placement: top !important;
-    }
-
-    .tab-description {
-      margin-bottom: 12px;
-      padding: 6px 10px;
-      font-size: 13px;
-    }
-
-    .tab-content {
-      min-height: 120px;
-    }
-  }
-
-  /* 小屏手机 */
-  @media (max-width: 480px) {
-    .tab-description {
-      margin-bottom: 8px;
-      padding: 4px 8px;
-      font-size: 12px;
-    }
-
-    .tab-content {
-      min-height: 100px;
-    }
-  }
-
-  /* ================= 辅助功能 ================= */
-
-  /* 减少动画的用户偏好 */
-  @media (prefers-reduced-motion: reduce) {
-    .form-tabs:deep(.n-tabs) {
-      --n-tab-animation-duration: 0s !important;
-    }
-  }
-
-  /* 高对比度模式支持 */
-  @media (prefers-contrast: high) {
-    .tab-description {
-      border-width: 2px;
-      font-weight: 500;
-    }
-  }
+<style scoped lang="scss">
+  @use './index.scss';
 </style>

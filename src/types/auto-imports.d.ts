@@ -6,7 +6,9 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const DYNAMIC_FORM_STATE_KEY: (typeof import('../composables/useDynamicFormState'))['DYNAMIC_FORM_STATE_KEY']
   const EffectScope: (typeof import('vue'))['EffectScope']
+  const FIELD_TYPE_OPTIONS: (typeof import('../composables/useDynamicFormState'))['FIELD_TYPE_OPTIONS']
   const acceptHMRUpdate: (typeof import('pinia'))['acceptHMRUpdate']
   const computed: (typeof import('vue'))['computed']
   const createApp: (typeof import('vue'))['createApp']
@@ -71,6 +73,7 @@ declare global {
   const useCssVars: (typeof import('vue'))['useCssVars']
   const useDebounceFn: (typeof import('@vueuse/core'))['useDebounceFn']
   const useDialog: (typeof import('naive-ui'))['useDialog']
+  const useDynamicFormState: (typeof import('../composables/useDynamicFormState'))['useDynamicFormState']
   const useId: (typeof import('vue'))['useId']
   const useLink: (typeof import('vue-router'))['useLink']
   const useLoadingBar: (typeof import('naive-ui'))['useLoadingBar']
@@ -107,6 +110,9 @@ declare global {
     WritableComputedRef,
   } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { DynamicFormStateType } from '../composables/useDynamicFormState'
+  import('../composables/useDynamicFormState')
 }
 
 // for vue template auto import
@@ -114,7 +120,13 @@ import { UnwrapRef } from 'vue'
 declare module 'vue' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
+    readonly DYNAMIC_FORM_STATE_KEY: UnwrapRef<
+      (typeof import('../composables/useDynamicFormState'))['DYNAMIC_FORM_STATE_KEY']
+    >
     readonly EffectScope: UnwrapRef<(typeof import('vue'))['EffectScope']>
+    readonly FIELD_TYPE_OPTIONS: UnwrapRef<
+      (typeof import('../composables/useDynamicFormState'))['FIELD_TYPE_OPTIONS']
+    >
     readonly acceptHMRUpdate: UnwrapRef<
       (typeof import('pinia'))['acceptHMRUpdate']
     >
@@ -223,6 +235,9 @@ declare module 'vue' {
       (typeof import('@vueuse/core'))['useDebounceFn']
     >
     readonly useDialog: UnwrapRef<(typeof import('naive-ui'))['useDialog']>
+    readonly useDynamicFormState: UnwrapRef<
+      (typeof import('../composables/useDynamicFormState'))['useDynamicFormState']
+    >
     readonly useId: UnwrapRef<(typeof import('vue'))['useId']>
     readonly useLink: UnwrapRef<(typeof import('vue-router'))['useLink']>
     readonly useLoadingBar: UnwrapRef<

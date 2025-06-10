@@ -1,0 +1,565 @@
+/* ===================================
+ * 自定义布局组件样式
+ * 功能：支持可视化表单布局设计与预览
+ * =================================== */
+
+.custom-layout {
+  /* ==================== 基础配置 ==================== */
+  
+  /* CSS变量定义 - 间距、圆角、过渡效果等 */
+  --layout-gap: 16px;
+  --layout-gap-sm: 12px;
+  --layout-gap-xs: 8px;
+  --layout-radius: 8px;
+  --layout-radius-sm: 6px;
+  --layout-radius-xs: 4px;
+  --layout-transition: all 0.2s ease;
+  --hover-transform: translateY(-1px);
+  --hover-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  /* 通用混合类 - 可复用的样式组合 */
+  %flex-center {
+    display: flex;
+    align-items: center;
+  }
+
+  %flex-between {
+    @extend %flex-center;
+    justify-content: space-between;
+  }
+
+  %hover-lift {
+    transition: var(--layout-transition);
+    cursor: move;
+
+    &:hover {
+      transform: var(--hover-transform);
+      box-shadow: var(--hover-shadow);
+    }
+  }
+
+  %bordered-card {
+    border: 1px solid var(--n-border-color);
+    border-radius: var(--layout-radius-sm);
+    background: var(--n-card-color);
+  }
+
+  /* ==================== 顶部工具栏 ==================== */
+  
+  .toolbar-card {
+    margin-bottom: var(--layout-gap);
+
+    .toolbar-content {
+      @extend %flex-between;
+      flex-wrap: wrap;
+      gap: var(--layout-gap);
+
+      .mode-section,
+      .stats-section, 
+      .actions-section {
+        @extend %flex-center;
+        gap: var(--layout-gap-sm);
+        flex-shrink: 0;
+      }
+
+      .section-label {
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      /* 统计信息显示 */
+      .stats-section {
+        gap: 20px;
+      }
+
+      .stat-item {
+        text-align: center;
+        min-width: 60px;
+
+        .stat-value {
+          display: block;
+          font-size: 18px;
+          font-weight: 600;
+          line-height: 1.2;
+          color: var(--n-primary-color);
+        }
+
+        .stat-label {
+          font-size: 12px;
+          opacity: 0.7;
+          margin-top: 4px;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+
+  /* ==================== 设计工具面板 ==================== */
+  
+  .design-panel {
+    margin-bottom: var(--layout-gap);
+
+    .design-tools {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+
+      .tool-group {
+        @extend %flex-center;
+        gap: var(--layout-gap-xs);
+        flex-wrap: wrap;
+
+        .group-label {
+          font-size: 14px;
+          font-weight: 500;
+          margin-right: 4px;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+
+  /* ==================== 主画布区域 ==================== */
+  
+  .layout-canvas {
+    min-height: 200px;
+
+    /* 设计模式样式 */
+    &.design-mode {
+      border: 2px dashed var(--n-border-color);
+      border-radius: var(--layout-radius);
+      padding: var(--layout-gap-sm);
+      background: var(--n-body-color);
+    }
+
+    /* 空状态提示 */
+    .canvas-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 120px;
+      text-align: center;
+
+      .hint-content {
+        h3 {
+          margin: 0 0 var(--layout-gap-xs) 0;
+          font-size: 18px;
+          color: var(--n-text-color);
+        }
+
+        p {
+          margin: 0;
+          opacity: 0.7;
+          font-size: 14px;
+        }
+      }
+    }
+
+    /* 区域容器布局 */
+    .areas-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--layout-gap);
+      min-height: 80px;
+    }
+
+    /* ==================== 自定义区域样式 ==================== */
+    
+    .custom-area {
+      @extend %bordered-card;
+      padding: var(--layout-gap);
+      min-height: 120px;
+
+      /* 区域头部 */
+      .area-header {
+        @extend %flex-between;
+        margin-bottom: var(--layout-gap);
+        padding-bottom: var(--layout-gap-xs);
+        border-bottom: 1px solid var(--n-divider-color);
+
+        .area-info {
+          @extend %flex-center;
+          gap: var(--layout-gap-xs);
+
+          .area-title {
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: var(--layout-radius-xs);
+            transition: var(--layout-transition);
+
+            &:hover {
+              background: var(--n-button-color-hover);
+              color: var(--n-primary-color);
+            }
+          }
+
+          .title-input {
+            min-width: 120px;
+            max-width: 200px;
+          }
+        }
+
+        .area-controls {
+          display: flex;
+          gap: 4px;
+        }
+      }
+
+      /* 字段容器 */
+      .area-fields {
+        display: flex;
+        flex-direction: column;
+        gap: var(--layout-gap-xs);
+        min-height: 60px;
+      }
+
+      /* 拖拽放置区域 */
+      .area-drop-zone {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 60px;
+        border: 2px dashed var(--n-border-color);
+        border-radius: var(--layout-radius-sm);
+        font-size: 14px;
+        opacity: 0.6;
+        transition: var(--layout-transition);
+        background: var(--n-body-color);
+
+        &:hover {
+          border-color: var(--n-primary-color);
+          opacity: 1;
+        }
+      }
+    }
+
+    /* ==================== 区域类型布局 ==================== */
+
+    /* 水平排列区域 */
+    .area-horizontal {
+      flex: 1;
+      min-width: 250px;
+      max-width: calc(50% - var(--layout-gap-xs));
+
+      .area-fields {
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        &.fields-horizontal {
+          gap: var(--layout-gap-sm);
+        }
+      }
+    }
+
+    /* 垂直排列区域 */
+    .area-vertical {
+      width: 100%;
+      margin-bottom: var(--layout-gap-xs);
+    }
+
+    /* 网格布局区域 */
+    .area-grid {
+      flex: 1;
+      min-width: 300px;
+
+      .area-fields {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--layout-gap-xs);
+
+        &.fields-grid {
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+      }
+    }
+
+    /* ==================== 字段项样式 ==================== */
+    
+    .field-item {
+      @extend %bordered-card;
+      @extend %hover-lift;
+      padding: var(--layout-gap-sm);
+      background: var(--n-body-color);
+      min-height: 40px;
+
+      &:hover {
+        border-color: var(--n-primary-color);
+      }
+
+      .field-preview {
+        @extend %flex-between;
+        gap: var(--layout-gap-xs);
+
+        .field-label {
+          font-size: 13px;
+          font-weight: 500;
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .field-type {
+          font-size: 11px;
+          opacity: 0.6;
+          background: var(--n-tag-color);
+          padding: 2px 6px;
+          border-radius: var(--layout-radius-xs);
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    /* ==================== 字段池样式 ==================== */
+    
+    .field-pool {
+      margin-top: var(--layout-gap);
+
+      .pool-fields {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--layout-gap-sm);
+        max-height: 200px;
+        overflow-y: auto;
+
+        /* 滚动条样式 */
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: var(--n-scrollbar-color);
+          border-radius: 3px;
+        }
+      }
+
+      .pool-field {
+        @extend %bordered-card;
+        @extend %hover-lift;
+        @extend %flex-between;
+        padding: var(--layout-gap-sm);
+        min-height: 40px;
+
+        &:hover {
+          border-color: var(--n-primary-color);
+        }
+
+        .field-name {
+          font-size: 13px;
+          font-weight: 500;
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .field-type-tag {
+          font-size: 11px;
+          padding: 2px var(--layout-gap-xs);
+          border-radius: var(--layout-radius-xs);
+          background: var(--n-tag-color);
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    /* ==================== 填写模式样式 ==================== */
+    
+    .empty-layout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 120px;
+      padding: var(--layout-gap-sm);
+    }
+
+    .form-areas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--layout-gap);
+      align-items: flex-start;
+
+      .form-area {
+        &.area-horizontal {
+          flex: 1;
+          min-width: 250px;
+          max-width: calc(50% - var(--layout-gap-xs));
+        }
+
+        &.area-vertical {
+          width: 100%;
+        }
+
+        &.area-grid {
+          flex: 1;
+          min-width: 300px;
+        }
+
+        .empty-area-hint {
+          padding: var(--layout-gap-sm);
+          border-radius: var(--layout-radius);
+
+          .area-hint-alert {
+            margin: 0;
+            text-align: center;
+          }
+        }
+      }
+    }
+
+    /* 表单项布局样式 */
+    .area-form-items {
+      display: flex;
+      flex-direction: column;
+      gap: var(--layout-gap);
+
+      &.layout-inline {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--layout-gap-sm);
+      }
+
+      &.layout-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--layout-gap);
+      }
+    }
+
+    /* 辅助样式 */
+    .area-empty {
+      padding: 20px 0;
+    }
+
+    .hint-text {
+      opacity: 0.7;
+    }
+
+    /* ==================== 拖拽状态效果 ==================== */
+    
+    .area-ghost,
+    .field-ghost {
+      opacity: 0.5;
+      background: var(--n-primary-color-suppl);
+      border: 2px dashed var(--n-primary-color);
+      transform: rotate(2deg);
+    }
+  }
+
+  /* ==================== 动画效果 ==================== */
+  
+  .custom-area,
+  .field-item,
+  .pool-field {
+    animation: fadeInUp 0.3s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ==================== 响应式布局 ==================== */
+  
+  /* 平板适配 */
+  @media (max-width: 1024px) {
+    .toolbar-content {
+      flex-direction: column;
+      gap: var(--layout-gap-sm);
+
+      .mode-section,
+      .stats-section, 
+      .actions-section {
+        justify-content: center;
+      }
+    }
+
+    .areas-container {
+      flex-direction: column;
+    }
+
+    .area-horizontal {
+      max-width: none;
+    }
+  }
+
+  /* 手机适配 */
+  @media (max-width: 768px) {
+    .design-tools {
+      flex-direction: column;
+      gap: var(--layout-gap-sm);
+
+      .tool-group {
+        justify-content: flex-start;
+      }
+    }
+
+    .stats-section {
+      gap: var(--layout-gap) !important;
+    }
+
+    .layout-canvas.design-mode {
+      padding: var(--layout-gap-sm);
+    }
+
+    .custom-area {
+      padding: var(--layout-gap-sm);
+      min-height: 100px;
+    }
+
+    .field-pool .pool-fields {
+      grid-template-columns: 1fr;
+      max-height: 150px;
+    }
+
+    /* 填写模式手机适配 */
+    .area-form-items.layout-inline {
+      flex-direction: column;
+    }
+  }
+
+  /* 小屏幕适配 */
+  @media (max-width: 480px) {
+    .custom-area .area-header {
+      flex-direction: column;
+      gap: var(--layout-gap-xs);
+      align-items: flex-start;
+
+      .area-controls {
+        align-self: flex-end;
+      }
+    }
+  }
+
+  /* ==================== 打印样式 ==================== */
+  
+  @media print {
+    /* 隐藏交互工具 */
+    .toolbar-card,
+    .design-panel,
+    .field-pool {
+      display: none;
+    }
+
+    /* 简化画布样式 */
+    .layout-canvas {
+      border: none;
+      padding: 0;
+    }
+
+    /* 优化打印分页 */
+    .custom-area {
+      break-inside: avoid;
+      margin-bottom: var(--layout-gap);
+    }
+  }
+}

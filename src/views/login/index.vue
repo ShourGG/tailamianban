@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:07:28
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-25 13:15:34
+ * @LastEditTime: 2025-06-06 09:48:15
  * @FilePath: \Robot_Admin\src\views\login\index.vue
  * @Description: 登录页
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -39,7 +39,7 @@
   import { useRouter } from 'vue-router'
   import { initDynamicRouter } from '@/router/dynamicRouter'
   import { s_userStore } from '@/stores/user/index'
-  import { OPTIONS } from './data.ts'
+  import { OPTIONS } from './data'
   import { useFormSubmit } from '@/hooks/useFormSubmit'
   import { loginApi, type LoginResponse } from '@/api/sys'
   import './index.scss'

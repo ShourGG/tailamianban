@@ -9,6 +9,6 @@
  */
 export * from './loading'
 export * from './store'
-export * from './naive-ui'
+export * from './naive-ui-plugin'
 export * from './dynamic-components'
-export * from './passive-scroll.ts'
+export * from './passive-scroll'

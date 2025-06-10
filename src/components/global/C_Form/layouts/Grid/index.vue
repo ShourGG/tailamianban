@@ -1,29 +1,78 @@
 <!--
  * @Author: ChenYu ycyplus@gmail.com
- * @Date: 2025-05-31 09:51:46
+ * @Date: 2025-06-04 19:20:15
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-31 13:07:37
+ * @LastEditTime: 2025-06-09 22:25:57
  * @FilePath: \Robot_Admin\src\components\global\C_Form\layouts\Grid\index.vue
- * @Description: 网格布局组件 - 使用 NGrid 和 NGridItem 实现响应式网格布局
+ * @Description: 表单组件 - 网格表单组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
-  <NGrid
-    :cols="cols"
-    :x-gap="gutter"
-    :y-gap="gutter"
-    class="c-form-grid"
-  >
-    <NGridItem
-      v-for="(item, index) in formItems"
-      :key="getItemKey(item, index)"
-      :span="getSpan(index)"
-      :offset="getOffset(index)"
+  <div class="c-grid-layout">
+    <!-- 配置面板 -->
+    <NCard
+      v-if="showConfigPanel"
+      size="small"
+      :bordered="false"
+      class="config-panel"
     >
-      <component :is="item" />
-    </NGridItem>
-  </NGrid>
+      <template #header>
+        <div class="config-header">
+          <span class="i-mdi-view-grid"></span>
+          <span>网格配置</span>
+        </div>
+      </template>
+
+      <div class="config-controls">
+        <div
+          v-for="control in configControls"
+          :key="control.key"
+          class="config-item"
+        >
+          <span class="config-label">{{ control.label }}:</span>
+          <component
+            :is="control.component"
+            v-model:value="control.value"
+            v-bind="control.props"
+            @update:value="emitConfigChange"
+          />
+        </div>
+      </div>
+    </NCard>
+
+    <!-- 网格容器 -->
+    <NGrid
+      v-bind="gridProps"
+      class="grid-container"
+    >
+      <NGridItem
+        v-for="(item, index) in formItems"
+        :key="getItemKey(item, index)"
+        v-bind="getItemProps(index)"
+        class="grid-item"
+      >
+        <div class="item-wrapper">
+          <component :is="item" />
+        </div>
+      </NGridItem>
+    </NGrid>
+
+    <!-- 统计信息 -->
+    <NAlert
+      v-if="showStats && isDev"
+      type="info"
+      :show-icon="false"
+      size="small"
+      class="grid-stats"
+    >
+      <template #header>
+        <span class="i-mdi-information-outline"></span>
+        网格信息
+      </template>
+      {{ statsText }}
+    </NAlert>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -31,49 +80,34 @@
 
   // ================= 类型定义 =================
 
-  /**
-   * 网格布局配置接口
-   */
-  interface GridLayoutConfig {
-    cols?: number // 网格总列数，默认24
-    gutter?: number // 网格间距，默认16px
+  interface GridConfig {
+    cols?: number
+    gutter?: number
+    responsive?: boolean
+    showConfigPanel?: boolean
+    showStats?: boolean
   }
 
-  /**
-   * 网格项布局配置接口
-   */
-  interface GridItemLayoutConfig {
-    span?: number // 占用列数，默认12
-    offset?: number // 偏移列数，默认0
-  }
-
-  /**
-   * 表单选项接口
-   */
   interface FormOption {
     type: string
     prop: string
     label?: string
-    layout?: GridItemLayoutConfig
-    [key: string]: any // 允许其他属性
+    layout?: {
+      span?: number
+      offset?: number
+      suffix?: boolean
+      grid?: {
+        span?: number
+        offset?: number
+        suffix?: boolean
+      }
+    }
   }
 
-  /**
-   * 布局配置接口
-   */
-  interface LayoutConfig {
-    type?: string
-    grid?: GridLayoutConfig
-    [key: string]: any // 允许其他布局类型的配置
-  }
-
-  /**
-   * 组件属性接口
-   */
   interface Props {
-    formItems: VNode[] // 表单项VNode数组
-    layoutConfig?: LayoutConfig // 布局配置
-    options?: FormOption[] // 表单选项配置数组
+    formItems: VNode[]
+    layoutConfig?: { grid?: GridConfig }
+    options?: FormOption[]
   }
 
   // ================= 组件属性 =================
@@ -83,105 +117,181 @@
     options: () => [],
   })
 
+  // ================= 响应式状态 =================
+
+  const isDev = ref(import.meta.env.DEV)
+  const internalConfig = reactive({
+    cols: 24,
+    gutter: 16,
+    responsive: true,
+  })
+
   // ================= 计算属性 =================
 
-  /**
-   * 网格总列数
-   */
-  const cols = computed((): number => {
-    return props.layoutConfig?.grid?.cols ?? 24
-  })
+  const gridConfig = computed(() => props.layoutConfig?.grid || {})
+  const showConfigPanel = computed(() => gridConfig.value.showConfigPanel)
+  const showStats = computed(() => gridConfig.value.showStats)
+
+  // 生效的配置（内部配置优先）
+  const effectiveConfig = computed(() => ({
+    cols: showConfigPanel.value
+      ? internalConfig.cols
+      : (gridConfig.value.cols ?? 24),
+    gutter: showConfigPanel.value
+      ? internalConfig.gutter
+      : (gridConfig.value.gutter ?? 16),
+    responsive: showConfigPanel.value
+      ? internalConfig.responsive
+      : (gridConfig.value.responsive ?? true),
+  }))
+
+  // 网格属性
+  const gridProps = computed(() => ({
+    cols: effectiveConfig.value.cols,
+    xGap: effectiveConfig.value.gutter,
+    yGap: effectiveConfig.value.gutter,
+    responsive: effectiveConfig.value.responsive ? 'screen' : 'self',
+  }))
+
+  // 配置控件定义
+  const configControls = computed(() => [
+    {
+      key: 'cols',
+      label: '列数',
+      component: 'NInputNumber',
+      value: computed({
+        get: () => internalConfig.cols,
+        set: (val: number) => (internalConfig.cols = val),
+      }),
+      props: { min: 1, max: 48, size: 'small' },
+    },
+    {
+      key: 'gutter',
+      label: '间距',
+      component: 'NInputNumber',
+      value: computed({
+        get: () => internalConfig.gutter,
+        set: (val: number) => (internalConfig.gutter = val),
+      }),
+      props: { min: 0, max: 48, size: 'small' },
+    },
+    {
+      key: 'responsive',
+      label: '响应式',
+      component: 'NSwitch',
+      value: computed({
+        get: () => internalConfig.responsive,
+        set: (val: boolean) => (internalConfig.responsive = val),
+      }),
+      props: { size: 'small' },
+    },
+  ])
+
+  // 统计文本
+  const statsText = computed(
+    () =>
+      `列数: ${effectiveConfig.value.cols} | 间距: ${effectiveConfig.value.gutter}px | 项目: ${props.formItems.length}个`
+  )
+
+  // ================= 核心方法 =================
 
   /**
-   * 网格间距
+   * 获取表单项key
    */
-  const gutter = computed((): number => {
-    return props.layoutConfig?.grid?.gutter ?? 16
-  })
-
-  // ================= 方法 =================
+  const getItemKey = (item: VNode, index: number): string =>
+    String(item.key) || (item.props as any)?.path || `grid-item-${index}`
 
   /**
-   * 获取表单项的唯一key（解决类型错误的核心方法）
-   * @param item VNode实例
-   * @param index 索引
-   * @returns 字符串类型的唯一标识符
+   * 获取布局属性值
    */
-  const getItemKey = (item: VNode, index: number): string => {
-    // 处理VNode.key的类型安全转换
-    if (item.key != null) {
-      // 将 PropertyKey | null 安全转换为 string
-      return String(item.key)
-    }
-
-    // 尝试从props中获取唯一标识
-    const itemProps = item.props as any
-    if (itemProps?.path) {
-      return itemProps.path
-    }
-
-    // 最后使用索引作为fallback
-    return `grid-item-${index}`
+  const getLayoutValue = (index: number, key: 'span' | 'offset' | 'suffix') => {
+    const option = props.options?.[index]?.layout
+    return option?.[key] ?? option?.grid?.[key]
   }
 
   /**
-   * 获取网格项占用的列数
-   * @param index 表单项索引
-   * @returns 占用列数
+   * 获取默认span值
    */
-  const getSpan = (index: number): number => {
-    const option = props.options?.[index]
-    const span = option?.layout?.span
-
-    // 验证span值的有效性
-    if (typeof span === 'number' && span > 0 && span <= cols.value) {
-      return span
-    }
-
-    // 默认占用12列（24列网格的一半）
-    return Math.min(12, cols.value)
+  const getDefaultSpan = (): number => {
+    const { cols } = effectiveConfig.value
+    return cols <= 12 ? cols : cols <= 24 ? 12 : 8
   }
 
   /**
-   * 获取网格项的偏移列数
-   * @param index 表单项索引
-   * @returns 偏移列数
+   * 获取网格项属性
    */
-  const getOffset = (index: number): number => {
-    const option = props.options?.[index]
-    const offset = option?.layout?.offset
+  const getItemProps = (index: number) => {
+    const span = getLayoutValue(index, 'span')
+    const offset = getLayoutValue(index, 'offset')
+    const suffix = getLayoutValue(index, 'suffix')
 
-    // 验证offset值的有效性
-    if (typeof offset === 'number' && offset >= 0 && offset < cols.value) {
-      return offset
+    return {
+      span:
+        typeof span === 'number' &&
+        span > 0 &&
+        span <= effectiveConfig.value.cols
+          ? span
+          : getDefaultSpan(),
+      offset:
+        typeof offset === 'number' &&
+        offset >= 0 &&
+        offset < effectiveConfig.value.cols
+          ? offset
+          : 0,
+      suffix: Boolean(suffix),
     }
-
-    return 0
   }
 
-  // ================= 开发环境验证 =================
+  /**
+   * 配置变更事件
+   */
+  const emitConfigChange = () => {
+    if (isDev.value) {
+      console.log('Grid config updated:', toRaw(internalConfig))
+    }
+  }
 
-  if (import.meta.env.DEV) {
-    // 验证配置项数量是否匹配
+  // ================= 监听器 =================
+
+  // 同步外部配置
+  watch(
+    gridConfig,
+    config => {
+      if (config.cols !== undefined) internalConfig.cols = config.cols
+      if (config.gutter !== undefined) internalConfig.gutter = config.gutter
+      if (config.responsive !== undefined)
+        internalConfig.responsive = config.responsive
+    },
+    { immediate: true }
+  )
+
+  // 开发环境验证
+  if (isDev.value) {
     watchEffect(() => {
-      if (props.options && props.options.length !== props.formItems.length) {
+      const optionsCount = props.options.length
+      const itemsCount = props.formItems.length
+
+      if (optionsCount > 0 && optionsCount !== itemsCount) {
         console.warn(
-          `[C_Form Grid Layout] 配置项数量(${props.options.length})与表单项数量(${props.formItems.length})不匹配`
+          `[GridLayout] 配置数量(${optionsCount})与表单项数量(${itemsCount})不匹配`
         )
       }
     })
   }
+
+  // ================= 暴露接口 =================
+
+  defineExpose({
+    updateGridConfig: (config: Partial<GridConfig>) =>
+      Object.assign(internalConfig, config),
+    getCurrentConfig: () => ({ ...effectiveConfig.value }),
+    getGridInfo: () => ({
+      ...effectiveConfig.value,
+      itemCount: props.formItems.length,
+    }),
+  })
 </script>
 
-<style scoped>
-  .c-form-grid {
-    width: 100%;
-  }
-
-  /* 移动端优化 */
-  @media (max-width: 768px) {
-    .c-form-grid :deep(.n-grid-item) {
-      margin-bottom: 8px;
-    }
-  }
+<style lang="scss" scoped>
+  @use './index.scss';
 </style>

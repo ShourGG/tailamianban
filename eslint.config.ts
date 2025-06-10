@@ -141,6 +141,7 @@ export default defineConfigWithVueTs(
             'router-view',
             'router-link',
             'transition',
+            'draggable',
             // 添加自定义组件前缀匹配过滤检查
             '/^icon-/i',
             '/^C_/',

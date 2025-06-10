@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-23 11:02:02
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-03 08:30:20
+ * @LastEditTime: 2025-06-08 17:51:28
  * @FilePath: \Robot_Admin\src\types\modules\form.d.ts
  * @Description: 表单相关类型 - 统一管理所有表单相关的类型定义
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -120,6 +120,9 @@ export interface DynamicFieldConfig {
   visible: boolean
   removable: boolean
   created: number
+  placeholder?: string
+  layout?: { span?: number }
+  rules?: FieldRule[]
 }
 
 /**
@@ -259,6 +262,7 @@ export interface LayoutConfig {
  * @description 单个表单项的完整配置
  */
 export interface FormOption {
+  id?: string
   type: ComponentType | string
   prop: string
   label?: string
@@ -415,3 +419,49 @@ export type StepSize = 'small' | 'medium'
  * 标签页位置类型
  */
 export type TabsPlacement = 'top' | 'right' | 'bottom' | 'left'
+
+// ----------------------------TAG: 分割线
+
+// 在你现有的 form.d.ts 文件末尾添加这些类型
+
+/**
+ * 动态表单配置接口
+ */
+export interface DynamicFormConfig {
+  maxFields: number
+  autoSave: boolean
+  enableSort: boolean
+  showControls: boolean
+  showItemControls: boolean
+}
+
+/**
+ * 动态表单状态接口
+ */
+export interface DynamicFormState {
+  config: DynamicFormConfig
+  baseFields: FormOption[]
+  dynamicFields: DynamicFieldConfig[]
+  hiddenFieldIds: Set<string>
+  fieldCounter: number
+  isInitialized: boolean
+}
+
+/**
+ * 动态表单状态管理器类型
+ */
+export interface DynamicFormStateType {
+  state: Readonly<DynamicFormState>
+  allFields: ComputedRef<FormOption[]>
+  visibleFields: ComputedRef<FormOption[]>
+  dynamicFieldsCount: ComputedRef<number>
+  canAddMoreFields: ComputedRef<boolean>
+  addField: (config?: Partial<DynamicFieldConfig>) => void
+  removeField: (index?: number) => void
+  clearDynamicFields: () => void
+  toggleFieldVisibility: (fieldId: string) => void
+  initialize: (
+    baseFields: FormOption[],
+    config?: Partial<DynamicFormConfig>
+  ) => void
+}
