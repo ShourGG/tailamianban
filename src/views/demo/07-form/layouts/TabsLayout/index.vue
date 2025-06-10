@@ -88,7 +88,7 @@
           size="small"
           @click="validateTab"
         >
-          <div class="i-carbon-task mr-1" />
+          <div class="i-mdi:task-auto mr-1" />
           验证 {{ getTabTitle(currentTab) }}
         </NButton>
       </template>
@@ -117,7 +117,7 @@
           type="default"
           @click="handleSaveDraft"
         >
-          <div class="i-carbon-save mr-1" />
+          <div class="i-mdi:content-save mr-1" />
           保存草稿
         </NButton>
 
@@ -125,7 +125,7 @@
           type="default"
           @click="handleLoadDraft"
         >
-          <div class="i-carbon-folder-open mr-1" />
+          <div class="i-mdi:folder-open-outline mr-1" />
           加载草稿
         </NButton>
 
@@ -133,7 +133,7 @@
           type="default"
           @click="handleReset"
         >
-          <div class="i-carbon-reset mr-1" />
+          <div class="i-mdi:lock-reset mr-1" />
           重置表单
         </NButton>
 
@@ -141,7 +141,7 @@
           type="warning"
           @click="handleExportData"
         >
-          <div class="i-carbon-download mr-1" />
+          <div class="i-mdi:download-multiple-outline mr-1" />
           导出数据
         </NButton>
       </NSpace>

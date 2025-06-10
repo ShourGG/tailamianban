@@ -108,7 +108,7 @@
               size="small"
               @click="validateCurrentTab"
             >
-              <div class="i-carbon-checkmark mr-1" />
+              <div class="i-carbon：star-check mr-1" />
               验证当前标签
             </NButton>
           </NSpace>

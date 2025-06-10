@@ -33,7 +33,7 @@
           @contextmenu.prevent="e => showContextMenu(e, tag, index)"
         >
           <template #icon>
-            <i :class="[tag.icon, 'w12px h12px']"></i>
+            <i :class="[`i-${tag.icon}`, 'w12px h12px']"></i>
           </template>
           {{ tag.title }}
         </NTag>

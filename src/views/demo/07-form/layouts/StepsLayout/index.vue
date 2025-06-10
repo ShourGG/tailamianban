@@ -73,7 +73,7 @@
         @click="handleSaveDraft"
       >
         <template #icon>
-          <div class="i-carbon-save" />
+          <div class="i-mdi:content-save" />
         </template>
         保存草稿
       </NButton>
@@ -83,7 +83,7 @@
         @click="handleLoadDraft"
       >
         <template #icon>
-          <div class="i-carbon-folder-open" />
+          <div class="i-mdi:folder-open-outline" />
         </template>
         加载草稿
       </NButton>
@@ -93,7 +93,7 @@
         @click="handleReset"
       >
         <template #icon>
-          <div class="i-carbon-reset" />
+          <div class="i-mdi:lock-reset" />
         </template>
         重置表单
       </NButton>

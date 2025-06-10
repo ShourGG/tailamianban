@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-30 08:36:17
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-02 22:35:15
+ * @LastEditTime: 2025-06-10 19:15:42
  * @FilePath: \Robot_Admin\src\views\demo\06-city\index.vue
  * @Description: 城市选择器组件场景示例
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -110,7 +110,7 @@
               :bordered="false"
             >
               <template #icon>
-                <span class="i-carbon:delivery" />
+                <span class="i-mdi:truck-delivery-outline" />
               </template>
               配送至: {{ city2 }}
             </NAlert>
@@ -494,8 +494,8 @@
       <template #header>
         <div class="card-header">
           <span class="card-title">
-            <NIcon style="vertical-align: middle; margin-right: 8px">
-              <span class="i-carbon:information" />
+            <NIcon style="margin-right: 8px">
+              <span class="i-mdi:information-box" />
             </NIcon>
             使用说明
           </span>

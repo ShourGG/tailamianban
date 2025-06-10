@@ -16,7 +16,9 @@
               size="small"
               round
             >
-              <template #icon><i class="i-carbon-dot-mark" /></template>
+              <template #icon
+                ><i class="i-mdi:map-marker-alert-outline"
+              /></template>
               Creator
             </NTag>
           </div>
@@ -52,7 +54,6 @@
         @click="openModal(project)"
       >
         <div class="icon">
-          <i :class="project.icon"></i>
           <NImage
             width="100"
             :src="useImage('notData')"
@@ -113,7 +114,9 @@
       <template #header>
         <div class="modal-header">
           <div class="modal-icon">
-            <i :class="currentItem.icon || 'i-carbon-app'"></i>
+            <i
+              :class="currentItem.icon || 'i-mdi:map-marker-alert-outline'"
+            ></i>
           </div>
           <div class="modal-title-block">
             <span class="modal-title">{{ currentItem.name }}</span>
@@ -186,70 +189,70 @@
       owner: '张三',
       desc: '前端开发项目',
       status: '^3.5.13',
-      icon: 'i-carbon-code',
+      imgName: 'i-mdi:code',
     },
     {
       name: 'Backend',
       owner: '李四',
       desc: '后端API开发',
       status: '在线',
-      icon: 'i-carbon-cloud-service',
+      imgName: 'i-carbon-cloud-service',
     },
     {
       name: 'Database',
       owner: '王五',
       desc: '数据库设计',
       status: '离线',
-      icon: 'i-carbon-data-base',
+      imgName: 'i-carbon-data-base',
     },
     {
       name: 'Mobile App',
       owner: '赵六',
       desc: '移动App开发',
       status: '在线',
-      icon: 'i-carbon-mobile',
+      imgName: 'i-carbon-mobile',
     },
     {
       name: 'DevOps',
       owner: '孙七',
       desc: '运维部署任务',
       status: '离线',
-      icon: 'i-carbon-deploy',
+      imgName: 'i-carbon-deploy',
     },
     {
       name: 'Testing',
       owner: '周八',
       desc: '测试自动化',
       status: '在线',
-      icon: 'i-carbon-test-tool',
+      imgName: 'i-carbon-test-tool',
     },
     {
       name: 'Analytics',
       owner: '吴九',
       desc: '数据分析',
       status: '在线',
-      icon: 'i-carbon-analytics',
+      imgName: 'i-carbon-analytics',
     },
     {
       name: 'Security',
       owner: '郑十',
       desc: '安全防护',
       status: '离线',
-      icon: 'i-carbon-security',
+      imgName: 'i-carbon-security',
     },
     {
       name: 'AI/ML',
       owner: '冯一',
       desc: '机器学习',
       status: '在线',
-      icon: 'i-carbon-machine-learning',
+      imgName: 'i-carbon-machine-learning',
     },
     {
       name: 'Design',
       owner: '陈二',
       desc: 'UI/UX设计',
       status: '在线',
-      icon: 'i-carbon-design',
+      imgName: 'i-carbon-design',
     },
   ]
 

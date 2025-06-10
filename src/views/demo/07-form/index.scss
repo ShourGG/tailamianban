@@ -2,12 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-05 23:21:56
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-10 10:07:01
- * @FilePath: \Robot_Admin\src\views\demo\07-form-module\form\index.scss
+ * @LastEditTime: 2025-06-10 21:22:22
+ * @FilePath: \Robot_Admin\src\views\demo\07-form\index.scss
  * @Description: 表单组件 - 演示页面 - 入口页面样式文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
- * 注意：悬停效果请使用 custom-card 类实现
  */
+
+
 
 // 基础样式变量
 @use 'sass:color';
@@ -53,15 +54,41 @@ $info: #0ea5e9;
   }
 }
 
-// 控制卡片 - 悬停效果由 custom-card 类提供
+// 控制卡片
 .control-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
   position: relative;
   overflow: hidden;
   border-radius: 6px;
 
+  // 头部渐变色条
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #18a058, #2080f0, #f0a020);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
   :deep(.n-card) {
     padding: 16px !important;
     min-height: 200px !important;
+    transition: inherit;
     position: relative;
   }
 
@@ -283,12 +310,37 @@ $info: #0ea5e9;
 .control-card:nth-child(3) .card-title::before { content: '📐'; }
 .control-card:nth-child(4) .card-title::before { content: '📊'; }
 
-// 表单区域 - 悬停效果由 custom-card 类提供
+// 表单区域
 .form-section {
   margin-bottom: 20px;
   position: relative;
   overflow: hidden;
   border-radius: 6px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+
+  // 头部渐变色条
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #18a058, #2080f0, #f0a020);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    &::before {
+      opacity: 1;
+    }
+  }
 
   :deep(.n-card) {
     padding: 20px;
@@ -340,15 +392,40 @@ $info: #0ea5e9;
   }
 }
 
-// 状态卡片 - 悬停效果由 custom-card 类提供
 .status-card {
   text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
   position: relative;
   overflow: hidden;
   border-radius: 6px;
 
+  // 头部渐变色条
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #18a058, #2080f0, #f0a020);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
   :deep(.n-card) {
     padding: 16px;
+    transition: inherit;
     position: relative;
   }
 
@@ -364,13 +441,12 @@ $info: #0ea5e9;
     font-size: 12px;
   }
 
-  // 保留颜色变化效果
   &:hover .number {
     color: color.adjust($primary, $lightness: -10%);
   }
 }
 
-// 数据预览模态框 - 保留渐变条，因为是特殊的模态框样式
+// 数据预览模态框
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -391,7 +467,7 @@ $info: #0ea5e9;
     overflow: hidden;
     border-radius: 6px;
 
-    // 模态框特有的渐变条（保留）
+    // 头部渐变色条
     &::before {
       content: '';
       position: absolute;
@@ -736,3 +812,5 @@ $info: #0ea5e9;
     }
   }
 }
+
+
