@@ -1,10 +1,20 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-06-04 19:20:15
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-10 17:24:15
+ * @FilePath: \Robot_Admin\src\views\demo\08-form-modal\index.vue
+ * @Description: 多模态表单 -  演示页面
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <div class="demo-container">
     <!-- 头部 -->
     <div class="header">
       <NH1 class="main-title">表单选择器组件场景示例</NH1>
       <div class="panel-title">
-        弹出控制中心<span class="subtitle">/ 5种主要的表单容器场景</span>
+        弹出控制中心<span class="subtitle"> / 5种主要的表单容器场景</span>
       </div>
       <div class="stats-overview">
         <NSpace size="large">
@@ -30,8 +40,7 @@
         class="card-wrapper"
       >
         <NCard
-          hoverable
-          class="container-card"
+          class="container-card custom-card"
           @click="handleCardAction(card.key)"
         >
           <template #header>

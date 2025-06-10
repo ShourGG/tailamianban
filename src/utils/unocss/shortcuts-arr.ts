@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-27 16:27:43
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-28 11:21:57
+ * @LastEditTime: 2025-06-10 17:09:58
  * @FilePath: \Robot_Admin\src\utils\unocss\shortcuts-arr.ts
  * @Description: uno 原子类快捷方式的配置
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.

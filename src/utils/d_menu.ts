@@ -2,13 +2,14 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-24 01:46:23
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-02 22:39:12
+ * @LastEditTime: 2025-06-10 15:05:42
  * @FilePath: \Robot_Admin\src\utils\d_menu.ts
  * @Description: 处理菜单的工具函数
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 import type { MenuOptions } from '@/types/modules/menu'
-import { NIcon, type MenuOption } from 'naive-ui/es'
+import { type MenuOption } from 'naive-ui/es'
+import { Icon } from '@iconify/vue'
 
 /**
  * * @description: 将菜单选项格式化为NMenu所需的格式
@@ -37,7 +38,9 @@ const renderMenuIcon = (item: MenuOptions) => {
   if (!icon) return undefined
 
   if (typeof icon === 'string') {
-    return () => h(NIcon, null, { default: () => h('span', { class: icon }) })
+    return () =>
+      h('span', { class: 'inline-flex items-center' }, [h(Icon, { icon })])
   }
-  return typeof icon === 'function' ? icon() : icon
+
+  return typeof icon === 'function' ? icon() : undefined
 }

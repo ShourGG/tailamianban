@@ -33,6 +33,6 @@ export default defineConfig({
     }),
   ],
   transformers: [transformerDirectives()],
-  shortcuts: {shortcutsArr},
+  shortcuts: shortcutsArr,
   safelist: iconSafelist,
 })

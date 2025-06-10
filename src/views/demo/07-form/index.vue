@@ -2,8 +2,8 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-06 16:24:01
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-10 10:06:14
- * @FilePath: \Robot_Admin\src\views\demo\07-form-module\form\index.vue
+ * @LastEditTime: 2025-06-10 17:46:30
+ * @FilePath: \Robot_Admin\src\views\demo\07-form\index.vue
  * @Description: 表单组件 - 演示页面 - 入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
 -->
@@ -21,8 +21,7 @@
       <div class="control-grid">
         <!-- 布局选择器 -->
         <NCard
-          hoverable
-          class="control-card"
+          class="control-card custom-card"
           :bordered="false"
         >
           <div class="card-title">布局类型</div>
@@ -43,8 +42,7 @@
 
         <!-- 配置面板 -->
         <NCard
-          hoverable
-          class="control-card"
+          class="control-card custom-card"
           :bordered="false"
         >
           <div class="card-title">表单配置</div>
@@ -84,8 +82,7 @@
 
         <!-- 统计和监控合并 -->
         <NCard
-          hoverable
-          class="control-card"
+          class="control-card custom-card"
           :bordered="false"
         >
           <div class="card-title">实时统计</div>
@@ -96,8 +93,7 @@
         </NCard>
 
         <NCard
-          hoverable
-          class="control-card"
+          class="control-card custom-card"
           :bordered="false"
         >
           <div class="card-title">性能监控</div>
@@ -117,7 +113,7 @@
 
     <!-- 表单展示 -->
     <NCard
-      class="form-section"
+      class="form-section custom-card"
       :bordered="false"
     >
       <div class="form-header">
@@ -149,7 +145,7 @@
         <NCard
           v-for="(card, index) in statusCards"
           :key="index"
-          :class="['status-card', card.type]"
+          :class="['status-card', 'custom-card', card.type]"
           :bordered="false"
         >
           <div class="number">{{ card.value }}</div>

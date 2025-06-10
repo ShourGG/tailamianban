@@ -1,9 +1,10 @@
 /**
  * ================================
- * 演示容器主样式文件
+ * 演示容器主样式文件（已清理重复样式）
  * ================================
  * 包含：主容器、头部区域、卡片网格、侧边栏、弹出层及响应式设计
- * 维护人员：请在修改时保持样式的一致性和动画效果
+ * 维护人员：请在修改时保持样式的一致性
+ * 注意：悬停效果请使用 custom-card 类实现
  */
 
 /* ================================
@@ -20,7 +21,6 @@
 
     /* 主标题样式 */
     .main-title {
-      font-weight: 550;
       display: flex;
       gap: 12px; /* 标题元素间距 */
     }
@@ -28,7 +28,6 @@
     /* 面板标题样式 */
     .panel-title {
       font-size: 20px;
-      font-weight: 550;
       color: #333;
       margin-bottom: 20px;
     }
@@ -49,83 +48,12 @@
         justify-content: center;
       }
 
-      /* 统计卡片样式 */
+      /* 统计卡片基础样式 - 悬停效果由 custom-card 类提供 */
       .n-statistic {
         padding: 16px 24px;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.05); /* 半透明背景 */
-        border: 1px solid rgba(255, 255, 255, 0.1); /* 边框 */
-        transition: all 0.3s ease; /* 平滑过渡动画 */
-        position: relative;
-        overflow: hidden;
-
-        /* 悬停效果：向上移动和阴影 */
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-          background: rgba(255, 255, 255, 0.08);
-        }
-
-        /* 顶部渐变装饰条 */
-        &::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background: linear-gradient(90deg, #18a058, #2080f0, #f0a020);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        /* 悬停时显示装饰条 */
-        &:hover::before {
-          opacity: 1;
-        }
-
-        /* 图标前缀样式 */
-        .n-statistic__prefix {
-          margin-right: 8px;
-          position: relative;
-
-          /* 图标样式 */
-          i {
-            font-size: 1.2rem;
-            transition: transform 0.3s ease;
-          }
-
-          /* 图标背景光晕效果 */
-          &::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(
-              circle,
-              rgba(24, 160, 88, 0.2) 0%,
-              transparent 70%
-            );
-            border-radius: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            transition: transform 0.3s ease;
-          }
-        }
-
-        /* 悬停时的图标动画效果 */
-        &:hover .n-statistic__prefix {
-          /* 图标放大 */
-          i {
-            transform: scale(1.1);
-          }
-
-          /* 显示背景光晕 */
-          &::after {
-            transform: translate(-50%, -50%) scale(1);
-          }
-        }
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
     }
   }
@@ -142,39 +70,10 @@
 
     /* 卡片包装器 */
     .card-wrapper {
-      /* 单个卡片容器 */
+      /* 单个卡片容器 - 悬停效果由 custom-card 类提供 */
       .container-card {
         height: 100%;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        position: relative;
         border-radius: 12px;
-        overflow: hidden;
-
-        /* 顶部装饰条 */
-        &::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 3px;
-          background: linear-gradient(90deg, #18a058, #2080f0, #f0a020);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          z-index: 1;
-        }
-
-        /* 卡片悬停效果 */
-        &:hover {
-          transform: translateY(-4px); /* 向上浮起 */
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-
-          /* 显示顶部装饰条 */
-          &::before {
-            opacity: 1;
-          }
-        }
 
         /* 卡片头部 */
         .card-header {
@@ -182,45 +81,13 @@
           align-items: center;
           gap: 16px;
 
-          /* 图标包装器 */
+          /* 图标包装器 - 基础定位样式 */
           .icon-wrapper {
             position: relative;
 
-            /* 卡片图标 */
+            /* 卡片图标基础样式 */
             .card-icon {
               font-size: 2rem;
-              transition: transform 0.3s ease;
-            }
-
-            /* 图标背景光晕效果 */
-            &::after {
-              content: '';
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              width: 40px;
-              height: 40px;
-              background: radial-gradient(
-                circle,
-                rgba(32, 128, 240, 0.1) 0%,
-                transparent 70%
-              );
-              border-radius: 50%;
-              transform: translate(-50%, -50%) scale(0);
-              transition: transform 0.3s ease;
-            }
-          }
-
-          /* 头部悬停时的图标动画 */
-          &:hover .icon-wrapper {
-            /* 图标放大 */
-            .card-icon {
-              transform: scale(1.1);
-            }
-
-            /* 显示背景光晕 */
-            &::after {
-              transform: translate(-50%, -50%) scale(1);
             }
           }
         }
@@ -241,22 +108,15 @@
             margin-bottom: 20px;
           }
 
-          /* 卡片统计数据区域 */
+          /* 卡片统计数据区域 - 布局样式 */
           .card-stats {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr; /* 三列等宽布局 */
             gap: 16px;
             padding: 16px;
             border-radius: 8px;
-            border: 1px solid;
-            border-color: var(--n-border-color);
+            border: 1px solid var(--n-border-color);
             background: rgba(255, 255, 255, 0.02);
-            transition: background 0.3s ease;
-
-            /* 统计区域悬停效果 */
-            &:hover {
-              background: rgba(255, 255, 255, 0.05);
-            }
 
             /* 单个统计项 */
             .stat-item {
@@ -274,23 +134,16 @@
           }
         }
 
-        /* 卡片浮动按钮 */
+        /* 卡片浮动按钮定位 */
         .card-float-btn {
           position: absolute;
           top: 16px;
           right: 16px;
           z-index: 10;
 
-          /* 按钮样式增强 */
+          /* 按钮基础样式 - 悬停效果由 custom-card 类的 .float-btn 提供 */
           .n-button {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-
-            /* 按钮悬停动画：放大并旋转 */
-            &:hover {
-              transform: scale(1.05) rotate(15deg);
-              box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-            }
           }
         }
       }

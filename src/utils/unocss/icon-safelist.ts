@@ -64,4 +64,5 @@ export const iconSafelist = [
   'i-mdi:file-document-box-search',
   'i-mdi:github',
   'i-mdi:gitlab',
+  'i-mdi:text-box-search-outline',
 ]
