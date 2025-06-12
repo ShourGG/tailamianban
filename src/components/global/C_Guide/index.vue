@@ -25,7 +25,7 @@
       popover: {
         title: '导航菜单头部区域',
         description: '在这里可以设置头部logo/头部信息',
-        side: 'right',
+        side: 'right' as const,
       },
     },
     {
@@ -33,7 +33,7 @@
       popover: {
         title: '导航菜单',
         description: '点击这里展开/收起侧边多级导航菜单',
-        side: 'right',
+        side: 'right' as const,
       },
     },
     {
@@ -41,7 +41,7 @@
       popover: {
         title: '折叠菜单',
         description: '点击这里可以折叠导航菜单，右侧区域更宽裕哦',
-        side: 'right',
+        side: 'right' as const,
       },
     },
     {
@@ -58,7 +58,7 @@
         title: '快速切换标签栏',
         description:
           '在这里帮你快速标记你的查看标签哦，便于快速回到你关注的页面哈',
-        side: 'bottom',
+        side: 'bottom' as const,
       },
     },
     {
@@ -66,7 +66,7 @@
       popover: {
         title: '整体操作区域',
         description: '这里的操作区域，我就不一一介绍了哦，你自己慢慢了解哈亲',
-        side: 'bottom',
+        side: 'bottom' as const,
       },
     },
   ]

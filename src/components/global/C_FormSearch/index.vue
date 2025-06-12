@@ -232,13 +232,14 @@
 
   // 处理 input 缓存历史记录
   const handleFocus = (itemProp: string) => {
-    const tempFormItemList = getItem(props.formSearchInputHistoryString!)
+    const tempFormItemList = getItem<SearchFormItem[]>(
+      props.formSearchInputHistoryString!
+    )
     if (tempFormItemList) {
       formItemList.value = tempFormItemList
     }
     setAllFieldsFocus(itemProp)
   }
-
   // 选择一条历史记录
   const selectHisItem = (value: string, itemProp: string) => {
     formParams.value[itemProp] = value

@@ -225,7 +225,7 @@
             {
               "path": "table",
               "name": "demo-table",
-              "component": "/09-table/index",
+              "component": "/demo/10-table/index",
               "meta": {
                 "icon": "mdi:file-table-box-multiple-outline",
                 "title": "超级表格",
