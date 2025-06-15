@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-06 16:24:01
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-10 21:38:50
+ * @LastEditTime: 2025-06-14 16:57:14
  * @FilePath: \Robot_Admin\src\views\demo\07-form\index.vue
  * @Description: 表单组件 - 演示页面 - 入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -134,7 +134,7 @@
         ref="layoutRef"
         v-model="formData"
         :label-placement="labelPlacement"
-        :validate-on-change="validateOnChange"
+        :validate-on-value-change="validateOnChange"
         @submit="handleSubmit"
         @validate-success="errorCount = 0"
         @validate-error="handleValidateError"
@@ -395,7 +395,7 @@
     { key: 'preview', type: 'preview', label: '预览数据' },
     { key: 'clear', type: 'clear', label: '清空数据' },
     { key: 'validate', type: 'validate', label: '验证表单' },
-  ]
+  ] as const
 
   const PREVIEW_MODES = [
     { value: 'json', label: 'JSON', icon: '🔍' },
@@ -555,7 +555,9 @@ export default formData;`
   }
 
   // 统一的动作处理器
-  const handleAction = (actionKey: string) => {
+  const handleAction = (
+    actionKey: 'fill' | 'preview' | 'clear' | 'validate'
+  ) => {
     const actions = {
       fill: () => {
         const testData = testDataConfig.getTestData(currentLayout.value)

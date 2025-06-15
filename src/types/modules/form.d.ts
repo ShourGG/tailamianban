@@ -152,6 +152,8 @@ export interface GridLayoutConfig {
   cols?: number
   gutter?: number
   yGutter?: number
+  xGap?: number
+  yGap: number
 }
 
 /**

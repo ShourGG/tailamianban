@@ -1,0 +1,83 @@
+// 组件核心样式
+.c-table-wrapper {
+  width: 100%;
+}
+
+// 可编辑单元格容器
+.cell-edit-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0 6px;
+  min-height: 32px;
+
+  &:hover .cell-edit-icon {
+    opacity: 1;
+    color: var(--n-primary-color);
+  }
+}
+
+// 单元格内容
+.cell-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 编辑图标
+.cell-edit-icon {
+  flex-shrink: 0;
+  margin-left: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--n-text-color-3);
+  opacity: 0;
+  padding: 3px;
+  border-radius: 4px;
+
+  &:hover {
+    transform: scale(1.1);
+    color: var(--n-primary-color-hover) !important;
+    background-color: var(--n-primary-color-suppl);
+  }
+}
+
+// 🔥 表格混合布局 - 支持固定宽度和自适应
+:deep(.n-data-table) {
+  table-layout: auto !important;
+  width: 100% !important;
+}
+
+// 🔥 所有普通列的最小宽度保护
+:deep(.n-data-table-th:not(:last-child),
+.n-data-table-td:not(:last-child)) {
+  min-width: 80px !important;
+}
+
+// 🔥 操作列固定合理宽度
+:deep(.n-data-table-th:last-child,
+.n-data-table-td:last-child) {
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
+  text-align: center !important;
+}
+
+// 🔥 操作按钮居中
+:deep(.n-data-table-td:last-child .n-space) {
+  justify-content: center !important;
+}
+
+// 按钮样式
+:deep(.n-button) {
+  white-space: nowrap;
+  font-size: 12px !important;
+  flex-shrink: 0 !important;
+
+  .n-icon {
+    margin-right: 2px !important;
+  }
+}

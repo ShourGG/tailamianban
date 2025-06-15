@@ -1,7 +1,17 @@
-<!-- src/components/global/C_Table/index.vue -->
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-06-13 18:38:58
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-15 02:06:01
+ * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
+ * @Description: 超级表格组件
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <div class="c-table-wrapper">
-    <n-data-table
+    <!-- 表格主体 -->
+    <NDataTable
       ref="tableRef"
       v-bind="tableProps"
       :columns="computedColumns"
@@ -9,101 +19,112 @@
       :loading="loading"
       :row-key="rowKey"
     />
+
+    <!-- 编辑模态框 -->
+    <NModal
+      class="w60%"
+      v-if="editMode === 'modal'"
+      v-model:show="modalEdit.isModalVisible.value"
+      :title="modalTitle"
+      :width="modalWidth"
+      preset="card"
+      :mask-closable="false"
+      :close-on-esc="false"
+    >
+      <C_Form
+        v-if="modalEdit.isModalVisible.value && formOptions.length > 0"
+        ref="cFormRef"
+        :key="formKey"
+        :model-value="modalEdit.editingData"
+        :options="formOptions"
+        :layout-type="'grid'"
+        :layout-config="{ grid: { cols: 2, xGap: 16, yGap: 16 } }"
+        :show-default-actions="false"
+        @update:model-value="handleFormUpdate"
+      />
+
+      <template #action>
+        <NSpace justify="end">
+          <NButton @click="modalEdit.cancelEdit">取消</NButton>
+          <NButton
+            type="primary"
+            :loading="submitLoading"
+            @click="handleModalSave"
+            >保存</NButton
+          >
+        </NSpace>
+      </template>
+    </NModal>
+
+    <!-- 查看模态框 -->
+    <NModal
+      class="w60%"
+      v-model:show="viewModalVisible"
+      title="查看详情"
+      :width="modalWidth"
+      preset="card"
+    >
+      <NDescriptions
+        v-if="viewModalVisible"
+        :column="2"
+        label-placement="left"
+      >
+        <NDescriptionsItem
+          v-for="column in displayColumns"
+          :key="column.key"
+          :label="column.title"
+          :span="
+            column.key === 'description' ||
+            column.editProps?.type === 'textarea'
+              ? 2
+              : 1
+          "
+        >
+          {{ getDisplayValue(column, viewingData) }}
+        </NDescriptionsItem>
+      </NDescriptions>
+      <template #action>
+        <NSpace justify="end">
+          <NButton @click="viewModalVisible = false">关闭</NButton>
+        </NSpace>
+      </template>
+    </NModal>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, h, ref, reactive } from 'vue'
-  import type { DataTableRowKey, DataTableColumns } from 'naive-ui'
   import type { VNodeChild } from 'vue'
   import {
-    NDataTable,
-    NInput,
-    NButton,
-    NSpace,
     NInputNumber,
     NDatePicker,
     NSelect,
-  } from 'naive-ui'
+    NInput,
+    NSwitch,
+    NIcon,
+    NSpace,
+    NButton,
+    type DataTableRowKey,
+    type DataTableColumn,
+  } from 'naive-ui/es'
+  import type {
+    TableColumn,
+    TableProps,
+    TableInstance,
+  } from '@/types/modules/table'
+  import { useRowEdit } from './composables/useRowEdit'
+  import { useCellEdit } from './composables/useCellEdit'
+  import { useModalEdit } from './composables/useModalEdit'
+  import {
+    getDisplayValue,
+    generateFormOptions,
+    getTableProps,
+    processColumnConfig,
+  } from './data'
 
-  // ========== 类型定义（内联） ==========
-  // 编辑模式类型
-  type EditMode = 'row' | 'cell' | 'none'
+  type DataRecord = Record<string, unknown>
 
-  // 编辑状态
-  interface EditState {
-    rowKey: DataTableRowKey | null
-    columnKey: string | null
-    mode: EditMode
-  }
-
-  // 表格列配置
-  interface TableColumn<T = any>
-    extends Omit<DataTableColumns<T>[number], 'key' | 'render'> {
-    key: string
-    title: string
-    editable?: boolean
-    editType?: 'input' | 'select' | 'date' | 'number' | 'custom'
-    editProps?: Record<string, any>
-    editRender?: (value: any, rowData: T, rowIndex: number) => VNodeChild
-    render?: (rowData: T, rowIndex: number) => VNodeChild
-    width?: number | string
-    align?: 'left' | 'center' | 'right'
-  }
-
-  // 表格属性
-  interface TableProps<T = any> {
-    columns: TableColumn<T>[]
-    data: T[]
-    rowKey?: (row: T) => DataTableRowKey
-    loading?: boolean
-    maxHeight?: number | string
-    minHeight?: number | string
-    scrollX?: number | string
-    striped?: boolean
-    bordered?: boolean
-    singleLine?: boolean
-    size?: 'small' | 'medium' | 'large'
-    // 编辑相关
-    editable?: boolean
-    editMode?: 'row' | 'cell' | 'both'
-    onSave?: (
-      rowData: T,
-      rowIndex: number,
-      columnKey?: string
-    ) => void | Promise<void>
-    onCancel?: (rowData: T, rowIndex: number) => void
-    // 行操作
-    showRowActions?: boolean
-    rowActions?: RowAction<T>[]
-  }
-
-  // 行操作配置
-  interface RowAction<T = any> {
-    label: string
-    icon?: string
-    type?: 'default' | 'primary' | 'info' | 'success' | 'warning' | 'error'
-    onClick: (row: T, index: number) => void
-    show?: (row: T, index: number) => boolean
-    disabled?: (row: T, index: number) => boolean
-  }
-
-  // 表格实例方法
-  interface TableInstance {
-    startEdit: (rowKey: DataTableRowKey, columnKey?: string) => void
-    cancelEdit: () => void
-    saveEdit: () => Promise<void>
-    isEditing: (rowKey: DataTableRowKey, columnKey?: string) => boolean
-    getEditingData: () => any
-  }
-
-  // 编辑单元格的值类型
-  type CellValue = string | number | boolean | Date | null | undefined
-
-  // ========== 组件逻辑 ==========
-  // Props
   const props = withDefaults(defineProps<TableProps>(), {
-    rowKey: (row: any) => row.id,
+    rowKey: (row: DataRecord) => row.id,
     loading: false,
     striped: true,
     bordered: true,
@@ -112,416 +133,430 @@
     editable: true,
     editMode: 'both',
     showRowActions: true,
+    modalTitle: '编辑数据',
+    modalWidth: 600,
+    columnWidth: 180,
   })
 
-  // Emits
   const emit = defineEmits<{
-    'update:data': [data: any[]]
-    save: [rowData: any, rowIndex: number, columnKey?: string]
-    cancel: [rowData: any, rowIndex: number]
+    'update:data': [data: DataRecord[]]
+    save: [rowData: DataRecord, rowIndex: number, columnKey?: string]
+    cancel: [rowData: DataRecord, rowIndex: number]
   }>()
 
   // Refs
   const tableRef = ref()
-  const editingData = ref<Record<string, any>>({})
-  const editState = reactive<EditState>({
-    rowKey: null,
-    columnKey: null,
-    mode: 'none',
-  })
+  const cFormRef = ref()
+  const viewModalVisible = ref(false)
+  const viewingData = ref<DataRecord>({})
+  const submitLoading = ref(false)
 
-  // 是否正在编辑
-  const isEditing = (rowKey: DataTableRowKey, columnKey?: string): boolean => {
-    if (!editState.rowKey) return false
+  // 计算属性
+  const editableColumns = computed(() =>
+    props.columns.filter(col => col.editable !== false)
+  )
+  const displayColumns = computed(() =>
+    processColumnConfig(props.columns).filter(col => col.key !== '_actions')
+  )
+  const tableProps = computed(() => getTableProps(props))
+  const formKey = computed(
+    () => `edit-form-${modalEdit.editingRowKey.value || 'new'}`
+  )
+  const formOptions = computed(() => generateFormOptions(editableColumns.value))
 
-    if (editState.mode === 'row') {
-      return editState.rowKey === rowKey
-    }
+  // 🔥 完全修复：正确的编辑组件映射
+  const EDIT_COMPONENTS = {
+    // Vue 组件 - 需要用 h() 函数渲染
+    number: NInputNumber,
+    switch: NSwitch,
+    input: NInput,
 
-    if (editState.mode === 'cell' && columnKey) {
-      return editState.rowKey === rowKey && editState.columnKey === columnKey
-    }
+    // 自定义渲染函数 - 可以直接调用
+    date: (componentProps: any) =>
+      h(NDatePicker, { ...componentProps, type: 'date', format: 'yyyy-MM-dd' }),
+    select: (componentProps: any) =>
+      h(NSelect, { ...componentProps, options: componentProps.options || [] }),
+    textarea: (componentProps: any) =>
+      h(NInput, { ...componentProps, type: 'textarea', rows: 3 }),
+  } as const
 
-    return false
+  // 核心处理函数
+  const handleSave = async (
+    rowData: DataRecord,
+    rowIndex: number,
+    columnKey?: string
+  ) => {
+    if (!rowData || rowIndex < 0 || rowIndex >= props.data.length) return
+
+    const newData = [...props.data]
+    newData[rowIndex] = { ...newData[rowIndex], ...rowData }
+
+    emit('update:data', newData)
+    await nextTick()
+    emit('save', newData[rowIndex], rowIndex, columnKey)
   }
 
-  // 开始编辑
-  const startEdit = (rowKey: DataTableRowKey, columnKey?: string) => {
-    const rowData = props.data.find(row => props.rowKey(row) === rowKey)
-    if (!rowData) return
-
-    editState.rowKey = rowKey
-    editState.columnKey = columnKey || null
-    editState.mode = columnKey ? 'cell' : 'row'
-
-    // 复制当前行数据用于编辑
-    editingData.value[rowKey as string] = { ...rowData }
+  const handleCancel = (rowData: DataRecord, rowIndex: number) => {
+    emit('cancel', rowData, rowIndex)
   }
 
-  // 取消编辑
-  const cancelEdit = () => {
-    const rowIndex = props.data.findIndex(
-      row => props.rowKey(row) === editState.rowKey
-    )
-    if (rowIndex > -1) {
-      props.onCancel?.(props.data[rowIndex], rowIndex)
-      emit('cancel', props.data[rowIndex], rowIndex)
-    }
-
-    editState.rowKey = null
-    editState.columnKey = null
-    editState.mode = 'none'
-    editingData.value = {}
+  const handleFormUpdate = (value: DataRecord) => {
+    Object.assign(modalEdit.editingData, value)
   }
 
-  // 保存编辑
-  const saveEdit = async () => {
-    if (!editState.rowKey) return
-
-    const rowKey = editState.rowKey
-    const columnKey = editState.columnKey
-    const rowIndex = props.data.findIndex(row => props.rowKey(row) === rowKey)
-
-    if (rowIndex === -1) return
-
-    const updatedData = editingData.value[rowKey as string]
-    if (!updatedData) return
-
+  const handleModalSave = async () => {
+    if (!cFormRef.value) return
+    submitLoading.value = true
     try {
-      // 调用保存回调
-      await props.onSave?.(updatedData, rowIndex, columnKey || undefined)
-
-      // 更新数据
-      const newData = [...props.data]
-      if (editState.mode === 'row') {
-        newData[rowIndex] = updatedData
-      } else if (editState.mode === 'cell' && columnKey) {
-        newData[rowIndex] = {
-          ...newData[rowIndex],
-          [columnKey]: updatedData[columnKey],
-        }
-      }
-
-      emit('update:data', newData)
-      emit('save', updatedData, rowIndex, columnKey || undefined)
-
-      // 清除编辑状态
-      editState.rowKey = null
-      editState.columnKey = null
-      editState.mode = 'none'
-      editingData.value = {}
-    } catch (error) {
-      console.error('Save failed:', error)
+      await cFormRef.value.validate()
+      await modalEdit.saveEdit()
+    } finally {
+      submitLoading.value = false
     }
   }
 
-  // 获取编辑数据
-  const getEditingData = () => {
-    if (!editState.rowKey) return null
-    return editingData.value[editState.rowKey as string]
-  }
-
-  // 渲染编辑组件
   const renderEditComponent = (
     column: TableColumn,
-    value: CellValue,
-    rowData: any
-  ) => {
-    const rowKey = props.rowKey(rowData)
-    const editData = editingData.value[rowKey as string] || {}
+    value: unknown,
+    onUpdate: (val: unknown) => void
+  ): VNodeChild => {
+    if (column.editRender) return column.editRender(value, {}, 0)
 
-    const updateValue = (val: CellValue) => {
-      if (!editingData.value[rowKey as string]) {
-        editingData.value[rowKey as string] = { ...rowData }
-      }
-      editingData.value[rowKey as string][column.key] = val
+    const componentProps = {
+      value,
+      'onUpdate:value': onUpdate,
+      placeholder: `请输入${column.title}`,
+      style: { width: '100%' },
+      ...column.editProps,
     }
 
-    // 自定义编辑渲染
-    if (column.editRender) {
-      return column.editRender(value, rowData, props.data.indexOf(rowData))
-    }
+    const editType = column.editType || 'input'
+    const Component =
+      EDIT_COMPONENTS[editType as keyof typeof EDIT_COMPONENTS] ||
+      EDIT_COMPONENTS.input
 
-    // 根据编辑类型渲染不同组件
-    switch (column.editType) {
-      case 'number':
-        return h(NInputNumber, {
-          value: editData[column.key] ?? value,
-          onUpdateValue: updateValue,
-          placeholder: `请输入${column.title}`,
-          ...column.editProps,
-        })
-
-      case 'date':
-        return h(NDatePicker, {
-          value: editData[column.key] ?? value,
-          onUpdateValue: updateValue,
-          placeholder: `请选择${column.title}`,
-          ...column.editProps,
-        })
-
-      case 'select':
-        return h(NSelect, {
-          value: editData[column.key] ?? value,
-          onUpdateValue: updateValue,
-          placeholder: `请选择${column.title}`,
-          ...column.editProps,
-        })
-
-      case 'input':
-      default:
-        return h(NInput, {
-          value: editData[column.key] ?? value,
-          onUpdateValue: updateValue,
-          placeholder: `请输入${column.title}`,
-          ...column.editProps,
-        })
-    }
+    return h(Component as Component, componentProps)
   }
 
-  // 渲染单元格
-  const renderCell = (column: TableColumn, rowData: any, rowIndex: number) => {
+  // renderCell 函数
+  const renderCell = (
+    column: TableColumn,
+    rowData: DataRecord,
+    rowIndex: number
+  ): VNodeChild => {
     const value = rowData[column.key]
     const rowKey = props.rowKey(rowData)
-    const isEditingCell = isEditing(rowKey, column.key)
-    const isEditingRow = isEditing(rowKey)
 
-    // 如果正在编辑（单元格或行编辑模式）
-    if (isEditingCell || (isEditingRow && column.editable !== false)) {
-      return renderEditComponent(column, value, rowData)
-    }
+    // 基础渲染策略
+    const strategies = [
+      // 非编辑模式
+      () =>
+        !props.editable ||
+        column.editable === false ||
+        props.editMode === 'none',
+      // 行编辑模式
+      () =>
+        (props.editMode === 'row' || props.editMode === 'both') &&
+        rowEdit.isEditingRow(rowKey),
+      // 单元格编辑模式
+      () =>
+        (props.editMode === 'cell' || props.editMode === 'both') &&
+        cellEdit.isEditingCell(rowKey, column.key),
+      // 可编辑单元格
+      () =>
+        (props.editMode === 'cell' || props.editMode === 'both') &&
+        !rowEdit.isEditingRow(rowKey),
+    ]
 
-    // 单元格编辑模式 - 显示值和编辑按钮
-    if (props.editMode === 'cell' || props.editMode === 'both') {
-      if (column.editable !== false) {
-        return h(
+    const renders = [
+      // 基础渲染 - 确保返回值类型安全
+      (): VNodeChild => {
+        if (column.render) {
+          const result = column.render(rowData, rowIndex)
+          return result !== null && result !== undefined
+            ? result
+            : String(value ?? '')
+        }
+        return String(value ?? '')
+      },
+
+      // 行编辑渲染
+      (): VNodeChild =>
+        renderEditComponent(
+          column,
+          rowEdit.getEditingRowData(rowKey)?.[column.key] ?? value,
+          val => rowEdit.updateEditingRowData(rowKey, column.key, val)
+        ),
+
+      // 单元格编辑渲染
+      (): VNodeChild =>
+        h(
           'div',
           {
-            class: 'cell-edit-wrapper',
+            class: 'relative w-full min-h-9 flex items-center overflow-visible',
           },
           [
+            // 输入框容器
             h(
-              'span',
-              { class: 'cell-value' },
-              column.render ? column.render(rowData, rowIndex) : value
-            ),
-            h('i', {
-              class: 'i-mdi:edit cell-edit-icon',
-              onClick: (e: Event) => {
-                e.stopPropagation()
-                startEdit(rowKey, column.key)
+              'div',
+              {
+                class: 'flex-1 min-w-0 pr-20',
               },
-            }),
+              [
+                renderEditComponent(
+                  column,
+                  cellEdit.getEditingCellValue(rowKey, column.key) ?? value,
+                  val =>
+                    cellEdit.updateEditingCellValue(rowKey, column.key, val)
+                ),
+              ]
+            ),
+
+            // 操作按钮
+            h(
+              'div',
+              {
+                class:
+                  'absolute top-1/2 right-1 -translate-y-1/2 flex items-center gap-1 bg-white/95 backdrop-blur-sm border border-gray-200/80 rounded-md px-2 py-1 shadow-md z-50 opacity-90 hover:opacity-100 hover:bg-white hover:shadow-lg hover:border-gray-300 transition-all duration-200',
+              },
+              [
+                // 保存按钮
+                h(
+                  'button',
+                  {
+                    class:
+                      'flex items-center justify-center w-6 h-6 rounded-md text-green-600 hover:text-green-700 hover:bg-green-50 hover:scale-110 active:scale-95 transition-all duration-200 flex-shrink-0',
+                    title: '保存',
+                    type: 'button',
+                    onClick: (e: Event) => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      cellEdit.saveEditCell()
+                    },
+                  },
+                  [h('i', { class: 'i-mdi:check w-4 h-4' })]
+                ),
+
+                // 取消按钮
+                h(
+                  'button',
+                  {
+                    class:
+                      'flex items-center justify-center w-6 h-6 rounded-md text-red-600 hover:text-red-700 hover:bg-red-50 hover:scale-110 active:scale-95 transition-all duration-200 flex-shrink-0',
+                    title: '取消',
+                    type: 'button',
+                    onClick: (e: Event) => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      cellEdit.cancelEditCell()
+                    },
+                  },
+                  [h('i', { class: 'i-mdi:close w-4 h-4' })]
+                ),
+              ]
+            ),
+          ]
+        ),
+
+      // 可编辑单元格渲染
+      (): VNodeChild =>
+        h('div', { class: 'cell-edit-wrapper' }, [
+          h(
+            'span',
+            { class: 'cell-value' },
+            column.render
+              ? (column.render(rowData, rowIndex) ?? String(value ?? ''))
+              : String(value ?? '')
+          ),
+          h('i', {
+            class: 'i-mdi:square-edit-outline cell-edit-icon ml-4px',
+            onClick: (e: Event) => {
+              e.stopPropagation()
+              cellEdit.startEditCell(rowKey, column.key)
+            },
+          }),
+        ]),
+    ]
+
+    const strategyIndex = strategies.findIndex(strategy => strategy())
+    return renders[strategyIndex] ? renders[strategyIndex]() : renders[0]()
+  }
+
+  const renderActions = (rowData: DataRecord, rowIndex: number): VNodeChild => {
+    const rowKey = props.rowKey(rowData)
+    const actions: VNodeChild[] = []
+
+    // 编辑相关操作
+    if (props.editMode === 'row' || props.editMode === 'both') {
+      actions.push(rowEdit.renderRowActions(rowKey))
+    }
+
+    if (props.editMode === 'modal') {
+      actions.push(
+        h(
+          NButton,
+          {
+            size: 'small',
+            type: 'primary',
+            quaternary: true,
+            onClick: () => modalEdit.startEdit(rowKey),
+          },
+          () => [
+            h(NIcon, { size: 14 }, () => h('i', { class: 'i-mdi:pencil' })),
+            '编辑',
           ]
         )
-      }
+      )
     }
 
-    // 默认渲染
-    return column.render ? column.render(rowData, rowIndex) : value
-  }
+    // 自定义操作
+    if (!rowEdit.isEditingRow(rowKey)) {
+      props.rowActions?.forEach(action => {
+        if (action.show?.(rowData, rowIndex) === false) return
 
-  // 操作列
-  const createActionColumn = (): TableColumn => {
-    return {
-      key: '_actions',
-      title: '操作',
-      width: 150,
-      align: 'center',
-      render: (rowData: any, rowIndex: number) => {
-        const rowKey = props.rowKey(rowData)
-        const isEditingRow = isEditing(rowKey)
-
-        if (isEditingRow && editState.mode === 'row') {
-          return h(
-            NSpace,
-            {},
-            {
-              default: () => [
-                h(
-                  NButton,
-                  {
-                    size: 'small',
-                    type: 'primary',
-                    onClick: () => saveEdit(),
-                  },
-                  { default: () => '保存' }
-                ),
-                h(
-                  NButton,
-                  {
-                    size: 'small',
-                    onClick: () => cancelEdit(),
-                  },
-                  { default: () => '取消' }
-                ),
-              ],
-            }
-          )
-        }
-
-        if (editState.mode === 'cell' && editState.rowKey === rowKey) {
-          return h(
-            NSpace,
-            {},
-            {
-              default: () => [
-                h(
-                  NButton,
-                  {
-                    size: 'small',
-                    type: 'primary',
-                    onClick: () => saveEdit(),
-                  },
-                  { default: () => '保存' }
-                ),
-                h(
-                  NButton,
-                  {
-                    size: 'small',
-                    onClick: () => cancelEdit(),
-                  },
-                  { default: () => '取消' }
-                ),
-              ],
-            }
-          )
-        }
-
-        const actions = []
-
-        // 行编辑按钮
-        if (props.editMode === 'row' || props.editMode === 'both') {
-          actions.push(
-            h(
-              NButton,
-              {
-                size: 'small',
-                type: 'primary',
-                quaternary: true,
-                onClick: () => startEdit(rowKey),
-              },
-              {
-                default: () => [
-                  h('i', { class: 'i-carbon-edit mr-1' }),
-                  '编辑',
-                ],
+        const onClick =
+          action.label === '查看'
+            ? () => {
+                viewingData.value = { ...rowData }
+                viewModalVisible.value = true
               }
-            )
+            : () => action.onClick(rowData, rowIndex)
+
+        actions.push(
+          h(
+            NButton,
+            {
+              size: 'small',
+              type: action.type || 'default',
+              quaternary: true,
+              onClick,
+            },
+            () => [
+              action.icon &&
+                h(NIcon, { size: 14 }, () => h('i', { class: action.icon })),
+              action.label,
+            ]
           )
-        }
-
-        // 自定义行操作
-        if (props.rowActions) {
-          props.rowActions.forEach(action => {
-            if (action.show && !action.show(rowData, rowIndex)) return
-
-            actions.push(
-              h(
-                NButton,
-                {
-                  size: 'small',
-                  type: action.type || 'default',
-                  quaternary: true,
-                  disabled: action.disabled?.(rowData, rowIndex),
-                  onClick: () => action.onClick(rowData, rowIndex),
-                },
-                {
-                  default: () => [
-                    action.icon && h('i', { class: `${action.icon} mr-1` }),
-                    action.label,
-                  ],
-                }
-              )
-            )
-          })
-        }
-
-        return h(NSpace, {}, { default: () => actions })
-      },
+        )
+      })
     }
+
+    return h(NSpace, { size: 2, wrap: false }, () => actions)
   }
 
-  // 计算后的列配置
-  const computedColumns = computed(() => {
-    const columns = props.columns.map(column => ({
+  // 计算列配置
+  const computedColumns = computed((): DataTableColumn[] => {
+    const columns: DataTableColumn[] = props.columns.map(column => ({
       ...column,
-      render: (rowData: any, rowIndex: number) =>
+      width: column.width || props.columnWidth,
+      titleAlign: 'center' as const,
+      align: 'center' as const,
+      render: (rowData: DataRecord, rowIndex: number) =>
         renderCell(column, rowData, rowIndex),
     }))
 
-    // 添加操作列
-    if (props.showRowActions && props.editable) {
-      columns.push(createActionColumn())
+    if (props.showRowActions && (props.editable || props.rowActions?.length)) {
+      columns.push({
+        key: '_actions',
+        title: '操作',
+        align: 'center' as const,
+        titleAlign: 'center' as const,
+        render: renderActions,
+      })
     }
 
     return columns
   })
 
-  // 表格属性
-  const tableProps = computed(() => {
-    const {
-      columns,
-      data,
-      editable,
-      editMode,
-      onSave,
-      onCancel,
-      showRowActions,
-      rowActions,
-      ...rest
-    } = props
-    return rest
+  // 组合式函数初始化
+  const rowEdit = useRowEdit({
+    data: () => props.data,
+    rowKey: props.rowKey,
+    onSave: handleSave,
+    onCancel: handleCancel,
   })
 
-  // 暴露实例方法
+  const cellEdit = useCellEdit({
+    data: () => props.data,
+    rowKey: props.rowKey,
+    onSave: handleSave,
+  })
+
+  const modalEdit = useModalEdit({
+    data: () => props.data,
+    rowKey: props.rowKey,
+    onSave: handleSave,
+    onCancel: handleCancel,
+  })
+
+  // 编辑模式处理
+  const handleStartEdit = (rowKey: DataTableRowKey, columnKey?: string) => {
+    switch (props.editMode) {
+      case 'modal':
+        modalEdit.startEdit(rowKey)
+        break
+      case 'cell':
+        if (columnKey) {
+          cellEdit.startEditCell(rowKey, columnKey)
+        }
+        break
+      case 'row':
+      case 'both':
+        rowEdit.startEditRow(rowKey)
+        break
+      case 'none':
+      default:
+        // 不执行任何操作
+        break
+    }
+  }
+
+  // 暴露方法
   defineExpose<TableInstance>({
-    startEdit,
-    cancelEdit,
-    saveEdit,
-    isEditing,
-    getEditingData,
-  })
+    startEdit: handleStartEdit,
 
-  // 导出类型供外部使用
-  export type { TableColumn, TableProps, RowAction, TableInstance, CellValue }
+    /**
+     * @description: 取消编辑操作
+     */
+    cancelEdit() {
+      if (modalEdit.isModalVisible.value) modalEdit.cancelEdit()
+      else if (cellEdit.editingCell.value.rowKey) cellEdit.cancelEditCell()
+      else if (rowEdit.editingRowKey.value) rowEdit.cancelEditRow()
+    },
+
+    /**
+     * @description:  保存编辑操作
+     */
+    async saveEdit() {
+      if (modalEdit.isModalVisible.value) await handleModalSave()
+      else if (cellEdit.editingCell.value.rowKey) await cellEdit.saveEditCell()
+      else if (rowEdit.editingRowKey.value) await rowEdit.saveEditRow()
+    },
+
+    /**
+     * * @description: 检查是否正在编辑
+     * ? @param {*} rowKey  行号
+     * ? @param {*} columnKey  列号
+     * ! @return {*}
+     */
+    isEditing(rowKey: DataTableRowKey, columnKey?: string) {
+      if (props.editMode === 'modal') return modalEdit.isEditingRow(rowKey)
+      if (columnKey) return cellEdit.isEditingCell(rowKey, columnKey)
+      return rowEdit.isEditingRow(rowKey)
+    },
+
+    /**
+     * @description: 获取正在编辑的数据
+     */
+    getEditingData() {
+      if (modalEdit.isModalVisible.value) return modalEdit.editingData
+      if (rowEdit.editingRowKey.value)
+        return rowEdit.getEditingRowData(rowEdit.editingRowKey.value)
+      return null
+    },
+  })
 </script>
 
-<style scoped>
-  .c-table-wrapper {
-    width: 100%;
-  }
-
-  .cell-edit-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .cell-value {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .cell-edit-icon {
-    flex-shrink: 0;
-    margin-left: 8px;
-    font-size: 16px;
-    color: var(--n-text-color-3);
-    cursor: pointer;
-    opacity: 0;
-    transition: all 0.3s;
-  }
-
-  .cell-edit-wrapper:hover .cell-edit-icon {
-    opacity: 1;
-    color: var(--n-primary-color);
-  }
-
-  .cell-edit-icon:hover {
-    transform: scale(1.1);
-  }
+<style scoped lang="scss">
+  @use './index.scss';
 </style>
