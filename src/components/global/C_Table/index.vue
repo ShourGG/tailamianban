@@ -2,10 +2,10 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-15 02:06:01
+ * @LastEditTime: 2025-06-15 13:18:30
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
  * @Description: 超级表格组件
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
@@ -111,9 +111,9 @@
     TableProps,
     TableInstance,
   } from '@/types/modules/table'
-  import { useRowEdit } from './composables/useRowEdit'
-  import { useCellEdit } from './composables/useCellEdit'
-  import { useModalEdit } from './composables/useModalEdit'
+  import { useRowEdit } from '../../../composables/Table/useRowEdit'
+  import { useCellEdit } from '../../../composables/Table/useCellEdit'
+  import { useModalEdit } from '../../../composables/Table/useModalEdit'
   import {
     getDisplayValue,
     generateFormOptions,

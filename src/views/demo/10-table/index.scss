@@ -1,0 +1,21 @@
+  .table-demo-page {
+    padding: 20px;
+  }
+
+  .list-disc {
+    list-style-type: disc;
+  }
+
+  .list-inside {
+    list-style-position: inside;
+  }
+
+  .space-y-1 > * + * {
+    margin-top: 0.25rem;
+  }
+
+  :deep(.n-radio-button__label) {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
