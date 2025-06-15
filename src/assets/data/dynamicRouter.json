@@ -238,7 +238,7 @@
             {
               "path": "table-expand",
               "name": "demo-table-expand",
-              "component": "/10-table-expand/index",
+              "component": "/demo/11-table-expand/index",
               "meta": {
                 "icon": "mdi:table-pivot",
                 "title": "Expand表格",
