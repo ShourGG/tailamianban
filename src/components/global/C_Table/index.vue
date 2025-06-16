@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-15 19:04:09
+ * @LastEditTime: 2025-06-16 12:24:33
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
- * @Description: 超级表格组件 - 优化版本
+ * @Description: 超级表格组件 - 增强版本（支持展开和选择）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
@@ -19,8 +19,10 @@
       :loading="loading"
       :row-key="rowKey"
       :expanded-row-keys="expandedKeys"
+      :checked-row-keys="checkedKeys"
       :render-expand="renderExpandFunction"
       @update:expanded-row-keys="handleExpandedRowKeysChange"
+      @update:checked-row-keys="handleCheckedRowKeysChange"
     />
 
     <!-- 编辑模态框 -->
@@ -94,7 +96,6 @@
 
 <script setup lang="ts">
   import type { VNodeChild, ComponentPublicInstance } from 'vue'
-
   import {
     NInputNumber,
     NDatePicker,
@@ -111,7 +112,10 @@
     TableColumn,
     TableProps,
     TableInstance,
+    TableEmits,
     EditType,
+    ParentChildLinkMode,
+    ChildSelectionState,
   } from '@/types/modules/table'
   import { useRowEdit } from '@/composables/Table/useRowEdit'
   import { useCellEdit } from '@/composables/Table/useCellEdit'
@@ -128,21 +132,38 @@
     validate: () => Promise<void>
   }
 
-  // 扩展 TableProps 支持展开功能
+  // 扩展 TableProps 支持展开和选择功能
   interface EnhancedTableProps<T = Record<string, any>> extends TableProps<T> {
+    // 🔥 展开功能配置
     expandable?: boolean
     onLoadExpandData?: (row: T) => Promise<any[]> | any[]
     renderExpandContent?: (
       row: T,
       expandData: any[],
-      loading: boolean
+      loading: boolean,
+      childSelection?: ChildSelectionState
     ) => VNodeChild
     rowExpandable?: (row: T) => boolean
+    defaultExpandedKeys?: DataTableRowKey[]
+
+    // 🔥 选择功能配置
+    enableSelection?: boolean
+    defaultCheckedKeys?: DataTableRowKey[]
+    rowCheckable?: (row: T) => boolean
+    maxSelection?: number
+
+    // 🔥 子表格选择配置
+    enableChildSelection?: boolean
+    childRowCheckable?: (childRow: any, parentRow: T) => boolean
+
+    // 🔥 父子联动配置
+    enableParentChildLink?: boolean
+    parentChildLinkMode?: ParentChildLinkMode
   }
 
   type DataRecord = Record<string, unknown>
 
-  // 编辑组件映射 - 优化类型安全
+  // 编辑组件映射
   const EDIT_COMPONENTS: Record<EditType, any> = {
     number: NInputNumber,
     switch: NSwitch,
@@ -172,14 +193,14 @@
     modalWidth: 600,
     columnWidth: 180,
     expandable: false,
+    enableSelection: false,
+    enableChildSelection: false,
+    enableParentChildLink: false,
+    parentChildLinkMode: 'loose',
   })
 
   // Emits 定义
-  const emit = defineEmits<{
-    'update:data': [data: DataRecord[]]
-    save: [rowData: DataRecord, rowIndex: number, columnKey?: string]
-    cancel: [rowData: DataRecord, rowIndex: number]
-  }>()
+  const emit = defineEmits<TableEmits>()
 
   // Refs
   const tableRef = ref<ComponentPublicInstance>()
@@ -188,7 +209,7 @@
   const viewingData = ref<DataRecord>({})
   const submitLoading = ref(false)
 
-  // 计算属性 - 使用类型安全的过滤
+  // 计算属性
   const editableColumns = computed(() =>
     props.columns.filter((col): col is TableColumn => col.editable !== false)
   )
@@ -205,31 +226,55 @@
 
   const formOptions = computed(() => generateFormOptions(editableColumns.value))
 
-  // 展开功能 - 简化空值检查
-  const expandState = computed(() => {
-    if (!props.expandable) return null
+  // 🔥 展开和选择功能初始化 - 彻底修复生命周期错误
+  let expandState: ReturnType<typeof useTableExpand> | null = null
 
-    return useTableExpand({
+  // 在 setup 顶层判断是否需要初始化展开功能
+  if (props.expandable || props.enableSelection || props.enableChildSelection) {
+    expandState = useTableExpand({
       data: computed(() => props.data),
       rowKey: props.rowKey,
-      rowExpandable: props.rowExpandable,
+      childRowKey: (child: any) => child.id,
+
+      // 展开配置
+      defaultExpandedKeys: props.defaultExpandedKeys,
       onLoadData: props.onLoadExpandData,
       renderContent: props.renderExpandContent,
-      onExpandChange: (keys: DataTableRowKey[]) => {
-        console.log('🔥 C_Table - 展开状态变化:', keys)
+      rowExpandable: props.rowExpandable,
+
+      // 选择配置
+      enableSelection: props.enableSelection,
+      defaultCheckedKeys: props.defaultCheckedKeys,
+      rowCheckable: props.rowCheckable,
+      maxSelection: props.maxSelection,
+
+      // 子选择配置
+      enableChildSelection: props.enableChildSelection,
+      childRowCheckable: props.childRowCheckable,
+
+      // 父子联动配置
+      enableParentChildLink: props.enableParentChildLink,
+      parentChildLinkMode: props.parentChildLinkMode,
+
+      // 事件回调
+      onExpandChange: (keys, row, expanded) => {
+        emit('expand-change', keys, row, expanded)
+      },
+      onSelectionChange: (checkedKeys, checkedRows, childSelections) => {
+        emit('selection-change', checkedKeys, checkedRows, childSelections)
+      },
+      onChildSelectionChange: (parentKey, childKeys, childRows) => {
+        emit('child-selection-change', parentKey, childKeys, childRows)
       },
     })
-  })
+  }
 
-  const expandedKeys = computed(
-    () => expandState.value?.expandedKeys.value ?? []
-  )
+  // 🔥 展开和选择状态
+  const expandedKeys = computed(() => expandState?.expandedKeys.value ?? [])
+  const checkedKeys = computed(() => expandState?.checkedKeys.value ?? [])
+  const renderExpandFunction = computed(() => undefined)
 
-  const renderExpandFunction = computed(() =>
-    expandState.value?.getRenderExpand()
-  )
-
-  // 组合式函数初始化
+  // 编辑功能初始化
   const rowEdit = useRowEdit({
     data: () => props.data,
     rowKey: props.rowKey,
@@ -250,12 +295,11 @@
     onCancel: handleCancel,
   })
 
-  // 核心处理函数
   /**
-   * @description 处理数据保存操作
+   * * @description 处理保存操作
    * ? @param rowData - 行数据对象
    * ? @param rowIndex - 行索引
-   * ? @param columnKey - 列键值(可选)
+   * ? @param columnKey - 列键名（可选）
    * ! @return Promise<void>
    */
   async function handleSave(
@@ -274,7 +318,7 @@
   }
 
   /**
-   * @description 处理取消编辑操作
+   * * @description 处理取消操作
    * ? @param rowData - 行数据对象
    * ? @param rowIndex - 行索引
    * ! @return void
@@ -284,8 +328,8 @@
   }
 
   /**
-   * @description 处理表单数据更新
-   * ? @param value - 更新的表单数据
+   * * @description 处理表单更新
+   * ? @param value - 表单数据对象
    * ! @return void
    */
   function handleFormUpdate(value: DataRecord) {
@@ -293,7 +337,7 @@
   }
 
   /**
-   * @description 处理模态框保存操作
+   * * @description 处理模态框保存
    * ! @return Promise<void>
    */
   async function handleModalSave() {
@@ -309,20 +353,29 @@
   }
 
   /**
-   * @description 处理展开行键值变化
-   * ? @param keys - 展开的行键值数组
+   * * @description 处理展开行键变化
+   * ? @param keys - 展开的行键数组
    * ! @return void
    */
   function handleExpandedRowKeysChange(keys: DataTableRowKey[]) {
-    console.log('🔥 C_Table - handleExpandedRowKeysChange:', keys)
-    if (expandState.value) {
-      expandState.value.expandedKeys.value = keys
+    if (expandState) {
+      expandState.handleExpandChange(keys)
     }
   }
 
-  // 工具函数
   /**
-   * @description 验证保存参数的有效性
+   * * @description 处理选中行键变化
+   * ? @param keys - 选中的行键数组
+   * ! @return void
+   */
+  function handleCheckedRowKeysChange(keys: DataTableRowKey[]) {
+    if (expandState) {
+      expandState.handleSelectionChange(keys)
+    }
+  }
+
+  /**
+   * * @description 验证保存参数是否有效
    * ? @param rowData - 行数据对象
    * ? @param rowIndex - 行索引
    * ! @return 参数是否有效
@@ -332,8 +385,8 @@
   }
 
   /**
-   * @description 获取描述项的跨度
-   * ? @param column - 列配置对象
+   * * @description 获取描述项的跨度
+   * ? @param column - 表格列配置
    * ! @return 跨度数值
    */
   function getDescriptionSpan(column: TableColumn): number {
@@ -343,11 +396,11 @@
   }
 
   /**
-   * @description 获取编辑模式下的单元格值
-   * ? @param column - 列配置对象
+   * * @description 获取编辑值
+   * ? @param column - 表格列配置
    * ? @param rowData - 行数据对象
-   * ? @param rowKey - 行键值
-   * ! @return 单元格值
+   * ? @param rowKey - 行键
+   * ! @return 编辑值
    */
   function getEditValue(
     column: TableColumn,
@@ -360,10 +413,10 @@
   }
 
   /**
-   * @description 获取单元格编辑模式下的值
-   * ? @param column - 列配置对象
+   * * @description 获取单元格编辑值
+   * ? @param column - 表格列配置
    * ? @param rowData - 行数据对象
-   * ? @param rowKey - 行键值
+   * ? @param rowKey - 行键
    * ! @return 单元格编辑值
    */
   function getCellEditValue(
@@ -377,8 +430,8 @@
   }
 
   /**
-   * @description 渲染编辑组件
-   * ? @param column - 列配置对象
+   * * @description 渲染编辑组件
+   * ? @param column - 表格列配置
    * ? @param value - 当前值
    * ? @param onUpdate - 更新回调函数
    * ! @return Vue节点子元素
@@ -407,8 +460,8 @@
   }
 
   /**
-   * @description 渲染单元格编辑操作按钮
-   * ? @param rowKey - 行键值
+   * * @description 渲染单元格编辑操作按钮
+   * ? @param rowKey - 行键
    * ! @return Vue节点子元素
    */
   function renderCellEditActions(rowKey: DataTableRowKey): VNodeChild {
@@ -420,7 +473,6 @@
           'absolute top-1/2 right-1 -translate-y-1/2 flex items-center gap-1 bg-white/95 backdrop-blur-sm border border-gray-200/80 rounded-md px-2 py-1 shadow-md z-50 opacity-90 hover:opacity-100 hover:bg-white hover:shadow-lg hover:border-gray-300 transition-all duration-200',
       },
       [
-        // 保存按钮
         h(
           'button',
           {
@@ -436,8 +488,6 @@
           },
           [h('i', { class: 'i-mdi:check w-4 h-4' })]
         ),
-
-        // 取消按钮
         h(
           'button',
           {
@@ -458,8 +508,8 @@
   }
 
   /**
-   * @description 渲染表格单元格
-   * ? @param column - 列配置对象
+   * * @description 渲染单元格
+   * ? @param column - 表格列配置
    * ? @param rowData - 行数据对象
    * ? @param rowIndex - 行索引
    * ! @return Vue节点子元素
@@ -472,7 +522,6 @@
     const value = rowData[column.key]
     const rowKey = props.rowKey(rowData)
 
-    // 不可编辑状态
     if (
       !props.editable ||
       column.editable === false ||
@@ -481,7 +530,6 @@
       return renderDisplayCell(column, rowData, rowIndex, value)
     }
 
-    // 行编辑模式
     if (isRowEditMode() && rowEdit.isEditingRow(rowKey)) {
       return renderEditComponent(
         column,
@@ -490,7 +538,6 @@
       )
     }
 
-    // 单元格编辑模式
     if (isCellEditMode()) {
       return cellEdit.isEditingCell(rowKey, column.key)
         ? renderEditingCell(column, rowData, rowKey)
@@ -501,8 +548,8 @@
   }
 
   /**
-   * @description 渲染显示模式的单元格
-   * ? @param column - 列配置对象
+   * * @description 渲染显示单元格
+   * ? @param column - 表格列配置
    * ? @param rowData - 行数据对象
    * ? @param rowIndex - 行索引
    * ? @param value - 单元格值
@@ -522,10 +569,10 @@
   }
 
   /**
-   * @description 渲染编辑中的单元格
-   * ? @param column - 列配置对象
+   * * @description 渲染编辑中的单元格
+   * ? @param column - 表格列配置
    * ? @param rowData - 行数据对象
-   * ? @param rowKey - 行键值
+   * ? @param rowKey - 行键
    * ! @return Vue节点子元素
    */
   function renderEditingCell(
@@ -552,12 +599,12 @@
   }
 
   /**
-   * @description 渲染可编辑的单元格
-   * ? @param column - 列配置对象
+   * * @description 渲染可编辑单元格
+   * ? @param column - 表格列配置
    * ? @param rowData - 行数据对象
    * ? @param rowIndex - 行索引
    * ? @param value - 单元格值
-   * ? @param rowKey - 行键值
+   * ? @param rowKey - 行键
    * ! @return Vue节点子元素
    */
   function renderEditableCell(
@@ -586,7 +633,7 @@
   }
 
   /**
-   * @description 判断是否为行编辑模式
+   * * @description 判断是否为行编辑模式
    * ! @return 是否为行编辑模式
    */
   function isRowEditMode(): boolean {
@@ -594,7 +641,7 @@
   }
 
   /**
-   * @description 判断是否为单元格编辑模式
+   * * @description 判断是否为单元格编辑模式
    * ! @return 是否为单元格编辑模式
    */
   function isCellEditMode(): boolean {
@@ -602,7 +649,7 @@
   }
 
   /**
-   * @description 渲染操作列
+   * * @description 渲染操作按钮
    * ? @param rowData - 行数据对象
    * ? @param rowIndex - 行索引
    * ! @return Vue节点子元素
@@ -611,7 +658,6 @@
     const rowKey = props.rowKey(rowData)
     const actions: VNodeChild[] = []
 
-    // 编辑相关操作
     if (isRowEditMode()) {
       actions.push(rowEdit.renderRowActions(rowKey))
     }
@@ -620,7 +666,6 @@
       actions.push(renderModalEditButton(rowKey))
     }
 
-    // 自定义操作
     if (!rowEdit.isEditingRow(rowKey)) {
       addCustomActions(actions, rowData, rowIndex)
     }
@@ -629,8 +674,8 @@
   }
 
   /**
-   * @description 渲染模态框编辑按钮
-   * ? @param rowKey - 行键值
+   * * @description 渲染模态框编辑按钮
+   * ? @param rowKey - 行键
    * ! @return Vue节点子元素
    */
   function renderModalEditButton(rowKey: DataTableRowKey): VNodeChild {
@@ -650,7 +695,7 @@
   }
 
   /**
-   * @description 添加自定义操作按钮
+   * * @description 添加自定义操作按钮
    * ? @param actions - 操作按钮数组
    * ? @param rowData - 行数据对象
    * ? @param rowIndex - 行索引
@@ -691,11 +736,8 @@
     })
   }
 
-  // 计算列配置
+  // 🔥 计算列配置 - 整合展开和选择功能
   const computedColumns = computed((): DataTableColumn[] => {
-    console.log('🔥 C_Table - 计算列配置, expandable:', props.expandable)
-
-    // 基础列配置
     let columns: DataTableColumn[] = props.columns.map(column => ({
       ...column,
       width: column.width || props.columnWidth,
@@ -705,12 +747,9 @@
         renderCell(column, rowData, rowIndex),
     }))
 
-    // 展开功能增强
-    if (props.expandable && expandState.value) {
-      console.log('🔥 C_Table - 使用 expandState.getColumnsWithExpand')
-      columns = expandState.value.getColumnsWithExpand(
-        columns as any
-      ) as DataTableColumn[]
+    // 🔥 使用 expandState 的列配置增强
+    if (expandState && (props.expandable || props.enableSelection)) {
+      columns = expandState.getTableColumns(columns as any) as DataTableColumn[]
     }
 
     // 添加操作列
@@ -722,7 +761,7 @@
   })
 
   /**
-   * @description 判断是否应该显示操作列
+   * * @description 判断是否显示操作列
    * ! @return 是否显示操作列
    */
   function shouldShowActionsColumn(): boolean {
@@ -733,7 +772,7 @@
   }
 
   /**
-   * @description 创建操作列配置
+   * * @description 创建操作列配置
    * ! @return 操作列配置对象
    */
   function createActionsColumn(): DataTableColumn {
@@ -747,7 +786,6 @@
     }
   }
 
-  // 编辑模式处理 - 使用映射减少圈复杂度
   const editModeHandlers = {
     modal: (rowKey: DataTableRowKey) => modalEdit.startEdit(rowKey),
     cell: (rowKey: DataTableRowKey, columnKey?: string) =>
@@ -758,9 +796,9 @@
   } as const
 
   /**
-   * @description 处理开始编辑操作
-   * ? @param rowKey - 行键值
-   * ? @param columnKey - 列键值(可选)
+   * * @description 处理开始编辑
+   * ? @param rowKey - 行键
+   * ? @param columnKey - 列键（可选）
    * ! @return void
    */
   function handleStartEdit(rowKey: DataTableRowKey, columnKey?: string) {
@@ -768,7 +806,6 @@
     handler?.(rowKey, columnKey)
   }
 
-  // 编辑状态管理
   const editStateManagers = {
     isModalEditing: () => modalEdit.isModalVisible.value,
     isCellEditing: () => !!cellEdit.editingCell.value.rowKey,
@@ -783,19 +820,19 @@
     saveRow: () => rowEdit.saveEditRow(),
   }
 
-  // 暴露方法
-  defineExpose<
-    TableInstance & {
-      expandAll: () => void
-      collapseAll: () => void
-    }
-  >({
+  // 🔥 暴露方法 - 包含展开和选择功能
+  defineExpose<TableInstance>({
+    /**
+     * * @description 开始编辑
+     * ? @param rowKey - 行键
+     * ? @param columnKey - 列键（可选）
+     * ! @return void
+     */
     startEdit: handleStartEdit,
 
     /**
-     * @description: 取消当前的编辑操作，根据当前编辑模式自动选择对应的取消方法
-     * 支持三种编辑模式：模态框编辑、单元格编辑、行编辑
-     * @return {void} 无返回值
+     * * @description 取消编辑
+     * ! @return void
      */
     cancelEdit() {
       if (editStateManagers.isModalEditing()) editStateManagers.cancelModal()
@@ -804,9 +841,8 @@
     },
 
     /**
-     * @description: 保存当前的编辑操作，根据当前编辑模式自动选择对应的保存方法
-     * 支持三种编辑模式：模态框编辑、单元格编辑、行编辑
-     * @return {Promise<void>} 返回保存操作的Promise对象
+     * * @description 保存编辑
+     * ! @return Promise<void>
      */
     async saveEdit() {
       if (editStateManagers.isModalEditing())
@@ -818,14 +854,10 @@
     },
 
     /**
-     * @description: 判断指定行或单元格是否处于编辑状态
-     * 根据editMode配置和参数来确定检查范围：
-     * - 模态框模式：检查指定行是否在模态框中编辑
-     * - 提供columnKey时：检查指定单元格是否在编辑
-     * - 仅提供rowKey时：检查指定行是否在编辑
-     * @param {DataTableRowKey} rowKey 行的唯一标识键值
-     * @param {string} [columnKey] 列的标识键值，可选参数
-     * @return {boolean} 返回true表示正在编辑，false表示未编辑
+     * * @description 判断是否正在编辑
+     * ? @param rowKey - 行键
+     * ? @param columnKey - 列键（可选）
+     * ! @return 是否正在编辑
      */
     isEditing(rowKey: DataTableRowKey, columnKey?: string) {
       if (props.editMode === 'modal') return modalEdit.isEditingRow(rowKey)
@@ -834,12 +866,8 @@
     },
 
     /**
-     * @description: 获取当前正在编辑的数据
-     * 根据当前编辑模式返回对应的编辑数据：
-     * - 模态框编辑：返回模态框中的编辑数据
-     * - 行编辑：返回正在编辑行的数据
-     * - 单元格编辑或无编辑状态：返回null
-     * @return {Object|null} 返回编辑数据对象，无编辑时返回null
+     * * @description 获取编辑中的数据
+     * ! @return 编辑中的数据或null
      */
     getEditingData() {
       if (editStateManagers.isModalEditing()) return modalEdit.editingData
@@ -850,21 +878,234 @@
     },
 
     /**
-     * @description: 展开表格中所有可展开的行
-     * 适用于树形表格或分组表格，将所有折叠的行展开显示
+     * * @description 展开行
+     * ? @param rowKey - 行键
+     * ! @return Promise<void>
      */
-    expandAll() {
-      console.log('🔥 C_Table - expandAll 被调用')
-      expandState.value?.expandAll()
+    expandRow: async (rowKey: DataTableRowKey) => {
+      if (expandState) {
+        const currentKeys = [...expandState.expandedKeys.value]
+        if (!currentKeys.includes(rowKey)) {
+          currentKeys.push(rowKey)
+          expandState.handleExpandChange(currentKeys)
+        }
+      }
     },
 
     /**
-     * @description: 折叠表格中所有已展开的行
-     * 适用于树形表格或分组表格，将所有展开的行折叠隐藏
+     * * @description 折叠行
+     * ? @param rowKey - 行键
+     * ! @return void
      */
-    collapseAll() {
-      console.log('🔥 C_Table - collapseAll 被调用')
-      expandState.value?.collapseAll()
+    collapseRow: (rowKey: DataTableRowKey) => {
+      if (expandState) {
+        const currentKeys = expandState.expandedKeys.value.filter(
+          key => key !== rowKey
+        )
+        expandState.handleExpandChange(currentKeys)
+      }
+    },
+
+    /**
+     * * @description 切换展开状态
+     * ? @param rowKey - 行键
+     * ! @return Promise<void>
+     */
+    toggleExpand: async (rowKey: DataTableRowKey) => {
+      if (expandState?.expandedKeys.value.includes(rowKey)) {
+        // 如果已展开，则折叠
+        const currentKeys = expandState.expandedKeys.value.filter(
+          key => key !== rowKey
+        )
+        expandState.handleExpandChange(currentKeys)
+      } else {
+        // 如果未展开，则展开
+        await expandState?.expandRow?.(rowKey)
+      }
+    },
+
+    /**
+     * * @description 展开所有行
+     * ! @return Promise<void>
+     */
+    expandAll: async () => {
+      await expandState?.expandAll()
+    },
+
+    /**
+     * * @description 折叠所有行
+     * ! @return void
+     */
+    collapseAll: () => {
+      expandState?.collapseAll()
+    },
+
+    /**
+     * * @description 判断行是否已展开
+     * ? @param rowKey - 行键
+     * ! @return 是否已展开
+     */
+    isExpanded: (rowKey: DataTableRowKey) => {
+      return expandState?.expandedKeys.value.includes(rowKey) ?? false
+    },
+
+    /**
+     * * @description 选中行
+     * ? @param rowKey - 行键
+     * ! @return void
+     */
+    selectRow: (rowKey: DataTableRowKey) => {
+      if (
+        expandState?.checkedKeys.value &&
+        !expandState.checkedKeys.value.includes(rowKey)
+      ) {
+        const newKeys = [...expandState.checkedKeys.value, rowKey]
+        expandState.handleSelectionChange(newKeys)
+      }
+    },
+
+    /**
+     * * @description 取消选中行
+     * ? @param rowKey - 行键
+     * ! @return void
+     */
+    unselectRow: (rowKey: DataTableRowKey) => {
+      if (expandState?.checkedKeys.value) {
+        const newKeys = expandState.checkedKeys.value.filter(
+          key => key !== rowKey
+        )
+        expandState.handleSelectionChange(newKeys)
+      }
+    },
+
+    /**
+     * * @description 选中所有行
+     * ! @return void
+     */
+    selectAll: () => {
+      expandState?.selectAll()
+    },
+
+    /**
+     * * @description 清空选择
+     * ! @return void
+     */
+    clearSelection: () => {
+      expandState?.clearSelection()
+    },
+
+    /**
+     * * @description 判断行是否已选中
+     * ? @param rowKey - 行键
+     * ! @return 是否已选中
+     */
+    isRowSelected: (rowKey: DataTableRowKey) => {
+      return expandState?.checkedKeys.value.includes(rowKey) ?? false
+    },
+
+    /**
+     * * @description 获取选中的行数据
+     * ! @return 选中的行数据数组
+     */
+    getSelectedRows: () => {
+      if (!expandState?.checkedKeys.value) return []
+      return props.data.filter(row =>
+        expandState!.checkedKeys.value.includes(props.rowKey(row))
+      )
+    },
+
+    /**
+     * * @description 选中子行
+     * ? @param parentKey - 父行键
+     * ? @param childKey - 子行键
+     * ! @return void
+     */
+    selectChildRow: (parentKey: DataTableRowKey, childKey: DataTableRowKey) => {
+      if (expandState?.childSelections.value) {
+        const current = expandState.childSelections.value.get(parentKey) || []
+        if (!current.includes(childKey)) {
+          const newSelection = [...current, childKey]
+          expandState.childSelections.value.set(parentKey, newSelection)
+          // 触发子选择变化事件
+          emit('child-selection-change', parentKey, newSelection, [])
+        }
+      }
+    },
+
+    /**
+     * * @description 取消选中子行
+     * ? @param parentKey - 父行键
+     * ? @param childKey - 子行键
+     * ! @return void
+     */
+    unselectChildRow: (
+      parentKey: DataTableRowKey,
+      childKey: DataTableRowKey
+    ) => {
+      if (expandState?.childSelections.value) {
+        const current = expandState.childSelections.value.get(parentKey) || []
+        const newSelection = current.filter(k => k !== childKey)
+        expandState.childSelections.value.set(parentKey, newSelection)
+        // 触发子选择变化事件
+        emit('child-selection-change', parentKey, newSelection, [])
+      }
+    },
+
+    /**
+     * * @description 选中所有子行
+     * ? @param parentKey - 父行键
+     * ! @return void
+     */
+    selectAllChildren: (parentKey: DataTableRowKey) => {
+      if (
+        expandState?.childSelections.value &&
+        expandState.expandDataMap?.value
+      ) {
+        const expandData = expandState.expandDataMap.value.get(parentKey) || []
+        const allChildKeys = expandData.map((child: any) => child.id)
+        expandState.childSelections.value.set(parentKey, allChildKeys)
+        // 触发子选择变化事件
+        emit('child-selection-change', parentKey, allChildKeys, expandData)
+      }
+    },
+
+    /**
+     * * @description 清空子行选择
+     * ? @param parentKey - 父行键
+     * ! @return void
+     */
+    clearChildrenSelection: (parentKey: DataTableRowKey) => {
+      if (expandState?.childSelections.value) {
+        expandState.childSelections.value.set(parentKey, [])
+        // 触发子选择变化事件
+        emit('child-selection-change', parentKey, [], [])
+      }
+    },
+
+    /**
+     * * @description 获取子行选中数据
+     * ? @param parentKey - 父行键
+     * ! @return 选中的子行数据数组
+     */
+    getChildSelectedRows: (parentKey: DataTableRowKey) => {
+      if (
+        !expandState?.childSelections.value ||
+        !expandState.expandDataMap?.value
+      ) {
+        return []
+      }
+      const selectedKeys =
+        expandState.childSelections.value.get(parentKey) || []
+      const expandData = expandState.expandDataMap.value.get(parentKey) || []
+      return expandData.filter((child: any) => selectedKeys.includes(child.id))
+    },
+
+    /**
+     * * @description 清空所有选择（包括父行和子行）
+     * ! @return void
+     */
+    clearAllSelections: () => {
+      expandState?.clearAllSelections()
     },
   })
 </script>

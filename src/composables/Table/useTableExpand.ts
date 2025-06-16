@@ -2,865 +2,585 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-15 19:30:00
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-16 00:10:46
+ * @LastEditTime: 2025-06-16 12:54:50
  * @FilePath: \Robot_Admin\src\composables\Table\useTableExpand.ts
- * @Description: 极简重构版表格展开功能 - 彻底降低圈复杂度 + 简单联动
+ * @Description: 精简版表格展开功能 - 优化复杂度和类型安全
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 import type { VNodeChild, Ref } from 'vue'
-import { type DataTableRowKey, NSpin, NDataTable, NButton } from 'naive-ui/es'
-import type { TableColumn } from '@/types/modules/table'
+import { type DataTableRowKey, NSpin, NDataTable } from 'naive-ui/es'
+import type {
+  TableColumn,
+  UseTableExpandOptions,
+  UseTableExpandReturn,
+  ChildSelectionState,
+} from '@/types/modules/table'
 
-// ================= 核心类型 =================
-export interface ExpandOptions<T = Record<string, any>> {
-  data: Ref<T[]> | T[]
-  rowKey: (row: T) => DataTableRowKey
-  defaultExpandedKeys?: DataTableRowKey[]
-  onLoadData?: (row: T) => Promise<any[]>
-  renderContent?: (
-    row: T,
-    expandData: any[],
-    loading: boolean,
-    childSelection?: any
-  ) => VNodeChild
-  accordion?: boolean
-  rowExpandable?: (row: T) => boolean
-  onExpandChange?: (
-    expandedKeys: DataTableRowKey[],
-    row?: T,
-    expanded?: boolean
-  ) => void
-
-  enableSelection?: boolean
-  defaultCheckedKeys?: DataTableRowKey[]
-  onSelectionChange?: (
-    checkedKeys: DataTableRowKey[],
-    checkedRows: T[],
-    childSelections?: Map<DataTableRowKey, any[]>
-  ) => void
-  rowCheckable?: (row: T) => boolean
-  maxSelection?: number
-
-  enableChildSelection?: boolean
-  childRowKey?: (childRow: any) => DataTableRowKey
-  childRowCheckable?: (childRow: any, parentRow: T) => boolean
-  onChildSelectionChange?: (
-    parentKey: DataTableRowKey,
-    childKeys: DataTableRowKey[],
-    childRows: any[]
-  ) => void
-}
-
-// ================= 纯函数工具 =================
-const arrayToggle = <T>(arr: T[], item: T): T[] => {
-  const index = arr.indexOf(item)
-  return index === -1 ? [...arr, item] : arr.filter((_, i) => i !== index)
-}
-
-const arrayAdd = <T>(arr: T[], items: T[]): T[] => [
-  ...new Set([...arr, ...items]),
-]
-
-const arrayRemove = <T>(arr: T[], items: T[]): T[] => {
-  const removeSet = new Set(items)
-  return arr.filter(item => !removeSet.has(item))
-}
-
-const safeGet = <K, V>(map: Map<K, V>, key: K, defaultValue: V): V =>
-  map.get(key) ?? defaultValue
-
-// ================= 基础状态 Hook =================
-const useBaseState = <T>(options: ExpandOptions<T>) => {
+// ================= 核心状态管理 =================
+const useExpandState = <T, C>(options: UseTableExpandOptions<T, C>) => {
   const expandedKeys = ref<DataTableRowKey[]>([
     ...(options.defaultExpandedKeys || []),
   ])
-  const expandDataMap = ref(new Map<DataTableRowKey, any[]>())
+  // 使用 any 避免 UnwrapRefSimple 类型问题
+  const expandDataMap = ref(new Map<DataTableRowKey, any>()) as Ref<
+    Map<DataTableRowKey, C[]>
+  >
   const loadingMap = ref(new Map<DataTableRowKey, boolean>())
-  const errorMap = ref(new Map<DataTableRowKey, string | null>())
+
+  const checkedKeys = options.enableSelection
+    ? ref<DataTableRowKey[]>([...(options.defaultCheckedKeys || [])])
+    : ref<DataTableRowKey[]>([])
+
+  const childSelections = options.enableChildSelection
+    ? ref(new Map<DataTableRowKey, DataTableRowKey[]>())
+    : ref(new Map<DataTableRowKey, DataTableRowKey[]>())
 
   return {
     expandedKeys,
     expandDataMap,
     loadingMap,
-    errorMap,
-    isExpanded: (key: DataTableRowKey) => expandedKeys.value.includes(key),
-    isLoading: (key: DataTableRowKey) => safeGet(loadingMap.value, key, false),
-    getExpandData: (key: DataTableRowKey) =>
-      safeGet(expandDataMap.value, key, []),
-    getError: (key: DataTableRowKey) => errorMap.value.get(key),
-  }
-}
-
-// ================= 选择状态 Hook =================
-const useSelectionState = <T>(options: ExpandOptions<T>) => {
-  if (!options.enableSelection) return null
-
-  const checkedKeys = ref<DataTableRowKey[]>([
-    ...(options.defaultCheckedKeys || []),
-  ])
-  const childSelections = options.enableChildSelection
-    ? ref(new Map<DataTableRowKey, DataTableRowKey[]>())
-    : null
-
-  return {
     checkedKeys,
     childSelections,
-    isChecked: (key: DataTableRowKey) => checkedKeys.value.includes(key),
-    getChildSelection: (parentKey: DataTableRowKey) =>
-      childSelections ? safeGet(childSelections.value, parentKey, []) : [],
-  }
+  } as const
 }
 
-// ================= 数据工具 Hook =================
-const useDataUtils = <T>(options: ExpandOptions<T>) => {
+// ================= 数据工具函数 =================
+const useDataUtils = <T, C>(options: UseTableExpandOptions<T, C>) => {
   const data = computed(() => unref(options.data))
+
+  const getRowKey = options.rowKey
+  const getChildRowKey =
+    options.childRowKey || ((child: C): DataTableRowKey => (child as any).id)
+
+  const findRow = (key: DataTableRowKey): T | undefined =>
+    data.value.find(row => getRowKey(row) === key)
+
+  const isRowExpandable = options.rowExpandable || ((): boolean => true)
+  const isRowCheckable = options.rowCheckable || ((): boolean => true)
+  const isChildRowCheckable = options.childRowCheckable || ((): boolean => true)
 
   return {
     data,
-    getRowKey: options.rowKey,
-    getChildRowKey:
-      options.childRowKey || ((child: any) => child.id || child.key),
-    findRow: (key: DataTableRowKey) =>
-      data.value.find(row => options.rowKey(row) === key),
-    isRowExpandable: options.rowExpandable || (() => true),
-    isRowCheckable: options.rowCheckable || (() => true),
-    isChildRowCheckable: options.childRowCheckable || (() => true),
-  }
+    getRowKey,
+    getChildRowKey,
+    findRow,
+    isRowExpandable,
+    isRowCheckable,
+    isChildRowCheckable,
+  } as const
 }
 
-// ================= 展开逻辑 Hook =================
-const useExpandLogic = <T>(
-  baseState: ReturnType<typeof useBaseState<T>>,
-  dataUtils: ReturnType<typeof useDataUtils<T>>,
-  selectionState: ReturnType<typeof useSelectionState<T>>,
-  options: ExpandOptions<T>
+// ================= 展开逻辑 =================
+const useExpandLogic = <T, C>(
+  state: ReturnType<typeof useExpandState<T, C>>,
+  utils: ReturnType<typeof useDataUtils<T, C>>,
+  options: UseTableExpandOptions<T, C>
 ) => {
-  const loadData = async (row: T): Promise<any[]> => {
+  const loadData = async (row: T): Promise<C[]> => {
     if (!options.onLoadData) return []
 
-    const key = dataUtils.getRowKey(row)
-    if (baseState.expandDataMap.value.has(key)) {
-      return baseState.getExpandData(key)
-    }
+    const key = utils.getRowKey(row)
+    const existingData = state.expandDataMap.value.get(key)
+    if (existingData) return existingData
 
-    baseState.loadingMap.value.set(key, true)
-    baseState.errorMap.value.delete(key)
+    state.loadingMap.value.set(key, true)
 
     try {
       const data = await options.onLoadData(row)
-      baseState.expandDataMap.value.set(key, data || [])
+      const result = data || []
+      state.expandDataMap.value.set(key, result as any)
 
       // 初始化子选择状态
       if (
-        selectionState?.childSelections &&
-        !selectionState.childSelections.value.has(key)
+        options.enableChildSelection &&
+        !state.childSelections.value.has(key)
       ) {
-        selectionState.childSelections.value.set(key, [])
+        state.childSelections.value.set(key, [])
       }
 
-      return data || []
+      return result
     } catch (error) {
-      baseState.errorMap.value.set(
-        key,
-        error instanceof Error ? error.message : '加载失败'
-      )
+      console.error('加载展开数据失败:', error)
       return []
     } finally {
-      baseState.loadingMap.value.set(key, false)
+      state.loadingMap.value.set(key, false)
     }
   }
 
-  const expandRow = async (key: DataTableRowKey): Promise<void> => {
-    if (baseState.isExpanded(key)) return
-
-    if (options.accordion) {
-      baseState.expandedKeys.value.length = 0
-    }
-
-    const row = dataUtils.findRow(key)
-    if (!row) return
-
-    await loadData(row)
-    baseState.expandedKeys.value.push(key)
-    options.onExpandChange?.(baseState.expandedKeys.value, row, true)
-
-    // 联动：展开时自动选中
-    if (selectionState && !selectionState.isChecked(key)) {
-      selectionState.checkedKeys.value.push(key)
-    }
+  const expandAll = async (): Promise<void> => {
+    const expandableRows = utils.data.value.filter(utils.isRowExpandable)
+    // 使用 Promise.allSettled 替代 Promise.all 避免 await-in-loop 警告
+    await Promise.allSettled(expandableRows.map(loadData))
+    state.expandedKeys.value = expandableRows.map(utils.getRowKey)
+    options.onExpandChange?.(state.expandedKeys.value)
   }
 
-  const collapseRow = (key: DataTableRowKey): void => {
-    if (!baseState.isExpanded(key)) return
-
-    baseState.expandedKeys.value = baseState.expandedKeys.value.filter(
-      k => k !== key
-    )
-    const row = dataUtils.findRow(key)
-    options.onExpandChange?.(baseState.expandedKeys.value, row, false)
-
-    // 联动：折叠时自动取消选中并清空子选择
-    if (selectionState) {
-      if (selectionState.isChecked(key)) {
-        selectionState.checkedKeys.value =
-          selectionState.checkedKeys.value.filter(k => k !== key)
-      }
-      selectionState.childSelections?.value.delete(key)
-    }
+  const collapseAll = (): void => {
+    state.expandedKeys.value = []
+    state.childSelections.value.clear()
+    options.onExpandChange?.(state.expandedKeys.value)
   }
 
-  const toggleExpand = async (key: DataTableRowKey): Promise<void> => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    baseState.isExpanded(key) ? collapseRow(key) : await expandRow(key)
-  }
-
-  const refreshData = async (key: DataTableRowKey): Promise<void> => {
-    const row = dataUtils.findRow(key)
-    if (!row) return
-
-    baseState.expandDataMap.value.delete(key)
-    baseState.errorMap.value.delete(key)
-    await loadData(row)
+  const handleExpandChange = (keys: DataTableRowKey[]): void => {
+    state.expandedKeys.value = keys
+    options.onExpandChange?.(keys)
   }
 
   return {
     loadData,
-    expandRow,
-    collapseRow,
-    toggleExpand,
-    refreshData,
-    expandAll: async () => {
-      const rows = dataUtils.data.value.filter(dataUtils.isRowExpandable)
-      await Promise.all(rows.map(loadData))
-      baseState.expandedKeys.value = rows.map(dataUtils.getRowKey)
-      options.onExpandChange?.(baseState.expandedKeys.value)
-    },
-    collapseAll: () => {
-      baseState.expandedKeys.value.length = 0
-      options.onExpandChange?.(baseState.expandedKeys.value)
-
-      // 清空所有子选择状态
-      if (selectionState?.childSelections) {
-        selectionState.childSelections.value.clear()
-      }
-    },
-  }
+    expandAll,
+    collapseAll,
+    handleExpandChange,
+  } as const
 }
 
-// ================= 选择逻辑 Hook =================
-const useSelectionLogic = <T>(
-  selectionState: ReturnType<typeof useSelectionState<T>>,
-  dataUtils: ReturnType<typeof useDataUtils<T>>,
-  baseState: ReturnType<typeof useBaseState<T>>,
-  expandLogic: ReturnType<typeof useExpandLogic<T>>,
-  options: ExpandOptions<T>
+// ================= 选择逻辑 =================
+const useSelectionLogic = <T, C>(
+  state: ReturnType<typeof useExpandState<T, C>>,
+  utils: ReturnType<typeof useDataUtils<T, C>>,
+  options: UseTableExpandOptions<T, C>
 ) => {
-  if (!selectionState) return null
-
-  const { checkedKeys } = selectionState
-
   const selectableRows = computed(() =>
-    dataUtils.data.value.filter(dataUtils.isRowCheckable)
+    utils.data.value.filter(utils.isRowCheckable)
   )
 
-  const checkedRows = computed(() =>
-    dataUtils.data.value.filter(row =>
-      checkedKeys.value.includes(dataUtils.getRowKey(row))
+  const selectedRowsCount = computed(() => state.checkedKeys.value.length)
+
+  const selectAll = (): void => {
+    if (!options.enableSelection) return
+
+    const keys = selectableRows.value.map(utils.getRowKey)
+    const finalKeys = options.maxSelection
+      ? keys.slice(0, options.maxSelection)
+      : keys
+
+    state.checkedKeys.value = finalKeys
+
+    const selectedRows = selectableRows.value.filter(row =>
+      finalKeys.includes(utils.getRowKey(row))
     )
-  )
 
-  const toggleSelection = async (key: DataTableRowKey): Promise<void> => {
-    const canSelect =
-      !selectionState.isChecked(key) &&
-      (!options.maxSelection || checkedKeys.value.length < options.maxSelection)
+    options.onSelectionChange?.(
+      finalKeys,
+      selectedRows,
+      state.childSelections.value
+    )
+  }
 
-    if (canSelect || selectionState.isChecked(key)) {
-      checkedKeys.value = arrayToggle(checkedKeys.value, key)
+  const clearSelection = (): void => {
+    if (!options.enableSelection) return
 
-      // 联动：选中时自动展开
-      if (selectionState.isChecked(key) && !baseState.isExpanded(key)) {
-        await expandLogic.expandRow(key)
-      }
-    }
+    state.checkedKeys.value = []
+    options.onSelectionChange?.([], [], state.childSelections.value)
+  }
+
+  const handleSelectionChange = (keys: DataTableRowKey[]): void => {
+    if (!options.enableSelection) return
+
+    state.checkedKeys.value = keys
+    const selectedRows = utils.data.value.filter(row =>
+      keys.includes(utils.getRowKey(row))
+    )
+    options.onSelectionChange?.(keys, selectedRows, state.childSelections.value)
   }
 
   return {
+    selectAll,
+    clearSelection,
+    handleSelectionChange,
+    selectedRowsCount,
     selectableRows,
-    checkedRows,
-    isAllChecked: computed(() => {
-      const selectableKeys = selectableRows.value.map(dataUtils.getRowKey)
-      return (
-        selectableKeys.length > 0 &&
-        selectableKeys.every(selectionState.isChecked)
-      )
-    }),
-    isIndeterminate: computed(() => {
-      const total = selectableRows.value.length
-      const checked = checkedKeys.value.length
-      return checked > 0 && checked < total
-    }),
-    toggleSelection,
-    selectAll: () => {
-      const keys = selectableRows.value.map(dataUtils.getRowKey)
-      checkedKeys.value = options.maxSelection
-        ? keys.slice(0, options.maxSelection)
-        : keys
-    },
-    clearSelection: () => {
-      checkedKeys.value.length = 0
-    },
-    selectRows: (keys: DataTableRowKey[]) => {
-      const available = options.maxSelection
-        ? options.maxSelection - checkedKeys.value.length
-        : Infinity
-      const validKeys = keys.slice(0, available)
-      checkedKeys.value = arrayAdd(checkedKeys.value, validKeys)
-    },
-    unselectRows: (keys: DataTableRowKey[]) => {
-      checkedKeys.value = arrayRemove(checkedKeys.value, keys)
-    },
-    invertSelection: () => {
-      const selectableKeys = selectableRows.value.map(dataUtils.getRowKey)
-      const newKeys = selectableKeys.filter(
-        key => !checkedKeys.value.includes(key)
-      )
-      checkedKeys.value = options.maxSelection
-        ? newKeys.slice(0, options.maxSelection)
-        : newKeys
-    },
-  }
+  } as const
 }
 
-// ================= 子选择逻辑 Hook =================
-const useChildSelectionLogic = <T>(
-  selectionState: ReturnType<typeof useSelectionState<T>>,
-  baseState: ReturnType<typeof useBaseState<T>>,
-  dataUtils: ReturnType<typeof useDataUtils<T>>,
-  options: ExpandOptions<T>
+// ================= 父子联动逻辑 =================
+const useParentChildLink = <T, C>(
+  state: ReturnType<typeof useExpandState<T, C>>,
+  options: UseTableExpandOptions<T, C>
 ) => {
-  if (!selectionState?.childSelections || !options.enableChildSelection)
-    return null
+  const isLinkEnabled = Boolean(
+    options.enableParentChildLink &&
+      options.enableSelection &&
+      options.enableChildSelection
+  )
 
-  const { childSelections } = selectionState
-
-  const toggleChildSelection = (
+  const handleParentChildLink = (
     parentKey: DataTableRowKey,
-    childKey: DataTableRowKey
+    selectedChildKeys: DataTableRowKey[],
+    totalChildren: number
   ): void => {
-    const current = selectionState.getChildSelection(parentKey)
-    const newSelection = arrayToggle(current, childKey)
+    if (!isLinkEnabled) return
 
-    childSelections.value.set(parentKey, newSelection)
+    const shouldSelectParent =
+      options.parentChildLinkMode === 'strict'
+        ? selectedChildKeys.length === totalChildren && totalChildren > 0
+        : selectedChildKeys.length > 0
 
-    const expandData = baseState.getExpandData(parentKey)
-    const selectedRows = expandData.filter(c =>
-      newSelection.includes(dataUtils.getChildRowKey(c))
-    )
+    const currentKeys = [...state.checkedKeys.value]
+    const isParentSelected = currentKeys.includes(parentKey)
 
-    options.onChildSelectionChange?.(parentKey, newSelection, selectedRows)
-
-    // 联动：子选择变化影响父选择
-    if (options.enableSelection && selectionState.checkedKeys) {
-      const hasSelected = newSelection.length > 0
-      const isParentSelected = selectionState.isChecked(parentKey)
-
-      if (hasSelected && !isParentSelected) {
-        selectionState.checkedKeys.value.push(parentKey)
-      } else if (!hasSelected && isParentSelected) {
-        selectionState.checkedKeys.value =
-          selectionState.checkedKeys.value.filter(k => k !== parentKey)
-      }
+    if (shouldSelectParent && !isParentSelected) {
+      state.checkedKeys.value = [...currentKeys, parentKey]
+    } else if (!shouldSelectParent && isParentSelected) {
+      state.checkedKeys.value = currentKeys.filter(k => k !== parentKey)
     }
-  }
-
-  const selectAllChildren = (parentKey: DataTableRowKey): void => {
-    const expandData = baseState.getExpandData(parentKey)
-    const parent = dataUtils.findRow(parentKey)
-
-    if (!parent) return
-
-    const checkableKeys = expandData
-      .filter(c => dataUtils.isChildRowCheckable(c, parent))
-      .map(dataUtils.getChildRowKey)
-
-    childSelections.value.set(parentKey, checkableKeys)
-    options.onChildSelectionChange?.(parentKey, checkableKeys, expandData)
-
-    // 联动：全选子项时自动选中父项
-    if (
-      options.enableSelection &&
-      selectionState.checkedKeys &&
-      !selectionState.isChecked(parentKey)
-    ) {
-      selectionState.checkedKeys.value.push(parentKey)
-    }
-  }
-
-  const clearChildrenSelection = (parentKey: DataTableRowKey): void => {
-    childSelections.value.set(parentKey, [])
-    options.onChildSelectionChange?.(parentKey, [], [])
-
-    // 联动：清空子项时自动取消选中父项
-    if (
-      options.enableSelection &&
-      selectionState.checkedKeys &&
-      selectionState.isChecked(parentKey)
-    ) {
-      selectionState.checkedKeys.value =
-        selectionState.checkedKeys.value.filter(k => k !== parentKey)
-    }
-  }
-
-  const isAllChildrenChecked = (parentKey: DataTableRowKey): boolean => {
-    const expandData = baseState.getExpandData(parentKey)
-    if (!expandData.length) return false
-
-    const selectedChildren = selectionState.getChildSelection(parentKey)
-    const parent = dataUtils.findRow(parentKey)
-    if (!parent) return false
-
-    const checkableChildren = expandData.filter(child =>
-      dataUtils.isChildRowCheckable(child, parent)
-    )
-
-    return (
-      checkableChildren.length > 0 &&
-      checkableChildren.every(child =>
-        selectedChildren.includes(dataUtils.getChildRowKey(child))
-      )
-    )
   }
 
   return {
-    toggleChildSelection,
-    selectAllChildren,
-    clearChildrenSelection,
-    isAllChildrenChecked,
-    isChildChecked: (parentKey: DataTableRowKey, childKey: DataTableRowKey) =>
-      selectionState.getChildSelection(parentKey).includes(childKey),
-    getChildSelectedData: (parentKey: DataTableRowKey) => {
-      const selected = selectionState.getChildSelection(parentKey)
-      const expandData = baseState.getExpandData(parentKey)
-      return expandData.filter(c =>
-        selected.includes(dataUtils.getChildRowKey(c))
+    handleParentChildLink,
+    isLinkEnabled,
+  } as const
+}
+
+// ================= 子选择逻辑 =================
+const useChildSelectionLogic = <T, C>(
+  state: ReturnType<typeof useExpandState<T, C>>,
+  utils: ReturnType<typeof useDataUtils<T, C>>,
+  parentChildLink: ReturnType<typeof useParentChildLink<T, C>>,
+  options: UseTableExpandOptions<T, C>
+) => {
+  const totalChildSelections = computed(() => {
+    if (!options.enableChildSelection) return 0
+    return Array.from(state.childSelections.value.values()).reduce(
+      (total, keys) => total + keys.length,
+      0
+    )
+  })
+
+  const clearAllSelections = (): void => {
+    state.checkedKeys.value = []
+    state.childSelections.value.clear()
+    options.onSelectionChange?.([], [], state.childSelections.value)
+  }
+
+  const handleChildSelectionChange = (
+    parentKey: DataTableRowKey,
+    childKeys: DataTableRowKey[]
+  ): void => {
+    if (!options.enableChildSelection) return
+
+    state.childSelections.value.set(parentKey, childKeys)
+
+    const expandData = state.expandDataMap.value.get(parentKey) || []
+    const selectedChildren = expandData.filter((child: any) =>
+      childKeys.includes(utils.getChildRowKey(child as C))
+    ) as C[]
+
+    options.onChildSelectionChange?.(parentKey, childKeys, selectedChildren)
+
+    // 触发父子联动
+    if (parentChildLink.isLinkEnabled) {
+      parentChildLink.handleParentChildLink(
+        parentKey,
+        childKeys,
+        expandData.length
       )
+    }
+  }
+
+  return {
+    totalChildSelections,
+    clearAllSelections,
+    handleChildSelectionChange,
+  } as const
+}
+
+// ================= 渲染辅助函数 =================
+const createChildSelectionState = <T, C>(
+  parentKey: DataTableRowKey,
+  state: ReturnType<typeof useExpandState<T, C>>,
+  utils: ReturnType<typeof useDataUtils<T, C>>,
+  childLogic: ReturnType<typeof useChildSelectionLogic<T, C>>,
+  options: UseTableExpandOptions<T, C>
+): ChildSelectionState | undefined => {
+  if (!options.enableChildSelection) return undefined
+
+  const selectedKeys = state.childSelections.value.get(parentKey) || []
+  const expandData = state.expandDataMap.value.get(parentKey) || []
+  const parent = utils.findRow(parentKey)
+
+  if (!parent) return undefined
+
+  const checkableChildren = expandData.filter((child: any) =>
+    utils.isChildRowCheckable(child as C, parent)
+  )
+
+  const isAllChecked =
+    checkableChildren.length > 0 &&
+    checkableChildren.every((child: any) =>
+      selectedKeys.includes(utils.getChildRowKey(child as C))
+    )
+
+  return {
+    selectedKeys,
+    isAllChecked,
+    selectAll: () => {
+      const allKeys = checkableChildren.map((child: any) =>
+        utils.getChildRowKey(child as C)
+      )
+      childLogic.handleChildSelectionChange(parentKey, allKeys)
     },
-    getAllSelectedData: () => {
-      const parentRows = dataUtils.data.value.filter(row =>
-        selectionState.isChecked(dataUtils.getRowKey(row))
-      )
-      const childSelectionsMap = new Map<DataTableRowKey, any[]>()
-
-      childSelections.value.forEach((selectedKeys, parentKey) => {
-        if (selectedKeys.length > 0) {
-          const expandData = baseState.getExpandData(parentKey)
-          const selectedChildren = expandData.filter(c =>
-            selectedKeys.includes(dataUtils.getChildRowKey(c))
-          )
-          childSelectionsMap.set(parentKey, selectedChildren)
-        }
-      })
-
-      return { parentRows, childSelections: childSelectionsMap }
+    clearAll: () => {
+      childLogic.handleChildSelectionChange(parentKey, [])
     },
   }
 }
 
-// ================= 渲染策略 =================
-const createRenderStrategies = () => ({
-  loading: () =>
-    h('div', { class: 'flex justify-center items-center py-8' }, [
-      h(NSpin, { size: 'small' }),
-      h('span', { class: 'ml-2 text-gray-500' }, '加载中...'),
-    ]),
+const createLoadingView = (): VNodeChild => {
+  return h('div', { class: 'flex justify-center items-center py-8' }, [
+    h(NSpin, { size: 'small' }),
+    h('span', { class: 'ml-2 text-gray-500' }, '加载中...'),
+  ])
+}
 
-  error: (error: string, onRetry: () => void) =>
-    h('div', { class: 'flex justify-center items-center py-6 text-red-500' }, [
-      h('span', error),
-      h(
-        NButton,
-        { class: 'ml-4', size: 'small', type: 'primary', onClick: onRetry },
-        () => '重试'
-      ),
-    ]),
+const createEmptyView = (): VNodeChild => {
+  return h('div', { class: 'text-center py-8 text-gray-400' }, '暂无数据')
+}
 
-  empty: () =>
-    h(
-      'div',
-      {
-        class: 'flex flex-col justify-center items-center py-12 text-gray-400',
-      },
-      [h('div', { class: 'text-sm' }, '暂无相关数据')]
-    ),
+const createDefaultColumns = (expandData: any[]): any[] => {
+  if (!expandData.length) return []
 
-  childTable: (
-    data: any[],
-    columns: any[],
-    selectedKeys: DataTableRowKey[],
-    onSelectionChange: any,
-    childRowKey: any
-  ) =>
-    h(NDataTable, {
-      data,
-      columns,
-      size: 'small',
-      striped: true,
-      scrollX: 600,
-      checkedRowKeys: selectedKeys,
-      rowKey: childRowKey,
-      onUpdateCheckedRowKeys: onSelectionChange,
-    }),
-})
+  const firstItem = expandData[0]
+  if (!firstItem || typeof firstItem !== 'object') return []
 
-// ================= 渲染器 Hook =================
-const useRenderer = <T>(
-  baseState: ReturnType<typeof useBaseState<T>>,
-  dataUtils: ReturnType<typeof useDataUtils<T>>,
-  expandLogic: ReturnType<typeof useExpandLogic<T>>,
-  selectionState: ReturnType<typeof useSelectionState<T>>,
-  childSelectionLogic: ReturnType<typeof useChildSelectionLogic<T>>,
-  options: ExpandOptions<T>
-) => {
-  const strategies = createRenderStrategies()
+  const dataKeys = Object.keys(firstItem).filter(
+    key => !['id', 'key'].includes(key)
+  )
 
-  const buildChildColumns = (data: any[], hasSelection: boolean) => {
-    const columns = []
-
-    if (hasSelection) columns.push({ type: 'selection', multiple: true })
-
-    columns.push({
+  return [
+    {
       title: '序号',
       key: '_index',
       width: 60,
       render: (_: any, index: number) => index + 1,
-    })
+    },
+    ...dataKeys.map(key => ({
+      key,
+      title: key.charAt(0).toUpperCase() + key.slice(1),
+      width: 120,
+      ellipsis: { tooltip: true },
+    })),
+  ]
+}
 
-    if (data.length > 0) {
-      Object.keys(data[0])
-        .filter(key => !['id', 'key'].includes(key))
-        .forEach(key =>
-          columns.push({
-            key,
-            title: key.charAt(0).toUpperCase() + key.slice(1),
-            width: 120,
-            ellipsis: { tooltip: true },
-          })
-        )
-    }
+const createDefaultTable = <T, C>(
+  key: DataTableRowKey,
+  expandData: any[],
+  childSelection: ChildSelectionState | undefined,
+  utils: ReturnType<typeof useDataUtils<T, C>>,
+  childLogic: ReturnType<typeof useChildSelectionLogic<T, C>>,
+  options: UseTableExpandOptions<T, C>
+): VNodeChild => {
+  const columns: any[] = []
 
-    return columns
+  if (options.enableChildSelection) {
+    columns.push({ type: 'selection', multiple: true })
   }
 
-  // 拆分渲染逻辑为多个小函数
-  const prepareExpandData = (row: T, key: DataTableRowKey) => {
-    if (options.onLoadData && !baseState.expandDataMap.value.has(key)) {
-      expandLogic.loadData(row)
-    }
-    return {
-      expandData: baseState.getExpandData(key),
-      loading: baseState.isLoading(key),
-      error: baseState.getError(key),
-    }
-  }
+  columns.push(...createDefaultColumns(expandData))
 
-  const createChildSelectionState = (key: DataTableRowKey) => {
-    if (!childSelectionLogic || !selectionState?.childSelections)
-      return undefined
-
-    return {
-      selectedKeys: selectionState.getChildSelection(key),
-      isAllChecked: childSelectionLogic.isAllChildrenChecked(key),
-      selectAll: () => childSelectionLogic.selectAllChildren(key),
-      clearAll: () => childSelectionLogic.clearChildrenSelection(key),
-    }
-  }
-
-  const createChildSelectionHandler = (
-    key: DataTableRowKey,
-    expandData: any[]
-  ) => {
-    if (!childSelectionLogic || !selectionState?.childSelections)
-      return undefined
-
-    return (keys: DataTableRowKey[]) => {
-      selectionState.childSelections!.value.set(key, keys)
-      const selectedRows = expandData.filter(c =>
-        keys.includes(dataUtils.getChildRowKey(c))
-      )
-      options.onChildSelectionChange?.(key, keys, selectedRows)
-
-      // 联动：子选择变化影响父选择
-      if (options.enableSelection && selectionState.checkedKeys) {
-        const hasSelected = keys.length > 0
-        const isParentSelected = selectionState.isChecked(key)
-
-        if (hasSelected && !isParentSelected) {
-          selectionState.checkedKeys.value.push(key)
-        } else if (!hasSelected && isParentSelected) {
-          selectionState.checkedKeys.value =
-            selectionState.checkedKeys.value.filter(k => k !== key)
-        }
-      }
-    }
-  }
-
-  const renderExpandHeader = (
-    row: T,
-    expandData: any[],
-    childSelectionState: any
-  ) =>
+  return h('div', { class: 'p-4 bg-gray-50' }, [
     h(
       'div',
-      {
-        class:
-          'px-4 py-3 bg-blue-50 border-b border-blue-100 flex items-center justify-between',
-      },
-      [
-        h(
-          'span',
-          { class: 'text-sm font-medium text-blue-700' },
-          `${(row as any).name || '数据'} 的子数据 (${expandData.length} 条)`
-        ),
-        childSelectionState &&
-          h('div', { class: 'flex gap-2' }, [
-            h(
-              NButton,
-              {
-                size: 'tiny',
-                type: 'primary',
-                onClick: childSelectionState.selectAll,
-              },
-              () => '全选'
-            ),
-            h(
-              NButton,
-              {
-                size: 'tiny',
-                type: 'warning',
-                onClick: childSelectionState.clearAll,
-              },
-              () => '清空'
-            ),
-          ]),
-      ]
-    )
-
-  const renderExpandTable = (
-    expandData: any[],
-    childSelectionState: any,
-    selectionHandler: any
-  ) => {
-    const columns = buildChildColumns(expandData, !!childSelectionState)
-    return strategies.childTable(
-      expandData,
+      { class: 'mb-2 text-sm text-gray-600' },
+      `详细信息 (${expandData.length} 条)`
+    ),
+    h(NDataTable, {
+      data: expandData,
       columns,
-      childSelectionState?.selectedKeys || [],
-      selectionHandler,
-      dataUtils.getChildRowKey
+      size: 'small',
+      striped: true,
+      checkedRowKeys: childSelection?.selectedKeys || [],
+      rowKey: (row: any) => utils.getChildRowKey(row as C),
+      onUpdateCheckedRowKeys: options.enableChildSelection
+        ? (keys: DataTableRowKey[]) => {
+            childLogic.handleChildSelectionChange(key, keys)
+          }
+        : undefined,
+    }),
+  ])
+}
+
+// ================= 渲染逻辑 =================
+const useRenderer = <T, C>(
+  state: ReturnType<typeof useExpandState<T, C>>,
+  utils: ReturnType<typeof useDataUtils<T, C>>,
+  childLogic: ReturnType<typeof useChildSelectionLogic<T, C>>,
+  options: UseTableExpandOptions<T, C>
+) => {
+  // 降低复杂度：拆分 renderExpandContent 函数
+  const renderExpandContent = (row: T): VNodeChild => {
+    const key = utils.getRowKey(row)
+    const expandData = state.expandDataMap.value.get(key) || []
+    const loading = state.loadingMap.value.get(key) || false
+    const childSelection = createChildSelectionState(
+      key,
+      state,
+      utils,
+      childLogic,
+      options
     )
-  }
 
-  const createExpandContent = (row: T): VNodeChild => {
-    const key = dataUtils.getRowKey(row)
-    const { expandData, loading, error } = prepareExpandData(row, key)
-    const childSelectionState = createChildSelectionState(key)
-
-    // 自定义渲染 - 复杂度: 1
+    // 如果有自定义渲染函数，使用自定义渲染
     if (options.renderContent) {
       return options.renderContent(
         row,
-        expandData,
+        expandData as C[],
         loading,
-        childSelectionState
+        childSelection
       )
     }
 
-    // 状态渲染 - 复杂度: 3
-    if (loading) return strategies.loading()
-    if (error)
-      return strategies.error(error, () => expandLogic.refreshData(key))
-    if (!expandData.length) return strategies.empty()
+    // 加载状态
+    if (loading) return createLoadingView()
 
-    // 子表格渲染 - 复杂度: 1
-    const selectionHandler = createChildSelectionHandler(key, expandData)
+    // 空数据状态
+    if (!expandData.length) return createEmptyView()
 
-    return h(
-      'div',
-      {
-        class:
-          'expand-content bg-gray-50/50 border-l-4 border-blue-200 ml-8 mr-4 rounded-r-lg overflow-hidden',
-      },
-      [
-        renderExpandHeader(row, expandData, childSelectionState),
-        h('div', { class: 'p-4' }, [
-          renderExpandTable(expandData, childSelectionState, selectionHandler),
-        ]),
-      ]
+    // 默认表格渲染
+    return createDefaultTable(
+      key,
+      expandData,
+      childSelection,
+      utils,
+      childLogic,
+      options
     )
   }
 
-  const getTableColumns = (originalColumns: TableColumn[]): any[] => {
-    const columns = [...originalColumns]
+  const getTableColumns = (originalColumns: TableColumn<T>[]): any[] => {
+    const columns: any[] = [...originalColumns]
 
+    // 添加选择列
     if (options.enableSelection) {
       columns.unshift({
         type: 'selection',
-        disabled: (row: T) => !dataUtils.isRowCheckable(row),
+        disabled: (row: T) => !utils.isRowCheckable(row),
         multiple: !options.maxSelection || options.maxSelection > 1,
-        key: '',
-        title: '',
       })
     }
 
+    // 添加展开列
     const expandIndex = options.enableSelection ? 1 : 0
     columns.splice(expandIndex, 0, {
       type: 'expand',
-      expandable: dataUtils.isRowExpandable,
-      renderExpand: createExpandContent,
-      key: '',
-      title: '',
+      expandable: utils.isRowExpandable,
+      renderExpand: renderExpandContent,
     })
 
     return columns
   }
 
-  return { getTableColumns }
+  return {
+    getTableColumns,
+  } as const
 }
 
-// ================= 主入口函数 =================
+// ================= 主函数 =================
 /**
- * @description: 表格扩展功能
+ * @description: 表格展开和选择功能组合
+ * @return {*}
  */
-export function useTableExpand<T = Record<string, any>>(
-  options: ExpandOptions<T>
-) {
-  // 创建各个 Hook
-  const baseState = useBaseState(options)
-  const selectionState = useSelectionState(options)
-  const dataUtils = useDataUtils(options)
-  const expandLogic = useExpandLogic(
-    baseState,
-    dataUtils,
-    selectionState,
+export function useTableExpand<T = Record<string, any>, C = any>(
+  options: UseTableExpandOptions<T, C>
+): UseTableExpandReturn<T, C> {
+  // 创建各个模块
+  const state = useExpandState(options)
+  const utils = useDataUtils(options)
+  const expandLogic = useExpandLogic(state, utils, options)
+  const selectionLogic = useSelectionLogic(state, utils, options)
+  const parentChildLink = useParentChildLink(state, options)
+  const childLogic = useChildSelectionLogic(
+    state,
+    utils,
+    parentChildLink,
     options
   )
-  const selectionLogic = useSelectionLogic(
-    selectionState,
-    dataUtils,
-    baseState,
-    expandLogic,
-    options
-  )
-  const childSelectionLogic = useChildSelectionLogic(
-    selectionState,
-    baseState,
-    dataUtils,
-    options
-  )
-  const renderer = useRenderer(
-    baseState,
-    dataUtils,
-    expandLogic,
-    selectionState,
-    childSelectionLogic,
-    options
-  )
+  const renderer = useRenderer(state, utils, childLogic, options)
 
   // 监听选择变化
-  if (selectionState && options.onSelectionChange) {
-    watch(
-      [selectionState.checkedKeys, dataUtils.data],
-      () => {
-        options.onSelectionChange!(
-          selectionState.checkedKeys.value,
-          selectionLogic!.checkedRows.value,
-          selectionState.childSelections?.value
+  if (options.onSelectionChange && options.enableSelection) {
+    watchEffect(() => {
+      if (!options.onSelectionChange) return
+
+      const selectedRows = utils.data.value.filter(row =>
+        state.checkedKeys.value.includes(utils.getRowKey(row))
+      )
+
+      // 避免初始化时的无意义调用
+      const hasSelection = state.checkedKeys.value.length > 0
+      const hasData = utils.data.value.length > 0
+
+      if (hasSelection || !hasData) {
+        options.onSelectionChange(
+          state.checkedKeys.value,
+          selectedRows,
+          state.childSelections.value
         )
-      },
-      { deep: true }
-    )
-  }
-
-  // 组合返回对象
-  const result = {
-    // 基础展开功能
-    ...baseState,
-    ...expandLogic,
-    ...renderer,
-    handleExpandChange: (keys: DataTableRowKey[]) => {
-      baseState.expandedKeys.value = keys
-    },
-  }
-
-  // 添加选择功能
-  if (selectionLogic) {
-    Object.assign(result, {
-      checkedKeys: selectionState!.checkedKeys,
-      checkedRows: selectionLogic.checkedRows,
-      isAllChecked: selectionLogic.isAllChecked,
-      isIndeterminate: selectionLogic.isIndeterminate,
-      selectableRowsCount: computed(
-        () => selectionLogic.selectableRows.value.length
-      ),
-      selectedRowsCount: computed(
-        () => selectionState!.checkedKeys.value.length
-      ),
-      toggleRowSelection: selectionLogic.toggleSelection,
-      selectRows: selectionLogic.selectRows,
-      unselectRows: selectionLogic.unselectRows,
-      selectAll: selectionLogic.selectAll,
-      clearSelection: selectionLogic.clearSelection,
-      invertSelection: selectionLogic.invertSelection,
-      isRowChecked: selectionState!.isChecked,
-      handleSelectionChange: (keys: DataTableRowKey[]) => {
-        selectionState!.checkedKeys.value = keys
-      },
+      }
     })
   }
 
-  // 添加子选择功能
-  if (childSelectionLogic) {
-    Object.assign(result, {
-      childSelections: selectionState!.childSelections,
-      toggleChildSelection: childSelectionLogic.toggleChildSelection,
-      selectAllChildren: childSelectionLogic.selectAllChildren,
-      clearChildrenSelection: childSelectionLogic.clearChildrenSelection,
-      isChildChecked: childSelectionLogic.isChildChecked,
-      isAllChildrenChecked: childSelectionLogic.isAllChildrenChecked,
-      getChildSelectedData: childSelectionLogic.getChildSelectedData,
-      getAllSelectedData: childSelectionLogic.getAllSelectedData,
-    })
+  // 单行展开方法
+  const expandRow = async (key: DataTableRowKey): Promise<void> => {
+    if (state.expandedKeys.value.includes(key)) return
+
+    const row = utils.findRow(key)
+    if (!row) return
+
+    await expandLogic.loadData(row)
+    state.expandedKeys.value = [...state.expandedKeys.value, key]
+    options.onExpandChange?.(state.expandedKeys.value, row, true)
   }
 
-  // 添加批量操作
-  if (selectionLogic) {
-    Object.assign(result, {
-      expandSelected: async () => {
-        await Promise.all(
-          selectionState!.checkedKeys.value.map(async (key: any) => {
-            if (!baseState.isExpanded(key)) {
-              await expandLogic.expandRow(key)
-            }
-          })
-        )
-      },
-      collapseSelected: () => {
-        selectionState!.checkedKeys.value.forEach((key: any) => {
-          if (baseState.isExpanded(key)) expandLogic.collapseRow(key)
-        })
-      },
-      selectExpanded: () => {
-        const toAdd = baseState.expandedKeys.value.filter(
-          (k: any) => !selectionState!.isChecked(k)
-        )
-        selectionLogic.selectRows(toAdd)
-      },
-      clearAllSelections: () => {
-        selectionLogic.clearSelection()
-        selectionState!.childSelections?.value.clear()
-      },
+  // 初始化数据加载
+  const initializeData = async (): Promise<void> => {
+    const keysToLoad = options.defaultExpandedKeys || []
+    if (keysToLoad.length === 0) return
+
+    // 使用 Promise.allSettled 替代循环中的 await
+    const loadPromises = keysToLoad.map(async key => {
+      const row = utils.findRow(key)
+      if (row && !state.expandDataMap.value.has(key)) {
+        await expandLogic.loadData(row)
+      }
     })
+
+    await Promise.allSettled(loadPromises)
   }
 
-  return result
+  // 使用 nextTick 确保组件挂载后执行
+  if (options.defaultExpandedKeys?.length) {
+    nextTick(initializeData)
+  }
+
+  return {
+    // 基础状态
+    expandedKeys: state.expandedKeys,
+    checkedKeys: state.checkedKeys,
+    childSelections: state.childSelections,
+
+    // 计算属性
+    selectedRowsCount: selectionLogic.selectedRowsCount,
+    totalChildSelections: childLogic.totalChildSelections,
+
+    // 展开方法
+    expandAll: expandLogic.expandAll,
+    collapseAll: expandLogic.collapseAll,
+    expandRow,
+    handleExpandChange: expandLogic.handleExpandChange,
+
+    // 选择方法
+    selectAll: selectionLogic.selectAll,
+    clearSelection: selectionLogic.clearSelection,
+    clearAllSelections: childLogic.clearAllSelections,
+    handleSelectionChange: selectionLogic.handleSelectionChange,
+
+    // 渲染方法
+    getTableColumns: renderer.getTableColumns,
+
+    // 数据映射
+    expandDataMap: state.expandDataMap,
+    loadingMap: state.loadingMap,
+  }
 }

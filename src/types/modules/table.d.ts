@@ -2,14 +2,14 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-15 14:03:31
+ * @LastEditTime: 2025-06-16 12:38:16
  * @FilePath: \Robot_Admin\src\types\modules\table.d.ts
- * @Description: 表格类型系统
+ * @Description: 表格类型系统 - 增强版
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
 import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
-import type { VNodeChild } from 'vue'
+import type { VNodeChild, Ref, ComputedRef } from 'vue'
 import type { FormItemRule } from 'naive-ui/es/form'
 
 // ================= 基础类型定义 =================
@@ -33,6 +33,8 @@ export type ButtonType =
   | 'success'
   | 'warning'
   | 'error'
+
+export type ParentChildLinkMode = 'strict' | 'loose'
 
 // ================= 数据映射类型 =================
 
@@ -98,9 +100,53 @@ export interface RowAction<T = Record<string, any>> {
   disabled?: (row: T, index: number) => boolean
 }
 
-// ================= 表格组件类型 =================
+// ================= 🔥 展开和选择功能类型定义 =================
 
-// 表格属性
+// 子选择状态
+export interface ChildSelectionState {
+  selectedKeys: DataTableRowKey[]
+  isAllChecked: boolean
+  selectAll: () => void
+  clearAll: () => void
+}
+
+// 展开配置选项 - 精简版
+export interface ExpandConfig<T = Record<string, any>, C = any> {
+  // 数据加载函数
+  onLoadData?: (row: T) => Promise<C[]> | C[]
+
+  // 内容渲染函数
+  renderContent?: (
+    row: T,
+    expandData: C[],
+    loading: boolean,
+    childSelection?: ChildSelectionState
+  ) => VNodeChild
+
+  // 行可展开判断
+  rowExpandable?: (row: T) => boolean
+}
+
+// 选择配置选项 - 精简版
+export interface SelectionConfig<T = Record<string, any>> {
+  // 基础选择配置
+  enableSelection?: boolean
+  defaultCheckedKeys?: DataTableRowKey[]
+  rowCheckable?: (row: T) => boolean
+  maxSelection?: number
+
+  // 子选择配置
+  enableChildSelection?: boolean
+  childRowCheckable?: (childRow: any, parentRow: T) => boolean
+
+  // 父子联动配置
+  enableParentChildLink?: boolean
+  parentChildLinkMode?: ParentChildLinkMode
+}
+
+// ================= 表格组件类型 - 增强版 =================
+
+// 表格属性 - 增强版
 export interface TableProps<T = Record<string, any>> {
   // 数据相关
   columns: TableColumn<T>[]
@@ -137,197 +183,227 @@ export interface TableProps<T = Record<string, any>> {
 
   // 列宽配置
   columnWidth?: number
+
+  // 🔥 展开功能配置
+  expandable?: boolean
+  onLoadExpandData?: (row: T) => Promise<any[]> | any[]
+  renderExpandContent?: (
+    row: T,
+    expandData: any[],
+    loading: boolean,
+    childSelection?: ChildSelectionState
+  ) => VNodeChild
+  rowExpandable?: (row: T) => boolean
+  defaultExpandedKeys?: DataTableRowKey[]
+
+  // 🔥 选择功能配置
+  enableSelection?: boolean
+  defaultCheckedKeys?: DataTableRowKey[]
+  rowCheckable?: (row: T) => boolean
+  maxSelection?: number
+
+  // 🔥 子表格选择配置
+  enableChildSelection?: boolean
+  childRowCheckable?: (childRow: any, parentRow: T) => boolean
+
+  // 🔥 父子联动配置
+  enableParentChildLink?: boolean
+  parentChildLinkMode?: ParentChildLinkMode
 }
 
-// 表格实例方法
+// 表格事件回调类型
+export interface TableEmits<T = Record<string, any>> {
+  'update:data': [data: T[]]
+  save: [rowData: T, rowIndex: number, columnKey?: string]
+  cancel: [rowData: T, rowIndex: number]
+
+  // 🔥 展开事件
+  'expand-change': [
+    expandedKeys: DataTableRowKey[],
+    row?: T,
+    expanded?: boolean,
+  ]
+
+  // 🔥 选择事件
+  'selection-change': [
+    checkedKeys: DataTableRowKey[],
+    checkedRows: T[],
+    childSelections?: Map<DataTableRowKey, DataTableRowKey[]>,
+  ]
+
+  // 🔥 子选择事件
+  'child-selection-change': [
+    parentKey: DataTableRowKey,
+    childKeys: DataTableRowKey[],
+    childRows: any[],
+  ]
+
+  // 🔥 父子联动事件
+  'parent-child-link-change': [
+    parentKey: DataTableRowKey,
+    shouldSelect: boolean,
+  ]
+}
+
+// 表格实例方法 - 增强版
 export interface TableInstance {
+  // 编辑功能
   startEdit: (rowKey: DataTableRowKey, columnKey?: string) => void
   cancelEdit: () => void
   saveEdit: () => Promise<void>
   isEditing: (rowKey: DataTableRowKey, columnKey?: string) => boolean
   getEditingData: () => any
+
+  // 🔥 展开功能
+  expandRow: (rowKey: DataTableRowKey) => Promise<void>
+  collapseRow: (rowKey: DataTableRowKey) => void
+  toggleExpand: (rowKey: DataTableRowKey) => Promise<void>
+  expandAll: () => Promise<void>
+  collapseAll: () => void
+  isExpanded: (rowKey: DataTableRowKey) => boolean
+
+  // 🔥 选择功能
+  selectRow: (rowKey: DataTableRowKey) => void
+  unselectRow: (rowKey: DataTableRowKey) => void
+  selectAll: () => void
+  clearSelection: () => void
+  isRowSelected: (rowKey: DataTableRowKey) => boolean
+  getSelectedRows: () => T[]
+
+  // 🔥 子选择功能
+  selectChildRow: (
+    parentKey: DataTableRowKey,
+    childKey: DataTableRowKey
+  ) => void
+  unselectChildRow: (
+    parentKey: DataTableRowKey,
+    childKey: DataTableRowKey
+  ) => void
+  selectAllChildren: (parentKey: DataTableRowKey) => void
+  clearChildrenSelection: (parentKey: DataTableRowKey) => void
+  getChildSelectedRows: (parentKey: DataTableRowKey) => any[]
+  clearAllSelections: () => void
 }
 
-// ================= 🔥 展开功能类型定义 =================
+// ================= useTableExpand 精简版类型 =================
 
-// 展开配置选项
-export interface ExpandOptions<T = Record<string, any>> {
-  // 数据源
+// 精简版展开选项
+export interface UseTableExpandOptions<T = Record<string, any>, C = any> {
+  // 基础数据
   data: Ref<T[]> | ComputedRef<T[]>
-
-  // 行键获取函数
   rowKey: (row: T) => DataTableRowKey
+  childRowKey?: (child: C) => DataTableRowKey
 
-  // 展开数据加载函数
-  onLoadData?: (row: T) => Promise<any[]> | any[]
-
-  // 展开内容渲染函数
-  renderContent?: (row: T, expandData: any[], isLoading: boolean) => VNodeChild
-
-  // 判断行是否可展开
+  // 展开配置
+  defaultExpandedKeys?: DataTableRowKey[]
+  onLoadData?: (row: T) => Promise<C[]> | C[]
+  renderContent?: (
+    row: T,
+    expandData: C[],
+    loading: boolean,
+    childSelection?: ChildSelectionState
+  ) => VNodeChild
   rowExpandable?: (row: T) => boolean
 
-  // 展开状态变化回调
+  // 选择配置
+  enableSelection?: boolean
+  defaultCheckedKeys?: DataTableRowKey[]
+  rowCheckable?: (row: T) => boolean
+  maxSelection?: number
+
+  // 子选择配置
+  enableChildSelection?: boolean
+  childRowCheckable?: (child: C, parent: T) => boolean
+
+  // 父子联动配置
+  enableParentChildLink?: boolean
+  parentChildLinkMode?: ParentChildLinkMode
+
+  // 事件回调
   onExpandChange?: (
     expandedKeys: DataTableRowKey[],
     row?: T,
     expanded?: boolean
   ) => void
-
-  // 默认展开的行
-  defaultExpandedKeys?: DataTableRowKey[]
-
-  // 是否支持同时展开多行
-  accordion?: boolean
-}
-
-// 展开状态管理
-export interface ExpandState {
-  // 当前展开的行键
-  expandedKeys: Ref<DataTableRowKey[]>
-
-  // 展开数据映射
-  expandDataMap: Ref<Map<DataTableRowKey, any[]>>
-
-  // 加载状态映射
-  expandLoadingMap: Ref<Map<DataTableRowKey, boolean>>
-
-  // 错误状态映射
-  expandErrorMap: Ref<Map<DataTableRowKey, string | null>>
-}
-
-// 展开操作方法
-export interface ExpandMethods {
-  // 展开指定行
-  expandRow: (rowKey: DataTableRowKey) => Promise<void>
-
-  // 收起指定行
-  collapseRow: (rowKey: DataTableRowKey) => void
-
-  // 切换展开状态
-  toggleExpand: (rowKey: DataTableRowKey) => Promise<void>
-
-  // 展开所有行
-  expandAll: () => Promise<void>
-
-  // 收起所有行
-  collapseAll: () => void
-
-  // 刷新展开数据
-  refreshExpandData: (rowKey: DataTableRowKey) => Promise<void>
-
-  // 获取展开数据
-  getExpandData: (rowKey: DataTableRowKey) => any[]
-
-  // 判断行是否展开
-  isExpanded: (rowKey: DataTableRowKey) => boolean
-
-  // 判断行是否正在加载
-  isLoading: (rowKey: DataTableRowKey) => boolean
-}
-
-// 展开渲染配置
-export interface ExpandRenderConfig {
-  // 展开按钮渲染
-  renderExpandIcon?: (
-    expanded: boolean,
-    loading: boolean,
-    rowData: any
-  ) => VNodeChild
-
-  // 展开内容渲染
-  renderExpandContent?: (
-    rowData: any,
-    expandData: any[],
-    loading: boolean,
-    error: string | null
-  ) => VNodeChild
-
-  // 空状态渲染
-  renderEmpty?: () => VNodeChild
-
-  // 加载状态渲染
-  renderLoading?: () => VNodeChild
-
-  // 错误状态渲染
-  renderError?: (error: string) => VNodeChild
+  onSelectionChange?: (
+    checkedKeys: DataTableRowKey[],
+    checkedRows: T[],
+    childSelections?: Map<DataTableRowKey, DataTableRowKey[]>
+  ) => void
+  onChildSelectionChange?: (
+    parentKey: DataTableRowKey,
+    childKeys: DataTableRowKey[],
+    childRows: C[]
+  ) => void
 }
 
 // useTableExpand 返回类型
-export interface UseTableExpandReturn extends ExpandState, ExpandMethods {
-  // 生成展开列配置
-  getExpandColumn: () => TableColumn
+export interface UseTableExpandReturn<T = Record<string, any>, C = any> {
+  // 基础状态
+  expandedKeys: Ref<DataTableRowKey[]>
+  checkedKeys: Ref<DataTableRowKey[]>
+  childSelections: Ref<Map<DataTableRowKey, DataTableRowKey[]>>
 
-  // 生成带展开功能的列配置
-  getColumnsWithExpand: (originalColumns: TableColumn[]) => TableColumn[]
+  // 计算属性
+  selectedRowsCount: ComputedRef<number>
+  totalChildSelections: ComputedRef<number>
 
-  // 获取 NDataTable 的 expandedRowKeys 属性
-  getExpandedRowKeys: ComputedRef<DataTableRowKey[]>
+  // 展开方法
+  expandAll: () => Promise<void>
+  collapseAll: () => void
+  expandRow: (key: DataTableRowKey) => Promise<void>
+  handleExpandChange: (keys: DataTableRowKey[]) => void
 
-  // 获取 NDataTable 的 renderExpand 函数
-  getRenderExpand: () => (rowData: any) => VNodeChild
-}
+  // 选择方法
+  selectAll: () => void
+  clearSelection: () => void
+  clearAllSelections: () => void
+  handleSelectionChange: (keys: DataTableRowKey[]) => void
 
-// ================= 编辑相关组合式函数类型 =================
+  // 渲染方法
+  getTableColumns: (originalColumns: TableColumn<T>[]) => any[]
 
-// 编辑选项
-export interface EditOptions<T = Record<string, any>> {
-  data: T[]
-  rowKey: (row: T) => DataTableRowKey
-  onSave?: (
-    rowData: T,
-    rowIndex: number,
-    columnKey?: string
-  ) => void | Promise<void>
-  onCancel?: (rowData: T, rowIndex: number) => void
-}
-
-// 模态框编辑状态
-export interface ModalEditState {
-  isModalVisible: Ref<boolean>
-  editingRowIndex: Ref<number>
-  editingRowKey: Ref<DataTableRowKey | null>
-  editingData: Record<string, any>
+  // 数据映射（供 C_Table 使用）
+  expandDataMap: Ref<Map<DataTableRowKey, C[]>>
+  loadingMap: Ref<Map<DataTableRowKey, boolean>>
 }
 
 // ================= 演示页面专用类型 =================
 
-// 员工数据类型
-export interface Employee {
+// 测试记录类型
+export interface TestRecord {
   id: number
   name: string
-  age: number
-  gender: 'male' | 'female'
-  email: string
-  department: 'tech' | 'hr' | 'market' | 'finance'
-  joinDate: number
-  status: 'active' | 'inactive' | 'probation'
-  description: string
+  department: string
+  role: string
+  status: string
+  hasChildren: boolean
 }
 
-// 🔥 新增：嵌套表格演示数据类型
-export interface MainRecord {
+// 子数据类型
+export interface ChildData {
   id: number
-  sequence: string
-  name: string
-  location: string
-  description: string
-  hasChildren?: boolean
+  project?: string
+  requirement?: string
+  service?: string
+  progress?: string
+  status: string
+  priority?: string
+  version?: string
 }
 
-export interface ChildRecord {
-  id: string | number
-  parentId: number
-  childSequence: string
-  childName: string
-  childLocation: string
-  status: 'active' | 'inactive' | 'pending'
-  createTime?: string
+// 选中的子数据分组
+export interface SelectedChildGroup {
+  parentKey: number
+  parentName: string
+  children: ChildData[]
 }
 
-// 表单组件映射类型
-export interface FormTypeMapping {
-  [key in EditType]?: string
+// 配置状态类型
+export interface DemoConfig {
+  enableSelection: boolean
+  enableChildSelection: boolean
+  parentChildLinkMode: ParentChildLinkMode
 }
 
 // ================= 工具类型 =================
