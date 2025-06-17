@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-17 18:27:13
+ * @LastEditTime: 2025-06-18 01:40:03
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
  * @Description: 超级表格组件 - 增强版本（支持展开、选择和动态行操作）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -10,7 +10,7 @@
 
 <template>
   <div class="c-table-wrapper">
-    <!-- 🔥 动态行工具栏 - 只在启用时显示 -->
+    <!--  动态行工具栏 - 只在启用时显示 -->
     <div
       v-if="dynamicRowsState"
       class="dynamic-rows-toolbar"
@@ -100,7 +100,7 @@
       </template>
     </NModal>
 
-    <!-- 🔥 动态行确认删除模态框 -->
+    <!--  动态行确认删除模态框 -->
     <component
       v-if="dynamicRowsState"
       :is="dynamicRowsState.renderConfirmModal()"
@@ -110,18 +110,7 @@
 
 <script setup lang="ts">
   import type { VNodeChild, ComponentPublicInstance } from 'vue'
-  import {
-    NInputNumber,
-    NDatePicker,
-    NSelect,
-    NInput,
-    NSwitch,
-    NIcon,
-    NSpace,
-    NButton,
-    type DataTableRowKey,
-    type DataTableColumn,
-  } from 'naive-ui/es'
+  import { type DataTableRowKey, type DataTableColumn } from 'naive-ui/es'
   import type {
     TableColumn,
     TableProps,
@@ -154,7 +143,7 @@
   // 扩展 TableProps 支持展开、选择和动态行功能
   interface EnhancedTableProps<T extends DataRecord = DataRecord>
     extends TableProps<T> {
-    // 🔥 展开功能配置
+    //  展开功能配置
     expandable?: boolean
     onLoadExpandData?: (row: T) => Promise<any[]> | any[]
     renderExpandContent?: (
@@ -166,25 +155,23 @@
     rowExpandable?: (row: T) => boolean
     defaultExpandedKeys?: DataTableRowKey[]
 
-    // 🔥 选择功能配置
+    //  选择功能配置
     enableSelection?: boolean
     defaultCheckedKeys?: DataTableRowKey[]
     rowCheckable?: (row: T) => boolean
     maxSelection?: number
 
-    // 🔥 子表格选择配置
+    //  子表格选择配置
     enableChildSelection?: boolean
     childRowCheckable?: (childRow: any, parentRow: T) => boolean
 
-    // 🔥 父子联动配置
+    //  父子联动配置
     enableParentChildLink?: boolean
     parentChildLinkMode?: ParentChildLinkMode
 
-    // 🔥 动态行功能配置 - 简化为单个配置对象
+    //  动态行功能配置 - 简化为单个配置对象
     dynamicRowsOptions?: DynamicRowsOptions<T>
   }
-
-  type DataRecord = Record<string, unknown>
 
   // 编辑组件映射
   const EDIT_COMPONENTS: Record<EditType, any> = {
@@ -223,7 +210,7 @@
     dynamicRowsOptions: undefined,
   })
 
-  // 🔥 扩展 Emits - 添加动态行事件
+  //  扩展 Emits - 添加动态行事件
   const emit = defineEmits<
     TableEmits & {
       'row-add': [newRow: DataRecord]
@@ -261,7 +248,7 @@
 
   const formOptions = computed(() => generateFormOptions(editableColumns.value))
 
-  // 🔥 动态行功能初始化 - 只在有配置时启用，使用正确的类型约束
+  //  动态行功能初始化 - 只在有配置时启用，使用正确的类型约束
   let dynamicRowsState: ReturnType<typeof useDynamicRows<DataRecord>> | null =
     null
 
@@ -302,7 +289,7 @@
     )
   }
 
-  // 🔥 展开和选择功能初始化 - 彻底修复生命周期错误
+  //  展开和选择功能初始化 - 彻底修复生命周期错误
   let expandState: ReturnType<typeof useTableExpand> | null = null
 
   // 在 setup 顶层判断是否需要初始化展开功能
@@ -345,7 +332,7 @@
     })
   }
 
-  // 🔥 展开和选择状态
+  //  展开和选择状态
   const expandedKeys = computed(() => expandState?.expandedKeys.value ?? [])
   const checkedKeys = computed(() => expandState?.checkedKeys.value ?? [])
   const renderExpandFunction = computed(() => undefined)
@@ -812,7 +799,7 @@
     })
   }
 
-  // 🔥 计算列配置 - 整合展开、选择和动态行功能
+  //  计算列配置 - 整合展开、选择和动态行功能
   const computedColumns = computed((): DataTableColumn[] => {
     let columns: DataTableColumn[] = props.columns.map(column => ({
       ...column,
@@ -823,14 +810,14 @@
         renderCell(column, rowData, rowIndex),
     }))
 
-    // 🔥 使用 dynamicRowsState 的列配置增强（如果启用动态行功能）
+    //  使用 dynamicRowsState 的列配置增强（如果启用动态行功能）
     if (dynamicRowsState) {
       columns = dynamicRowsState.enhanceColumns(
         columns as any
       ) as DataTableColumn[]
     }
 
-    // 🔥 使用 expandState 的列配置增强
+    //  使用 expandState 的列配置增强
     if (expandState && (props.expandable || props.enableSelection)) {
       columns = expandState.getTableColumns(columns as any) as DataTableColumn[]
     }
@@ -869,15 +856,6 @@
     }
   }
 
-  const editModeHandlers = {
-    modal: (rowKey: DataTableRowKey) => modalEdit.startEdit(rowKey),
-    cell: (rowKey: DataTableRowKey, columnKey?: string) =>
-      columnKey && cellEdit.startEditCell(rowKey, columnKey),
-    row: (rowKey: DataTableRowKey) => rowEdit.startEditRow(rowKey),
-    both: (rowKey: DataTableRowKey) => rowEdit.startEditRow(rowKey),
-    none: () => {},
-  } as const
-
   /**
    * * @description 处理开始编辑
    * ? @param rowKey - 行键
@@ -885,28 +863,19 @@
    * ! @return void
    */
   function handleStartEdit(rowKey: DataTableRowKey, columnKey?: string) {
-    const handler = editModeHandlers[props.editMode]
-    handler?.(rowKey, columnKey)
+    if (props.editMode === 'modal') {
+      modalEdit.startEdit(rowKey)
+    } else if (props.editMode === 'cell' && columnKey) {
+      cellEdit.startEditCell(rowKey, columnKey)
+    } else if (props.editMode === 'row' || props.editMode === 'both') {
+      rowEdit.startEditRow(rowKey)
+    }
   }
 
-  const editStateManagers = {
-    isModalEditing: () => modalEdit.isModalVisible.value,
-    isCellEditing: () => !!cellEdit.editingCell.value.rowKey,
-    isRowEditing: () => !!rowEdit.editingRowKey.value,
-
-    cancelModal: () => modalEdit.cancelEdit(),
-    cancelCell: () => cellEdit.cancelEditCell(),
-    cancelRow: () => rowEdit.cancelEditRow(),
-
-    saveModal: () => handleModalSave(),
-    saveCell: () => cellEdit.saveEditCell(),
-    saveRow: () => rowEdit.saveEditRow(),
-  }
-
-  // 🔥 暴露方法 - 包含展开、选择和动态行功能
+  //  暴露方法 - 包含展开、选择和动态行功能
   defineExpose<
     TableInstance & {
-      // 🔥 动态行操作方法
+      //  动态行操作方法
       addRow: () => void
       insertRow: () => void
       deleteRow: () => void
@@ -935,9 +904,9 @@
      * ! @return void
      */
     cancelEdit() {
-      if (editStateManagers.isModalEditing()) editStateManagers.cancelModal()
-      else if (editStateManagers.isCellEditing()) editStateManagers.cancelCell()
-      else if (editStateManagers.isRowEditing()) editStateManagers.cancelRow()
+      if (modalEdit.isModalVisible.value) modalEdit.cancelEdit()
+      else if (cellEdit.editingCell.value.rowKey) cellEdit.cancelEditCell()
+      else if (rowEdit.editingRowKey.value) rowEdit.cancelEditRow()
     },
 
     /**
@@ -945,12 +914,9 @@
      * ! @return Promise<void>
      */
     async saveEdit() {
-      if (editStateManagers.isModalEditing())
-        await editStateManagers.saveModal()
-      else if (editStateManagers.isCellEditing())
-        await editStateManagers.saveCell()
-      else if (editStateManagers.isRowEditing())
-        await editStateManagers.saveRow()
+      if (modalEdit.isModalVisible.value) await handleModalSave()
+      else if (cellEdit.editingCell.value.rowKey) await cellEdit.saveEditCell()
+      else if (rowEdit.editingRowKey.value) await rowEdit.saveEditRow()
     },
 
     /**
@@ -970,8 +936,8 @@
      * ! @return 编辑中的数据或null
      */
     getEditingData() {
-      if (editStateManagers.isModalEditing()) return modalEdit.editingData
-      if (editStateManagers.isRowEditing()) {
+      if (modalEdit.isModalVisible.value) return modalEdit.editingData
+      if (rowEdit.editingRowKey.value) {
         return rowEdit.getEditingRowData(rowEdit.editingRowKey.value!)
       }
       return null
@@ -1208,7 +1174,7 @@
       expandState?.clearAllSelections()
     },
 
-    // 🔥 动态行操作方法
+    //  动态行操作方法
     /**
      * * @description 添加新行
      * ! @return void
@@ -1303,13 +1269,4 @@
 
 <style scoped lang="scss">
   @use './index.scss';
-
-  // 🔥 动态行工具栏样式
-  .dynamic-rows-toolbar {
-    margin-bottom: 16px;
-    padding: 16px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-  }
 </style>

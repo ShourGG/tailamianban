@@ -2,22 +2,18 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-17 10:52:35
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-17 20:00:34
+ * @LastEditTime: 2025-06-17 23:53:29
  * @FilePath: \Robot_Admin\src\composables\Table\useDynamicRow.ts
  * @Description: 表格动态行操作 Hooks -  增行、插行、删除行、复制行、调整行、单选功能、打印功能
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
-
-import { type Ref, type VNodeChild } from 'vue'
 import {
-  type DataTableRowKey,
-  NButton,
-  NButtonGroup,
-  NSpace,
-  NIcon,
-  NModal,
-  NTooltip,
-} from 'naive-ui/es'
+  type Ref,
+  type RendererElement,
+  type RendererNode,
+  type VNodeChild,
+} from 'vue'
+import { type DataTableRowKey } from 'naive-ui/es'
 import {
   usePrintWatermark,
   printPresets,
@@ -44,6 +40,7 @@ export interface DynamicRowsOptions<T extends DataRecord = DataRecord> {
   printOptions?: PrintWatermarkOptions
   printPreset?: 'table' | 'form' | 'report'
   printWatermarkText?: string
+  printTargetSelector?: string
 
   // 交互配置
   confirmDelete?: boolean
@@ -142,18 +139,39 @@ function createNewRow<T extends DataRecord>(
   } as T
 }
 
-// ================= 核心状态管理 =================
+// ================= 主函数 =================
 
 /**
- * * @description 创建动态行状态管理
- * ? @param data - 表格数据引用
+ * * @description 表格动态行操作功能组合
+ * ? @param data - 表格数据响应式引用
  * ? @param options - 配置选项
- * ! @return 状态管理对象
+ * ! @return 动态行操作的所有功能
  */
-function useDynamicRowsState<T extends DataRecord>(
+export function useDynamicRows<T extends DataRecord = DataRecord>(
   data: Ref<T[]>,
-  options: DynamicRowsOptions<T>
-) {
+  options: DynamicRowsOptions<T> = {}
+): DynamicRowsReturn<T> {
+  const message = useMessage()
+
+  // 默认配置
+  const finalOptions = {
+    rowKey: 'id',
+    enableRadioSelection: true,
+    enableAdd: true,
+    enableInsert: true,
+    enableDelete: true,
+    enableCopy: true,
+    enableMove: true,
+    enablePrint: true,
+    confirmDelete: true,
+    deleteConfirmText: '确定要删除选中的行吗？此操作不可撤销。',
+    printPreset: 'table' as const,
+    printTargetSelector: '.c-table-wrapper',
+    defaultRowData: () => ({}) as T,
+    ...options,
+  }
+
+  // 状态
   const selectedRowKey = ref<DataTableRowKey | null>(null)
   const deleteConfirmVisible = ref(false)
 
@@ -161,7 +179,7 @@ function useDynamicRowsState<T extends DataRecord>(
     if (selectedRowKey.value === null) return null
     return (
       data.value.find(
-        row => getRowKey(row, options.rowKey || 'id') === selectedRowKey.value
+        row => getRowKey(row, finalOptions.rowKey) === selectedRowKey.value
       ) || null
     )
   })
@@ -178,99 +196,139 @@ function useDynamicRowsState<T extends DataRecord>(
       selectedRowIndex.value < data.value.length - 1
   )
 
-  return {
-    selectedRowKey,
-    selectedRowData,
-    selectedRowIndex,
-    canMoveUp,
-    canMoveDown,
-    deleteConfirmVisible,
+  // 打印功能
+  const {
+    loading: printLoading,
+    progress: printProgress,
+    printWithWatermark,
+    downloadScreenshot,
+    quickPrint,
+  } = usePrintWatermark()
+
+  /**
+   * * @description 获取打印配置选项
+   * ! @return 打印配置对象
+   */
+  const getPrintOptions = (): PrintWatermarkOptions => {
+    if (finalOptions.printOptions) {
+      return finalOptions.printOptions
+    }
+
+    const preset = finalOptions.printPreset || 'table'
+    const baseConfig = printPresets[preset]
+
+    if (finalOptions.printWatermarkText && baseConfig.watermark) {
+      return {
+        ...baseConfig,
+        watermark: {
+          ...baseConfig.watermark,
+          text: finalOptions.printWatermarkText,
+        },
+      }
+    }
+
+    return baseConfig
   }
-}
 
-// ================= 行操作逻辑 =================
-
-/**
- * * @description 创建行操作方法
- * ? @param data - 表格数据引用
- * ? @param state - 状态管理对象
- * ? @param options - 配置选项
- * ! @return 行操作方法集合
- */
-function useRowOperations<T extends DataRecord>(
-  data: Ref<T[]>,
-  state: ReturnType<typeof useDynamicRowsState<T>>,
-  options: DynamicRowsOptions<T>
-) {
-  const message = useMessage()
-
+  /**
+   * * @description 更新表格数据
+   * ? @param newData - 新的数据数组
+   * ! @return void
+   */
   const updateData = (newData: T[]) => {
     data.value = newData
-    options.onRowChange?.(newData)
+    finalOptions.onRowChange?.(newData)
   }
 
+  /**
+   * * @description 添加新行到表格末尾
+   * ! @return void
+   */
   const addRow = () => {
-    if (!options.enableAdd) return
+    if (!finalOptions.enableAdd) return
 
-    const newRow = createNewRow(options.defaultRowData, options.rowKey || 'id')
+    const newRow = createNewRow(
+      finalOptions.defaultRowData,
+      finalOptions.rowKey
+    )
     const newData = [...data.value, newRow]
     updateData(newData)
-    options.onRowAdd?.(newRow)
+    finalOptions.onRowAdd?.(newRow)
     message.success('添加行成功')
   }
 
+  /**
+   * * @description 在选中行后插入新行
+   * ! @return void
+   */
   const insertRow = () => {
-    if (!options.enableInsert || !state.selectedRowData.value) {
+    if (!finalOptions.enableInsert || !selectedRowData.value) {
       message.warning('请先选择一行数据')
       return
     }
 
-    const newRow = createNewRow(options.defaultRowData, options.rowKey || 'id')
+    const newRow = createNewRow(
+      finalOptions.defaultRowData,
+      finalOptions.rowKey
+    )
     const newData = [...data.value]
-    newData.splice(state.selectedRowIndex.value + 1, 0, newRow)
+    newData.splice(selectedRowIndex.value + 1, 0, newRow)
     updateData(newData)
-    options.onRowAdd?.(newRow)
+    finalOptions.onRowAdd?.(newRow)
     message.success('插入行成功')
   }
 
+  /**
+   * * @description 删除选中的行
+   * ! @return void
+   */
   const deleteRow = () => {
-    if (!options.enableDelete || !state.selectedRowData.value) {
+    if (!finalOptions.enableDelete || !selectedRowData.value) {
       message.warning('请先选择要删除的行')
       return
     }
 
-    if (options.confirmDelete) {
-      state.deleteConfirmVisible.value = true
+    if (finalOptions.confirmDelete) {
+      deleteConfirmVisible.value = true
     } else {
       confirmDelete()
     }
   }
 
+  /**
+   * * @description 确认删除操作
+   * ! @return void
+   */
   const confirmDelete = () => {
-    if (!state.selectedRowData.value) return
+    if (!selectedRowData.value) return
 
-    const deletedRow = state.selectedRowData.value
-    const deletedIndex = state.selectedRowIndex.value
+    const deletedRow = selectedRowData.value
+    const deletedIndex = selectedRowIndex.value
 
     const newData = data.value.filter((_, index) => index !== deletedIndex)
     updateData(newData)
 
-    state.selectedRowKey.value = null
-    options.onSelectionChange?.(null, null)
-    options.onRowDelete?.(deletedRow, deletedIndex)
+    selectedRowKey.value = null
+    finalOptions.onSelectionChange?.(null, null)
+    finalOptions.onRowDelete?.(deletedRow, deletedIndex)
 
     message.success('删除行成功')
-    state.deleteConfirmVisible.value = false
+    deleteConfirmVisible.value = false
   }
 
+  /**
+   * * @description 复制选中的行
+   * ! @return void
+   */
   const copyRow = () => {
-    if (!options.enableCopy || !state.selectedRowData.value) {
+    if (!finalOptions.enableCopy || !selectedRowData.value) {
       message.warning('请先选择要复制的行')
       return
     }
 
-    const originalRow = state.selectedRowData.value
-    const keyField = typeof options.rowKey === 'string' ? options.rowKey : 'id'
+    const originalRow = selectedRowData.value
+    const keyField =
+      typeof finalOptions.rowKey === 'string' ? finalOptions.rowKey : 'id'
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [keyField]: _originalKey, ...rowData } = originalRow as any
 
@@ -281,14 +339,18 @@ function useRowOperations<T extends DataRecord>(
 
     const newData = [...data.value, newRow]
     updateData(newData)
-    options.onRowCopy?.(originalRow, newRow)
+    finalOptions.onRowCopy?.(originalRow, newRow)
     message.success('复制行成功')
   }
 
+  /**
+   * * @description 将选中行向上移动
+   * ! @return void
+   */
   const moveRowUp = () => {
-    if (!options.enableMove || !state.canMoveUp.value) return
+    if (!finalOptions.enableMove || !canMoveUp.value) return
 
-    const currentIndex = state.selectedRowIndex.value
+    const currentIndex = selectedRowIndex.value
     const newData = [...data.value]
     const movingRow = newData[currentIndex]
 
@@ -298,14 +360,18 @@ function useRowOperations<T extends DataRecord>(
     ]
 
     updateData(newData)
-    options.onRowMove?.(movingRow, currentIndex, currentIndex - 1)
+    finalOptions.onRowMove?.(movingRow, currentIndex, currentIndex - 1)
     message.success('行已上移')
   }
 
+  /**
+   * * @description 将选中行向下移动
+   * ! @return void
+   */
   const moveRowDown = () => {
-    if (!options.enableMove || !state.canMoveDown.value) return
+    if (!finalOptions.enableMove || !canMoveDown.value) return
 
-    const currentIndex = state.selectedRowIndex.value
+    const currentIndex = selectedRowIndex.value
     const newData = [...data.value]
     const movingRow = newData[currentIndex]
 
@@ -315,96 +381,42 @@ function useRowOperations<T extends DataRecord>(
     ]
 
     updateData(newData)
-    options.onRowMove?.(movingRow, currentIndex, currentIndex + 1)
+    finalOptions.onRowMove?.(movingRow, currentIndex, currentIndex + 1)
     message.success('行已下移')
   }
 
-  return {
-    addRow,
-    insertRow,
-    deleteRow,
-    confirmDelete,
-    copyRow,
-    moveRowUp,
-    moveRowDown,
-  }
-}
-
-// ================= 选择逻辑 =================
-
-/**
- * * @description 创建选择操作方法
- * ? @param data - 表格数据引用
- * ? @param state - 状态管理对象
- * ? @param options - 配置选项
- * ! @return 选择操作方法集合
- */
-function useSelectionLogic<T extends DataRecord>(
-  data: Ref<T[]>,
-  state: ReturnType<typeof useDynamicRowsState<T>>,
-  options: DynamicRowsOptions<T>
-) {
+  /**
+   * * @description 选中指定行
+   * ? @param key - 行键值
+   * ! @return void
+   */
   const selectRow = (key: DataTableRowKey) => {
     const row = data.value.find(
-      row => getRowKey(row, options.rowKey || 'id') === key
+      row => getRowKey(row, finalOptions.rowKey) === key
     )
     if (row) {
-      state.selectedRowKey.value = key
-      options.onSelectionChange?.(key, row)
+      selectedRowKey.value = key
+      finalOptions.onSelectionChange?.(key, row)
     }
   }
 
+  /**
+   * * @description 清空选择状态
+   * ! @return void
+   */
   const clearSelection = () => {
-    state.selectedRowKey.value = null
-    options.onSelectionChange?.(null, null)
+    selectedRowKey.value = null
+    finalOptions.onSelectionChange?.(null, null)
   }
 
-  return {
-    selectRow,
-    clearSelection,
-  }
-}
-
-// ================= 打印逻辑 =================
-
-/**
- * * @description 创建打印操作方法
- * ? @param options - 配置选项
- * ! @return 打印操作方法集合
- */
-function usePrintLogic<T extends DataRecord>(options: DynamicRowsOptions<T>) {
-  const {
-    loading: printLoading,
-    progress: printProgress,
-    printWithWatermark,
-    downloadScreenshot,
-    quickPrint,
-  } = usePrintWatermark()
-
-  const getPrintOptions = (): PrintWatermarkOptions => {
-    if (options.printOptions) {
-      return options.printOptions
-    }
-
-    const preset = options.printPreset || 'table'
-    const baseConfig = printPresets[preset]
-
-    if (options.printWatermarkText && baseConfig.watermark) {
-      return {
-        ...baseConfig,
-        watermark: {
-          ...baseConfig.watermark,
-          text: options.printWatermarkText,
-        },
-      }
-    }
-
-    return baseConfig
-  }
-
+  /**
+   * * @description 处理打印操作
+   * ? @param elementRef - 要打印的元素引用
+   * ! @return Promise<void>
+   */
   const handlePrint = async (elementRef: Ref<HTMLElement | undefined>) => {
     if (!elementRef.value) {
-      useMessage().error('打印元素未找到')
+      message.error('打印元素未找到')
       return
     }
 
@@ -412,12 +424,18 @@ function usePrintLogic<T extends DataRecord>(options: DynamicRowsOptions<T>) {
     await printWithWatermark(elementRef.value, printOptions)
   }
 
+  /**
+   * * @description 处理下载操作
+   * ? @param elementRef - 要下载的元素引用
+   * ? @param filename - 文件名（可选）
+   * ! @return Promise<void>
+   */
   const handleDownload = async (
     elementRef: Ref<HTMLElement | undefined>,
     filename?: string
   ) => {
     if (!elementRef.value) {
-      useMessage().error('下载元素未找到')
+      message.error('下载元素未找到')
       return
     }
 
@@ -425,43 +443,30 @@ function usePrintLogic<T extends DataRecord>(options: DynamicRowsOptions<T>) {
     await downloadScreenshot(elementRef.value, filename, printOptions)
   }
 
+  /**
+   * * @description 处理快速打印操作
+   * ? @param elementRef - 要打印的元素引用
+   * ! @return Promise<void>
+   */
   const handleQuickPrint = async (elementRef: Ref<HTMLElement | undefined>) => {
     if (!elementRef.value) {
-      useMessage().error('打印元素未找到')
+      message.error('打印元素未找到')
       return
     }
 
-    const watermarkText = options.printWatermarkText || 'Robot Admin'
+    const watermarkText = finalOptions.printWatermarkText || 'Robot Admin'
     await quickPrint(elementRef.value, watermarkText)
   }
 
-  return {
-    printLoading,
-    printProgress,
-    handlePrint,
-    handleDownload,
-    handleQuickPrint,
-  }
-}
-
-// ================= 列增强逻辑 =================
-
-/**
- * * @description 创建列增强方法
- * ? @param state - 状态管理对象
- * ? @param selection - 选择操作对象
- * ? @param options - 配置选项
- * ! @return 列增强方法
- */
-function useColumnEnhancement<T extends DataRecord>(
-  state: ReturnType<typeof useDynamicRowsState<T>>,
-  selection: ReturnType<typeof useSelectionLogic<T>>,
-  options: DynamicRowsOptions<T>
-) {
+  /**
+   * * @description 增强表格列配置，添加单选列
+   * ? @param columns - 原始列配置数组
+   * ! @return 增强后的列配置数组
+   */
   const enhanceColumns = (columns: TableColumn<T>[]): TableColumn<T>[] => {
     const enhancedColumns = [...columns]
 
-    if (options.enableRadioSelection) {
+    if (finalOptions.enableRadioSelection) {
       enhancedColumns.unshift({
         key: '_radio_selection',
         title: '选择',
@@ -469,16 +474,16 @@ function useColumnEnhancement<T extends DataRecord>(
         align: 'center',
         editable: false,
         render: (rowData: T) => {
-          const rowKeyVal = getRowKey(rowData, options.rowKey || 'id')
+          const rowKeyVal = getRowKey(rowData, finalOptions.rowKey)
           return h('div', { class: 'flex justify-center' }, [
             h('input', {
               type: 'radio',
               name: 'table-radio-selection',
-              checked: state.selectedRowKey.value === rowKeyVal,
+              checked: selectedRowKey.value === rowKeyVal,
               class: 'cursor-pointer accent-blue-500 scale-110',
               onChange: (e: Event) => {
                 if ((e.target as HTMLInputElement).checked) {
-                  selection.selectRow(rowKeyVal)
+                  selectRow(rowKeyVal)
                 }
               },
             }),
@@ -490,44 +495,32 @@ function useColumnEnhancement<T extends DataRecord>(
     return enhancedColumns
   }
 
-  return {
-    enhanceColumns,
-  }
-}
-
-// ================= 渲染逻辑 =================
-
-/**
- * * @description 创建渲染方法
- * ? @param state - 状态管理对象
- * ? @param operations - 行操作对象
- * ? @param print - 打印操作对象
- * ? @param options - 配置选项
- * ! @return 渲染方法集合
- */
-function useRenderer<T extends DataRecord>(
-  state: ReturnType<typeof useDynamicRowsState<T>>,
-  operations: ReturnType<typeof useRowOperations<T>>,
-  print: ReturnType<typeof usePrintLogic<T>>,
-  options: DynamicRowsOptions<T>
-) {
+  /**
+   * * @description 渲染工具栏
+   * ! @return Vue节点子元素
+   */
   const renderToolbar = (): VNodeChild => {
-    const buttons = []
+    const buttons: globalThis.VNode<
+      RendererNode,
+      RendererElement,
+      { [key: string]: any }
+    >[] = []
 
-    if (options.enablePrint) {
+    if (finalOptions.enablePrint) {
       buttons.push(
         h(
           NButton,
           {
-            loading: print.printLoading.value,
+            loading: printLoading.value,
             type: 'primary',
             ghost: true,
             onClick: async () => {
               try {
-                // 获取表格容器元素
-                const tableElement = document.querySelector('.c-table-wrapper')
+                const tableElement = document.querySelector(
+                  finalOptions.printTargetSelector
+                )
                 if (tableElement) {
-                  await print.handlePrint(ref(tableElement as HTMLElement))
+                  await handlePrint(ref(tableElement as HTMLElement))
                 } else {
                   console.warn('未找到表格容器元素')
                 }
@@ -544,14 +537,18 @@ function useRenderer<T extends DataRecord>(
       )
     }
 
-    const rowButtons = []
+    const rowButtons: globalThis.VNode<
+      RendererNode,
+      RendererElement,
+      { [key: string]: any }
+    >[] = []
 
-    if (options.enableAdd) {
+    if (finalOptions.enableAdd) {
       rowButtons.push(
         h(
           NButton,
           {
-            onClick: operations.addRow,
+            onClick: addRow,
             type: 'primary',
           },
           {
@@ -562,20 +559,20 @@ function useRenderer<T extends DataRecord>(
       )
     }
 
-    if (options.enableInsert) {
+    if (finalOptions.enableInsert) {
       rowButtons.push(
         h(
           NTooltip,
           {
-            disabled: !!state.selectedRowData.value,
+            disabled: !!selectedRowData.value,
           },
           {
             trigger: () =>
               h(
                 NButton,
                 {
-                  onClick: operations.insertRow,
-                  disabled: !state.selectedRowData.value,
+                  onClick: insertRow,
+                  disabled: !selectedRowData.value,
                   type: 'primary',
                   ghost: true,
                 },
@@ -593,20 +590,20 @@ function useRenderer<T extends DataRecord>(
       )
     }
 
-    if (options.enableDelete) {
+    if (finalOptions.enableDelete) {
       rowButtons.push(
         h(
           NTooltip,
           {
-            disabled: !!state.selectedRowData.value,
+            disabled: !!selectedRowData.value,
           },
           {
             trigger: () =>
               h(
                 NButton,
                 {
-                  onClick: operations.deleteRow,
-                  disabled: !state.selectedRowData.value,
+                  onClick: deleteRow,
+                  disabled: !selectedRowData.value,
                   type: 'error',
                   ghost: true,
                 },
@@ -621,20 +618,20 @@ function useRenderer<T extends DataRecord>(
       )
     }
 
-    if (options.enableCopy) {
+    if (finalOptions.enableCopy) {
       rowButtons.push(
         h(
           NTooltip,
           {
-            disabled: !!state.selectedRowData.value,
+            disabled: !!selectedRowData.value,
           },
           {
             trigger: () =>
               h(
                 NButton,
                 {
-                  onClick: operations.copyRow,
-                  disabled: !state.selectedRowData.value,
+                  onClick: copyRow,
+                  disabled: !selectedRowData.value,
                   type: 'info',
                   ghost: true,
                 },
@@ -650,20 +647,20 @@ function useRenderer<T extends DataRecord>(
       )
     }
 
-    if (options.enableMove) {
+    if (finalOptions.enableMove) {
       rowButtons.push(
         h(
           NTooltip,
           {
-            disabled: state.canMoveUp.value,
+            disabled: canMoveUp.value,
           },
           {
             trigger: () =>
               h(
                 NButton,
                 {
-                  onClick: operations.moveRowUp,
-                  disabled: !state.canMoveUp.value,
+                  onClick: moveRowUp,
+                  disabled: !canMoveUp.value,
                   type: 'warning',
                   ghost: true,
                 },
@@ -674,21 +671,21 @@ function useRenderer<T extends DataRecord>(
                 }
               ),
             default: () =>
-              !state.selectedRowData.value ? '请先选择数据' : '已经是第一行',
+              !selectedRowData.value ? '请先选择数据' : '已经是第一行',
           }
         ),
         h(
           NTooltip,
           {
-            disabled: state.canMoveDown.value,
+            disabled: canMoveDown.value,
           },
           {
             trigger: () =>
               h(
                 NButton,
                 {
-                  onClick: operations.moveRowDown,
-                  disabled: !state.canMoveDown.value,
+                  onClick: moveRowDown,
+                  disabled: !canMoveDown.value,
                   type: 'warning',
                   ghost: true,
                 },
@@ -699,118 +696,80 @@ function useRenderer<T extends DataRecord>(
                 }
               ),
             default: () =>
-              !state.selectedRowData.value ? '请先选择数据' : '已经是最后一行',
+              !selectedRowData.value ? '请先选择数据' : '已经是最后一行',
           }
         )
       )
     }
 
     if (rowButtons.length > 0) {
-      // 修复 NButtonGroup 的插槽问题
       buttons.push(h(NButtonGroup, {}, () => rowButtons))
     }
 
-    // 修复 NSpace 的插槽问题
     return h('div', { class: 'dynamic-rows-toolbar mb-4 flex justify-end' }, [
       h(NSpace, {}, () => buttons),
     ])
   }
 
+  /**
+   * * @description 渲染删除确认模态框
+   * ! @return Vue节点子元素
+   */
   const renderConfirmModal = (): VNodeChild => {
     return h(NModal, {
-      show: state.deleteConfirmVisible.value,
+      show: deleteConfirmVisible.value,
       'onUpdate:show': (show: boolean) => {
-        state.deleteConfirmVisible.value = show
+        deleteConfirmVisible.value = show
       },
       preset: 'dialog',
       title: '确认删除',
-      content:
-        options.deleteConfirmText || '确定要删除选中的行吗？此操作不可撤销。',
+      content: finalOptions.deleteConfirmText,
       positiveText: '确认删除',
       negativeText: '取消',
-      onPositiveClick: operations.confirmDelete,
+      onPositiveClick: confirmDelete,
     })
   }
 
-  return {
-    renderToolbar,
-    renderConfirmModal,
-  }
-}
-
-// ================= 主函数 =================
-
-/**
- * * @description 表格动态行操作功能组合
- * ? @param data - 表格数据响应式引用
- * ? @param options - 配置选项
- * ! @return 动态行操作的所有功能
- */
-export function useDynamicRows<T extends DataRecord = DataRecord>(
-  data: Ref<T[]>,
-  options: DynamicRowsOptions<T> = {}
-): DynamicRowsReturn<T> {
-  const defaultOptions: DynamicRowsOptions<T> = {
-    rowKey: 'id',
-    enableRadioSelection: true,
-    enableAdd: true,
-    enableInsert: true,
-    enableDelete: true,
-    enableCopy: true,
-    enableMove: true,
-    enablePrint: true,
-    confirmDelete: true,
-    deleteConfirmText: '确定要删除选中的行吗？此操作不可撤销。',
-    printPreset: 'table',
-    defaultRowData: () => ({}) as T,
-    ...options,
-  }
-
-  const state = useDynamicRowsState(data, defaultOptions)
-  const operations = useRowOperations(data, state, defaultOptions)
-  const selection = useSelectionLogic(data, state, defaultOptions)
-  const print = usePrintLogic(defaultOptions)
-  const columnEnhancement = useColumnEnhancement(
-    state,
-    selection,
-    defaultOptions
-  )
-  const renderer = useRenderer(state, operations, print, defaultOptions)
+  // 组件卸载时清理
+  onBeforeUnmount(() => {
+    selectedRowKey.value = null
+    deleteConfirmVisible.value = false
+  })
 
   return {
     // 状态
-    selectedRowKey: state.selectedRowKey,
-    selectedRowData: state.selectedRowData,
-    selectedRowIndex: state.selectedRowIndex,
-    canMoveUp: state.canMoveUp,
-    canMoveDown: state.canMoveDown,
-    deleteConfirmVisible: state.deleteConfirmVisible,
-    printLoading: print.printLoading,
-    printProgress: print.printProgress,
+    selectedRowKey,
+    selectedRowData,
+    selectedRowIndex,
+    canMoveUp,
+    canMoveDown,
+    deleteConfirmVisible,
+    printLoading,
+    printProgress,
 
     // 行操作方法
-    addRow: operations.addRow,
-    insertRow: operations.insertRow,
-    deleteRow: operations.deleteRow,
-    confirmDelete: operations.confirmDelete,
-    copyRow: operations.copyRow,
-    moveRowUp: operations.moveRowUp,
-    moveRowDown: operations.moveRowDown,
+    addRow,
+    insertRow,
+    deleteRow,
+    confirmDelete,
+    copyRow,
+    moveRowUp,
+    moveRowDown,
 
     // 选择方法
-    selectRow: selection.selectRow,
-    clearSelection: selection.clearSelection,
+    selectRow,
+    clearSelection,
 
     // 打印方法
-    handlePrint: print.handlePrint,
-    handleDownload: print.handleDownload,
-    handleQuickPrint: print.handleQuickPrint,
+    handlePrint,
+    handleDownload,
+    handleQuickPrint,
 
     // 列增强方法
-    enhanceColumns: columnEnhancement.enhanceColumns,
+    enhanceColumns,
 
-    // 渲染方法
-    renderToolbar: renderer.renderToolbar,
-    renderConfirmModal: renderer.renderConfirmModal,
+    // 工具栏渲染
+    renderToolbar,
+    renderConfirmModal,
   }
 }

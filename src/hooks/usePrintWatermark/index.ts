@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-17 10:10:33
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-17 13:43:38
+ * @LastEditTime: 2025-06-17 23:28:51
  * @FilePath: \Robot_Admin\src\hooks\usePrintWatermark\index.ts
  * @Description: 打印水印组合工具 - 封装 printJS 和 html2canvas
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -318,7 +318,7 @@ function downloadCanvas(
 
 // ================= 打印函数 =================
 
-let focusInterval: number | null = null
+let focusInterval: NodeJS.Timeout | null = null
 
 /**
  * * @description 启动焦点保持(某些浏览器打印需要)

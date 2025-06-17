@@ -2,8 +2,8 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-17 15:11:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-17 15:23:04
- * @FilePath: \Robot_Admin\src\config\vite\plugin\viteAutoImportConfig.ts
+ * @LastEditTime: 2025-06-17 23:41:26
+ * @FilePath: \Robot_Admin\src\config\vite\viteAutoImportConfig.ts
  * @Description: Vite 自动导入配置
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
@@ -25,7 +25,6 @@ export default AutoImport({
         'useNotification',
         'useLoadingBar',
         'NCard',
-        'NButton',
         'NSpace',
         'NTag',
         'NBadge',
@@ -34,6 +33,16 @@ export default AutoImport({
         'NCode',
         'NAlert',
         'NSpin',
+        'NInputNumber',
+        'NDatePicker',
+        'NSelect',
+        'NInput',
+        'NSwitch',
+        'NIcon',
+        'NTooltip',
+        'NButton',
+        'NButtonGroup',
+        'NModal',
       ],
     },
   ],

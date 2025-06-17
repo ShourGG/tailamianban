@@ -10,13 +10,22 @@ declare global {
   const NAlert: typeof import('naive-ui')['NAlert']
   const NBadge: typeof import('naive-ui')['NBadge']
   const NButton: typeof import('naive-ui')['NButton']
+  const NButtonGroup: typeof import('naive-ui')['NButtonGroup']
   const NCard: typeof import('naive-ui')['NCard']
   const NCode: typeof import('naive-ui')['NCode']
   const NCollapse: typeof import('naive-ui')['NCollapse']
   const NCollapseItem: typeof import('naive-ui')['NCollapseItem']
+  const NDatePicker: typeof import('naive-ui')['NDatePicker']
+  const NIcon: typeof import('naive-ui')['NIcon']
+  const NInput: typeof import('naive-ui')['NInput']
+  const NInputNumber: typeof import('naive-ui')['NInputNumber']
+  const NModal: typeof import('naive-ui')['NModal']
+  const NSelect: typeof import('naive-ui')['NSelect']
   const NSpace: typeof import('naive-ui')['NSpace']
   const NSpin: typeof import('naive-ui')['NSpin']
+  const NSwitch: typeof import('naive-ui')['NSwitch']
   const NTag: typeof import('naive-ui')['NTag']
+  const NTooltip: typeof import('naive-ui')['NTooltip']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
@@ -113,13 +122,22 @@ declare module 'vue' {
     readonly NAlert: UnwrapRef<typeof import('naive-ui')['NAlert']>
     readonly NBadge: UnwrapRef<typeof import('naive-ui')['NBadge']>
     readonly NButton: UnwrapRef<typeof import('naive-ui')['NButton']>
+    readonly NButtonGroup: UnwrapRef<typeof import('naive-ui')['NButtonGroup']>
     readonly NCard: UnwrapRef<typeof import('naive-ui')['NCard']>
     readonly NCode: UnwrapRef<typeof import('naive-ui')['NCode']>
     readonly NCollapse: UnwrapRef<typeof import('naive-ui')['NCollapse']>
     readonly NCollapseItem: UnwrapRef<typeof import('naive-ui')['NCollapseItem']>
+    readonly NDatePicker: UnwrapRef<typeof import('naive-ui')['NDatePicker']>
+    readonly NIcon: UnwrapRef<typeof import('naive-ui')['NIcon']>
+    readonly NInput: UnwrapRef<typeof import('naive-ui')['NInput']>
+    readonly NInputNumber: UnwrapRef<typeof import('naive-ui')['NInputNumber']>
+    readonly NModal: UnwrapRef<typeof import('naive-ui')['NModal']>
+    readonly NSelect: UnwrapRef<typeof import('naive-ui')['NSelect']>
     readonly NSpace: UnwrapRef<typeof import('naive-ui')['NSpace']>
     readonly NSpin: UnwrapRef<typeof import('naive-ui')['NSpin']>
+    readonly NSwitch: UnwrapRef<typeof import('naive-ui')['NSwitch']>
     readonly NTag: UnwrapRef<typeof import('naive-ui')['NTag']>
+    readonly NTooltip: UnwrapRef<typeof import('naive-ui')['NTooltip']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>

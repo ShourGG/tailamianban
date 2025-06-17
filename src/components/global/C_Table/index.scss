@@ -45,28 +45,26 @@
   }
 }
 
-// 🔥 表格混合布局 - 支持固定宽度和自适应
+//  表格混合布局 - 支持固定宽度和自适应
 :deep(.n-data-table) {
   table-layout: auto !important;
   width: 100% !important;
 }
 
-// 🔥 所有普通列的最小宽度保护
-:deep(.n-data-table-th:not(:last-child),
-.n-data-table-td:not(:last-child)) {
+//  所有普通列的最小宽度保护
+:deep(.n-data-table-th:not(:last-child), .n-data-table-td:not(:last-child)) {
   min-width: 80px !important;
 }
 
-// 🔥 操作列固定合理宽度
-:deep(.n-data-table-th:last-child,
-.n-data-table-td:last-child) {
+//  操作列固定合理宽度
+:deep(.n-data-table-th:last-child, .n-data-table-td:last-child) {
   width: 160px !important;
   min-width: 160px !important;
   max-width: 160px !important;
   text-align: center !important;
 }
 
-// 🔥 操作按钮居中
+//  操作按钮居中
 :deep(.n-data-table-td:last-child .n-space) {
   justify-content: center !important;
 }
@@ -80,4 +78,13 @@
   .n-icon {
     margin-right: 2px !important;
   }
+}
+
+//  动态行工具栏样式
+.dynamic-rows-toolbar {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
 }
