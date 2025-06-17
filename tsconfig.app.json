@@ -10,14 +10,13 @@
     "src/**/*", // src 目录下所有文件
     "src/**/*.vue", // Vue 单文件组件（虽然被上面包含，但明确声明更清晰）
     "src/**/*.d.ts", // src 目录下的类型声明文件
-    "src/types/**/*", // 自定义类型文件目录
-    "src/**/*.json" // 对json文件导入支持
+    "src/**/*.json", // 对json文件导入支持
+    "package.json"
   ],
 
   // 排除不需要编译的文件和目录
   "exclude": [
-    "src/**/__tests__/*", // 测试文件
-    "types/**/*" // 旧的 types 目录（已迁移到 src/types）
+    "src/**/__tests__/*" // 测试文件
   ],
 
   "compilerOptions": {

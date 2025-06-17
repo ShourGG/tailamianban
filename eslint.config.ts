@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-11 22:14:48
+ * @LastEditTime: 2025-06-17 15:25:00
  * @FilePath: \Robot_Admin\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.

@@ -6,9 +6,17 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-  const DYNAMIC_FORM_STATE_KEY: (typeof import('../composables/Form/useDynamicFormState'))['DYNAMIC_FORM_STATE_KEY']
   const EffectScope: typeof import('vue')['EffectScope']
-  const FIELD_TYPE_OPTIONS: (typeof import('../composables/Form/useDynamicFormState'))['FIELD_TYPE_OPTIONS']
+  const NAlert: typeof import('naive-ui')['NAlert']
+  const NBadge: typeof import('naive-ui')['NBadge']
+  const NButton: typeof import('naive-ui')['NButton']
+  const NCard: typeof import('naive-ui')['NCard']
+  const NCode: typeof import('naive-ui')['NCode']
+  const NCollapse: typeof import('naive-ui')['NCollapse']
+  const NCollapseItem: typeof import('naive-ui')['NCollapseItem']
+  const NSpace: typeof import('naive-ui')['NSpace']
+  const NSpin: typeof import('naive-ui')['NSpin']
+  const NTag: typeof import('naive-ui')['NTag']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
@@ -73,7 +81,6 @@ declare global {
   const useCssVars: typeof import('vue')['useCssVars']
   const useDebounceFn: typeof import('@vueuse/core')['useDebounceFn']
   const useDialog: typeof import('naive-ui')['useDialog']
-  const useDynamicFormState: (typeof import('../composables/Form/useDynamicFormState'))['useDynamicFormState']
   const useId: typeof import('vue')['useId']
   const useLink: typeof import('vue-router')['useLink']
   const useLoadingBar: typeof import('naive-ui')['useLoadingBar']
@@ -103,6 +110,16 @@ declare module 'vue' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
+    readonly NAlert: UnwrapRef<typeof import('naive-ui')['NAlert']>
+    readonly NBadge: UnwrapRef<typeof import('naive-ui')['NBadge']>
+    readonly NButton: UnwrapRef<typeof import('naive-ui')['NButton']>
+    readonly NCard: UnwrapRef<typeof import('naive-ui')['NCard']>
+    readonly NCode: UnwrapRef<typeof import('naive-ui')['NCode']>
+    readonly NCollapse: UnwrapRef<typeof import('naive-ui')['NCollapse']>
+    readonly NCollapseItem: UnwrapRef<typeof import('naive-ui')['NCollapseItem']>
+    readonly NSpace: UnwrapRef<typeof import('naive-ui')['NSpace']>
+    readonly NSpin: UnwrapRef<typeof import('naive-ui')['NSpin']>
+    readonly NTag: UnwrapRef<typeof import('naive-ui')['NTag']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>

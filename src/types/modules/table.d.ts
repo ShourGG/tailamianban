@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-16 12:38:16
+ * @LastEditTime: 2025-06-17 18:27:13
  * @FilePath: \Robot_Admin\src\types\modules\table.d.ts
- * @Description: 表格类型系统 - 增强版
+ * @Description: 表格类型系统
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
@@ -12,7 +12,10 @@ import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
 import type { VNodeChild, Ref, ComputedRef } from 'vue'
 import type { FormItemRule } from 'naive-ui/es/form'
 
-// ================= 基础类型定义 =================
+// ================= 核心类型定义 =================
+
+// 🔥 统一数据记录类型 - 所有组件和 Hook 都使用这个
+export type DataRecord = Record<string, unknown>
 
 export type EditMode = 'row' | 'cell' | 'both' | 'modal' | 'none'
 
@@ -77,8 +80,8 @@ export interface EditProps {
   readonly?: boolean
 }
 
-// 表格列配置
-export interface TableColumn<T = Record<string, any>>
+// 表格列配置 - 使用统一的 DataRecord 约束
+export interface TableColumn<T extends DataRecord = DataRecord>
   extends Omit<DataTableColumns<T>[number], 'key' | 'render'> {
   key: keyof T | string
   title: string
@@ -90,8 +93,8 @@ export interface TableColumn<T = Record<string, any>>
   render?: (rowData: T, rowIndex: number) => VNodeChild
 }
 
-// 行操作配置
-export interface RowAction<T = Record<string, any>> {
+// 行操作配置 - 使用统一的 DataRecord 约束
+export interface RowAction<T extends DataRecord = DataRecord> {
   label: string
   icon?: string
   type?: ButtonType
@@ -110,8 +113,8 @@ export interface ChildSelectionState {
   clearAll: () => void
 }
 
-// 展开配置选项 - 精简版
-export interface ExpandConfig<T = Record<string, any>, C = any> {
+// 展开配置选项 - 使用统一的 DataRecord 约束
+export interface ExpandConfig<T extends DataRecord = DataRecord, C = any> {
   // 数据加载函数
   onLoadData?: (row: T) => Promise<C[]> | C[]
 
@@ -127,8 +130,8 @@ export interface ExpandConfig<T = Record<string, any>, C = any> {
   rowExpandable?: (row: T) => boolean
 }
 
-// 选择配置选项 - 精简版
-export interface SelectionConfig<T = Record<string, any>> {
+// 选择配置选项 - 使用统一的 DataRecord 约束
+export interface SelectionConfig<T extends DataRecord = DataRecord> {
   // 基础选择配置
   enableSelection?: boolean
   defaultCheckedKeys?: DataTableRowKey[]
@@ -146,8 +149,8 @@ export interface SelectionConfig<T = Record<string, any>> {
 
 // ================= 表格组件类型 - 增强版 =================
 
-// 表格属性 - 增强版
-export interface TableProps<T = Record<string, any>> {
+// 表格属性 - 使用统一的 DataRecord 约束
+export interface TableProps<T extends DataRecord = DataRecord> {
   // 数据相关
   columns: TableColumn<T>[]
   data: T[]
@@ -211,8 +214,8 @@ export interface TableProps<T = Record<string, any>> {
   parentChildLinkMode?: ParentChildLinkMode
 }
 
-// 表格事件回调类型
-export interface TableEmits<T = Record<string, any>> {
+// 表格事件回调类型 - 使用统一的 DataRecord 约束
+export interface TableEmits<T extends DataRecord = DataRecord> {
   'update:data': [data: T[]]
   save: [rowData: T, rowIndex: number, columnKey?: string]
   cancel: [rowData: T, rowIndex: number]
@@ -245,8 +248,8 @@ export interface TableEmits<T = Record<string, any>> {
   ]
 }
 
-// 表格实例方法 - 增强版
-export interface TableInstance {
+// 表格实例方法 - 使用统一的 DataRecord 约束
+export interface TableInstance<T extends DataRecord = DataRecord> {
   // 编辑功能
   startEdit: (rowKey: DataTableRowKey, columnKey?: string) => void
   cancelEdit: () => void
@@ -285,10 +288,13 @@ export interface TableInstance {
   clearAllSelections: () => void
 }
 
-// ================= useTableExpand 精简版类型 =================
+// ================= useTableExpand 类型 =================
 
-// 精简版展开选项
-export interface UseTableExpandOptions<T = Record<string, any>, C = any> {
+// useTableExpand 配置选项 - 使用统一的 DataRecord 约束
+export interface UseTableExpandOptions<
+  T extends DataRecord = DataRecord,
+  C = any,
+> {
   // 基础数据
   data: Ref<T[]> | ComputedRef<T[]>
   rowKey: (row: T) => DataTableRowKey
@@ -337,8 +343,11 @@ export interface UseTableExpandOptions<T = Record<string, any>, C = any> {
   ) => void
 }
 
-// useTableExpand 返回类型
-export interface UseTableExpandReturn<T = Record<string, any>, C = any> {
+// useTableExpand 返回类型 - 使用统一的 DataRecord 约束
+export interface UseTableExpandReturn<
+  T extends DataRecord = DataRecord,
+  C = any,
+> {
   // 基础状态
   expandedKeys: Ref<DataTableRowKey[]>
   checkedKeys: Ref<DataTableRowKey[]>
@@ -371,7 +380,7 @@ export interface UseTableExpandReturn<T = Record<string, any>, C = any> {
 // ================= 演示页面专用类型 =================
 
 // 测试记录类型
-export interface TestRecord {
+export interface TestRecord extends DataRecord {
   id: number
   name: string
   department: string
@@ -381,7 +390,7 @@ export interface TestRecord {
 }
 
 // 子数据类型
-export interface ChildData {
+export interface ChildData extends DataRecord {
   id: number
   project?: string
   requirement?: string

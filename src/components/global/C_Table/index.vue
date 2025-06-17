@@ -2,14 +2,22 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-16 12:24:33
+ * @LastEditTime: 2025-06-17 18:27:13
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
- * @Description: 超级表格组件 - 增强版本（支持展开和选择）
+ * @Description: 超级表格组件 - 增强版本（支持展开、选择和动态行操作）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
   <div class="c-table-wrapper">
+    <!-- 🔥 动态行工具栏 - 只在启用时显示 -->
+    <div
+      v-if="dynamicRowsState"
+      class="dynamic-rows-toolbar"
+    >
+      <component :is="dynamicRowsState.renderToolbar()" />
+    </div>
+
     <!-- 表格主体 -->
     <NDataTable
       ref="tableRef"
@@ -91,6 +99,12 @@
         </NSpace>
       </template>
     </NModal>
+
+    <!-- 🔥 动态行确认删除模态框 -->
+    <component
+      v-if="dynamicRowsState"
+      :is="dynamicRowsState.renderConfirmModal()"
+    />
   </div>
 </template>
 
@@ -116,11 +130,16 @@
     EditType,
     ParentChildLinkMode,
     ChildSelectionState,
+    DataRecord,
   } from '@/types/modules/table'
   import { useRowEdit } from '@/composables/Table/useRowEdit'
   import { useCellEdit } from '@/composables/Table/useCellEdit'
   import { useModalEdit } from '@/composables/Table/useModalEdit'
   import { useTableExpand } from '@/composables/Table/useTableExpand'
+  import {
+    useDynamicRows,
+    type DynamicRowsOptions,
+  } from '@/composables/Table/useDynamicRow'
   import {
     getDisplayValue,
     generateFormOptions,
@@ -132,8 +151,9 @@
     validate: () => Promise<void>
   }
 
-  // 扩展 TableProps 支持展开和选择功能
-  interface EnhancedTableProps<T = Record<string, any>> extends TableProps<T> {
+  // 扩展 TableProps 支持展开、选择和动态行功能
+  interface EnhancedTableProps<T extends DataRecord = DataRecord>
+    extends TableProps<T> {
     // 🔥 展开功能配置
     expandable?: boolean
     onLoadExpandData?: (row: T) => Promise<any[]> | any[]
@@ -159,6 +179,9 @@
     // 🔥 父子联动配置
     enableParentChildLink?: boolean
     parentChildLinkMode?: ParentChildLinkMode
+
+    // 🔥 动态行功能配置 - 简化为单个配置对象
+    dynamicRowsOptions?: DynamicRowsOptions<T>
   }
 
   type DataRecord = Record<string, unknown>
@@ -197,10 +220,22 @@
     enableChildSelection: false,
     enableParentChildLink: false,
     parentChildLinkMode: 'loose',
+    dynamicRowsOptions: undefined,
   })
 
-  // Emits 定义
-  const emit = defineEmits<TableEmits>()
+  // 🔥 扩展 Emits - 添加动态行事件
+  const emit = defineEmits<
+    TableEmits & {
+      'row-add': [newRow: DataRecord]
+      'row-delete': [deletedRow: DataRecord, index: number]
+      'row-copy': [originalRow: DataRecord, newRow: DataRecord]
+      'row-move': [row: DataRecord, fromIndex: number, toIndex: number]
+      'row-selection-change': [
+        selectedKey: DataTableRowKey | null,
+        selectedRow: DataRecord | null,
+      ]
+    }
+  >()
 
   // Refs
   const tableRef = ref<ComponentPublicInstance>()
@@ -225,6 +260,47 @@
   )
 
   const formOptions = computed(() => generateFormOptions(editableColumns.value))
+
+  // 🔥 动态行功能初始化 - 只在有配置时启用，使用正确的类型约束
+  let dynamicRowsState: ReturnType<typeof useDynamicRows<DataRecord>> | null =
+    null
+
+  if (props.dynamicRowsOptions) {
+    const dynamicOptions: DynamicRowsOptions<DataRecord> = {
+      ...props.dynamicRowsOptions,
+
+      // 事件回调
+      onRowChange: data => {
+        emit('update:data', data)
+        props.dynamicRowsOptions?.onRowChange?.(data)
+      },
+      onSelectionChange: (selectedKey, selectedRow) => {
+        emit('row-selection-change', selectedKey, selectedRow)
+        props.dynamicRowsOptions?.onSelectionChange?.(selectedKey, selectedRow)
+      },
+      onRowAdd: newRow => {
+        emit('row-add', newRow)
+        props.dynamicRowsOptions?.onRowAdd?.(newRow)
+      },
+      onRowDelete: (deletedRow, index) => {
+        emit('row-delete', deletedRow, index)
+        props.dynamicRowsOptions?.onRowDelete?.(deletedRow, index)
+      },
+      onRowCopy: (originalRow, newRow) => {
+        emit('row-copy', originalRow, newRow)
+        props.dynamicRowsOptions?.onRowCopy?.(originalRow, newRow)
+      },
+      onRowMove: (row, fromIndex, toIndex) => {
+        emit('row-move', row, fromIndex, toIndex)
+        props.dynamicRowsOptions?.onRowMove?.(row, fromIndex, toIndex)
+      },
+    }
+
+    dynamicRowsState = useDynamicRows(
+      computed(() => props.data),
+      dynamicOptions
+    )
+  }
 
   // 🔥 展开和选择功能初始化 - 彻底修复生命周期错误
   let expandState: ReturnType<typeof useTableExpand> | null = null
@@ -736,7 +812,7 @@
     })
   }
 
-  // 🔥 计算列配置 - 整合展开和选择功能
+  // 🔥 计算列配置 - 整合展开、选择和动态行功能
   const computedColumns = computed((): DataTableColumn[] => {
     let columns: DataTableColumn[] = props.columns.map(column => ({
       ...column,
@@ -746,6 +822,13 @@
       render: (rowData: DataRecord, rowIndex: number) =>
         renderCell(column, rowData, rowIndex),
     }))
+
+    // 🔥 使用 dynamicRowsState 的列配置增强（如果启用动态行功能）
+    if (dynamicRowsState) {
+      columns = dynamicRowsState.enhanceColumns(
+        columns as any
+      ) as DataTableColumn[]
+    }
 
     // 🔥 使用 expandState 的列配置增强
     if (expandState && (props.expandable || props.enableSelection)) {
@@ -820,8 +903,25 @@
     saveRow: () => rowEdit.saveEditRow(),
   }
 
-  // 🔥 暴露方法 - 包含展开和选择功能
-  defineExpose<TableInstance>({
+  // 🔥 暴露方法 - 包含展开、选择和动态行功能
+  defineExpose<
+    TableInstance & {
+      // 🔥 动态行操作方法
+      addRow: () => void
+      insertRow: () => void
+      deleteRow: () => void
+      copyRow: () => void
+      moveRowUp: () => void
+      moveRowDown: () => void
+      clearRowSelection: () => void
+      getSelectedRowData: () => DataRecord | null
+      printTable: (elementRef?: HTMLElement) => Promise<void>
+      downloadTableScreenshot: (
+        elementRef?: HTMLElement,
+        filename?: string
+      ) => Promise<void>
+    }
+  >({
     /**
      * * @description 开始编辑
      * ? @param rowKey - 行键
@@ -1107,9 +1207,109 @@
     clearAllSelections: () => {
       expandState?.clearAllSelections()
     },
+
+    // 🔥 动态行操作方法
+    /**
+     * * @description 添加新行
+     * ! @return void
+     */
+    addRow: () => {
+      dynamicRowsState?.addRow()
+    },
+
+    /**
+     * * @description 插入新行
+     * ! @return void
+     */
+    insertRow: () => {
+      dynamicRowsState?.insertRow()
+    },
+
+    /**
+     * * @description 删除选中行
+     * ! @return void
+     */
+    deleteRow: () => {
+      dynamicRowsState?.deleteRow()
+    },
+
+    /**
+     * * @description 复制选中行
+     * ! @return void
+     */
+    copyRow: () => {
+      dynamicRowsState?.copyRow()
+    },
+
+    /**
+     * * @description 上移选中行
+     * ! @return void
+     */
+    moveRowUp: () => {
+      dynamicRowsState?.moveRowUp()
+    },
+
+    /**
+     * * @description 下移选中行
+     * ! @return void
+     */
+    moveRowDown: () => {
+      dynamicRowsState?.moveRowDown()
+    },
+
+    /**
+     * * @description 清空行选择
+     * ! @return void
+     */
+    clearRowSelection: () => {
+      dynamicRowsState?.clearSelection()
+    },
+
+    /**
+     * * @description 获取选中的行数据
+     * ! @return 选中的行数据或null
+     */
+    getSelectedRowData: () => {
+      return dynamicRowsState?.selectedRowData.value || null
+    },
+
+    /**
+     * * @description 打印表格
+     * ? @param elementRef - 要打印的元素引用
+     * ! @return Promise<void>
+     */
+    printTable: async (elementRef?: HTMLElement) => {
+      if (dynamicRowsState && elementRef) {
+        await dynamicRowsState.handlePrint(ref(elementRef))
+      }
+    },
+
+    /**
+     * * @description 下载表格截图
+     * ? @param elementRef - 要截图的元素引用
+     * ? @param filename - 文件名
+     * ! @return Promise<void>
+     */
+    downloadTableScreenshot: async (
+      elementRef?: HTMLElement,
+      filename?: string
+    ) => {
+      if (dynamicRowsState && elementRef) {
+        await dynamicRowsState.handleDownload(ref(elementRef), filename)
+      }
+    },
   })
 </script>
 
 <style scoped lang="scss">
   @use './index.scss';
+
+  // 🔥 动态行工具栏样式
+  .dynamic-rows-toolbar {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
 </style>
