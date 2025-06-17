@@ -251,7 +251,7 @@
             {
               "path": "demo-change-table",
               "name": "demo-change-table",
-              "component": "/12-demo-change-table/index",
+              "component": "/demo/12-change-table/index",
               "meta": {
                 "icon": "mdi:table-multiple",
                 "title": "表格动态行",

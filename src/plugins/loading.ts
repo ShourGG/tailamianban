@@ -110,6 +110,8 @@ export function setupLoading() {
 
   // ====== 动态添加关键帧和细节样式 ======
   const style = document.createElement('style')
+  // 🔧 关键修复：给样式表添加唯一标识
+  style.setAttribute('data-loading-styles', 'true')
   style.textContent = `
     @keyframes pulse {
       0%, 100% { transform: scale(0.8); opacity: 0.8; }
@@ -174,16 +176,14 @@ export function removeLoading() {
   // 动画结束后移除
   setTimeout(() => {
     loading.remove()
-    const styles = document.querySelectorAll(
-      'style'
+
+    // 只删除我们自己创建的样式表，不要误删其他样式
+    const loadingStyles = document.querySelectorAll(
+      'style[data-loading-styles="true"]'
     ) as NodeListOf<HTMLStyleElement>
-    styles.forEach(style => {
-      if (
-        style.textContent?.includes('pulse') ||
-        style.textContent?.includes('fadeIn')
-      ) {
-        style.remove()
-      }
+
+    loadingStyles.forEach(style => {
+      style.remove()
     })
 
     // 恢复默认背景色
