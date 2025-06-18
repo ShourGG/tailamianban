@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-15 19:30:00
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-16 12:54:50
+ * @LastEditTime: 2025-06-18 14:19:28
  * @FilePath: \Robot_Admin\src\composables\Table\useTableExpand.ts
- * @Description: 精简版表格展开功能 - 优化复杂度和类型安全
+ * @Description: 表格展开功能
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 import type { VNodeChild, Ref } from 'vue'
@@ -14,10 +14,13 @@ import type {
   UseTableExpandOptions,
   UseTableExpandReturn,
   ChildSelectionState,
+  DataRecord,
 } from '@/types/modules/table'
 
 // ================= 核心状态管理 =================
-const useExpandState = <T, C>(options: UseTableExpandOptions<T, C>) => {
+const useExpandState = <T extends DataRecord, C>(
+  options: UseTableExpandOptions<T, C>
+) => {
   const expandedKeys = ref<DataTableRowKey[]>([
     ...(options.defaultExpandedKeys || []),
   ])
@@ -45,7 +48,9 @@ const useExpandState = <T, C>(options: UseTableExpandOptions<T, C>) => {
 }
 
 // ================= 数据工具函数 =================
-const useDataUtils = <T, C>(options: UseTableExpandOptions<T, C>) => {
+const useDataUtils = <T extends DataRecord, C>(
+  options: UseTableExpandOptions<T, C>
+) => {
   const data = computed(() => unref(options.data))
 
   const getRowKey = options.rowKey
@@ -71,7 +76,7 @@ const useDataUtils = <T, C>(options: UseTableExpandOptions<T, C>) => {
 }
 
 // ================= 展开逻辑 =================
-const useExpandLogic = <T, C>(
+const useExpandLogic = <T extends DataRecord, C>(
   state: ReturnType<typeof useExpandState<T, C>>,
   utils: ReturnType<typeof useDataUtils<T, C>>,
   options: UseTableExpandOptions<T, C>
@@ -135,7 +140,7 @@ const useExpandLogic = <T, C>(
 }
 
 // ================= 选择逻辑 =================
-const useSelectionLogic = <T, C>(
+const useSelectionLogic = <T extends DataRecord, C>(
   state: ReturnType<typeof useExpandState<T, C>>,
   utils: ReturnType<typeof useDataUtils<T, C>>,
   options: UseTableExpandOptions<T, C>
@@ -194,7 +199,7 @@ const useSelectionLogic = <T, C>(
 }
 
 // ================= 父子联动逻辑 =================
-const useParentChildLink = <T, C>(
+const useParentChildLink = <T extends DataRecord, C>(
   state: ReturnType<typeof useExpandState<T, C>>,
   options: UseTableExpandOptions<T, C>
 ) => {
@@ -233,7 +238,7 @@ const useParentChildLink = <T, C>(
 }
 
 // ================= 子选择逻辑 =================
-const useChildSelectionLogic = <T, C>(
+const useChildSelectionLogic = <T extends DataRecord, C>(
   state: ReturnType<typeof useExpandState<T, C>>,
   utils: ReturnType<typeof useDataUtils<T, C>>,
   parentChildLink: ReturnType<typeof useParentChildLink<T, C>>,
@@ -286,7 +291,7 @@ const useChildSelectionLogic = <T, C>(
 }
 
 // ================= 渲染辅助函数 =================
-const createChildSelectionState = <T, C>(
+const createChildSelectionState = <T extends DataRecord, C>(
   parentKey: DataTableRowKey,
   state: ReturnType<typeof useExpandState<T, C>>,
   utils: ReturnType<typeof useDataUtils<T, C>>,
@@ -363,7 +368,7 @@ const createDefaultColumns = (expandData: any[]): any[] => {
   ]
 }
 
-const createDefaultTable = <T, C>(
+const createDefaultTable = <T extends DataRecord, C>(
   key: DataTableRowKey,
   expandData: any[],
   childSelection: ChildSelectionState | undefined,
@@ -402,7 +407,7 @@ const createDefaultTable = <T, C>(
 }
 
 // ================= 渲染逻辑 =================
-const useRenderer = <T, C>(
+const useRenderer = <T extends DataRecord, C>(
   state: ReturnType<typeof useExpandState<T, C>>,
   utils: ReturnType<typeof useDataUtils<T, C>>,
   childLogic: ReturnType<typeof useChildSelectionLogic<T, C>>,
@@ -481,9 +486,10 @@ const useRenderer = <T, C>(
  * @description: 表格展开和选择功能组合
  * @return {*}
  */
-export function useTableExpand<T = Record<string, any>, C = any>(
-  options: UseTableExpandOptions<T, C>
-): UseTableExpandReturn<T, C> {
+export function useTableExpand<
+  T extends DataRecord = Record<string, any>,
+  C = any,
+>(options: UseTableExpandOptions<T, C>): UseTableExpandReturn<T, C> {
   // 创建各个模块
   const state = useExpandState(options)
   const utils = useDataUtils(options)
