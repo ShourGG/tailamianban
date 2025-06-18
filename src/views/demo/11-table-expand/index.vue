@@ -1,7 +1,6 @@
 <template>
   <div class="nested-demo-page">
     <NH1>嵌套表格场景示例</NH1>
-
     <NSpace
       vertical
       size="large"

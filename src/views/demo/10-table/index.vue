@@ -16,34 +16,6 @@
         vertical
         :size="20"
       >
-        <!-- 功能说明 -->
-        <NAlert
-          type="success"
-          title="功能说明"
-        >
-          <ul class="list-disc list-inside space-y-1">
-            <li
-              ><strong>行内编辑：</strong
-              >点击右侧"编辑"按钮，整行变为可编辑状态</li
-            >
-            <li
-              ><strong>单元格编辑：</strong
-              >悬停单元格显示编辑图标，点击编辑单个字段</li
-            >
-            <li><strong>混合模式：</strong>同时支持行内编辑和单元格编辑</li>
-            <li
-              ><strong>模态框编辑：</strong>🎯
-              使用模态框表单，完整的验证系统</li
-            >
-            <li><strong>禁用编辑：</strong>完全禁用所有编辑功能，表格只读</li>
-            <li><strong>查看功能：</strong>查看模态框展示详细信息</li>
-            <li
-              ><strong>🎯 验证系统：</strong>完整的 v_verify
-              验证，包括必填、长度、格式等验证</li
-            >
-          </ul>
-        </NAlert>
-
         <!-- 编辑模式切换 -->
         <NCard
           title="编辑模式选择"

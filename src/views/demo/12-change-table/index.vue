@@ -1,252 +1,93 @@
 <template>
   <div class="demo-container">
-    <!-- 页面标题 -->
-    <div class="page-header">
-      <h1>C_Table 动态行操作演示</h1>
-      <p>展示 C_Table 集成动态行功能后的简化使用方式</p>
-    </div>
+    <NH1>动态表格场景示例</NH1>
 
-    <!-- 主要功能卡片 -->
-    <div class="main-card">
-      <div class="card-header">
-        <h2>员工信息管理</h2>
-        <div class="header-actions">
-          <button
-            @click="resetData"
-            class="btn-secondary"
-          >
-            <i class="i-mdi:refresh"></i>
-            重置数据
-          </button>
-          <button
-            @click="exportData"
-            class="btn-secondary"
-          >
-            <i class="i-mdi:download"></i>
-            导出数据
-          </button>
-          <button
-            @click="toggleStats"
-            class="btn-secondary"
-          >
-            <i class="i-mdi:chart-line"></i>
-            {{ showStats ? '隐藏' : '显示' }}统计
-          </button>
+    <NCard class="table-card">
+      <template #header>
+        <div class="card-header">
+          <h3>员工信息管理（例）</h3>
+          <NSpace>
+            <NButton @click="resetData">重置数据</NButton>
+            <NButton
+              type="primary"
+              @click="addEmployee"
+              >添加员工</NButton
+            >
+          </NSpace>
         </div>
-      </div>
+      </template>
 
-      <!-- C_Table 组件 -->
       <div
-        ref="tableContainerRef"
-        class="table-section"
+        ref="tableContainer"
+        class="c-table-wrapper"
       >
-        <div class="table-watermark">Robot Admin - 员工信息表</div>
-
         <C_Table
-          ref="cTableRef"
+          ref="tableRef"
           v-model:data="tableData"
           :columns="columns"
-          :loading="loading"
-          :row-key="rowKey"
-          :editable="true"
-          :edit-mode="'both'"
-          :show-row-actions="true"
-          :row-actions="customRowActions"
-          :modal-title="'编辑员工信息'"
-          :modal-width="700"
-          :dynamic-rows-options="dynamicRowsConfig"
-          @save="handleSave"
-          @cancel="handleCancel"
+          :row-actions="rowActions"
+          :preset="tablePreset"
           @row-add="handleRowAdd"
           @row-delete="handleRowDelete"
-          @row-copy="handleRowCopy"
-          @row-move="handleRowMove"
-          @row-selection-change="handleRowSelectionChange"
+          @save="handleSave"
+        />
+
+        <!-- 自动铺满水印 -->
+        <div
+          ref="watermarkLayer"
+          class="auto-watermark"
+          :style="watermarkStyle"
+        ></div>
+      </div>
+
+      <NAlert
+        v-if="selectedEmployee"
+        type="info"
+        class="selected-info"
+        closable
+        @close="clearSelection"
+      >
+        <strong>已选中：</strong>{{ selectedEmployee.name }} -
+        {{ selectedEmployee.department }}
+      </NAlert>
+    </NCard>
+
+    <NCard>
+      <template #header>
+        <div class="card-header">
+          <h3>操作日志</h3>
+          <NButton
+            size="small"
+            @click="logs = []"
+            >清空</NButton
+          >
+        </div>
+      </template>
+
+      <div class="logs">
+        <div
+          v-for="log in logs.slice(0, 6)"
+          :key="log.time"
+          class="log-item"
+        >
+          <NTag
+            :type="getLogTagType(log.type)"
+            size="small"
+            >{{ log.type }}</NTag
+          >
+          <span>{{ log.message }}</span>
+          <NTime
+            :time="new Date(log.time)"
+            type="relative"
+            class="log-time"
+          />
+        </div>
+        <NEmpty
+          v-if="logs.length === 0"
+          description="暂无操作记录"
         />
       </div>
-
-      <!-- 选中行信息 -->
-      <div
-        v-if="selectedRowInfo"
-        class="selected-info"
-      >
-        <div class="alert alert-info">
-          <div class="alert-content">
-            <strong>当前选中：</strong>
-            {{ selectedRowInfo.name }} - {{ selectedRowInfo.department }} -
-            {{ selectedRowInfo.status === 'active' ? '活跃' : '非活跃' }}
-          </div>
-          <div class="selected-actions">
-            <button
-              @click="handleQuickEdit"
-              class="btn-sm btn-primary"
-            >
-              <i class="i-mdi:pencil"></i>
-              快速编辑
-            </button>
-            <button
-              @click="handlePrintTable"
-              class="btn-sm btn-success"
-            >
-              <i class="i-mdi:printer"></i>
-              打印表格
-            </button>
-            <button
-              @click="handleDownloadTable"
-              class="btn-sm btn-success"
-            >
-              <i class="i-mdi:download"></i>
-              下载截图
-            </button>
-            <button
-              @click="clearSelection"
-              class="btn-sm btn-secondary"
-            >
-              <i class="i-mdi:close"></i>
-              取消选择
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 数据统计卡片 -->
-    <div
-      v-if="showStats"
-      class="stats-card"
-    >
-      <div class="card-header">
-        <h3>数据统计</h3>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-value">{{ tableData.length }}</div>
-          <div class="stat-label">总员工数</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">{{ activeCount }}</div>
-          <div class="stat-label">活跃员工</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">{{ selectedRowInfo ? '1' : '0' }}</div>
-          <div class="stat-label">选中行数</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">{{ operationLogs.length }}</div>
-          <div class="stat-label">操作次数</div>
-        </div>
-      </div>
-
-      <!-- 操作记录 -->
-      <div class="operation-logs">
-        <h4>操作记录</h4>
-        <div class="logs-list">
-          <div
-            v-for="(log, index) in operationLogs.slice(0, 6)"
-            :key="index"
-            class="log-item"
-          >
-            <span
-              class="log-type"
-              :class="log.type"
-              >{{ log.type }}</span
-            >
-            <span class="log-message">{{ log.message }}</span>
-            <span class="log-time">{{ log.time }}</span>
-          </div>
-          <div
-            v-if="operationLogs.length === 0"
-            class="empty-logs"
-          >
-            暂无操作记录，试试表格上方的动态行操作按钮吧！
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 功能说明 -->
-    <div class="feature-alert">
-      <h3>C_Table 动态行功能说明</h3>
-      <div class="feature-content">
-        <div class="usage-example">
-          <h4>简化后的使用方式</h4>
-          <pre><code>&lt;C_Table
-  v-model:data="tableData"
-  :columns="columns"
-  :dynamic-rows-options="{
-    enableRadioSelection: true,
-    enableAdd: true,
-    enableDelete: true,
-    enableMove: true,
-    enablePrint: true,
-    printWatermarkText: '我的表格',
-    defaultRowData: () => ({ name: '新员工' })
-  }"
-  @row-add="handleRowAdd"
-  @row-delete="handleRowDelete"
-/&gt;</code></pre>
-        </div>
-
-        <div class="feature-grid">
-          <div class="feature-item">
-            <h4>配置对象属性</h4>
-            <ul>
-              <li><strong>enableRadioSelection:</strong> 启用单选功能</li>
-              <li><strong>enableAdd/enableInsert:</strong> 启用增加/插入行</li>
-              <li><strong>enableDelete/enableCopy:</strong> 启用删除/复制行</li>
-              <li><strong>enableMove:</strong> 启用移动行</li>
-              <li><strong>enablePrint:</strong> 启用打印功能</li>
-              <li><strong>printWatermarkText:</strong> 打印水印文本</li>
-            </ul>
-          </div>
-
-          <div class="feature-item">
-            <h4>事件监听</h4>
-            <ul>
-              <li><strong>@row-add:</strong> 添加行事件</li>
-              <li><strong>@row-delete:</strong> 删除行事件</li>
-              <li><strong>@row-copy:</strong> 复制行事件</li>
-              <li><strong>@row-move:</strong> 移动行事件</li>
-              <li><strong>@row-selection-change:</strong> 选择变化事件</li>
-            </ul>
-          </div>
-
-          <div class="feature-item">
-            <h4>方法调用</h4>
-            <ul>
-              <li><strong>addRow():</strong> 编程式添加行</li>
-              <li><strong>deleteRow():</strong> 编程式删除行</li>
-              <li><strong>printTable():</strong> 编程式打印</li>
-              <li><strong>downloadTableScreenshot():</strong> 下载截图</li>
-              <li><strong>getSelectedRowData():</strong> 获取选中行</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="usage-tips">
-          <h4>优化说明</h4>
-          <ol>
-            <li
-              ><strong>简化配置：</strong>使用单个 dynamic-rows-options
-              对象替代多个 enable-xxx props</li
-            >
-            <li
-              ><strong>减少代码：</strong>C_Table
-              内部处理所有动态行逻辑，使用者无需手动调用 Hook</li
-            >
-            <li
-              ><strong>保持原有功能：</strong
-              >所有编辑、展开、选择功能都不受影响</li
-            >
-            <li
-              ><strong>向后兼容：</strong>不传 dynamic-rows-options
-              时功能完全不变</li
-            >
-          </ol>
-        </div>
-      </div>
-    </div>
+    </NCard>
   </div>
 </template>
 
@@ -256,142 +97,157 @@
     DataRecord,
     RowAction,
   } from '@/types/modules/table'
-  import type { DynamicRowsOptions } from '@/composables/Table/useDynamicRow'
-  import type { DataTableRowKey } from 'naive-ui/es'
 
-  // 员工数据接口
-  interface EmployeeData extends DataRecord {
+  // ================= 类型定义 =================
+  interface Employee extends DataRecord {
     id: string
     name: string
     age: number
     email: string
     department: string
-    status: 'active' | 'inactive'
     salary: number
-    createTime: string
-    description?: string
+    status: 'active' | 'inactive'
   }
 
-  // 操作日志接口
-  interface OperationLog {
-    type: 'add' | 'delete' | 'copy' | 'move' | 'edit' | 'select'
+  interface Log {
+    type: 'add' | 'delete' | 'edit' | 'select'
     message: string
     time: string
   }
 
-  // C_Table 实例接口
-  interface CTableInstance {
-    startEdit: (rowKey: DataTableRowKey) => void
-    clearRowSelection: () => void
-    printTable: (elementRef: HTMLElement) => Promise<void>
-    downloadTableScreenshot: (
-      elementRef: HTMLElement,
-      filename?: string
-    ) => Promise<void>
-  }
-
-  // 响应式数据
+  // ================= 响应式数据 =================
   const message = useMessage()
-  const cTableRef = ref<CTableInstance>()
-  const tableContainerRef = ref<HTMLElement>()
-  const showStats = ref(true)
-  const loading = ref(false)
-  const operationLogs = ref<OperationLog[]>([])
-  const selectedRowInfo = ref<EmployeeData | null>(null)
+  const tableRef = ref()
+  const tableContainer = ref<HTMLElement>()
+  const watermarkLayer = ref<HTMLElement>()
+  const selectedEmployee = ref<Employee | null>(null)
+  const logs = ref<Log[]>([])
 
-  // 初始数据
-  const initialData: EmployeeData[] = [
+  const initialData: Employee[] = [
     {
       id: '1',
       name: '张三',
-      age: 25,
-      email: 'zhangsan@example.com',
+      age: 28,
+      email: 'zhang@example.com',
       department: '技术部',
+      salary: 15000,
       status: 'active',
-      salary: 12000,
-      createTime: '2023-12-01 10:30:00',
-      description: '前端开发工程师',
     },
     {
       id: '2',
       name: '李四',
-      age: 28,
-      email: 'lisi@example.com',
+      age: 32,
+      email: 'li@example.com',
       department: '产品部',
+      salary: 18000,
       status: 'active',
-      salary: 15000,
-      createTime: '2023-12-02 14:20:00',
-      description: '产品经理',
     },
     {
       id: '3',
       name: '王五',
-      age: 30,
-      email: 'wangwu@example.com',
-      department: '设计部',
-      status: 'inactive',
-      salary: 10000,
-      createTime: '2023-12-03 09:15:00',
-      description: 'UI设计师',
-    },
-    {
-      id: '4',
-      name: '赵六',
       age: 26,
-      email: 'zhaoliu@example.com',
-      department: '运营部',
-      status: 'active',
-      salary: 9000,
-      createTime: '2023-12-04 16:45:00',
-      description: '运营专员',
+      email: 'wang@example.com',
+      department: '设计部',
+      salary: 12000,
+      status: 'inactive',
     },
   ]
 
-  // 使用 ref 而不是 computed，避免只读警告
-  const tableData = ref<EmployeeData[]>([...initialData])
+  const tableData = ref<Employee[]>([...initialData])
 
-  // 表格配置
-  const rowKey = (row: EmployeeData) => row.id
+  // ================= 自动水印 =================
+  const watermarkStyle = ref('')
 
-  // 列配置
-  const columns: TableColumn<EmployeeData>[] = [
-    {
-      key: 'id',
-      title: 'ID',
-      width: 80,
-      align: 'center',
-      editable: false,
-    },
+  const createWatermark = () => {
+    const text = 'Robot Admin'
+    const fontSize = 16
+    const color = 'rgba(100, 100, 100, 0.25)'
+    const rotate = -45
+
+    // 创建 canvas 来测量文字尺寸
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')!
+    ctx.font = `${fontSize}px Arial`
+    const textWidth = ctx.measureText(text).width
+    const textHeight = fontSize
+
+    // 计算旋转后的实际尺寸
+    const radians = (rotate * Math.PI) / 180
+    const rotatedWidth =
+      Math.abs(textWidth * Math.cos(radians)) +
+      Math.abs(textHeight * Math.sin(radians))
+    const rotatedHeight =
+      Math.abs(textWidth * Math.sin(radians)) +
+      Math.abs(textHeight * Math.cos(radians))
+
+    // 设置水印间距（稍微大一点避免重叠）
+    const xGap = Math.max(rotatedWidth + 50, 180)
+    const yGap = Math.max(rotatedHeight + 30, 100)
+
+    // 创建 SVG 水印
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${xGap}" height="${yGap}">
+      <text 
+        x="50%" 
+        y="50%" 
+        text-anchor="middle" 
+        dominant-baseline="middle"
+        font-family="Arial" 
+        font-size="${fontSize}" 
+        fill="${color}"
+        transform="rotate(${rotate} ${xGap / 2} ${yGap / 2})"
+      >${text}</text>
+    </svg>
+  `
+
+    const svgBlob = new Blob([svg], { type: 'image/svg+xml' })
+    const svgUrl = URL.createObjectURL(svgBlob)
+
+    watermarkStyle.value = `
+    background-image: url("${svgUrl}");
+    background-repeat: repeat;
+    background-position: 0 0;
+  `
+  }
+
+  // ================= 工具函数 =================
+  const getLogTagType = (type: Log['type']) => {
+    const typeMap = {
+      add: 'success',
+      delete: 'error',
+      edit: 'warning',
+      select: 'info',
+    }
+    return typeMap[type] || 'default'
+  }
+
+  // ================= 表格配置 =================
+  const columns: TableColumn<DataRecord>[] = [
     {
       key: 'name',
       title: '姓名',
-      width: 120,
+      width: 100,
       editable: true,
       editType: 'input',
-      editProps: { placeholder: '请输入姓名' },
     },
     {
       key: 'age',
       title: '年龄',
       width: 80,
-      align: 'center',
       editable: true,
       editType: 'number',
-      editProps: { min: 18, max: 65 },
     },
     {
       key: 'email',
       title: '邮箱',
-      width: 220,
+      width: 200,
       editable: true,
       editType: 'email',
-      editProps: { placeholder: '请输入邮箱' },
     },
     {
       key: 'department',
       title: '部门',
-      width: 120,
-      align: 'center',
+      width: 100,
       editable: true,
       editType: 'select',
       editProps: {
@@ -399,26 +255,24 @@
           { label: '技术部', value: '技术部' },
           { label: '产品部', value: '产品部' },
           { label: '设计部', value: '设计部' },
-          { label: '运营部', value: '运营部' },
         ],
       },
     },
     {
       key: 'salary',
       title: '薪资',
-      width: 120,
-      align: 'right',
+      width: 100,
       editable: true,
       editType: 'number',
-      editProps: { min: 3000, max: 50000 },
-      render: (rowData: EmployeeData) =>
-        `¥${rowData.salary?.toLocaleString() || 0}`,
+      render: (row: DataRecord) => {
+        const employee = row as Employee
+        return `¥${employee.salary.toLocaleString()}`
+      },
     },
     {
       key: 'status',
       title: '状态',
-      width: 100,
-      align: 'center',
+      width: 80,
       editable: true,
       editType: 'select',
       editProps: {
@@ -427,441 +281,204 @@
           { label: '非活跃', value: 'inactive' },
         ],
       },
-      render: (rowData: EmployeeData) =>
-        rowData.status === 'active' ? '🟢 活跃' : '🔴 非活跃',
-    },
-    {
-      key: 'createTime',
-      title: '创建时间',
-      width: 160,
-      editable: false,
-    },
-  ]
-
-  // 动态行配置
-  const dynamicRowsConfig: DynamicRowsOptions<EmployeeData> = {
-    rowKey: 'id',
-    enableRadioSelection: true,
-    enableAdd: true,
-    enableInsert: true,
-    enableDelete: true,
-    enableCopy: true,
-    enableMove: true,
-    enablePrint: true,
-    confirmDelete: true,
-    deleteConfirmText: '确定要删除选中的员工吗？此操作不可撤销。',
-    printPreset: 'table',
-    printWatermarkText: 'Robot Admin - 员工信息表',
-    defaultRowData: (): EmployeeData => ({
-      id: '',
-      name: '新员工',
-      age: 25,
-      email: '',
-      department: '技术部',
-      status: 'active',
-      salary: 8000,
-      createTime: new Date().toLocaleString(),
-      description: '',
-    }),
-  }
-
-  // 自定义行操作
-  const customRowActions: RowAction<EmployeeData>[] = [
-    {
-      label: '详情',
-      icon: 'i-mdi:eye',
-      type: 'info',
-      onClick: (row: EmployeeData) => {
-        message.info(`查看 ${row.name} 的详细信息`)
-        addOperationLog('edit', `查看了员工 ${row.name} 的详情`)
+      render: (row: DataRecord) => {
+        const employee = row as Employee
+        return employee.status === 'active' ? '🟢 活跃' : '🔴 非活跃'
       },
     },
   ]
 
-  // 计算属性
-  const activeCount = computed(
-    () => tableData.value.filter(emp => emp.status === 'active').length
-  )
+  const rowActions: RowAction<DataRecord>[] = [
+    {
+      label: '详情',
+      icon: 'i-mdi:eye',
+      type: 'info',
+      onClick: (row: DataRecord) => {
+        const employee = row as Employee
+        message.info(`查看 ${employee.name} 的详细信息`)
+        addLog('edit', `查看了 ${employee.name} 的详情`)
+      },
+    },
+  ]
 
-  // 添加操作日志
-  const addOperationLog = (type: OperationLog['type'], logMessage: string) => {
-    operationLogs.value.unshift({
+  const tablePreset = {
+    dynamicRows: {
+      enableRadioSelection: true,
+      enableAdd: true,
+      enableInsert: true,
+      enableDelete: true,
+      enableCopy: true,
+      enableMove: true,
+      enablePrint: true,
+      printTargetSelector: '.c-table-wrapper',
+      printOptions: {
+        watermark: {
+          text: 'Robot Admin',
+          position: 'repeat' as const,
+          textSize: 16,
+          textColor: 'rgba(100, 100, 100, 0.25)',
+          xGap: 200,
+          yGap: 120,
+          rotate: -45,
+        },
+      },
+      onRowChange: (data: DataRecord[]) => {
+        const employees = data as Employee[]
+        console.log('行数据变化:', employees.length, '行')
+      },
+      defaultRowData: (): DataRecord =>
+        ({
+          id: '',
+          name: '新员工',
+          age: 25,
+          email: '',
+          department: '技术部',
+          salary: 8000,
+          status: 'active',
+        }) as Employee,
+    },
+    edit: {
+      enabled: true,
+      mode: 'both' as const,
+      showRowActions: true,
+      modalTitle: '编辑员工信息',
+      modalWidth: 700,
+    },
+  }
+
+  const addLog = (type: Log['type'], message: string) => {
+    logs.value.unshift({
       type,
-      message: logMessage,
-      time: new Date().toLocaleTimeString(),
+      message,
+      time: new Date().toISOString(),
     })
+    if (logs.value.length > 20) logs.value.splice(20)
+  }
 
-    if (operationLogs.value.length > 20) {
-      operationLogs.value = operationLogs.value.slice(0, 20)
+  // ================= 事件处理函数 =================
+  const handleRowAdd = (newRow: DataRecord) => {
+    const employee = newRow as Employee
+    message.success(`添加员工：${employee.name}`)
+    addLog('add', `添加了新员工：${employee.name}`)
+  }
+
+  const handleRowDelete = (deletedRow: DataRecord) => {
+    const employee = deletedRow as Employee
+    message.success(`删除员工：${employee.name}`)
+    addLog('delete', `删除了员工：${employee.name}`)
+    if (selectedEmployee.value?.id === employee.id) {
+      selectedEmployee.value = null
     }
   }
 
-  // C_Table 事件处理
-  const handleSave = (rowData: EmployeeData, _rowIndex: number) => {
-    message.success(`保存成功: ${rowData.name}`)
-    addOperationLog('edit', `编辑了员工 ${rowData.name} 的信息`)
+  const handleSave = (rowData: DataRecord) => {
+    const employee = rowData as Employee
+    message.success(`保存成功：${employee.name}`)
+    addLog('edit', `编辑了员工 ${employee.name} 的信息`)
   }
 
-  const handleCancel = (rowData: EmployeeData) => {
-    message.info(`取消编辑: ${rowData.name}`)
-  }
-
-  const handleRowAdd = (newRow: EmployeeData) => {
-    message.success(`添加了新员工: ${newRow.name}`)
-    addOperationLog('add', `添加了新员工: ${newRow.name}`)
-  }
-
-  const handleRowDelete = (deletedRow: EmployeeData) => {
-    message.success(`删除了员工: ${deletedRow.name}`)
-    addOperationLog('delete', `删除了员工: ${deletedRow.name}`)
-  }
-
-  const handleRowCopy = (originalRow: EmployeeData) => {
-    message.success(`复制了员工: ${originalRow.name}`)
-    addOperationLog('copy', `复制了员工: ${originalRow.name}`)
-  }
-
-  const handleRowMove = (
-    row: EmployeeData,
-    fromIndex: number,
-    toIndex: number
-  ) => {
-    const direction = toIndex > fromIndex ? '下移' : '上移'
-    message.success(`${direction}了员工: ${row.name}`)
-    addOperationLog('move', `${direction}了员工: ${row.name}`)
-  }
-
-  const handleRowSelectionChange = (
-    selectedKey: DataTableRowKey | null,
-    selectedRow: EmployeeData | null
-  ) => {
-    selectedRowInfo.value = selectedRow
-    if (selectedRow) {
-      addOperationLog('select', `选中了员工: ${selectedRow.name}`)
-    }
-  }
-
-  // 页面操作方法
   const resetData = () => {
     tableData.value = [...initialData]
-    operationLogs.value = []
-    selectedRowInfo.value = null
-    cTableRef.value?.clearRowSelection()
+    logs.value = []
+    selectedEmployee.value = null
     message.success('数据已重置')
   }
 
-  const exportData = () => {
-    const dataStr = JSON.stringify(tableData.value, null, 2)
-    const blob = new Blob([dataStr], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `员工信息表-${new Date().toISOString().slice(0, 10)}.json`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-    message.success('数据导出成功')
-  }
+  const addEmployee = () => {
+    const names = ['赵六', '钱七', '孙八', '李九']
+    const depts = ['技术部', '产品部', '设计部']
 
-  const toggleStats = () => {
-    showStats.value = !showStats.value
-  }
-
-  const handleQuickEdit = () => {
-    if (selectedRowInfo.value && cTableRef.value?.startEdit) {
-      cTableRef.value.startEdit(selectedRowInfo.value.id)
-      addOperationLog('edit', `开始编辑员工: ${selectedRowInfo.value.name}`)
+    const newEmployee: Employee = {
+      id: Date.now().toString(),
+      name: names[Math.floor(Math.random() * names.length)],
+      age: Math.floor(Math.random() * 20) + 23,
+      email: `user${Date.now()}@example.com`,
+      department: depts[Math.floor(Math.random() * depts.length)],
+      salary: Math.floor(Math.random() * 10000) + 8000,
+      status: 'active',
     }
-  }
 
-  const handlePrintTable = async () => {
-    if (cTableRef.value?.printTable && tableContainerRef.value) {
-      try {
-        await cTableRef.value.printTable(tableContainerRef.value)
-        addOperationLog('edit', '打印了表格')
-        message.success('打印任务已发送')
-      } catch (error) {
-        console.error('打印失败:', error)
-        message.error('打印失败，请重试')
-      }
-    } else {
-      message.warning('打印功能暂不可用')
-    }
-  }
-
-  const handleDownloadTable = async () => {
-    if (cTableRef.value?.downloadTableScreenshot && tableContainerRef.value) {
-      try {
-        const filename = `员工信息表-${new Date().toISOString().slice(0, 10)}`
-        await cTableRef.value.downloadTableScreenshot(
-          tableContainerRef.value,
-          filename
-        )
-        addOperationLog('edit', '下载了表格截图')
-        message.success('截图下载成功')
-      } catch (error) {
-        console.error('下载失败:', error)
-        message.error('下载失败，请重试')
-      }
-    } else {
-      message.warning('下载功能暂不可用')
-    }
+    tableData.value.push(newEmployee)
+    message.success(`添加员工：${newEmployee.name}`)
+    addLog('add', `手动添加了员工：${newEmployee.name}`)
   }
 
   const clearSelection = () => {
-    cTableRef.value?.clearRowSelection()
-    selectedRowInfo.value = null
+    selectedEmployee.value = null
+    tableRef.value?.clearRowSelection()
     message.info('已清空选择')
   }
+
+  // ================= 生命周期 =================
+  onMounted(() => {
+    nextTick(() => {
+      createWatermark()
+    })
+  })
 </script>
 
 <style scoped lang="scss">
   .demo-container {
-    max-width: 1200px;
-    margin: 0 auto;
     padding: 20px;
-    font-family:
-      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
   }
 
-  .page-header {
-    text-align: center;
-    margin-bottom: 30px;
-
-    h1 {
-      font-size: 28px;
-      color: #333;
-      margin: 0 0 10px 0;
-    }
-
-    p {
-      color: #666;
-      margin: 0;
-    }
-  }
-
-  .main-card,
-  .stats-card,
-  .feature-alert {
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 20px;
+  .table-card {
     margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
 
-    h2,
     h3 {
       margin: 0;
-      color: #333;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 10px;
     }
   }
 
-  .table-section {
-    border: 1px solid #e0e0e0;
+  .c-table-wrapper {
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     overflow: hidden;
     position: relative;
+  }
 
-    .table-watermark {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-45deg);
-      font-size: 48px;
-      color: rgba(0, 0, 0, 0.05);
-      font-weight: bold;
-      pointer-events: none;
-      z-index: 10;
-      white-space: nowrap;
-      user-select: none;
-      font-family: 'Microsoft YaHei', sans-serif;
-    }
-
-    :deep(.c-table-wrapper) {
-      position: relative;
-      z-index: 1;
-      background: rgba(255, 255, 255, 0.98);
-    }
-
-    :deep(.n-data-table) {
-      background: rgba(255, 255, 255, 0.95);
-    }
-
-    :deep(.n-data-table-tbody) {
-      background: rgba(255, 255, 255, 0.95);
-    }
+  .auto-watermark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 1;
   }
 
   .selected-info {
-    margin-top: 15px;
-
-    .alert {
-      padding: 12px 15px;
-      border-radius: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      &.alert-info {
-        background: #e7f3ff;
-        border: 1px solid #b3d9ff;
-        color: #0066cc;
-      }
-    }
-
-    .alert-content {
-      flex: 1;
-    }
-
-    .selected-actions {
-      display: flex;
-      gap: 8px;
-    }
+    margin-top: 16px;
   }
 
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-bottom: 20px;
-  }
-
-  .stat-item {
-    text-align: center;
-    padding: 15px;
-    background: #f9f9f9;
-    border-radius: 6px;
-
-    .stat-value {
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .stat-label {
-      font-size: 14px;
-      color: #666;
-      margin-top: 5px;
-    }
-  }
-
-  .operation-logs {
-    h4 {
-      margin: 0 0 15px 0;
-      color: #333;
-    }
-
-    .logs-list {
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-    }
+  .logs {
+    max-height: 200px;
+    overflow-y: auto;
 
     .log-item {
       display: flex;
-      gap: 10px;
-      padding: 8px 12px;
-      border-bottom: 1px solid #f0f0f0;
-      font-size: 14px;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-color);
 
       &:last-child {
         border-bottom: none;
       }
 
-      .log-type {
-        background: #e0e0e0;
-        color: #666;
-        padding: 2px 6px;
-        border-radius: 3px;
-        font-size: 12px;
-        min-width: 50px;
-        text-align: center;
-
-        &.add {
-          background: #d4edda;
-          color: #155724;
-        }
-        &.delete {
-          background: #f8d7da;
-          color: #721c24;
-        }
-        &.copy {
-          background: #d1ecf1;
-          color: #0c5460;
-        }
-        &.move {
-          background: #fff3cd;
-          color: #856404;
-        }
-        &.edit {
-          background: #e2e3e5;
-          color: #383d41;
-        }
-        &.select {
-          background: #cce5ff;
-          color: #004085;
-        }
-      }
-
-      .log-message {
-        flex: 1;
-        color: #333;
-      }
-
       .log-time {
-        color: #999;
-        font-size: 12px;
+        margin-left: auto;
       }
-    }
-
-    .empty-logs {
-      padding: 20px;
-      text-align: center;
-      color: #999;
-      font-style: italic;
-    }
-  }
-
-  .feature-content {
-    .usage-example {
-      margin-bottom: 20px;
-
-      h4 {
-        color: #333;
-        margin: 0 0 10px 0;
-      }
-
-      pre {
-        background: #f5f5f5;
-        padding: 15px;
-        border-radius: 6px;
-        overflow-x: auto;
-
-        code {
-          font-family: 'Courier New', monospace;
-          font-size: 14px;
-          color: #333;
-        }
-      }
-    }
-
-    .feature-grid {
-      grid-template-columns: 1fr;
     }
   }
 </style>

@@ -2,15 +2,15 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-18 01:40:03
+ * @LastEditTime: 2025-06-18 11:01:28
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
- * @Description: 超级表格组件 - 增强版本（支持展开、选择和动态行操作）
+ * @Description: 超级表格组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
   <div class="c-table-wrapper">
-    <!--  动态行工具栏 - 只在启用时显示 -->
+    <!-- 动态行工具栏 -->
     <div
       v-if="dynamicRowsState"
       class="dynamic-rows-toolbar"
@@ -35,10 +35,10 @@
 
     <!-- 编辑模态框 -->
     <NModal
-      v-if="editMode === 'modal'"
+      v-if="config.editMode === 'modal'"
       v-model:show="modalEdit.isModalVisible.value"
-      :title="modalTitle"
-      :width="modalWidth"
+      :title="config.modalTitle"
+      :width="config.modalWidth"
       preset="card"
       :mask-closable="false"
       :close-on-esc="false"
@@ -74,7 +74,7 @@
     <NModal
       v-model:show="viewModalVisible"
       title="查看详情"
-      :width="modalWidth"
+      :width="config.modalWidth"
       preset="card"
       class="w60%"
     >
@@ -100,7 +100,7 @@
       </template>
     </NModal>
 
-    <!--  动态行确认删除模态框 -->
+    <!-- 动态行确认删除模态框 -->
     <component
       v-if="dynamicRowsState"
       :is="dynamicRowsState.renderConfirmModal()"
@@ -140,10 +140,56 @@
     validate: () => Promise<void>
   }
 
-  // 扩展 TableProps 支持展开、选择和动态行功能
+  // ================= 类型定义 =================
+
+  interface TablePresetConfig<T extends DataRecord = DataRecord> {
+    dynamicRows?: DynamicRowsOptions<T> | boolean
+    expandable?: ExpandableConfig<T> | boolean
+    selection?: SelectionConfig<T> | boolean
+    edit?: EditConfig | boolean
+  }
+
+  interface ExpandableConfig<T extends DataRecord = DataRecord> {
+    enabled?: boolean
+    defaultExpanded?: DataTableRowKey[]
+    onLoadData?: (row: T) => Promise<any[]> | any[]
+    renderContent?: (
+      row: T,
+      expandData: any[],
+      loading: boolean,
+      childSelection?: ChildSelectionState
+    ) => VNodeChild
+    rowExpandable?: (row: T) => boolean
+  }
+
+  interface SelectionConfig<T extends DataRecord = DataRecord> {
+    enabled?: boolean
+    defaultChecked?: DataTableRowKey[]
+    rowCheckable?: (row: T) => boolean
+    maxSelection?: number
+    childSelection?: {
+      enabled?: boolean
+      childRowCheckable?: (childRow: any, parentRow: T) => boolean
+    }
+    parentChildLink?: {
+      enabled?: boolean
+      mode?: ParentChildLinkMode
+    }
+  }
+
+  interface EditConfig {
+    enabled?: boolean
+    mode?: 'row' | 'cell' | 'modal' | 'both' | 'none'
+    showRowActions?: boolean
+    modalTitle?: string
+    modalWidth?: number
+  }
+
   interface EnhancedTableProps<T extends DataRecord = DataRecord>
     extends TableProps<T> {
-    //  展开功能配置
+    preset?: TablePresetConfig<T>
+
+    // 保留原有配置方式（向下兼容）
     expandable?: boolean
     onLoadExpandData?: (row: T) => Promise<any[]> | any[]
     renderExpandContent?: (
@@ -155,25 +201,198 @@
     rowExpandable?: (row: T) => boolean
     defaultExpandedKeys?: DataTableRowKey[]
 
-    //  选择功能配置
     enableSelection?: boolean
     defaultCheckedKeys?: DataTableRowKey[]
     rowCheckable?: (row: T) => boolean
     maxSelection?: number
 
-    //  子表格选择配置
     enableChildSelection?: boolean
     childRowCheckable?: (childRow: any, parentRow: T) => boolean
 
-    //  父子联动配置
     enableParentChildLink?: boolean
     parentChildLinkMode?: ParentChildLinkMode
 
-    //  动态行功能配置 - 简化为单个配置对象
     dynamicRowsOptions?: DynamicRowsOptions<T>
   }
 
-  // 编辑组件映射
+  // ================= 配置合并工具函数 =================
+
+  /**
+   * @description: 处理动态行配置
+   * @param preset - 预设配置对象
+   * @param props - 组件属性
+   * @return 处理后的动态行配置
+   */
+  function processDynamicRowsConfig<T extends DataRecord>(
+    preset: TablePresetConfig<T>,
+    props: EnhancedTableProps<T>
+  ) {
+    return preset.dynamicRows
+      ? typeof preset.dynamicRows === 'boolean'
+        ? ({
+            enableRadioSelection: true,
+            enableAdd: true,
+            enableInsert: true,
+            enableDelete: true,
+            enableCopy: true,
+            enableMove: true,
+            enablePrint: true,
+          } as DynamicRowsOptions<T>)
+        : preset.dynamicRows
+      : props.dynamicRowsOptions
+  }
+
+  /**
+   * @description: 处理展开功能配置
+   * @param preset - 预设配置对象
+   * @param props - 组件属性
+   * @return 处理后的展开配置
+   */
+  function processExpandConfig<T extends DataRecord>(
+    preset: TablePresetConfig<T>,
+    props: EnhancedTableProps<T>
+  ) {
+    const expandConfig = preset.expandable
+      ? typeof preset.expandable === 'boolean'
+        ? { enabled: true }
+        : preset.expandable
+      : {}
+
+    return {
+      expandable: expandConfig.enabled ?? props.expandable,
+      defaultExpandedKeys:
+        expandConfig.defaultExpanded ?? props.defaultExpandedKeys,
+      onLoadExpandData: expandConfig.onLoadData ?? props.onLoadExpandData,
+      renderExpandContent:
+        expandConfig.renderContent ?? props.renderExpandContent,
+      rowExpandable: expandConfig.rowExpandable ?? props.rowExpandable,
+    }
+  }
+
+  /**
+   * @description: 处理基础选择配置
+   * @param selectionConfig - 选择配置对象
+   * @param props - 组件属性
+   * @return 处理后的基础选择配置
+   */
+  function processBasicSelectionConfig<T extends DataRecord>(
+    selectionConfig: any,
+    props: EnhancedTableProps<T>
+  ) {
+    return {
+      enableSelection: selectionConfig.enabled ?? props.enableSelection,
+      defaultCheckedKeys:
+        selectionConfig.defaultChecked ?? props.defaultCheckedKeys,
+      rowCheckable: selectionConfig.rowCheckable ?? props.rowCheckable,
+      maxSelection: selectionConfig.maxSelection ?? props.maxSelection,
+    }
+  }
+
+  /**
+   * @description: 处理子选择配置
+   * @param selectionConfig - 选择配置对象
+   * @param props - 组件属性
+   * @return 处理后的子选择配置
+   */
+  function processChildSelectionConfig<T extends DataRecord>(
+    selectionConfig: any,
+    props: EnhancedTableProps<T>
+  ) {
+    return {
+      enableChildSelection:
+        selectionConfig.childSelection?.enabled ?? props.enableChildSelection,
+      childRowCheckable:
+        selectionConfig.childSelection?.childRowCheckable ??
+        props.childRowCheckable,
+    }
+  }
+
+  /**
+   * @description: 处理父子联动配置
+   * @param selectionConfig - 选择配置对象
+   * @param props - 组件属性
+   * @return 处理后的父子联动配置
+   */
+  function processParentChildLinkConfig<T extends DataRecord>(
+    selectionConfig: any,
+    props: EnhancedTableProps<T>
+  ) {
+    return {
+      enableParentChildLink:
+        selectionConfig.parentChildLink?.enabled ?? props.enableParentChildLink,
+      parentChildLinkMode:
+        selectionConfig.parentChildLink?.mode ?? props.parentChildLinkMode,
+    }
+  }
+
+  /**
+   * @description: 处理选择功能配置
+   * @param preset - 预设配置对象
+   * @param props - 组件属性
+   * @return 处理后的选择配置
+   */
+  function processSelectionConfig<T extends DataRecord>(
+    preset: TablePresetConfig<T>,
+    props: EnhancedTableProps<T>
+  ) {
+    const selectionConfig = preset.selection
+      ? typeof preset.selection === 'boolean'
+        ? { enabled: true }
+        : preset.selection
+      : {}
+
+    return {
+      ...processBasicSelectionConfig(selectionConfig, props),
+      ...processChildSelectionConfig(selectionConfig, props),
+      ...processParentChildLinkConfig(selectionConfig, props),
+    }
+  }
+
+  /**
+   * @description: 处理编辑功能配置
+   * @param preset - 预设配置对象
+   * @param props - 组件属性
+   * @return 处理后的编辑配置
+   */
+  function processEditConfig<T extends DataRecord>(
+    preset: TablePresetConfig<T>,
+    props: EnhancedTableProps<T>
+  ) {
+    const editConfig = preset.edit
+      ? typeof preset.edit === 'boolean'
+        ? { enabled: true }
+        : preset.edit
+      : {}
+
+    return {
+      editable: editConfig.enabled ?? props.editable,
+      editMode: editConfig.mode ?? props.editMode,
+      showRowActions: editConfig.showRowActions ?? props.showRowActions,
+      modalTitle: editConfig.modalTitle ?? props.modalTitle,
+      modalWidth: editConfig.modalWidth ?? props.modalWidth,
+    }
+  }
+
+  /**
+   * @description: 创建统一配置对象
+   * @param props - 组件属性
+   * @return 合并后的统一配置
+   */
+  function createUnifiedConfig<T extends DataRecord>(
+    props: EnhancedTableProps<T>
+  ) {
+    const preset = props.preset || {}
+
+    return {
+      dynamicRows: processDynamicRowsConfig(preset, props),
+      ...processExpandConfig(preset, props),
+      ...processSelectionConfig(preset, props),
+      ...processEditConfig(preset, props),
+    }
+  }
+
+  // ================= 编辑组件映射 =================
+
   const EDIT_COMPONENTS: Record<EditType, any> = {
     number: NInputNumber,
     switch: NSwitch,
@@ -188,7 +407,8 @@
       h(NInput, { ...props, type: 'textarea', rows: 3 }),
   }
 
-  // Props 定义
+  // ================= Props 定义 =================
+
   const props = withDefaults(defineProps<EnhancedTableProps>(), {
     rowKey: (row: DataRecord) => row.id,
     loading: false,
@@ -208,9 +428,9 @@
     enableParentChildLink: false,
     parentChildLinkMode: 'loose',
     dynamicRowsOptions: undefined,
+    preset: undefined,
   })
 
-  //  扩展 Emits - 添加动态行事件
   const emit = defineEmits<
     TableEmits & {
       'row-add': [newRow: DataRecord]
@@ -224,14 +444,18 @@
     }
   >()
 
-  // Refs
+  // ================= 核心状态 =================
+
   const tableRef = ref<ComponentPublicInstance>()
   const cFormRef = ref<CFormInstance>()
   const viewModalVisible = ref(false)
   const viewingData = ref<DataRecord>({})
   const submitLoading = ref(false)
 
-  // 计算属性
+  // ================= 配置和计算属性 =================
+
+  const config = computed(() => createUnifiedConfig(props))
+
   const editableColumns = computed(() =>
     props.columns.filter((col): col is TableColumn => col.editable !== false)
   )
@@ -241,129 +465,160 @@
   )
 
   const tableProps = computed(() => getTableProps(props))
-
   const formKey = computed(
     () => `edit-form-${modalEdit.editingRowKey.value || 'new'}`
   )
-
   const formOptions = computed(() => generateFormOptions(editableColumns.value))
 
-  //  动态行功能初始化 - 只在有配置时启用，使用正确的类型约束
-  let dynamicRowsState: ReturnType<typeof useDynamicRows<DataRecord>> | null =
-    null
+  // ================= 事件处理器工厂 =================
 
-  if (props.dynamicRowsOptions) {
-    const dynamicOptions: DynamicRowsOptions<DataRecord> = {
-      ...props.dynamicRowsOptions,
+  const createEventHandlers = () => ({
+    // 通用事件
+    onSave: handleSave,
+    onCancel: handleCancel,
 
-      // 事件回调
-      onRowChange: data => {
-        emit('update:data', data)
-        props.dynamicRowsOptions?.onRowChange?.(data)
-      },
-      onSelectionChange: (selectedKey, selectedRow) => {
-        emit('row-selection-change', selectedKey, selectedRow)
-        props.dynamicRowsOptions?.onSelectionChange?.(selectedKey, selectedRow)
-      },
-      onRowAdd: newRow => {
-        emit('row-add', newRow)
-        props.dynamicRowsOptions?.onRowAdd?.(newRow)
-      },
-      onRowDelete: (deletedRow, index) => {
-        emit('row-delete', deletedRow, index)
-        props.dynamicRowsOptions?.onRowDelete?.(deletedRow, index)
-      },
-      onRowCopy: (originalRow, newRow) => {
-        emit('row-copy', originalRow, newRow)
-        props.dynamicRowsOptions?.onRowCopy?.(originalRow, newRow)
-      },
-      onRowMove: (row, fromIndex, toIndex) => {
-        emit('row-move', row, fromIndex, toIndex)
-        props.dynamicRowsOptions?.onRowMove?.(row, fromIndex, toIndex)
-      },
-    }
+    // 展开选择事件
+    onExpandChange: (
+      keys: DataTableRowKey[],
+      row?: DataRecord,
+      expanded?: boolean
+    ) => {
+      emit('expand-change', keys, row, expanded)
+    },
+    onSelectionChange: (
+      checkedKeys: DataTableRowKey[],
+      checkedRows: DataRecord[],
+      childSelections: any
+    ) => {
+      emit('selection-change', checkedKeys, checkedRows, childSelections)
+    },
+    onChildSelectionChange: (
+      parentKey: DataTableRowKey,
+      childKeys: DataTableRowKey[],
+      childRows: any[]
+    ) => {
+      emit('child-selection-change', parentKey, childKeys, childRows)
+    },
 
-    dynamicRowsState = useDynamicRows(
-      computed(() => props.data),
-      dynamicOptions
-    )
-  }
+    // 动态行事件
+    onRowChange: (data: DataRecord[]) => {
+      emit('update:data', data)
+      config.value.dynamicRows?.onRowChange?.(data)
+    },
+    onRowSelectionChange: (
+      selectedKey: DataTableRowKey | null,
+      selectedRow: DataRecord | null
+    ) => {
+      emit('row-selection-change', selectedKey, selectedRow)
+      config.value.dynamicRows?.onSelectionChange?.(selectedKey, selectedRow)
+    },
+    onRowAdd: (newRow: DataRecord) => {
+      emit('row-add', newRow)
+      config.value.dynamicRows?.onRowAdd?.(newRow)
+    },
+    onRowDelete: (deletedRow: DataRecord, index: number) => {
+      emit('row-delete', deletedRow, index)
+      config.value.dynamicRows?.onRowDelete?.(deletedRow, index)
+    },
+    onRowCopy: (originalRow: DataRecord, newRow: DataRecord) => {
+      emit('row-copy', originalRow, newRow)
+      config.value.dynamicRows?.onRowCopy?.(originalRow, newRow)
+    },
+    onRowMove: (row: DataRecord, fromIndex: number, toIndex: number) => {
+      emit('row-move', row, fromIndex, toIndex)
+      config.value.dynamicRows?.onRowMove?.(row, fromIndex, toIndex)
+    },
+  })
 
-  //  展开和选择功能初始化 - 彻底修复生命周期错误
-  let expandState: ReturnType<typeof useTableExpand> | null = null
+  const eventHandlers = createEventHandlers()
 
-  // 在 setup 顶层判断是否需要初始化展开功能
-  if (props.expandable || props.enableSelection || props.enableChildSelection) {
-    expandState = useTableExpand({
-      data: computed(() => props.data),
-      rowKey: props.rowKey,
-      childRowKey: (child: any) => child.id,
+  // ================= 功能状态初始化 =================
 
-      // 展开配置
-      defaultExpandedKeys: props.defaultExpandedKeys,
-      onLoadData: props.onLoadExpandData,
-      renderContent: props.renderExpandContent,
-      rowExpandable: props.rowExpandable,
-
-      // 选择配置
-      enableSelection: props.enableSelection,
-      defaultCheckedKeys: props.defaultCheckedKeys,
-      rowCheckable: props.rowCheckable,
-      maxSelection: props.maxSelection,
-
-      // 子选择配置
-      enableChildSelection: props.enableChildSelection,
-      childRowCheckable: props.childRowCheckable,
-
-      // 父子联动配置
-      enableParentChildLink: props.enableParentChildLink,
-      parentChildLinkMode: props.parentChildLinkMode,
-
-      // 事件回调
-      onExpandChange: (keys, row, expanded) => {
-        emit('expand-change', keys, row, expanded)
-      },
-      onSelectionChange: (checkedKeys, checkedRows, childSelections) => {
-        emit('selection-change', checkedKeys, checkedRows, childSelections)
-      },
-      onChildSelectionChange: (parentKey, childKeys, childRows) => {
-        emit('child-selection-change', parentKey, childKeys, childRows)
-      },
-    })
-  }
-
-  //  展开和选择状态
-  const expandedKeys = computed(() => expandState?.expandedKeys.value ?? [])
-  const checkedKeys = computed(() => expandState?.checkedKeys.value ?? [])
-  const renderExpandFunction = computed(() => undefined)
-
-  // 编辑功能初始化
+  // 编辑功能
   const rowEdit = useRowEdit({
     data: () => props.data,
     rowKey: props.rowKey,
-    onSave: handleSave,
-    onCancel: handleCancel,
+    onSave: eventHandlers.onSave,
+    onCancel: eventHandlers.onCancel,
   })
 
   const cellEdit = useCellEdit({
     data: () => props.data,
     rowKey: props.rowKey,
-    onSave: handleSave,
+    onSave: eventHandlers.onSave,
   })
 
   const modalEdit = useModalEdit({
     data: () => props.data,
     rowKey: props.rowKey,
-    onSave: handleSave,
-    onCancel: handleCancel,
+    onSave: eventHandlers.onSave,
+    onCancel: eventHandlers.onCancel,
   })
 
+  // 展开功能
+  const expandState = (() => {
+    const needsExpand =
+      config.value.expandable ||
+      config.value.enableSelection ||
+      config.value.enableChildSelection
+
+    if (!needsExpand) return null
+
+    return useTableExpand({
+      data: computed(() => props.data),
+      rowKey: props.rowKey,
+      childRowKey: (child: any) => child.id,
+
+      // 配置
+      defaultExpandedKeys: config.value.defaultExpandedKeys,
+      onLoadData: config.value.onLoadExpandData,
+      renderContent: config.value.renderExpandContent,
+      rowExpandable: config.value.rowExpandable,
+      enableSelection: config.value.enableSelection,
+      defaultCheckedKeys: config.value.defaultCheckedKeys,
+      rowCheckable: config.value.rowCheckable,
+      maxSelection: config.value.maxSelection,
+      enableChildSelection: config.value.enableChildSelection,
+      childRowCheckable: config.value.childRowCheckable,
+      enableParentChildLink: config.value.enableParentChildLink,
+      parentChildLinkMode: config.value.parentChildLinkMode,
+
+      // 事件
+      onExpandChange: eventHandlers.onExpandChange,
+      onSelectionChange: eventHandlers.onSelectionChange,
+      onChildSelectionChange: eventHandlers.onChildSelectionChange,
+    })
+  })()
+
+  // 动态行功能
+  const dynamicRowsState = (() => {
+    if (!config.value.dynamicRows) return null
+
+    const dynamicOptions: DynamicRowsOptions<DataRecord> = {
+      ...config.value.dynamicRows,
+      onRowChange: eventHandlers.onRowChange,
+      onSelectionChange: eventHandlers.onRowSelectionChange,
+      onRowAdd: eventHandlers.onRowAdd,
+      onRowDelete: eventHandlers.onRowDelete,
+      onRowCopy: eventHandlers.onRowCopy,
+      onRowMove: eventHandlers.onRowMove,
+    }
+
+    return useDynamicRows(
+      computed(() => props.data),
+      dynamicOptions
+    )
+  })()
+
+  // 状态计算
+  const expandedKeys = computed(() => expandState?.expandedKeys.value ?? [])
+  const checkedKeys = computed(() => expandState?.checkedKeys.value ?? [])
+  const renderExpandFunction = computed(() => undefined)
+
+  // ================= 事件处理函数 =================
+
   /**
-   * * @description 处理保存操作
-   * ? @param rowData - 行数据对象
-   * ? @param rowIndex - 行索引
-   * ? @param columnKey - 列键名（可选）
-   * ! @return Promise<void>
+   * @description: 处理保存操作
    */
   async function handleSave(
     rowData: DataRecord,
@@ -381,27 +636,21 @@
   }
 
   /**
-   * * @description 处理取消操作
-   * ? @param rowData - 行数据对象
-   * ? @param rowIndex - 行索引
-   * ! @return void
+   * @description: 处理取消操作
    */
   function handleCancel(rowData: DataRecord, rowIndex: number) {
     emit('cancel', rowData, rowIndex)
   }
 
   /**
-   * * @description 处理表单更新
-   * ? @param value - 表单数据对象
-   * ! @return void
+   * @description: 处理模态框编辑数据更新
    */
   function handleFormUpdate(value: DataRecord) {
     Object.assign(modalEdit.editingData, value)
   }
 
   /**
-   * * @description 处理模态框保存
-   * ! @return Promise<void>
+   * @description: 处理模态框保存操作
    */
   async function handleModalSave() {
     if (!cFormRef.value) return
@@ -416,41 +665,30 @@
   }
 
   /**
-   * * @description 处理展开行键变化
-   * ? @param keys - 展开的行键数组
-   * ! @return void
+   * @description: 处理展开行键变化
    */
   function handleExpandedRowKeysChange(keys: DataTableRowKey[]) {
-    if (expandState) {
-      expandState.handleExpandChange(keys)
-    }
+    expandState?.handleExpandChange(keys)
   }
 
   /**
-   * * @description 处理选中行键变化
-   * ? @param keys - 选中的行键数组
-   * ! @return void
+   * @description: 处理选中行键变化
    */
   function handleCheckedRowKeysChange(keys: DataTableRowKey[]) {
-    if (expandState) {
-      expandState.handleSelectionChange(keys)
-    }
+    expandState?.handleSelectionChange(keys)
   }
 
+  // ================= 工具函数 =================
+
   /**
-   * * @description 验证保存参数是否有效
-   * ? @param rowData - 行数据对象
-   * ? @param rowIndex - 行索引
-   * ! @return 参数是否有效
+   * @description:  检查保存参数是否有效
    */
   function isValidSaveParams(rowData: DataRecord, rowIndex: number): boolean {
     return !!(rowData && rowIndex >= 0 && rowIndex < props.data.length)
   }
 
   /**
-   * * @description 获取描述项的跨度
-   * ? @param column - 表格列配置
-   * ! @return 跨度数值
+   * @description: 获取描述信息的跨度
    */
   function getDescriptionSpan(column: TableColumn): number {
     return column.key === 'description' || column.editProps?.type === 'textarea'
@@ -458,46 +696,10 @@
       : 1
   }
 
-  /**
-   * * @description 获取编辑值
-   * ? @param column - 表格列配置
-   * ? @param rowData - 行数据对象
-   * ? @param rowKey - 行键
-   * ! @return 编辑值
-   */
-  function getEditValue(
-    column: TableColumn,
-    rowData: DataRecord,
-    rowKey: DataTableRowKey
-  ): unknown {
-    return (
-      rowEdit.getEditingRowData(rowKey)?.[column.key] ?? rowData[column.key]
-    )
-  }
+  // ================= 渲染工具函数 =================
 
   /**
-   * * @description 获取单元格编辑值
-   * ? @param column - 表格列配置
-   * ? @param rowData - 行数据对象
-   * ? @param rowKey - 行键
-   * ! @return 单元格编辑值
-   */
-  function getCellEditValue(
-    column: TableColumn,
-    rowData: DataRecord,
-    rowKey: DataTableRowKey
-  ): unknown {
-    return (
-      cellEdit.getEditingCellValue(rowKey, column.key) ?? rowData[column.key]
-    )
-  }
-
-  /**
-   * * @description 渲染编辑组件
-   * ? @param column - 表格列配置
-   * ? @param value - 当前值
-   * ? @param onUpdate - 更新回调函数
-   * ! @return Vue节点子元素
+   * 渲染编辑组件
    */
   function renderEditComponent(
     column: TableColumn,
@@ -523,12 +725,14 @@
   }
 
   /**
-   * * @description 渲染单元格编辑操作按钮
-   * ? @param rowKey - 行键
-   * ! @return Vue节点子元素
+   * 渲染单元格编辑操作按钮
    */
   function renderCellEditActions(rowKey: DataTableRowKey): VNodeChild {
-    console.log('rowKey', rowKey)
+    console.log('🚀 ~ renderCellEditActions ~ rowKey:', rowKey)
+
+    const buttonClass =
+      'flex items-center justify-center w-6 h-6 rounded-md hover:scale-110 active:scale-95 transition-all duration-200 flex-shrink-0'
+
     return h(
       'div',
       {
@@ -539,8 +743,7 @@
         h(
           'button',
           {
-            class:
-              'flex items-center justify-center w-6 h-6 rounded-md text-green-600 hover:text-green-700 hover:bg-green-50 hover:scale-110 active:scale-95 transition-all duration-200 flex-shrink-0',
+            class: `${buttonClass} text-green-600 hover:text-green-700 hover:bg-green-50`,
             title: '保存',
             type: 'button',
             onClick: (e: Event) => {
@@ -554,8 +757,7 @@
         h(
           'button',
           {
-            class:
-              'flex items-center justify-center w-6 h-6 rounded-md text-red-600 hover:text-red-700 hover:bg-red-50 hover:scale-110 active:scale-95 transition-all duration-200 flex-shrink-0',
+            class: `${buttonClass} text-red-600 hover:text-red-700 hover:bg-red-50`,
             title: '取消',
             type: 'button',
             onClick: (e: Event) => {
@@ -571,11 +773,23 @@
   }
 
   /**
-   * * @description 渲染单元格
-   * ? @param column - 表格列配置
-   * ? @param rowData - 行数据对象
-   * ? @param rowIndex - 行索引
-   * ! @return Vue节点子元素
+   * 编辑模式检查器
+   */
+  const editModeChecker = {
+    isNonEditable: (column: TableColumn) =>
+      !config.value.editable ||
+      column.editable === false ||
+      config.value.editMode === 'none',
+
+    isRowEditMode: () =>
+      config.value.editMode === 'row' || config.value.editMode === 'both',
+
+    isCellEditMode: () =>
+      config.value.editMode === 'cell' || config.value.editMode === 'both',
+  }
+
+  /**
+   * 渲染单元格
    */
   function renderCell(
     column: TableColumn,
@@ -585,23 +799,22 @@
     const value = rowData[column.key]
     const rowKey = props.rowKey(rowData)
 
-    if (
-      !props.editable ||
-      column.editable === false ||
-      props.editMode === 'none'
-    ) {
+    // 不可编辑
+    if (editModeChecker.isNonEditable(column)) {
       return renderDisplayCell(column, rowData, rowIndex, value)
     }
 
-    if (isRowEditMode() && rowEdit.isEditingRow(rowKey)) {
+    // 行编辑模式
+    if (editModeChecker.isRowEditMode() && rowEdit.isEditingRow(rowKey)) {
       return renderEditComponent(
         column,
-        getEditValue(column, rowData, rowKey),
+        rowEdit.getEditingRowData(rowKey)?.[column.key] ?? value,
         val => rowEdit.updateEditingRowData(rowKey, column.key, val)
       )
     }
 
-    if (isCellEditMode()) {
+    // 单元格编辑模式
+    if (editModeChecker.isCellEditMode()) {
       return cellEdit.isEditingCell(rowKey, column.key)
         ? renderEditingCell(column, rowData, rowKey)
         : renderEditableCell(column, rowData, rowIndex, value, rowKey)
@@ -611,12 +824,7 @@
   }
 
   /**
-   * * @description 渲染显示单元格
-   * ? @param column - 表格列配置
-   * ? @param rowData - 行数据对象
-   * ? @param rowIndex - 行索引
-   * ? @param value - 单元格值
-   * ! @return Vue节点子元素
+   * @description: 渲染单元格显示内容
    */
   function renderDisplayCell(
     column: TableColumn,
@@ -625,18 +833,13 @@
     value: unknown
   ): VNodeChild {
     if (column.render) {
-      const result = column.render(rowData, rowIndex)
-      return result ?? String(value ?? '')
+      return column.render(rowData, rowIndex) ?? String(value ?? '')
     }
     return String(value ?? '')
   }
 
   /**
-   * * @description 渲染编辑中的单元格
-   * ? @param column - 表格列配置
-   * ? @param rowData - 行数据对象
-   * ? @param rowKey - 行键
-   * ! @return Vue节点子元素
+   * @description: 渲染单元格编辑内容
    */
   function renderEditingCell(
     column: TableColumn,
@@ -645,14 +848,13 @@
   ): VNodeChild {
     return h(
       'div',
-      {
-        class: 'relative w-full min-h-9 flex items-center overflow-visible',
-      },
+      { class: 'relative w-full min-h-9 flex items-center overflow-visible' },
       [
         h('div', { class: 'flex-1 min-w-0 pr-20' }, [
           renderEditComponent(
             column,
-            getCellEditValue(column, rowData, rowKey),
+            cellEdit.getEditingCellValue(rowKey, column.key) ??
+              rowData[column.key],
             val => cellEdit.updateEditingCellValue(rowKey, column.key, val)
           ),
         ]),
@@ -662,13 +864,7 @@
   }
 
   /**
-   * * @description 渲染可编辑单元格
-   * ? @param column - 表格列配置
-   * ? @param rowData - 行数据对象
-   * ? @param rowIndex - 行索引
-   * ? @param value - 单元格值
-   * ? @param rowKey - 行键
-   * ! @return Vue节点子元素
+   * @description: 渲染可编辑单元格
    */
   function renderEditableCell(
     column: TableColumn,
@@ -696,110 +892,73 @@
   }
 
   /**
-   * * @description 判断是否为行编辑模式
-   * ! @return 是否为行编辑模式
-   */
-  function isRowEditMode(): boolean {
-    return props.editMode === 'row' || props.editMode === 'both'
-  }
-
-  /**
-   * * @description 判断是否为单元格编辑模式
-   * ! @return 是否为单元格编辑模式
-   */
-  function isCellEditMode(): boolean {
-    return props.editMode === 'cell' || props.editMode === 'both'
-  }
-
-  /**
-   * * @description 渲染操作按钮
-   * ? @param rowData - 行数据对象
-   * ? @param rowIndex - 行索引
-   * ! @return Vue节点子元素
+   * 渲染操作按钮
    */
   function renderActions(rowData: DataRecord, rowIndex: number): VNodeChild {
     const rowKey = props.rowKey(rowData)
     const actions: VNodeChild[] = []
 
-    if (isRowEditMode()) {
+    // 行编辑按钮
+    if (editModeChecker.isRowEditMode()) {
       actions.push(rowEdit.renderRowActions(rowKey))
     }
 
-    if (props.editMode === 'modal') {
-      actions.push(renderModalEditButton(rowKey))
-    }
-
-    if (!rowEdit.isEditingRow(rowKey)) {
-      addCustomActions(actions, rowData, rowIndex)
-    }
-
-    return h(NSpace, { size: 2, wrap: false }, () => actions)
-  }
-
-  /**
-   * * @description 渲染模态框编辑按钮
-   * ? @param rowKey - 行键
-   * ! @return Vue节点子元素
-   */
-  function renderModalEditButton(rowKey: DataTableRowKey): VNodeChild {
-    return h(
-      NButton,
-      {
-        size: 'small',
-        type: 'primary',
-        quaternary: true,
-        onClick: () => modalEdit.startEdit(rowKey),
-      },
-      () => [
-        h(NIcon, { size: 14 }, () => h('i', { class: 'i-mdi:pencil' })),
-        '编辑',
-      ]
-    )
-  }
-
-  /**
-   * * @description 添加自定义操作按钮
-   * ? @param actions - 操作按钮数组
-   * ? @param rowData - 行数据对象
-   * ? @param rowIndex - 行索引
-   * ! @return void
-   */
-  function addCustomActions(
-    actions: VNodeChild[],
-    rowData: DataRecord,
-    rowIndex: number
-  ): void {
-    props.rowActions?.forEach(action => {
-      if (action.show?.(rowData, rowIndex) === false) return
-
-      const onClick =
-        action.label === '查看'
-          ? () => {
-              viewingData.value = { ...rowData }
-              viewModalVisible.value = true
-            }
-          : () => action.onClick(rowData, rowIndex)
-
+    // 模态框编辑按钮
+    if (config.value.editMode === 'modal') {
       actions.push(
         h(
           NButton,
           {
             size: 'small',
-            type: action.type || 'default',
+            type: 'primary',
             quaternary: true,
-            onClick,
+            onClick: () => modalEdit.startEdit(rowKey),
           },
           () => [
-            action.icon &&
-              h(NIcon, { size: 14 }, () => h('i', { class: action.icon })),
-            action.label,
+            h(NIcon, { size: 14 }, () => h('i', { class: 'i-mdi:pencil' })),
+            '编辑',
           ]
         )
       )
-    })
+    }
+
+    // 自定义操作按钮
+    if (!rowEdit.isEditingRow(rowKey)) {
+      props.rowActions?.forEach(action => {
+        if (action.show?.(rowData, rowIndex) === false) return
+
+        const onClick =
+          action.label === '查看'
+            ? () => {
+                viewingData.value = { ...rowData }
+                viewModalVisible.value = true
+              }
+            : () => action.onClick(rowData, rowIndex)
+
+        actions.push(
+          h(
+            NButton,
+            {
+              size: 'small',
+              type: action.type || 'default',
+              quaternary: true,
+              onClick,
+            },
+            () => [
+              action.icon &&
+                h(NIcon, { size: 14 }, () => h('i', { class: action.icon })),
+              action.label,
+            ]
+          )
+        )
+      })
+    }
+
+    return h(NSpace, { size: 2, wrap: false }, () => actions)
   }
 
-  //  计算列配置 - 整合展开、选择和动态行功能
+  // ================= 计算列配置 =================
+
   const computedColumns = computed((): DataTableColumn[] => {
     let columns: DataTableColumn[] = props.columns.map(column => ({
       ...column,
@@ -810,72 +969,370 @@
         renderCell(column, rowData, rowIndex),
     }))
 
-    //  使用 dynamicRowsState 的列配置增强（如果启用动态行功能）
+    // 功能列增强
     if (dynamicRowsState) {
       columns = dynamicRowsState.enhanceColumns(
         columns as any
       ) as DataTableColumn[]
     }
 
-    //  使用 expandState 的列配置增强
-    if (expandState && (props.expandable || props.enableSelection)) {
+    if (
+      expandState &&
+      (config.value.expandable || config.value.enableSelection)
+    ) {
       columns = expandState.getTableColumns(columns as any) as DataTableColumn[]
     }
 
-    // 添加操作列
-    if (shouldShowActionsColumn()) {
-      columns.push(createActionsColumn())
+    // 操作列
+    if (
+      config.value.showRowActions &&
+      (config.value.editable || props.rowActions?.length)
+    ) {
+      columns.push({
+        key: '_actions',
+        title: '操作',
+        align: 'center' as const,
+        titleAlign: 'center' as const,
+        width: 120,
+        render: renderActions,
+      })
     }
 
     return columns
   })
 
-  /**
-   * * @description 判断是否显示操作列
-   * ! @return 是否显示操作列
-   */
-  function shouldShowActionsColumn(): boolean {
-    return !!(
-      props.showRowActions &&
-      (props.editable || props.rowActions?.length)
-    )
+  // ================= 统一的状态管理器 =================
+
+  const stateManager = {
+    // 编辑控制
+    edit: {
+      /**
+       * @description: 开始编辑
+       */
+      start(rowKey: DataTableRowKey, columnKey?: string) {
+        const mode = config.value.editMode
+        if (mode === 'modal') modalEdit.startEdit(rowKey)
+        else if (mode === 'cell' && columnKey)
+          cellEdit.startEditCell(rowKey, columnKey)
+        else if (mode === 'row' || mode === 'both') rowEdit.startEditRow(rowKey)
+      },
+
+      /**
+       * @description: 取消编辑
+       */
+      cancel() {
+        if (modalEdit.isModalVisible.value) modalEdit.cancelEdit()
+        else if (cellEdit.editingCell.value.rowKey) cellEdit.cancelEditCell()
+        else if (rowEdit.editingRowKey.value) rowEdit.cancelEditRow()
+      },
+
+      /**
+       * @description: 保存编辑
+       */
+      async save() {
+        if (modalEdit.isModalVisible.value) await handleModalSave()
+        else if (cellEdit.editingCell.value.rowKey)
+          await cellEdit.saveEditCell()
+        else if (rowEdit.editingRowKey.value) await rowEdit.saveEditRow()
+      },
+
+      /**
+       * @description: 是否正在编辑
+       */
+      isEditing(rowKey: DataTableRowKey, columnKey?: string) {
+        if (config.value.editMode === 'modal')
+          return modalEdit.isEditingRow(rowKey)
+        if (columnKey) return cellEdit.isEditingCell(rowKey, columnKey)
+        return rowEdit.isEditingRow(rowKey)
+      },
+
+      /**
+       * @description: 获取当前编辑数据
+       */
+      getEditingData() {
+        if (modalEdit.isModalVisible.value) return modalEdit.editingData
+        if (rowEdit.editingRowKey.value) {
+          return rowEdit.getEditingRowData(rowEdit.editingRowKey.value!)
+        }
+        return null
+      },
+    },
+
+    // 展开控制
+    expand: {
+      /**
+       * @description: 展开行
+       */
+      async row(rowKey: DataTableRowKey) {
+        if (expandState) {
+          const currentKeys = [...expandState.expandedKeys.value]
+          if (!currentKeys.includes(rowKey)) {
+            currentKeys.push(rowKey)
+            expandState.handleExpandChange(currentKeys)
+          }
+        }
+      },
+
+      /**
+       * @description: 折叠行
+       */
+      collapse(rowKey: DataTableRowKey) {
+        if (expandState) {
+          const currentKeys = expandState.expandedKeys.value.filter(
+            key => key !== rowKey
+          )
+          expandState.handleExpandChange(currentKeys)
+        }
+      },
+
+      /**
+       * @description: 展开折叠切换
+       */
+      async toggle(rowKey: DataTableRowKey) {
+        if (expandState?.expandedKeys.value.includes(rowKey)) {
+          this.collapse(rowKey)
+        } else {
+          await this.row(rowKey)
+        }
+      },
+
+      /**
+       * @description: 展开所有行
+       */
+      async all() {
+        await expandState?.expandAll()
+      },
+      /**
+       * @description: 折叠所有行
+       */
+      collapseAll() {
+        expandState?.collapseAll()
+      },
+      /**
+       * @description: 检查行是否已展开
+       */
+      isExpanded(rowKey: DataTableRowKey) {
+        return expandState?.expandedKeys.value.includes(rowKey) ?? false
+      },
+    },
+
+    // 选择控制
+    selection: {
+      /**
+       * @description: 选择指定行
+       */
+      select(rowKey: DataTableRowKey) {
+        if (
+          expandState?.checkedKeys.value &&
+          !expandState.checkedKeys.value.includes(rowKey)
+        ) {
+          const newKeys = [...expandState.checkedKeys.value, rowKey]
+          expandState.handleSelectionChange(newKeys)
+        }
+      },
+
+      /**
+       * @description: 取消选择指定行
+       */
+      unselect(rowKey: DataTableRowKey) {
+        if (expandState?.checkedKeys.value) {
+          const newKeys = expandState.checkedKeys.value.filter(
+            key => key !== rowKey
+          )
+          expandState.handleSelectionChange(newKeys)
+        }
+      },
+
+      /**
+       * @description: 选择所有行
+       */
+      all() {
+        expandState?.selectAll()
+      },
+
+      /**
+       * @description: 清除所有行选择
+       */
+      clear() {
+        expandState?.clearSelection()
+      },
+
+      /**
+       * @description: 检查行是否已选择
+       */
+      isSelected(rowKey: DataTableRowKey) {
+        return expandState?.checkedKeys.value.includes(rowKey) ?? false
+      },
+
+      /**
+       * @description: 获取所有已选择的行数据
+       */
+      getSelected() {
+        if (!expandState?.checkedKeys.value) return []
+        return props.data.filter(row =>
+          expandState!.checkedKeys.value.includes(props.rowKey(row))
+        )
+      },
+    },
+
+    // 子选择控制
+    childSelection: {
+      /**
+       * @description: 选择指定父行下的子行
+       */
+      select(parentKey: DataTableRowKey, childKey: DataTableRowKey) {
+        if (expandState?.childSelections.value) {
+          const current = expandState.childSelections.value.get(parentKey) || []
+          if (!current.includes(childKey)) {
+            const newSelection = [...current, childKey]
+            expandState.childSelections.value.set(parentKey, newSelection)
+            emit('child-selection-change', parentKey, newSelection, [])
+          }
+        }
+      },
+
+      /**
+       * @description: 取消选择指定父行下的子行
+       */
+      unselect(parentKey: DataTableRowKey, childKey: DataTableRowKey) {
+        if (expandState?.childSelections.value) {
+          const current = expandState.childSelections.value.get(parentKey) || []
+          const newSelection = current.filter(k => k !== childKey)
+          expandState.childSelections.value.set(parentKey, newSelection)
+          emit('child-selection-change', parentKey, newSelection, [])
+        }
+      },
+
+      /**
+       * @description: 选择指定父行下的所有子行
+       */
+      selectAll(parentKey: DataTableRowKey) {
+        if (
+          expandState?.childSelections.value &&
+          expandState.expandDataMap?.value
+        ) {
+          const expandData =
+            expandState.expandDataMap.value.get(parentKey) || []
+          const allChildKeys = expandData.map((child: any) => child.id)
+          expandState.childSelections.value.set(parentKey, allChildKeys)
+          emit('child-selection-change', parentKey, allChildKeys, expandData)
+        }
+      },
+
+      /**
+       * @description: 清除指定父行下的所有子行选择
+       */
+      clear(parentKey: DataTableRowKey) {
+        if (expandState?.childSelections.value) {
+          expandState.childSelections.value.set(parentKey, [])
+          emit('child-selection-change', parentKey, [], [])
+        }
+      },
+
+      /**
+       * @description: 获取指定父行下所有已选择的子行数据
+       */
+      getSelected(parentKey: DataTableRowKey) {
+        if (
+          !expandState?.childSelections.value ||
+          !expandState.expandDataMap?.value
+        ) {
+          return []
+        }
+        const selectedKeys =
+          expandState.childSelections.value.get(parentKey) || []
+        const expandData = expandState.expandDataMap.value.get(parentKey) || []
+        return expandData.filter((child: any) =>
+          selectedKeys.includes(child.id)
+        )
+      },
+    },
+
+    // 动态行控制
+    dynamicRows: {
+      /**
+       * @description: 添加行
+       */
+      add() {
+        dynamicRowsState?.addRow()
+      },
+      /**
+       * @description: 插入行
+       */
+      insert() {
+        dynamicRowsState?.insertRow()
+      },
+
+      /**
+       * @description: 删除行
+       */
+      delete() {
+        dynamicRowsState?.deleteRow()
+      },
+      /**
+       * @description: 复制行
+       */
+      copy() {
+        dynamicRowsState?.copyRow()
+      },
+      /**
+       * @description:  上移动态行
+       */
+      moveUp() {
+        dynamicRowsState?.moveRowUp()
+      },
+      /**
+       * @description: 下移动态行
+       */
+      moveDown() {
+        dynamicRowsState?.moveRowDown()
+      },
+      /**
+       * @description: 清空动态行数据
+       */
+      clearSelection() {
+        dynamicRowsState?.clearSelection()
+      },
+      /**
+       * @description: 获取当前选中的动态行数据
+       */
+      getSelected() {
+        return dynamicRowsState?.selectedRowData.value || null
+      },
+
+      /**
+       * @description: 打印表格
+       */
+      async print(elementRef?: HTMLElement) {
+        if (dynamicRowsState && elementRef) {
+          await dynamicRowsState.handlePrint(ref(elementRef))
+        }
+      },
+
+      /**
+       * @description: 导出表格数据
+       */
+      async download(elementRef?: HTMLElement, filename?: string) {
+        if (dynamicRowsState && elementRef) {
+          await dynamicRowsState.handleDownload(ref(elementRef), filename)
+        }
+      },
+    },
+
+    //
+    /**
+     * @description: 清除所有选择
+     */
+    clearAllSelections() {
+      expandState?.clearAllSelections()
+    },
   }
 
-  /**
-   * * @description 创建操作列配置
-   * ! @return 操作列配置对象
-   */
-  function createActionsColumn(): DataTableColumn {
-    return {
-      key: '_actions',
-      title: '操作',
-      align: 'center' as const,
-      titleAlign: 'center' as const,
-      width: 120,
-      render: renderActions,
-    }
-  }
+  // ================= 暴露方法 =================
 
-  /**
-   * * @description 处理开始编辑
-   * ? @param rowKey - 行键
-   * ? @param columnKey - 列键（可选）
-   * ! @return void
-   */
-  function handleStartEdit(rowKey: DataTableRowKey, columnKey?: string) {
-    if (props.editMode === 'modal') {
-      modalEdit.startEdit(rowKey)
-    } else if (props.editMode === 'cell' && columnKey) {
-      cellEdit.startEditCell(rowKey, columnKey)
-    } else if (props.editMode === 'row' || props.editMode === 'both') {
-      rowEdit.startEditRow(rowKey)
-    }
-  }
-
-  //  暴露方法 - 包含展开、选择和动态行功能
   defineExpose<
     TableInstance & {
-      //  动态行操作方法
+      // 动态行操作方法
       addRow: () => void
       insertRow: () => void
       deleteRow: () => void
@@ -891,379 +1348,48 @@
       ) => Promise<void>
     }
   >({
-    /**
-     * * @description 开始编辑
-     * ? @param rowKey - 行键
-     * ? @param columnKey - 列键（可选）
-     * ! @return void
-     */
-    startEdit: handleStartEdit,
+    // 编辑相关
+    startEdit: stateManager.edit.start,
+    cancelEdit: stateManager.edit.cancel,
+    saveEdit: stateManager.edit.save,
+    isEditing: stateManager.edit.isEditing,
+    getEditingData: stateManager.edit.getEditingData,
 
-    /**
-     * * @description 取消编辑
-     * ! @return void
-     */
-    cancelEdit() {
-      if (modalEdit.isModalVisible.value) modalEdit.cancelEdit()
-      else if (cellEdit.editingCell.value.rowKey) cellEdit.cancelEditCell()
-      else if (rowEdit.editingRowKey.value) rowEdit.cancelEditRow()
-    },
+    // 展开相关
+    expandRow: stateManager.expand.row,
+    collapseRow: stateManager.expand.collapse,
+    toggleExpand: stateManager.expand.toggle,
+    expandAll: stateManager.expand.all,
+    collapseAll: stateManager.expand.collapseAll,
+    isExpanded: stateManager.expand.isExpanded,
 
-    /**
-     * * @description 保存编辑
-     * ! @return Promise<void>
-     */
-    async saveEdit() {
-      if (modalEdit.isModalVisible.value) await handleModalSave()
-      else if (cellEdit.editingCell.value.rowKey) await cellEdit.saveEditCell()
-      else if (rowEdit.editingRowKey.value) await rowEdit.saveEditRow()
-    },
+    // 选择相关
+    selectRow: stateManager.selection.select,
+    unselectRow: stateManager.selection.unselect,
+    selectAll: stateManager.selection.all,
+    clearSelection: stateManager.selection.clear,
+    isRowSelected: stateManager.selection.isSelected,
+    getSelectedRows: stateManager.selection.getSelected,
 
-    /**
-     * * @description 判断是否正在编辑
-     * ? @param rowKey - 行键
-     * ? @param columnKey - 列键（可选）
-     * ! @return 是否正在编辑
-     */
-    isEditing(rowKey: DataTableRowKey, columnKey?: string) {
-      if (props.editMode === 'modal') return modalEdit.isEditingRow(rowKey)
-      if (columnKey) return cellEdit.isEditingCell(rowKey, columnKey)
-      return rowEdit.isEditingRow(rowKey)
-    },
+    // 子选择相关
+    selectChildRow: stateManager.childSelection.select,
+    unselectChildRow: stateManager.childSelection.unselect,
+    selectAllChildren: stateManager.childSelection.selectAll,
+    clearChildrenSelection: stateManager.childSelection.clear,
+    getChildSelectedRows: stateManager.childSelection.getSelected,
+    clearAllSelections: stateManager.clearAllSelections,
 
-    /**
-     * * @description 获取编辑中的数据
-     * ! @return 编辑中的数据或null
-     */
-    getEditingData() {
-      if (modalEdit.isModalVisible.value) return modalEdit.editingData
-      if (rowEdit.editingRowKey.value) {
-        return rowEdit.getEditingRowData(rowEdit.editingRowKey.value!)
-      }
-      return null
-    },
-
-    /**
-     * * @description 展开行
-     * ? @param rowKey - 行键
-     * ! @return Promise<void>
-     */
-    expandRow: async (rowKey: DataTableRowKey) => {
-      if (expandState) {
-        const currentKeys = [...expandState.expandedKeys.value]
-        if (!currentKeys.includes(rowKey)) {
-          currentKeys.push(rowKey)
-          expandState.handleExpandChange(currentKeys)
-        }
-      }
-    },
-
-    /**
-     * * @description 折叠行
-     * ? @param rowKey - 行键
-     * ! @return void
-     */
-    collapseRow: (rowKey: DataTableRowKey) => {
-      if (expandState) {
-        const currentKeys = expandState.expandedKeys.value.filter(
-          key => key !== rowKey
-        )
-        expandState.handleExpandChange(currentKeys)
-      }
-    },
-
-    /**
-     * * @description 切换展开状态
-     * ? @param rowKey - 行键
-     * ! @return Promise<void>
-     */
-    toggleExpand: async (rowKey: DataTableRowKey) => {
-      if (expandState?.expandedKeys.value.includes(rowKey)) {
-        // 如果已展开，则折叠
-        const currentKeys = expandState.expandedKeys.value.filter(
-          key => key !== rowKey
-        )
-        expandState.handleExpandChange(currentKeys)
-      } else {
-        // 如果未展开，则展开
-        await expandState?.expandRow?.(rowKey)
-      }
-    },
-
-    /**
-     * * @description 展开所有行
-     * ! @return Promise<void>
-     */
-    expandAll: async () => {
-      await expandState?.expandAll()
-    },
-
-    /**
-     * * @description 折叠所有行
-     * ! @return void
-     */
-    collapseAll: () => {
-      expandState?.collapseAll()
-    },
-
-    /**
-     * * @description 判断行是否已展开
-     * ? @param rowKey - 行键
-     * ! @return 是否已展开
-     */
-    isExpanded: (rowKey: DataTableRowKey) => {
-      return expandState?.expandedKeys.value.includes(rowKey) ?? false
-    },
-
-    /**
-     * * @description 选中行
-     * ? @param rowKey - 行键
-     * ! @return void
-     */
-    selectRow: (rowKey: DataTableRowKey) => {
-      if (
-        expandState?.checkedKeys.value &&
-        !expandState.checkedKeys.value.includes(rowKey)
-      ) {
-        const newKeys = [...expandState.checkedKeys.value, rowKey]
-        expandState.handleSelectionChange(newKeys)
-      }
-    },
-
-    /**
-     * * @description 取消选中行
-     * ? @param rowKey - 行键
-     * ! @return void
-     */
-    unselectRow: (rowKey: DataTableRowKey) => {
-      if (expandState?.checkedKeys.value) {
-        const newKeys = expandState.checkedKeys.value.filter(
-          key => key !== rowKey
-        )
-        expandState.handleSelectionChange(newKeys)
-      }
-    },
-
-    /**
-     * * @description 选中所有行
-     * ! @return void
-     */
-    selectAll: () => {
-      expandState?.selectAll()
-    },
-
-    /**
-     * * @description 清空选择
-     * ! @return void
-     */
-    clearSelection: () => {
-      expandState?.clearSelection()
-    },
-
-    /**
-     * * @description 判断行是否已选中
-     * ? @param rowKey - 行键
-     * ! @return 是否已选中
-     */
-    isRowSelected: (rowKey: DataTableRowKey) => {
-      return expandState?.checkedKeys.value.includes(rowKey) ?? false
-    },
-
-    /**
-     * * @description 获取选中的行数据
-     * ! @return 选中的行数据数组
-     */
-    getSelectedRows: () => {
-      if (!expandState?.checkedKeys.value) return []
-      return props.data.filter(row =>
-        expandState!.checkedKeys.value.includes(props.rowKey(row))
-      )
-    },
-
-    /**
-     * * @description 选中子行
-     * ? @param parentKey - 父行键
-     * ? @param childKey - 子行键
-     * ! @return void
-     */
-    selectChildRow: (parentKey: DataTableRowKey, childKey: DataTableRowKey) => {
-      if (expandState?.childSelections.value) {
-        const current = expandState.childSelections.value.get(parentKey) || []
-        if (!current.includes(childKey)) {
-          const newSelection = [...current, childKey]
-          expandState.childSelections.value.set(parentKey, newSelection)
-          // 触发子选择变化事件
-          emit('child-selection-change', parentKey, newSelection, [])
-        }
-      }
-    },
-
-    /**
-     * * @description 取消选中子行
-     * ? @param parentKey - 父行键
-     * ? @param childKey - 子行键
-     * ! @return void
-     */
-    unselectChildRow: (
-      parentKey: DataTableRowKey,
-      childKey: DataTableRowKey
-    ) => {
-      if (expandState?.childSelections.value) {
-        const current = expandState.childSelections.value.get(parentKey) || []
-        const newSelection = current.filter(k => k !== childKey)
-        expandState.childSelections.value.set(parentKey, newSelection)
-        // 触发子选择变化事件
-        emit('child-selection-change', parentKey, newSelection, [])
-      }
-    },
-
-    /**
-     * * @description 选中所有子行
-     * ? @param parentKey - 父行键
-     * ! @return void
-     */
-    selectAllChildren: (parentKey: DataTableRowKey) => {
-      if (
-        expandState?.childSelections.value &&
-        expandState.expandDataMap?.value
-      ) {
-        const expandData = expandState.expandDataMap.value.get(parentKey) || []
-        const allChildKeys = expandData.map((child: any) => child.id)
-        expandState.childSelections.value.set(parentKey, allChildKeys)
-        // 触发子选择变化事件
-        emit('child-selection-change', parentKey, allChildKeys, expandData)
-      }
-    },
-
-    /**
-     * * @description 清空子行选择
-     * ? @param parentKey - 父行键
-     * ! @return void
-     */
-    clearChildrenSelection: (parentKey: DataTableRowKey) => {
-      if (expandState?.childSelections.value) {
-        expandState.childSelections.value.set(parentKey, [])
-        // 触发子选择变化事件
-        emit('child-selection-change', parentKey, [], [])
-      }
-    },
-
-    /**
-     * * @description 获取子行选中数据
-     * ? @param parentKey - 父行键
-     * ! @return 选中的子行数据数组
-     */
-    getChildSelectedRows: (parentKey: DataTableRowKey) => {
-      if (
-        !expandState?.childSelections.value ||
-        !expandState.expandDataMap?.value
-      ) {
-        return []
-      }
-      const selectedKeys =
-        expandState.childSelections.value.get(parentKey) || []
-      const expandData = expandState.expandDataMap.value.get(parentKey) || []
-      return expandData.filter((child: any) => selectedKeys.includes(child.id))
-    },
-
-    /**
-     * * @description 清空所有选择（包括父行和子行）
-     * ! @return void
-     */
-    clearAllSelections: () => {
-      expandState?.clearAllSelections()
-    },
-
-    //  动态行操作方法
-    /**
-     * * @description 添加新行
-     * ! @return void
-     */
-    addRow: () => {
-      dynamicRowsState?.addRow()
-    },
-
-    /**
-     * * @description 插入新行
-     * ! @return void
-     */
-    insertRow: () => {
-      dynamicRowsState?.insertRow()
-    },
-
-    /**
-     * * @description 删除选中行
-     * ! @return void
-     */
-    deleteRow: () => {
-      dynamicRowsState?.deleteRow()
-    },
-
-    /**
-     * * @description 复制选中行
-     * ! @return void
-     */
-    copyRow: () => {
-      dynamicRowsState?.copyRow()
-    },
-
-    /**
-     * * @description 上移选中行
-     * ! @return void
-     */
-    moveRowUp: () => {
-      dynamicRowsState?.moveRowUp()
-    },
-
-    /**
-     * * @description 下移选中行
-     * ! @return void
-     */
-    moveRowDown: () => {
-      dynamicRowsState?.moveRowDown()
-    },
-
-    /**
-     * * @description 清空行选择
-     * ! @return void
-     */
-    clearRowSelection: () => {
-      dynamicRowsState?.clearSelection()
-    },
-
-    /**
-     * * @description 获取选中的行数据
-     * ! @return 选中的行数据或null
-     */
-    getSelectedRowData: () => {
-      return dynamicRowsState?.selectedRowData.value || null
-    },
-
-    /**
-     * * @description 打印表格
-     * ? @param elementRef - 要打印的元素引用
-     * ! @return Promise<void>
-     */
-    printTable: async (elementRef?: HTMLElement) => {
-      if (dynamicRowsState && elementRef) {
-        await dynamicRowsState.handlePrint(ref(elementRef))
-      }
-    },
-
-    /**
-     * * @description 下载表格截图
-     * ? @param elementRef - 要截图的元素引用
-     * ? @param filename - 文件名
-     * ! @return Promise<void>
-     */
-    downloadTableScreenshot: async (
-      elementRef?: HTMLElement,
-      filename?: string
-    ) => {
-      if (dynamicRowsState && elementRef) {
-        await dynamicRowsState.handleDownload(ref(elementRef), filename)
-      }
-    },
+    // 动态行相关
+    addRow: stateManager.dynamicRows.add,
+    insertRow: stateManager.dynamicRows.insert,
+    deleteRow: stateManager.dynamicRows.delete,
+    copyRow: stateManager.dynamicRows.copy,
+    moveRowUp: stateManager.dynamicRows.moveUp,
+    moveRowDown: stateManager.dynamicRows.moveDown,
+    clearRowSelection: stateManager.dynamicRows.clearSelection,
+    getSelectedRowData: stateManager.dynamicRows.getSelected,
+    printTable: stateManager.dynamicRows.print,
+    downloadTableScreenshot: stateManager.dynamicRows.download,
   })
 </script>
 
