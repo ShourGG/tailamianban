@@ -266,7 +266,7 @@
         {
           "path": "calendar",
           "name": "demo-calendar",
-          "component": "/11-calendar/index",
+          "component": "/demo/13-calendar/index",
           "meta": {
             "icon": "mdi:calendar-month",
             "title": "日历",
