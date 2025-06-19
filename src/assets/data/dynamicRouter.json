@@ -249,9 +249,9 @@
               }
             },
             {
-              "path": "demo-change-table",
-              "name": "demo-change-table",
-              "component": "/demo/12-change-table/index",
+              "path": "table-dynamic",
+              "name": "demo-table-dynamic",
+              "component": "/demo/12-table-dynamic/index",
               "meta": {
                 "icon": "mdi:table-multiple",
                 "title": "表格动态行",
