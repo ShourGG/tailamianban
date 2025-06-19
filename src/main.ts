@@ -21,6 +21,7 @@ import {
   setupNaiveUI,
   setupDynamicComponents,
   PassiveScrollPlugin,
+  setupHighlight,
 } from '@/plugins'
 
 /**
@@ -52,6 +53,7 @@ async function bootstrap() {
   setupStore(app)
   setupNaiveUI(app)
   setupDynamicComponents(app)
+  setupHighlight(app)
 
   // 第四阶段：异步插件
   await router.isReady()

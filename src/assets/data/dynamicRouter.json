@@ -295,7 +295,7 @@
         {
           "path": "code-editor",
           "name": "editor-code",
-          "component": "/13-code-editor/index",
+          "component": "/demo/14-code-editor/index",
           "meta": {
             "icon": "mdi:microsoft-visual-studio-code",
             "title": "代码编辑器",

@@ -11,6 +11,7 @@ declare module 'vue' {
     C_Breadcrumb: typeof import('./../components/global/C_Breadcrumb/index.vue')['default']
     C_Cascade: typeof import('./../components/global/C_Cascade/index.vue')['default']
     C_City: typeof import('./../components/global/C_City/index.vue')['default']
+    C_Code: typeof import('./../components/global/C_Code/index.vue')['default']
     C_columnSetting: typeof import('./../components/local/c_columnSetting/index.vue')['default']
     C_ColumnSetting: typeof import('./src/components/global/C_ColumnSetting/index.vue')['ColumnSetting']
     C_Date: typeof import('./../components/global/C_Date/index.vue')['default']
