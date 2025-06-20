@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-27 22:35:11
+ * @LastEditTime: 2025-06-20 16:07:54
  * @FilePath: \Robot_Admin\src\main.ts
  * @Description: 根入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -22,13 +22,8 @@ import {
   setupDynamicComponents,
   PassiveScrollPlugin,
   setupHighlight,
+  setupMarkdown,
 } from '@/plugins'
-
-/**
- * * @description: 添加这个函数来初始化 Pinia store
- * ? @param {Pinia} pinia
- * ! @return {*}
-
 
 /**
  * @description: 应用启动入口
@@ -54,6 +49,7 @@ async function bootstrap() {
   setupNaiveUI(app)
   setupDynamicComponents(app)
   setupHighlight(app)
+  setupMarkdown(app)
 
   // 第四阶段：异步插件
   await router.isReady()

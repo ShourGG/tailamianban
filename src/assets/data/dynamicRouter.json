@@ -308,7 +308,7 @@
         {
           "path": "markdown-editor",
           "name": "editor-markdown",
-          "component": "/14-markdown-editor/index",
+          "component": "/demo/15-markdown-editor/index",
           "meta": {
             "icon": "mdi:language-markdown",
             "title": "Markdown编辑器",

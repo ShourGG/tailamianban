@@ -41,6 +41,7 @@
     "@fullcalendar/vue3": "^6.1.17",
     "@iconify-json/ri": "^1.2.5",
     "@iconify/vue": "^5.0.0",
+    "@kangc/v-md-editor": "^2.3.18",
     "@splinetool/runtime": "^1.9.92",
     "@vueuse/core": "^13.1.0",
     "axios": "^1.9.0",

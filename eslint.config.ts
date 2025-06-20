@@ -146,6 +146,8 @@ export default defineConfigWithVueTs(
             '/^icon-/i',
             '/^C_/',
             '/^c_/',
+            // 第三方插件的组件
+            'v-md-editor'
           ],
         },
       ],
