@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-19 13:00:00
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-19 18:09:52
+ * @LastEditTime: 2025-06-21 17:13:13
  * @FilePath: \Robot_Admin\src\views\demo\14-code-editor\index.vue
  * @Description: C_Code 组件演示页面 (优化版)
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -10,7 +10,7 @@
 
 <template>
   <div class="code-editor-demo">
-    <NH1>代码编辑器组件场景示例</NH1>
+    <NH1>Code编辑器组件场景示例</NH1>
     <NSpace
       vertical
       size="large"

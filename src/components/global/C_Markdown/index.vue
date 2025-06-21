@@ -13,7 +13,6 @@
     <v-md-editor
       :model-value="modelValue"
       :height="height"
-      :disabled="disabled"
       :placeholder="placeholder"
       :toolbar="toolbar"
       :mode="mode"
@@ -24,6 +23,7 @@
       :include-level="includeLevel"
       :left-toolbar="leftToolbar"
       :right-toolbar="rightToolbar"
+      :default-show-toc="true"
       @update:model-value="handleInput"
       @change="handleChange"
       @save="handleSave"
@@ -78,7 +78,7 @@
     height: '400px',
     disabled: false,
     placeholder: '请输入 Markdown 内容...',
-    mode: 'edit', // edit 模式默认就是左右分栏（编辑+预览）
+    mode: 'editable',
     tocNavPosition: 'right',
     defaultFullscreen: false,
     autofocus: false,
@@ -251,48 +251,5 @@
 </script>
 
 <style lang="scss" scoped>
-  .c-markdown-wrapper {
-    position: relative;
-
-    :deep(.v-md-editor) {
-      border-radius: 6px;
-      border: 1px solid var(--border-color, #e1e5e9);
-
-      &:hover {
-        border-color: var(--primary-color, #18a058);
-      }
-
-      &:focus-within {
-        border-color: var(--primary-color, #18a058);
-        box-shadow: 0 0 0 2px var(--primary-color-suppl, rgba(24, 160, 88, 0.2));
-      }
-
-      // 禁用状态样式
-      &.disabled {
-        background-color: var(--input-color-disabled, #f5f5f5);
-        cursor: not-allowed;
-
-        .v-md-editor__editor {
-          cursor: not-allowed;
-        }
-      }
-    }
-
-    // 字数统计样式
-    .word-count {
-      position: absolute;
-      bottom: 8px;
-      right: 12px;
-      font-size: 12px;
-      color: var(--text-color-3, #a0a0a0);
-      background: var(--card-color, #fff);
-      padding: 2px 6px;
-      border-radius: 4px;
-      z-index: 10;
-
-      &.exceed {
-        color: var(--error-color, #d03050);
-      }
-    }
-  }
+  @use './index.scss';
 </style>

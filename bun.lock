@@ -4,6 +4,7 @@
     "": {
       "name": "bun_vite_uno_naive",
       "dependencies": {
+        "robot-admin": ".",
         "@commitlint/cli": "12.1.4",
         "@commitlint/config-conventional": "12.1.4",
         "@fullcalendar/core": "^6.1.17",
@@ -17,7 +18,6 @@
         "@splinetool/runtime": "^1.9.92",
         "@vueuse/core": "^13.1.0",
         "axios": "^1.9.0",
-        "bun": "^1.2.16",
         "driver.js": "^1.3.6",
         "echarts": "^5.6.0",
         "highlight.js": "^11.11.1",
@@ -329,28 +329,6 @@
     "@nuxt/kit": ["@nuxt/kit@3.17.4", "", { "dependencies": { "c12": "^3.0.4", "consola": "^3.4.2", "defu": "^6.1.4", "destr": "^2.0.5", "errx": "^0.1.0", "exsolve": "^1.0.5", "ignore": "^7.0.4", "jiti": "^2.4.2", "klona": "^2.0.6", "knitwork": "^1.2.0", "mlly": "^1.7.4", "ohash": "^2.0.11", "pathe": "^2.0.3", "pkg-types": "^2.1.0", "scule": "^1.3.0", "semver": "^7.7.2", "std-env": "^3.9.0", "tinyglobby": "^0.2.13", "ufo": "^1.6.1", "unctx": "^2.4.1", "unimport": "^5.0.1", "untyped": "^2.0.0" } }, "sha512-l+hY8sy2XFfg3PigZj+PTu6+KIJzmbACTRimn1ew/gtCz+F38f6KTF4sMRTN5CUxiB8TRENgEonASmkAWfpO9Q=="],
 
     "@one-ini/wasm": ["@one-ini/wasm@0.1.1", "https://registry.npmmirror.com/@one-ini/wasm/-/wasm-0.1.1.tgz", {}, "sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw=="],
-
-    "@oven/bun-darwin-aarch64": ["@oven/bun-darwin-aarch64@1.2.16", "", { "os": "darwin", "cpu": "arm64" }, "sha512-NLVU9YDORq/3WuJOE5TQv5of3R99n56gYZPfdqP4U0/5nllbC8yzRxA2BWwAS2RxxD0Y3bxqEVUsIGiTNN2jxg=="],
-
-    "@oven/bun-darwin-x64": ["@oven/bun-darwin-x64@1.2.16", "", { "os": "darwin", "cpu": "x64" }, "sha512-HpcSVCTH9n+9bG2zu3OUJ9h22m6HzNgZpqib9r4NEVZg7Z2U86bOUMKlTCA0ZANaWsK9czl2VIhMWbLF4fgvLA=="],
-
-    "@oven/bun-darwin-x64-baseline": ["@oven/bun-darwin-x64-baseline@1.2.16", "", { "os": "darwin", "cpu": "x64" }, "sha512-FtKr6FwLN+QfrF0/vJtOwBMU72krmrHlxhRSElbKEOWox2n2vWSZ/sNNkHePEsrxGfqaHC5GhEZk2lnaZTavBQ=="],
-
-    "@oven/bun-linux-aarch64": ["@oven/bun-linux-aarch64@1.2.16", "", { "os": "linux", "cpu": "arm64" }, "sha512-nd0eZhihfgrDtfI/NdEqOAQ8KY87SWNQLZKjRB8WoYkqcY1BGwtZqvJOc2bEn2oERJ8K2etJRynXz+MKngiYxw=="],
-
-    "@oven/bun-linux-aarch64-musl": ["@oven/bun-linux-aarch64-musl@1.2.16", "", { "os": "linux", "cpu": "none" }, "sha512-MhvQ0hecunZnbac9cEOqA1CGk/ISDhhnF35i9l90Jgc/osfgGndViLkMp3wk1EO5UG4/Kbil1OlfLmyOHKq0SQ=="],
-
-    "@oven/bun-linux-x64": ["@oven/bun-linux-x64@1.2.16", "", { "os": "linux", "cpu": "x64" }, "sha512-qYUXPXbT4S+MImv51+dLBHKFYy40QIowwCRtzUFGf3TG+9MQQUXHNXryMNSdHveHqecd9rO1EIQ8hroAPBl+Sg=="],
-
-    "@oven/bun-linux-x64-baseline": ["@oven/bun-linux-x64-baseline@1.2.16", "", { "os": "linux", "cpu": "x64" }, "sha512-ZysDeqDfUAqKrQu2R+ddRgSCY30qSnn0LQLr6fAm7Pw9lU2yhWVNa8R3DavddmZQc1vUw6j3ITIAE+DDT9OBCg=="],
-
-    "@oven/bun-linux-x64-musl": ["@oven/bun-linux-x64-musl@1.2.16", "", { "os": "linux", "cpu": "x64" }, "sha512-6o5Oi5ARKYErF6nIBrewxtl20PGhM97faPemJ+v26D47dRNAlUWN5lMVuOqZOhYjqzOe4V+NpxIFBHtXWEmoNQ=="],
-
-    "@oven/bun-linux-x64-musl-baseline": ["@oven/bun-linux-x64-musl-baseline@1.2.16", "", { "os": "linux", "cpu": "x64" }, "sha512-cWwny3cxYkvV9fYnSDb2brXodWV7IcG+Bwd3q3b8OUYbeC3ekHN3zm+TYdSxIVhMm7z46CkiDz5QnnQWVVfZ5A=="],
-
-    "@oven/bun-windows-x64": ["@oven/bun-windows-x64@1.2.16", "", { "os": "win32", "cpu": "x64" }, "sha512-1xUlHHbMZ3DMZlEcppBAQ5vQDgNHDMIGB/AXO+dxQJl/3GiO/Ek4pMDzcqMnlbGDaDcTmTXyZ6cEXEF4C2qygQ=="],
-
-    "@oven/bun-windows-x64-baseline": ["@oven/bun-windows-x64-baseline@1.2.16", "", { "os": "win32", "cpu": "x64" }, "sha512-tHdtHqH6c5ScNusLWOzZCTeuV2rSc3mvlLQQ+DYefTy+XwtjXmY47MbBSgNuBWVYePIob9BqDFOtTHYIWRZTww=="],
 
     "@oxlint/darwin-arm64": ["@oxlint/darwin-arm64@0.15.15", "https://registry.npmmirror.com/@oxlint/darwin-arm64/-/darwin-arm64-0.15.15.tgz", { "os": "darwin", "cpu": "arm64" }, "sha512-7GOyGM6D36lUhsOvavAVpF72SycPVG0Enunx0bzv8g0+9TklzOSFN3FJlZjLst14VPdZWujZMLgkQC7tOp+Rwg=="],
 
@@ -719,8 +697,6 @@
     "braces": ["braces@3.0.3", "https://registry.npmmirror.com/braces/-/braces-3.0.3.tgz", { "dependencies": { "fill-range": "^7.1.1" } }, "sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA=="],
 
     "browserslist": ["browserslist@4.24.4", "https://registry.npmmirror.com/browserslist/-/browserslist-4.24.4.tgz", { "dependencies": { "caniuse-lite": "^1.0.30001688", "electron-to-chromium": "^1.5.73", "node-releases": "^2.0.19", "update-browserslist-db": "^1.1.1" }, "bin": { "browserslist": "cli.js" } }, "sha512-KDi1Ny1gSePi1vm0q4oxSF8b4DR44GF4BbmS2YdhPLOEqd8pDviZOGH/GsmRwoWJ2+5Lr085X7naowMwKHDG1A=="],
-
-    "bun": ["bun@1.2.16", "", { "optionalDependencies": { "@oven/bun-darwin-aarch64": "1.2.16", "@oven/bun-darwin-x64": "1.2.16", "@oven/bun-darwin-x64-baseline": "1.2.16", "@oven/bun-linux-aarch64": "1.2.16", "@oven/bun-linux-aarch64-musl": "1.2.16", "@oven/bun-linux-x64": "1.2.16", "@oven/bun-linux-x64-baseline": "1.2.16", "@oven/bun-linux-x64-musl": "1.2.16", "@oven/bun-linux-x64-musl-baseline": "1.2.16", "@oven/bun-windows-x64": "1.2.16", "@oven/bun-windows-x64-baseline": "1.2.16" }, "os": [ "linux", "win32", "darwin", ], "cpu": [ "x64", "arm64", ], "bin": { "bun": "bin/bun.exe", "bunx": "bin/bun.exe" } }, "sha512-sjZH6rr1P6yu44+XPA8r+ZojwmK9Kbz9lO6KAA/4HRIupdpC31k7b93crLBm19wEYmd6f2+3+57/7tbOcmHbGg=="],
 
     "bundle-name": ["bundle-name@4.1.0", "https://registry.npmmirror.com/bundle-name/-/bundle-name-4.1.0.tgz", { "dependencies": { "run-applescript": "^7.0.0" } }, "sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q=="],
 
@@ -1727,6 +1703,8 @@
     "rfdc": ["rfdc@1.4.1", "https://registry.npmmirror.com/rfdc/-/rfdc-1.4.1.tgz", {}, "sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA=="],
 
     "rimraf": ["rimraf@2.6.3", "https://registry.npmmirror.com/rimraf/-/rimraf-2.6.3.tgz", { "dependencies": { "glob": "^7.1.3" }, "bin": { "rimraf": "./bin.js" } }, "sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA=="],
+
+    "robot-admin": ["robot-admin@file:", { "dependencies": { "@commitlint/cli": "12.1.4", "@commitlint/config-conventional": "12.1.4", "@fullcalendar/core": "^6.1.17", "@fullcalendar/daygrid": "^6.1.17", "@fullcalendar/interaction": "^6.1.17", "@fullcalendar/list": "^6.1.17", "@fullcalendar/vue3": "^6.1.17", "@iconify-json/ri": "^1.2.5", "@iconify/vue": "^5.0.0", "@kangc/v-md-editor": "^2.3.18", "@splinetool/runtime": "^1.9.92", "@vueuse/core": "^13.1.0", "axios": "^1.9.0", "driver.js": "^1.3.6", "echarts": "^5.6.0", "highlight.js": "^11.11.1", "html2canvas": "^1.4.1", "husky": "7.0.1", "motion-v": "^1.1.0-alpha.1", "nprogress": "^0.2.0", "pinia": "^3.0.1", "pinia-plugin-persistedstate": "^4.3.0", "print-js": "^1.6.0", "vue": "^3.5.13", "vue-router": "^4.5.0", "vuedraggable": "^4.1.0", "wangeditor": "^4.7.15", "xlsx": "^0.18.5" }, "devDependencies": { "@iconify-json/ic": "^1.2.2", "@iconify-json/mdi": "^1.2.3", "@inspira-ui/plugins": "^0.0.1", "@tsconfig/node22": "^22.0.0", "@types/jsdom": "^21.1.7", "@types/node": "^22.13.9", "@types/nprogress": "^0.2.3", "@vitejs/plugin-vue": "^5.2.1", "@vitejs/plugin-vue-jsx": "^4.1.1", "@vitest/eslint-plugin": "^1.1.36", "@vue/eslint-config-prettier": "^10.2.0", "@vue/eslint-config-typescript": "^14.5.0", "@vue/runtime-core": "^3.5.13", "@vue/test-utils": "^2.4.6", "@vue/tsconfig": "^0.7.0", "class-variance-authority": "^0.7.1", "clsx": "^2.1.1", "commitizen": "4.2.4", "cz-customizable": "6.3.0", "eslint": "^9.21.0", "eslint-plugin-jsdoc": "^50.6.11", "eslint-plugin-oxlint": "^0.15.13", "eslint-plugin-vue": "~10.0.0", "jiti": "^2.4.2", "jsdom": "^26.0.0", "lint-staged": "^15.5.0", "naive-ui": "^2.41.0", "npm-run-all2": "^7.0.2", "oxlint": "^0.15.13", "prettier": "3.5.3", "sass": "^1.87.0", "typescript": "~5.8.0", "unocss": "66.0.0", "unplugin-auto-import": "^19.1.2", "unplugin-icons": "^22.1.0", "unplugin-vue-components": "^28.5.0", "vite": "^6.2.1", "vite-console-plugin": "^1.0.0", "vite-plugin-vue-devtools": "^7.7.2", "vitest": "^3.0.8", "vue-tsc": "^2.2.8" } }],
 
     "robust-predicates": ["robust-predicates@3.0.2", "", {}, "sha512-IXgzBWvWQwE6PrDI05OvmXUIruQTcoMDzRsOd5CDvHCVLcLHMTSYvOK5Cm46kWqlV3yAbuSpBZdJ5oP5OUoStg=="],
 
