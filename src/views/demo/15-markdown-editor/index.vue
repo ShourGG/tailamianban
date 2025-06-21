@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-20 16:20:00
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-21 17:13:48
+ * @LastEditTime: 2025-06-21 17:10:50
  * @FilePath: \Robot_Admin\src\views\demo\15-markdown-editor\index.vue
  * @Description: Markdown 编辑器演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -430,8 +430,9 @@
               type="primary"
             >
               {{
-                categoryOptions.find(opt => opt.value === articleForm.category)
-                  ?.label
+                categoryOptions.find(
+                  (opt: any) => opt.value === articleForm.category
+                )?.label
               }}
             </NTag>
             <NTag
