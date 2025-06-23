@@ -12,7 +12,10 @@
   <div class="markdown-demo-page">
     <NH1>Markdown编辑器组件场景示例</NH1>
     <NCard class="demo-header">
-      <p>基于 Vue 的 Markdown 编辑器，支持实时预览、语法高亮、图片上传等功能</p>
+      <p
+        >基于 Vue 的 v-md-editor 插件，封装了Markdown
+        编辑器，支持实时预览、语法高亮、图片上传等功能</p
+      >
     </NCard>
 
     <NTabs

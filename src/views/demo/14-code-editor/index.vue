@@ -2,15 +2,19 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-19 13:00:00
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-21 17:13:13
+ * @LastEditTime: 2025-06-23 09:43:05
  * @FilePath: \Robot_Admin\src\views\demo\14-code-editor\index.vue
- * @Description: C_Code 组件演示页面 (优化版)
+ * @Description: C_Code 组件演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
   <div class="code-editor-demo">
     <NH1>Code编辑器组件场景示例</NH1>
+    <p class="mb-10px">
+      基于 NCode 封装的 C_Code
+      组件，集成多种API，预设常用的功能、代码高亮、复制、全屏等功能。
+    </p>
     <NSpace
       vertical
       size="large"

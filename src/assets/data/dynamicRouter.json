@@ -321,7 +321,7 @@
         {
           "path": "text-editor",
           "name": "editor-text",
-          "component": "/15-text-editor/index",
+          "component": "/demo/16-text-editor/index",
           "meta": {
             "icon": "mdi:text-shadow",
             "title": "富文本编辑器",
