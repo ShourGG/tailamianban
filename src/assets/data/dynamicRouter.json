@@ -334,15 +334,23 @@
       ]
     },
     {
-      "path": "/export-zip",
-      "name": "export-zip",
+      "path": "/hooks",
+      "name": "hooks",
       "component": "layout",
-      "redirect": "/export-zip/index",
+      "redirect": "/export-zip",
+      "meta": {
+        "icon": "mdi:hook",
+        "title": "独立 Hooks ",
+        "hidden": false,
+        "full": false,
+        "affix": false,
+        "keepAlive": false
+      },
       "children": [
         {
-          "path": "export-zip-index",
-          "name": "export-zip-index",
-          "component": "/16-export-zip/index",
+          "path": "export-zip",
+          "name": "export-zip",
+          "component": "/demo/17-export-zip/index",
           "meta": {
             "icon": "mdi:file-export-outline",
             "title": "导出zip",
@@ -354,6 +362,7 @@
         }
       ]
     },
+
     {
       "path": "/dragable",
       "name": "dragable",
