@@ -34,7 +34,7 @@
         class="demo-card demo-section"
       >
         <template #header-extra>
-          <span class="i-carbon:settings text-purple-500"></span>
+          <span class="i-mdi:wrench-settings text-purple-500"></span>
         </template>
 
         <NForm
@@ -80,7 +80,7 @@
               @click="handleCustomDownload"
             >
               <template #icon>
-                <span class="i-carbon:cloud-download"></span>
+                <span class="i-mdi:cloud-download-outline"></span>
               </template>
               自定义下载
             </NButton>
@@ -117,7 +117,7 @@
               @click="handleBatchDownload"
             >
               <template #icon>
-                <span class="i-carbon:document-multiple-02"></span>
+                <span class="i-mdi:download-multiple-outline"></span>
               </template>
               批量下载 ({{ selectedFiles.length }})
             </NButton>
@@ -226,25 +226,25 @@
   const quickDownloadButtons = computed(() => ({
     excel: {
       type: 'primary' as const,
-      icon: 'i-carbon:document-spreadsheet',
+      icon: 'i-mdi:microsoft-excel',
       label: '下载 Excel',
       handler: handleDownloadExcel,
     },
     csv: {
       type: 'success' as const,
-      icon: 'i-carbon:csv',
+      icon: 'i-mdi:file-csv-outline',
       label: '下载 CSV',
       handler: handleDownloadCSV,
     },
     pdf: {
       type: 'error' as const,
-      icon: 'i-carbon:document-pdf',
+      icon: 'i-mdi:file-pdf-box',
       label: '下载 PDF',
       handler: handleDownloadPDF,
     },
     json: {
       type: 'info' as const,
-      icon: 'i-carbon:json',
+      icon: 'i-mdi:code-json',
       label: '下载 JSON',
       handler: handleDownloadJSON,
     },
