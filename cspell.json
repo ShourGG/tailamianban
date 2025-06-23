@@ -38,6 +38,7 @@
     "echart",
     "Echarts",
     "endl",
+    "endobj",
     "fillna",
     "fullcalendar",
     "Gitee",
@@ -60,6 +61,7 @@
     "maxlength",
     "mkdirp",
     "monokai",
+    "msword",
     "njsproj",
     "nomal",
     "Nord",
@@ -74,6 +76,7 @@
     "Persistedstate",
     "Polor",
     "preg",
+    "presentationml",
     "Refcampagin",
     "Samge",
     "Serever",
@@ -99,7 +102,8 @@
     "vueuse",
     "vuex",
     "wangeditor",
-    "wechat"
+    "wechat",
+    "wordprocessingml"
   ],
   // flagWords - list of words to be always considered incorrect
   // This is useful for offensive words and common spelling errors.

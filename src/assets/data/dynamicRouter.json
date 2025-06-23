@@ -372,6 +372,19 @@
             "affix": false,
             "keepAlive": false
           }
+        },
+        {
+          "path": "download-all",
+          "name": "download-all",
+          "component": "/demo/19-download-all/index",
+          "meta": {
+            "icon": "mdi:download-circle-outline",
+            "title": "下载 All",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
         }
       ]
     },
