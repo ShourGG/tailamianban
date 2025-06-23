@@ -11,7 +11,7 @@
 <template>
   <div class="jszip-demo">
     <!-- 头部 -->
-    <NH1>导出zip 场景示例</NH1>
+    <NH1>导出 Zip - [useJsZip] 场景示例</NH1>
     <p class="mb-20px">JSZip Hooks 配置驱动的文件压缩导出工具</p>
 
     <!-- 全局进度 -->

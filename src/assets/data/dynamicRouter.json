@@ -353,7 +353,20 @@
           "component": "/demo/17-export-zip/index",
           "meta": {
             "icon": "mdi:file-export-outline",
-            "title": "导出zip",
+            "title": "导出 Zip",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
+        },
+        {
+          "path": "copy-text",
+          "name": "copy-text",
+          "component": "/demo/18-copy-text/index",
+          "meta": {
+            "icon": "mdi:alpha-t-circle",
+            "title": "复制 Text",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -384,27 +397,7 @@
         }
       ]
     },
-    {
-      "path": "/copy-text",
-      "name": "copy-text",
-      "component": "layout",
-      "redirect": "/copy-text/index",
-      "children": [
-        {
-          "path": "copy-text-index",
-          "name": "copy-text-index",
-          "component": "/18-copy-text/index",
-          "meta": {
-            "icon": "mdi:alpha-t-circle",
-            "title": "复制文本",
-            "hidden": false,
-            "full": false,
-            "affix": false,
-            "keepAlive": false
-          }
-        }
-      ]
-    },
+
     {
       "path": "/directives",
       "name": "directives",
