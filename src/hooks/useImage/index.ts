@@ -2,8 +2,8 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-29 19:11:35
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-29 19:16:57
- * @FilePath: \Robot_Admin\src\hooks\useImg\index.ts
+ * @LastEditTime: 2025-06-24 16:39:47
+ * @FilePath: \Robot_Admin\src\hooks\useImage\index.ts
  * @Description: 图片引用函数钩子
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */

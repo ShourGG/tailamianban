@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-17 15:25:00
+ * @LastEditTime: 2025-06-24 18:05:09
  * @FilePath: \Robot_Admin\eslint.config.ts
  * @Description: oxlint 和 eslint 配置文件，不要随便改，改了要同步干系人（注意）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -32,6 +32,13 @@ export default defineConfigWithVueTs(
   //MARK： 核心规则组（按优先级排序）
 
   ...oxlint.configs['flat/recommended'], // 高性能基础校验
+
+  {
+    rules: {
+      'no-useless-escape': 'off',
+    },
+  },
+
   pluginVue.configs['flat/essential'], // Vue 专用规则
   vueTsConfigs.recommended, // TS 专用规则
 
@@ -147,7 +154,7 @@ export default defineConfigWithVueTs(
             '/^C_/',
             '/^c_/',
             // 第三方插件的组件
-            'v-md-editor'
+            'v-md-editor',
           ],
         },
       ],
