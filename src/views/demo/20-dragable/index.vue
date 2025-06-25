@@ -1,21 +1,6 @@
 <template>
   <div class="draggable-demo">
-    <!-- 页面标题 -->
-    <div class="page-header">
-      <h2 class="page-title">拖拽组件演示</h2>
-      <div class="page-description">
-        <span>拖拽组件常用于对当前活动列表进行优先级重新排列场景。基于 </span>
-        <NButton
-          text
-          type="primary"
-          @click="openLink('https://github.com/SortableJS/vue.draggable.next')"
-        >
-          vue-draggable-plus
-        </NButton>
-        <span> 实现</span>
-      </div>
-    </div>
-
+    <NH1 class="page-title">拖拽组件场景示例</NH1>
     <!-- 看板式拖拽 -->
     <NCard
       title="看板式任务管理"

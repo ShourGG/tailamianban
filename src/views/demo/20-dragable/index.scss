@@ -1,22 +1,7 @@
  .draggable-demo {
     padding: 24px;
     min-height: 100vh;
-  }
 
-  .page-header {
-    margin-bottom: 24px;
-
-    .page-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-    }
-
-    .page-description {
-      font-size: 14px;
-      line-height: 1.5;
-    }
-  }
 
   .kanban-card {
     margin-bottom: 24px;
@@ -352,3 +337,4 @@
       grid-column: span 4;
     }
   }
+}
