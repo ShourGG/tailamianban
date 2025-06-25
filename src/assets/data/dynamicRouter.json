@@ -448,7 +448,7 @@
         {
           "path": "watermark-direct",
           "name": "directives-watermark",
-          "component": "/directives/watermark-direct/index",
+          "component": "/demo/22-watermark-direct/index",
           "meta": {
             "icon": "mdi:watermark",
             "title": "水印指令",

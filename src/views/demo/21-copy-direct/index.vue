@@ -1,6 +1,16 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-06-25 16:30:16
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-25 19:25:54
+ * @FilePath: \Robot_Admin\src\views\demo\21-copy-direct\index.vue
+ * @Description: 复制指令演示页面
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <div class="copy-demo-page">
-    <NH1>v-copy 复制指令演示</NH1>
+    <NH1>v-copy 复制指令场景示例</NH1>
 
     <NGrid
       :cols="2"
