@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-19 08:29:09
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-19 11:23:24
+ * @LastEditTime: 2025-06-25 11:19:50
  * @FilePath: \Robot_Admin\src\views\demo\13-calendar\index.vue
  * @Description: 日历组件演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -64,12 +64,14 @@
 </template>
 
 <script setup lang="ts">
+  import { type CalendarViewType } from '@/components/global/C_FullCalendar/index.vue'
+
   const message = useMessage()
   const dialog = useDialog()
   const calendarRef = ref()
 
   // 视图控制
-  const currentView = ref('dayGridMonth')
+  const currentView = ref<CalendarViewType>('dayGridMonth')
   const editable = ref(true)
 
   // 事件数据 - 使用 v-model 双向绑定

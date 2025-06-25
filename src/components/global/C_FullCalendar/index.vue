@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-19 08:26:47
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-19 11:01:39
+ * @LastEditTime: 2025-06-25 11:22:09
  * @FilePath: \Robot_Admin\src\components\global\C_FullCalendar\index.vue
  * @Description: 全局日历组件 - 内置事件管理功能
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -19,7 +19,10 @@
 
 <template>
   <div class="c-full-calendar">
-    <FullCalendar :options="calendarOptions" />
+    <FullCalendar
+      ref="calendarRef"
+      :options="calendarOptions"
+    />
 
     <!-- 事件操作对话框 -->
     <NModal
@@ -148,7 +151,7 @@
     [key: string]: any
   }
 
-  type CalendarViewType =
+  export type CalendarViewType =
     | 'dayGridMonth'
     | 'dayGridWeek'
     | 'dayGridDay'
@@ -186,6 +189,8 @@
     'event-deleted',
     'event-dropped',
   ])
+
+  const calendarRef = ref()
 
   const message = useMessage()
 
@@ -472,7 +477,11 @@
 
   // 暴露方法
   defineExpose({
-    getApi: () => calendarOptions.value?.getApi?.(),
+    getApi: () => {
+      // 需要获取 FullCalendar 组件的引用
+      const calendarApi = calendarRef.value?.getApi()
+      return calendarApi
+    },
     addEvent: addEventToArray,
     updateEvent: updateEventInArray,
     deleteEvent: removeEventFromArray,
