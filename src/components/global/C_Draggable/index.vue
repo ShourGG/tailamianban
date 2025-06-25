@@ -6,7 +6,8 @@
     <VueDraggable
       v-model="internalList"
       v-bind="draggableOptions"
-      :class="['c-draggable-list', listClass]"
+      :class="listClasses"
+      :style="listStyles"
       @start="handleStart"
       @end="handleEnd"
       @add="handleAdd"
@@ -100,6 +101,12 @@
   }
 
   /**
+   * * @description 布局模式枚举
+   * ? @type LayoutMode
+   */
+  type LayoutMode = 'vertical' | 'horizontal' | 'grid' | 'flex-wrap'
+
+  /**
    * * @description 组件属性接口
    * ? @interface Props
    */
@@ -139,6 +146,22 @@
     swapThreshold?: number
     invertSwap?: boolean
     direction?: 'vertical' | 'horizontal'
+
+    // 新增布局配置
+    layout?: LayoutMode
+    gridColumns?: number
+    gridRows?: number
+    gap?: string | number
+    flexWrap?: boolean
+    justifyContent?:
+      | 'flex-start'
+      | 'flex-end'
+      | 'center'
+      | 'space-between'
+      | 'space-around'
+      | 'space-evenly'
+    alignItems?: 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'baseline'
+    customStyles?: Record<string, string | number>
   }
 
   /**
@@ -164,6 +187,14 @@
     swapThreshold: 1,
     invertSwap: false,
     direction: 'vertical',
+    layout: 'vertical',
+    gridColumns: 4,
+    gridRows: undefined,
+    gap: '8px',
+    flexWrap: false,
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+    customStyles: () => ({}),
   })
 
   /**
@@ -208,6 +239,45 @@
    * ! @returns 列表是否为空的布尔值
    */
   const isEmpty = computed(() => props.modelValue.length === 0)
+
+  /**
+   * * @description 构建列表容器的CSS类名
+   * ? @computed
+   * ! @returns CSS类名数组
+   */
+  const listClasses = computed(() => {
+    return [
+      'c-draggable-list',
+      props.listClass,
+      `layout-${props.layout}`,
+      {
+        'flex-wrap':
+          props.flexWrap &&
+          (props.layout === 'horizontal' || props.layout === 'flex-wrap'),
+      },
+    ]
+  })
+
+  /**
+   * * @description 构建列表容器的内联样式
+   * ? @computed
+   * ! @returns 样式对象
+   */
+  const listStyles = computed(() => {
+    const styles: Record<string, string | number> = {
+      '--gap': typeof props.gap === 'number' ? `${props.gap}px` : props.gap,
+      '--grid-columns': props.gridColumns,
+      '--justify-content': props.justifyContent,
+      '--align-items': props.alignItems,
+      ...props.customStyles,
+    }
+
+    if (props.gridRows) {
+      styles['--grid-rows'] = props.gridRows
+    }
+
+    return styles
+  })
 
   /**
    * * @description 构建拖拽组件的配置选项
