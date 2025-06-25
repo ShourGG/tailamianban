@@ -1,3 +1,13 @@
+/*
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-06-25 10:58:18
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-25 15:35:29
+ * @FilePath: \Robot_Admin\src\views\demo\20-dragable\data.ts
+ * @Description: 拖拽组件的演示页面 - 数据层
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
+ */
+
 // 优先级类型定义
 export type Priority = 'high' | 'medium' | 'low'
 
@@ -23,86 +33,129 @@ export const rainbowColors = [
   '#27AE60',
 ]
 
-// 任务数据
-export const todoTasksData = [
-  {
-    id: 1,
-    title: 'Dashboard 页面重构',
-    priority: 'high' as Priority,
-    date: '2024-01-19',
-    tag: 'web',
-    comments: 28,
-    avatar: 'https://07akioni.oss-cn-beijing.aliyuncs.com/demo1.JPG',
-    name: 'Alex',
-  },
-  {
-    id: 2,
-    title: '用户角色页面重构',
-    priority: 'medium' as Priority,
-    date: '2024-01-18',
-    tag: 'web',
-    comments: 15,
-    avatar: 'https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/ip.jpg',
-    name: 'CHENY',
-  },
-]
+// 任务接口定义
+export interface Task {
+  id: number
+  title: string
+  priority: Priority
+  date: string
+  tag: string
+  comments: number
+  avatar: string
+  name: string
+}
 
-export const progressTasksData = [
-  {
-    id: 3,
-    title: '看板功能重构',
-    priority: 'medium' as Priority,
-    date: '2024-01-18',
-    tag: 'web',
-    comments: 22,
-    avatar: 'https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/ip.jpg',
-    name: 'CHENY',
-  },
-  {
-    id: 4,
-    title: 'UI 界面修复',
-    priority: 'low' as Priority,
-    date: '2024-01-19',
-    tag: 'mobile',
-    comments: 13,
-    avatar: 'https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/ip.jpg',
-    name: 'CHENY',
-  },
-]
+// 看板数据结构 - 统一管理所有列
+export const kanbanData = {
+  todo: [
+    {
+      id: 1,
+      title: 'Dashboard 页面重构',
+      priority: 'high' as Priority,
+      date: '2024-01-19',
+      tag: 'web',
+      comments: 28,
+      avatar: 'https://07akioni.oss-cn-beijing.aliyuncs.com/demo1.JPG',
+      name: 'Alex',
+    },
+    {
+      id: 2,
+      title: '用户角色页面重构',
+      priority: 'medium' as Priority,
+      date: '2024-01-18',
+      tag: 'web',
+      comments: 15,
+      avatar: 'https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/ip.jpg',
+      name: 'CHENY',
+    },
+  ],
+  progress: [
+    {
+      id: 3,
+      title: '看板功能重构',
+      priority: 'medium' as Priority,
+      date: '2024-01-18',
+      tag: 'web',
+      comments: 22,
+      avatar: 'https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/ip.jpg',
+      name: 'CHENY',
+    },
+    {
+      id: 4,
+      title: 'UI 界面修复',
+      priority: 'low' as Priority,
+      date: '2024-01-19',
+      tag: 'mobile',
+      comments: 13,
+      avatar: 'https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/ip.jpg',
+      name: 'CHENY',
+    },
+  ],
+  review: [
+    {
+      id: 5,
+      title: '首页重构',
+      priority: 'high' as Priority,
+      date: '2024-01-19',
+      tag: 'web',
+      comments: 28,
+      avatar: 'https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/ip.jpg',
+      name: 'CHENY',
+    },
+    {
+      id: 6,
+      title: '分析页面重构',
+      priority: 'high' as Priority,
+      date: '2024-01-19',
+      tag: 'web',
+      comments: 28,
+      avatar: 'https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/ip.jpg',
+      name: 'CHENY',
+    },
+  ],
+  done: [
+    {
+      id: 7,
+      title: '拖拽组件开发',
+      priority: 'low' as Priority,
+      date: '2024-01-15',
+      tag: 'web',
+      comments: 28,
+      avatar: 'https://07akioni.oss-cn-beijing.aliyuncs.com/demo1.JPG',
+      name: 'David',
+    },
+  ],
+}
 
-export const reviewTasksData = [
+// 看板列配置
+export const kanbanColumnsConfig = [
   {
-    id: 5,
-    title: '首页重构',
-    priority: 'high' as Priority,
-    date: '2024-01-19',
-    tag: 'web',
-    comments: 28,
-    avatar: 'https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/ip.jpg',
-    name: 'CHENY',
+    key: 'todo' as keyof typeof kanbanData,
+    title: 'TODO',
+    headerClass: 'todo-header',
+    emptyIcon: 'i-mdi:clipboard-list-outline',
+    emptyText: '暂无任务',
   },
   {
-    id: 6,
-    title: '分析页面重构',
-    priority: 'high' as Priority,
-    date: '2024-01-19',
-    tag: 'web',
-    comments: 28,
-    avatar: 'https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/ip.jpg',
-    name: 'CHENY',
+    key: 'progress' as keyof typeof kanbanData,
+    title: 'IN PROGRESS',
+    headerClass: 'progress-header',
+    emptyIcon: 'i-mdi:progress-clock',
+    emptyText: '暂无进行中',
   },
-]
-
-export const doneTasksData = [
   {
-    id: 7,
-    title: '拖拽组件开发',
-    priority: 'low' as Priority,
-    date: '2024-01-15',
-    tag: 'web',
-    comments: 28,
-    avatar: 'https://07akioni.oss-cn-beijing.aliyuncs.com/demo1.JPG',
-    name: 'David',
+    key: 'review' as keyof typeof kanbanData,
+    title: 'REVIEW',
+    headerClass: 'review-header',
+    emptyIcon: 'i-mdi:eye-check-outline',
+    emptyText: '暂无待审核',
+  },
+  {
+    key: 'done' as keyof typeof kanbanData,
+    title: 'DONE',
+    headerClass: 'done-header',
+    emptyIcon: 'i-mdi:check-circle-outline',
+    emptyText: '暂无已完成',
   },
 ]
 

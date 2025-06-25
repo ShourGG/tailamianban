@@ -1,3 +1,13 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-06-25 09:10:18
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-25 15:36:02
+ * @FilePath: \Robot_Admin\src\components\global\C_Draggable\index.vue
+ * @Description: 拖拽组件  - 基于 vue-draggable-plus 封装
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <div
     class="c-draggable-wrapper"

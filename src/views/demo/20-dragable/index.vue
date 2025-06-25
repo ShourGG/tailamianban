@@ -1,6 +1,17 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-06-25 08:53:15
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-25 15:32:41
+ * @FilePath: \Robot_Admin\src\views\demo\20-dragable\index.vue
+ * @Description: 拖拽
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <div class="draggable-demo">
     <NH1 class="page-title">拖拽组件场景示例</NH1>
+
     <!-- 看板式拖拽 -->
     <NCard
       title="看板式任务管理"
@@ -19,7 +30,7 @@
 
       <div class="kanban-board">
         <div
-          v-for="column in kanbanColumns"
+          v-for="column in kanbanColumnsConfig"
           :key="column.key"
           class="kanban-column"
         >
@@ -27,10 +38,10 @@
             class="column-header"
             :class="column.headerClass"
           >
-            <h4>{{ column.title }} ({{ column.tasks.length }})</h4>
+            <h4>{{ column.title }} ({{ kanbanTasks[column.key].length }})</h4>
           </div>
           <C_Draggable
-            v-model="column.tasks"
+            v-model="kanbanTasks[column.key]"
             group="kanban"
             :animation="150"
             class="task-list"
@@ -176,10 +187,8 @@
     type Priority,
     priorityConfig,
     rainbowColors,
-    todoTasksData,
-    progressTasksData,
-    reviewTasksData,
-    doneTasksData,
+    kanbanData,
+    kanbanColumnsConfig,
     techCardsData,
     activitiesData,
     taskNamesList,
@@ -187,49 +196,10 @@
 
   const message = useMessage()
 
-  // 响应式数据
-  const todoTasks = ref(todoTasksData)
-  const progressTasks = ref(progressTasksData)
-  const reviewTasks = ref(reviewTasksData)
-  const doneTasks = ref(doneTasksData)
+  // 统一的响应式数据管理
+  const kanbanTasks = ref(kanbanData)
   const techCards = ref(techCardsData)
   const activities = ref(activitiesData)
-
-  // 看板列配置
-  const kanbanColumns = computed(() => [
-    {
-      key: 'todo',
-      title: 'TODO',
-      tasks: todoTasks.value,
-      headerClass: 'todo-header',
-      emptyIcon: 'i-mdi:clipboard-list-outline',
-      emptyText: '暂无任务',
-    },
-    {
-      key: 'progress',
-      title: 'IN PROGRESS',
-      tasks: progressTasks.value,
-      headerClass: 'progress-header',
-      emptyIcon: 'i-mdi:progress-clock',
-      emptyText: '暂无进行中',
-    },
-    {
-      key: 'review',
-      title: 'REVIEW',
-      tasks: reviewTasks.value,
-      headerClass: 'review-header',
-      emptyIcon: 'i-mdi:eye-check-outline',
-      emptyText: '暂无待审核',
-    },
-    {
-      key: 'done',
-      title: 'DONE',
-      tasks: doneTasks.value,
-      headerClass: 'done-header',
-      emptyIcon: 'i-mdi:check-circle-outline',
-      emptyText: '暂无已完成',
-    },
-  ])
 
   // 工具函数
   const getPriorityType = (priority: Priority) => priorityConfig[priority].type
@@ -242,7 +212,7 @@
   const addNewTask = () => {
     const newTask = {
       id: Date.now(),
-      title: `新任务 ${todoTasks.value.length + 1}`,
+      title: `新任务 ${kanbanTasks.value.todo.length + 1}`,
       priority: 'medium' as Priority,
       date: new Date().toLocaleDateString(),
       tag: 'web',
@@ -250,7 +220,7 @@
       avatar: 'https://07akioni.oss-cn-beijing.aliyuncs.com/demo1.JPG',
       name: 'New User',
     }
-    todoTasks.value.push(newTask)
+    kanbanTasks.value.todo.push(newTask)
     message.success('新任务已添加')
   }
 
