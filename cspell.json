@@ -76,6 +76,7 @@
     "openxmlformats",
     "oxlint",
     "Persistedstate",
+    "Pinia",
     "Polor",
     "preg",
     "presentationml",

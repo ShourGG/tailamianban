@@ -15,6 +15,7 @@ declare module 'vue' {
     C_columnSetting: typeof import('./../components/local/c_columnSetting/index.vue')['default']
     C_ColumnSetting: typeof import('./src/components/global/C_ColumnSetting/index.vue')['ColumnSetting']
     C_Date: typeof import('./../components/global/C_Date/index.vue')['default']
+    C_Draggable: typeof import('./../components/global/C_Draggable/index.vue')['default']
     C_Editor: typeof import('./../components/global/C_Editor/index.vue')['default']
     C_f: typeof import('./src/components/global/C_f/index.vue')['f']
     C_Fo: typeof import('./src/components/global/C_Fo/index.vue')['Fo']

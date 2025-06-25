@@ -262,7 +262,23 @@
               }
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "path": "/plugins",
+      "name": "plugins",
+      "component": "layout",
+      "redirect": "/plugins/calendar",
+      "meta": {
+        "icon": "mdi:plugin",
+        "title": "插件组件 ",
+        "hidden": false,
+        "full": false,
+        "affix": false,
+        "keepAlive": false
+      },
+      "children": [
         {
           "path": "calendar",
           "name": "demo-calendar",
@@ -270,6 +286,19 @@
           "meta": {
             "icon": "mdi:calendar-month",
             "title": "日历",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
+        },
+        {
+          "path": "dragable",
+          "name": "dragable",
+          "component": "/demo/20-dragable/index",
+          "meta": {
+            "icon": "mdi:drag-variant",
+            "title": "拖拽组件",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -380,28 +409,6 @@
           "meta": {
             "icon": "mdi:download-circle-outline",
             "title": "下载 All",
-            "hidden": false,
-            "full": false,
-            "affix": false,
-            "keepAlive": false
-          }
-        }
-      ]
-    },
-
-    {
-      "path": "/dragable",
-      "name": "dragable",
-      "component": "layout",
-      "redirect": "/dragable/index",
-      "children": [
-        {
-          "path": "dragable-index",
-          "name": "dragable-index",
-          "component": "/17-dragable/index",
-          "meta": {
-            "icon": "mdi:drag-variant",
-            "title": "拖拽组件",
             "hidden": false,
             "full": false,
             "affix": false,

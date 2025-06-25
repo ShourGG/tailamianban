@@ -60,6 +60,7 @@
     "print-js": "^1.6.0",
     "robot-admin": ".",
     "vue": "^3.5.13",
+    "vue-draggable-plus": "^0.6.0",
     "vue-router": "^4.5.0",
     "vuedraggable": "^4.1.0",
     "wangeditor": "^4.7.15",
