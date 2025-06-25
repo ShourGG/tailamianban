@@ -435,7 +435,7 @@
         {
           "path": "copy-direct",
           "name": "directives-copy",
-          "component": "/directives/copy-direct/index",
+          "component": "/demo/21-copy-direct/index",
           "meta": {
             "icon": "mdi:content-copy",
             "title": "复制指令",

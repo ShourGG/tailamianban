@@ -13,6 +13,7 @@ export * from './naive-ui-plugin'
 export * from './dynamic-components'
 export * from './passive-scroll'
 export * from './markdown'
+export * from './directives'
 
 export {
   setupHighlight,

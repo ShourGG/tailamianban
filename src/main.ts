@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-20 16:07:54
+ * @LastEditTime: 2025-06-25 16:41:32
  * @FilePath: \Robot_Admin\src\main.ts
  * @Description: 根入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -23,6 +23,7 @@ import {
   PassiveScrollPlugin,
   setupHighlight,
   setupMarkdown,
+  setupDirectives,
 } from '@/plugins'
 
 /**
@@ -50,6 +51,7 @@ async function bootstrap() {
   setupDynamicComponents(app)
   setupHighlight(app)
   setupMarkdown(app)
+  setupDirectives(app)
 
   // 第四阶段：异步插件
   await router.isReady()
