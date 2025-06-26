@@ -639,7 +639,7 @@
       "path": "/iframe",
       "name": "iframe",
       "component": "layout",
-      "redirect": "/iframe/index",
+      "redirect": "/iframe/embedded-docs",
       "meta": {
         "icon": "mdi:iframe-array",
         "title": "外部页面",
@@ -650,13 +650,14 @@
       },
       "children": [
         {
-          "path": "index",
-          "name": "iframe-index",
-          "component": "/iframe/index",
+          "path": "embedded-docs",
+          "name": "iframe-embedded",
+          "component": "/iframe/blank-docs",
           "meta": {
             "icon": "mdi:file-document-edit",
             "title": "内嵌文档",
             "link": "https://www.tzagileteam.com/",
+            "external": false,
             "hidden": false,
             "full": false,
             "affix": false,
@@ -664,9 +665,9 @@
           }
         },
         {
-          "path": "document",
-          "name": "iframe-document",
-          "component": "/iframe/blank",
+          "path": "online-docs",
+          "name": "iframe-online",
+          "component": "/iframe/blank-docs",
           "meta": {
             "icon": "mdi:file-document-box-search",
             "title": "线上文档",
@@ -680,7 +681,7 @@
         {
           "path": "github",
           "name": "iframe-github",
-          "component": "/iframe/blank",
+          "component": "/iframe/blank-docs",
           "meta": {
             "icon": "mdi:github",
             "title": "Github 仓库",
@@ -694,7 +695,7 @@
         {
           "path": "gitee",
           "name": "iframe-gitee",
-          "component": "/iframe/blank",
+          "component": "/iframe/blank-docs",
           "meta": {
             "icon": "mdi:gitlab",
             "title": "Gitee 仓库",
