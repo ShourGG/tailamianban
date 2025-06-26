@@ -8,8 +8,6 @@
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-import { ref, reactive } from 'vue'
-
 /**
  * * @description 脚本标签常量，避免字符串中的转义问题
  */

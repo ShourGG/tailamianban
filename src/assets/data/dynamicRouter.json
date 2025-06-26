@@ -487,7 +487,7 @@
         {
           "path": "throttle-direct",
           "name": "directives-throttle",
-          "component": "/directives/throttle-direct/index",
+          "component": "/demo/25-throttle-direct/index",
           "meta": {
             "icon": "mdi:bathroom-tap",
             "title": "节流指令",
