@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-26 15:51:08
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-26 16:21:53
+ * @LastEditTime: 2025-06-26 16:32:37
  * @FilePath: \Robot_Admin\src\views\demo\26-longpress-direct\index.vue
  * @Description: 长按指令演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -10,7 +10,7 @@
 
 <template>
   <div class="longpress-demo-page">
-    <NH1>v-longpress 长按指令演示</NH1>
+    <NH1>v-longpress 长按指令场景示例</NH1>
 
     <NGrid
       :cols="2"

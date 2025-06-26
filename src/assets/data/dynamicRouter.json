@@ -509,6 +509,19 @@
             "affix": false,
             "keepAlive": false
           }
+        },
+        {
+          "path": "permission-direct",
+          "name": "directives-permission",
+          "component": "/demo/27-permission-direct/index",
+          "meta": {
+            "icon": "mdi:lock-smart",
+            "title": "权限指令",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
         }
       ]
     },

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-26 11:08:55
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-26 14:14:33
+ * @LastEditTime: 2025-06-26 16:28:18
  * @FilePath: \Robot_Admin\src\views\demo\24-debounce-direct\index.vue
  * @Description: 防抖指令演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -371,7 +371,6 @@
     TAB_TITLES,
     DEMO_CONFIG,
   } from './data'
-
   // 创建状态和处理函数
   const state = createDemoState()
   const handlers = createDemoHandlers(state)
