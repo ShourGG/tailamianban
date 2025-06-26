@@ -461,7 +461,7 @@
         {
           "path": "drag-direct",
           "name": "directives-drag",
-          "component": "/directives/drag-direct/index",
+          "component": "/demo/23-drag-direct/index",
           "meta": {
             "icon": "mdi:drag",
             "title": "拖拽指令",
