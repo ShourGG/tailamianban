@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-26 11:08:55
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-26 14:42:04
+ * @LastEditTime: 2025-06-26 16:25:05
  * @FilePath: \Robot_Admin\src\views\demo\25-throttle-direct\index.vue
  * @Description: 节流指令演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -417,8 +417,6 @@
               <C_Code
                 :code="code"
                 language="html"
-                :show-header="false"
-                :show-line-numbers="false"
               />
             </NTabPane>
           </NTabs>

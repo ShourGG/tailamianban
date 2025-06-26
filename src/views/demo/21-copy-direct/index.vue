@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-25 16:30:16
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-25 19:25:54
+ * @LastEditTime: 2025-06-26 16:26:20
  * @FilePath: \Robot_Admin\src\views\demo\21-copy-direct\index.vue
  * @Description: 复制指令演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -169,8 +169,6 @@
               <C_Code
                 :code="basicCode"
                 language="html"
-                :show-header="false"
-                :show-line-numbers="false"
               />
             </NTabPane>
 
@@ -181,8 +179,6 @@
               <C_Code
                 :code="messageCode"
                 language="html"
-                :show-header="false"
-                :show-line-numbers="false"
               />
             </NTabPane>
 
@@ -193,8 +189,6 @@
               <C_Code
                 :code="advancedCode"
                 language="html"
-                :show-header="false"
-                :show-line-numbers="false"
               />
             </NTabPane>
           </NTabs>

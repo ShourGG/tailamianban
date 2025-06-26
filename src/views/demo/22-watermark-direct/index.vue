@@ -274,8 +274,6 @@
               <C_Code
                 :code="basicCode"
                 language="html"
-                :show-header="false"
-                :show-line-numbers="false"
               />
             </NTabPane>
 
@@ -286,8 +284,6 @@
               <C_Code
                 :code="styleCode"
                 language="html"
-                :show-header="false"
-                :show-line-numbers="false"
               />
             </NTabPane>
 
@@ -298,8 +294,6 @@
               <C_Code
                 :code="advancedCode"
                 language="html"
-                :show-header="false"
-                :show-line-numbers="false"
               />
             </NTabPane>
 
@@ -310,8 +304,6 @@
               <C_Code
                 :code="scenarioCode"
                 language="html"
-                :show-header="false"
-                :show-line-numbers="false"
               />
             </NTabPane>
           </NTabs>

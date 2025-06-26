@@ -354,8 +354,6 @@
               <C_Code
                 :code="code"
                 language="html"
-                :show-header="false"
-                :show-line-numbers="false"
               />
             </NTabPane>
           </NTabs>

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-26 15:51:08
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-26 16:17:39
+ * @LastEditTime: 2025-06-26 16:21:53
  * @FilePath: \Robot_Admin\src\views\demo\26-longpress-direct\index.vue
  * @Description: 长按指令演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -129,6 +129,7 @@
                   :max="DEMO_CONFIG.DURATION_MAX"
                   :step="DEMO_CONFIG.DURATION_STEP"
                   style="width: 120px"
+                  class="mt--8px"
                 />
                 <NText>ms</NText>
               </NSpace>
