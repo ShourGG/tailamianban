@@ -1,8 +1,8 @@
 /*
  * @Author: ChenYu ycyplus@gmail.com
- * @Date: 2025-06-26 10:00:00
+ * @Date: 2025-06-26 08:18:54
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-26 08:18:54
+ * @LastEditTime: 2025-06-26 09:01:11
  * @FilePath: \Robot_Admin\src\views\demo\23-drag-direct\data.ts
  * @Description: 拖拽指令演示页面数据
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.

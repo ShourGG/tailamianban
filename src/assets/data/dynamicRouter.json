@@ -474,7 +474,7 @@
         {
           "path": "debounce-direct",
           "name": "directives-debounce",
-          "component": "/directives/debounce-direct/index",
+          "component": "/demo/24-debounce-direct/index",
           "meta": {
             "icon": "mdi:debian",
             "title": "防抖指令",
