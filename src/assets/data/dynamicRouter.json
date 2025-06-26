@@ -500,7 +500,7 @@
         {
           "path": "longpress-direct",
           "name": "directives-longpress",
-          "component": "/directives/longpress-direct/index",
+          "component": "/demo/26-longpress-direct/index",
           "meta": {
             "icon": "mdi:hand-double-tap",
             "title": "长按指令",
