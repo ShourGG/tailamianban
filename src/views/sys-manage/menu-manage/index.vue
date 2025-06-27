@@ -10,7 +10,11 @@
           class="search-input"
         >
           <template #prefix>
-            <div class="i-mdi:magnify text-gray-400"></div>
+            <C_Icon
+              name="mdi:magnify"
+              :size="16"
+              color="#9CA3AF"
+            />
           </template>
         </NInput>
       </div>
@@ -20,19 +24,28 @@
           @click="handleAddMenu()"
         >
           <template #icon>
-            <div class="i-mdi:plus"></div>
+            <C_Icon
+              name="mdi:plus"
+              :size="16"
+            />
           </template>
           新增菜单
         </NButton>
         <NButton @click="expandAll">
           <template #icon>
-            <div class="i-mdi:file-tree"></div>
+            <C_Icon
+              name="mdi:file-tree"
+              :size="16"
+            />
           </template>
           {{ isAllExpanded ? '收起全部' : '展开全部' }}
         </NButton>
         <NButton @click="refreshMenus">
           <template #icon>
-            <div class="i-mdi:refresh"></div>
+            <C_Icon
+              name="mdi:refresh"
+              :size="16"
+            />
           </template>
           刷新
         </NButton>
@@ -49,18 +62,12 @@
         <div class="tree-container">
           <C_Tree
             ref="treeRef"
+            mode="menu"
             :data="filteredMenuList"
             :search-pattern="searchPattern"
             :searchable="false"
             :show-toolbar="false"
-            :draggable="true"
-            :show-line="true"
-            key-field="id"
-            label-field="name"
-            children-field="children"
-            icon-field="icon"
             :status-configs="menuStatusConfigs"
-            :actions="menuActions"
             :default-expanded-keys="expandedKeys"
             :default-selected-keys="selectedKeys"
             @node-select="handleNodeSelect"
@@ -91,7 +98,10 @@
               @click="handleEditMenu(selectedMenu)"
             >
               <template #icon>
-                <div class="i-mdi:pencil"></div>
+                <C_Icon
+                  name="mdi:pencil"
+                  :size="14"
+                />
               </template>
               编辑
             </NButton>
@@ -104,7 +114,11 @@
           class="empty-state"
         >
           <div class="empty-icon">
-            <div class="i-mdi:menu text-6xl text-gray-300"></div>
+            <C_Icon
+              name="mdi:menu"
+              :size="72"
+              color="#D1D5DB"
+            />
           </div>
           <p class="empty-text">请从左侧选择一个菜单节点查看详细信息</p>
         </div>
@@ -129,9 +143,10 @@
                   size="small"
                 >
                   <template #icon>
-                    <div
-                      :class="getMenuTypeConfig(selectedMenu.type).icon"
-                    ></div>
+                    <C_Icon
+                      :name="getMenuTypeConfig(selectedMenu.type).icon"
+                      :size="12"
+                    />
                   </template>
                   {{ getMenuTypeText(selectedMenu.type) }}
                 </NTag>
@@ -153,17 +168,6 @@
               >
                 <span class="label">组件路径：</span>
                 <span class="value">{{ selectedMenu.component }}</span>
-              </div>
-              <div
-                v-if="selectedMenu.permission"
-                class="info-item"
-              >
-                <span class="label">权限标识：</span>
-                <NTag
-                  type="warning"
-                  size="small"
-                  >{{ selectedMenu.permission }}</NTag
-                >
               </div>
               <div class="info-item">
                 <span class="label">排序：</span>
@@ -206,7 +210,10 @@
                 @click="handleAddPermission"
               >
                 <template #icon>
-                  <div class="i-mdi:plus"></div>
+                  <C_Icon
+                    name="mdi:plus"
+                    :size="14"
+                  />
                 </template>
                 添加权限
               </NButton>
@@ -219,7 +226,12 @@
               >
                 <div class="permission-info">
                   <div class="permission-name">
-                    <div class="i-mdi:button-cursor text-orange-500 mr-2"></div>
+                    <C_Icon
+                      name="mdi:button-cursor"
+                      :size="16"
+                      color="#fa8c16"
+                      class="mr-2"
+                    />
                     {{ permission.name }}
                   </div>
                   <div class="permission-code">{{ permission.permission }}</div>
@@ -227,14 +239,17 @@
                 <div class="permission-actions">
                   <NButton
                     size="tiny"
-                    @click="handleEditMenu(permission)"
+                    @click="handleEditPermission(permission)"
                   >
                     <template #icon>
-                      <div class="i-mdi:pencil"></div>
+                      <C_Icon
+                        name="mdi:pencil"
+                        :size="12"
+                      />
                     </template>
                   </NButton>
                   <NPopconfirm
-                    @positive-click="handleDeleteMenu(permission.id)"
+                    @positive-click="handleDeletePermission(permission.id)"
                   >
                     <template #trigger>
                       <NButton
@@ -242,7 +257,10 @@
                         type="error"
                       >
                         <template #icon>
-                          <div class="i-mdi:delete"></div>
+                          <C_Icon
+                            name="mdi:delete"
+                            :size="12"
+                          />
                         </template>
                       </NButton>
                     </template>
@@ -267,10 +285,6 @@
               <div class="stat-item">
                 <div class="stat-number">{{ childrenStats.menus }}</div>
                 <div class="stat-label">菜单</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-number">{{ childrenStats.buttons }}</div>
-                <div class="stat-label">按钮</div>
               </div>
             </div>
           </div>
@@ -313,19 +327,34 @@
           <NRadioGroup v-model:value="formData.type">
             <NRadio value="directory">
               <div class="flex items-center">
-                <div class="i-mdi:folder mr-2 text-blue-500"></div>
+                <C_Icon
+                  name="mdi:folder"
+                  :size="16"
+                  color="#1890ff"
+                  class="mr-2"
+                />
                 目录
               </div>
             </NRadio>
             <NRadio value="menu">
               <div class="flex items-center">
-                <div class="i-mdi:file-document mr-2 text-green-500"></div>
+                <C_Icon
+                  name="mdi:file-document"
+                  :size="16"
+                  color="#52c41a"
+                  class="mr-2"
+                />
                 菜单
               </div>
             </NRadio>
             <NRadio value="button">
               <div class="flex items-center">
-                <div class="i-mdi:button-cursor mr-2 text-orange-500"></div>
+                <C_Icon
+                  name="mdi:button-cursor"
+                  :size="16"
+                  color="#fa8c16"
+                  class="mr-2"
+                />
                 按钮
               </div>
             </NRadio>
@@ -385,13 +414,14 @@
         >
           <NInput
             v-model:value="formData.icon"
-            placeholder="请输入图标类名，如：i-mdi:menu"
+            placeholder="请输入图标名称，如：mdi:menu"
           >
             <template #prefix>
-              <div
-                :class="formData.icon || 'i-mdi:menu'"
-                class="text-gray-400"
-              ></div>
+              <C_Icon
+                :name="formData.icon || 'mdi:menu'"
+                :size="16"
+                color="#9CA3AF"
+              />
             </template>
           </NInput>
         </NFormItem>
@@ -466,65 +496,27 @@
 </template>
 
 <script setup lang="ts">
-  import type { FormInst, FormRules } from 'naive-ui/es/form'
-  import type { TreeSelectOption } from 'naive-ui/es/tree-select'
+  import type { FormInst, TreeSelectOption } from 'naive-ui/es'
   import C_Tree from '@/components/global/C_Tree/index.vue'
 
-  // 类型定义
-  type MenuType = 'directory' | 'menu' | 'button'
+  // 从 data.ts 导入类型和数据配置
+  import {
+    type MenuData,
+    type FormData,
+    type ButtonPermission,
+    FORM_RULES,
+    MENU_STATUS_CONFIGS,
+    DEFAULT_FORM_DATA,
+    getMenuListApi,
+    getButtonPermissionsApi,
+    addMenuApi,
+    updateMenuApi,
+    deleteMenuApi,
+    addButtonPermissionApi,
+    updateButtonPermissionApi,
+    deleteButtonPermissionApi,
+  } from './data'
 
-  interface MenuData {
-    id: string
-    name: string
-    type: MenuType
-    parentId: string | null
-    path?: string
-    component?: string
-    icon?: string
-    permission?: string
-    sort: number
-    status: number
-    hidden: number
-    remark?: string
-    children?: MenuData[]
-  }
-
-  interface FormData {
-    id?: string
-    name: string
-    type: MenuType
-    parentId: string | null
-    path: string
-    component: string
-    icon: string
-    permission: string
-    sort: number
-    status: number
-    hidden: number
-    remark: string
-  }
-
-  interface ApiResponse<T = unknown> {
-    code: string
-    data: T
-    msg: string
-  }
-
-  interface RouteConfig {
-    path: string
-    name: string
-    component?: string
-    meta: {
-      icon?: string
-      title: string
-      hidden?: boolean
-      permission?: string
-      description?: string
-    }
-    children?: RouteConfig[]
-  }
-
-  // 定义拖拽信息类型
   interface DropInfo {
     node: any
     dragNode: any
@@ -545,96 +537,26 @@
   const selectedKeys = ref<string[]>([])
   const isAllExpanded = ref(false)
   const menuList = ref<MenuData[]>([])
+  const selectedMenuButtonPermissions = ref<ButtonPermission[]>([])
 
   // 表单数据
-  const formData = reactive<FormData>({
-    name: '',
-    type: 'menu',
-    parentId: null,
-    path: '',
-    component: '',
-    icon: '',
-    permission: '',
-    sort: 0,
-    status: 1,
-    hidden: 0,
-    remark: '',
-  })
+  const formData = reactive<FormData>({ ...DEFAULT_FORM_DATA })
 
-  // 表单验证规则 - 简化验证
-  const formRules: FormRules = {
-    name: [
-      { required: true, message: '请输入菜单名称', trigger: ['input', 'blur'] },
-    ],
-    type: [
-      {
-        required: true,
-        message: '请选择菜单类型',
-        trigger: ['change', 'blur'],
-      },
-    ],
-    sort: [
-      {
-        required: true,
-        type: 'number',
-        message: '请输入排序号',
-        trigger: ['input', 'blur'],
-      },
-    ],
-  }
+  // 表单验证规则
+  const formRules = FORM_RULES
 
   // 计算属性
   const modalTitle = computed(() =>
     modalMode.value === 'add' ? '新增菜单' : '编辑菜单'
   )
-
-  const menuStatusConfigs = computed(() => [
-    {
-      field: 'status',
-      values: {
-        0: { text: '禁用', type: 'error' as const },
-        1: { text: '', type: 'success' as const },
-      },
-    },
-    {
-      field: 'hidden',
-      values: {
-        0: { text: '', type: 'success' as const },
-        1: { text: '隐藏', type: 'warning' as const },
-      },
-    },
-  ])
-
-  // 修复类型错误 - 移除不支持的 type
-  const menuActions = computed(() => [
-    {
-      key: 'add',
-      text: '新增子菜单',
-      icon: 'i-mdi:plus',
-      type: 'primary' as const,
-    },
-    { key: 'edit', text: '编辑', icon: 'i-mdi:pencil', type: 'info' as const },
-    {
-      key: 'delete',
-      text: '删除',
-      icon: 'i-mdi:delete',
-      type: 'error' as const,
-      confirm: '确认删除该菜单吗？',
-    },
-  ])
+  const menuStatusConfigs = computed(() => MENU_STATUS_CONFIGS)
 
   const selectedMenu = computed(() => {
     if (selectedKeys.value.length === 0) return null
     return findMenuById(menuList.value, selectedKeys.value[0])
   })
 
-  const buttonPermissions = computed(() => {
-    if (!selectedMenu.value || selectedMenu.value.type !== 'menu') return []
-    return (
-      selectedMenu.value.children?.filter(child => child.type === 'button') ||
-      []
-    )
-  })
+  const buttonPermissions = computed(() => selectedMenuButtonPermissions.value)
 
   const childrenStats = computed(() => {
     if (
@@ -644,16 +566,11 @@
     )
       return null
 
-    const stats = { directories: 0, menus: 0, buttons: 0 }
+    const stats = { directories: 0, menus: 0 }
     const countChildren = (children: MenuData[]) => {
       children.forEach(child => {
-        stats[
-          child.type === 'directory'
-            ? 'directories'
-            : child.type === 'menu'
-              ? 'menus'
-              : 'buttons'
-        ]++
+        if (child.type === 'directory') stats.directories++
+        else if (child.type === 'menu') stats.menus++
         if (child.children) countChildren(child.children)
       })
     }
@@ -672,11 +589,9 @@
           children: menu.children ? buildOptions(menu.children) : undefined,
         }))
     }
-
     return [{ id: null, name: '根目录' }, ...buildOptions(menuList.value)]
   })
 
-  // 搜索功能 - 简化实现
   const filteredMenuList = computed(() => {
     if (!searchPattern.value.trim()) return menuList.value
 
@@ -697,8 +612,8 @@
   })
 
   // 工具函数
-  const getMenuTypeText = (type: MenuType): string => {
-    const typeMap: Record<MenuType, string> = {
+  const getMenuTypeText = (type: 'directory' | 'menu' | 'button'): string => {
+    const typeMap = {
       directory: '目录',
       menu: '菜单',
       button: '按钮',
@@ -706,14 +621,11 @@
     return typeMap[type]
   }
 
-  const getMenuTypeConfig = (type: MenuType) => {
-    const configMap: Record<
-      MenuType,
-      { icon: string; color: 'info' | 'success' | 'warning' }
-    > = {
-      directory: { icon: 'i-mdi:folder', color: 'info' },
-      menu: { icon: 'i-mdi:file-document', color: 'success' },
-      button: { icon: 'i-mdi:button-cursor', color: 'warning' },
+  const getMenuTypeConfig = (type: 'directory' | 'menu' | 'button') => {
+    const configMap = {
+      directory: { icon: 'mdi:folder', color: 'info' as const },
+      menu: { icon: 'mdi:file-document', color: 'success' as const },
+      button: { icon: 'mdi:button-cursor', color: 'warning' as const },
     }
     return configMap[type]
   }
@@ -729,73 +641,21 @@
     return null
   }
 
-  // 拆分菜单创建函数，降低圈复杂度
-  const determineMenuType = (route: RouteConfig): MenuType => {
-    if (route.meta.permission && !route.component) return 'button'
-    if (route.children?.length && route.component === 'layout')
-      return 'directory'
-    return 'menu'
-  }
-
-  const processIcon = (icon?: string): string | undefined => {
-    if (!icon) return undefined
-    return `i-mdi:${icon.replace(/[^a-zA-Z0-9-]/g, '-')}`
-  }
-
-  const generateMenuId = (route: RouteConfig): string => {
-    return route.name || route.path.replace(/\//g, '-')
-  }
-
-  const processComponent = (component?: string): string | undefined => {
-    return component === 'layout' ? undefined : component
-  }
-
-  const createBaseMenuData = (
-    route: RouteConfig,
-    parentId: string | null,
-    sort: number
-  ): MenuData => {
-    return {
-      id: generateMenuId(route),
-      name: route.meta.title,
-      type: determineMenuType(route),
-      parentId,
-      path: route.path,
-      component: processComponent(route.component),
-      icon: processIcon(route.meta.icon),
-      permission: route.meta.permission,
-      sort,
-      status: 1,
-      hidden: route.meta.hidden ? 1 : 0,
-      remark: route.meta.description || '',
-      children: undefined,
-    }
-  }
-
-  const processChildren = (
-    route: RouteConfig,
-    menuId: string
-  ): MenuData[] | undefined => {
-    if (!route.children) return undefined
-    return route.children.map((child, index) =>
-      createMenuFromRoute(child, menuId, index + 1)
-    )
-  }
-
-  // 重构后的菜单创建函数 - 大幅降低圈复杂度
-  const createMenuFromRoute = (
-    route: RouteConfig,
-    parentId: string | null = null,
-    sort: number = 0
-  ): MenuData => {
-    const menu = createBaseMenuData(route, parentId, sort)
-    menu.children = processChildren(route, menu.id)
-    return menu
-  }
-
-  // 事件处理 - 修复类型问题
-  const handleNodeSelect = (node: any, keys: (string | number)[]) => {
+  // 事件处理
+  const handleNodeSelect = async (node: any, keys: (string | number)[]) => {
     selectedKeys.value = keys.map(k => String(k))
+
+    if (selectedMenu.value && selectedMenu.value.type === 'menu') {
+      try {
+        const response = await getButtonPermissionsApi(selectedMenu.value.id)
+        selectedMenuButtonPermissions.value = response.data
+      } catch (error) {
+        console.error('获取按钮权限失败:', error)
+        selectedMenuButtonPermissions.value = []
+      }
+    } else {
+      selectedMenuButtonPermissions.value = []
+    }
   }
 
   const handleNodeAction = (action: string, node: any) => {
@@ -812,13 +672,7 @@
   const handleNodeDrop = async (info: DropInfo) => {
     const { node, dragNode, dropPosition } = info
     message.success(
-      `已将 "${dragNode.name}" 移动到 "${node.name}" ${
-        dropPosition === 'inside'
-          ? '内部'
-          : dropPosition === 'before'
-            ? '前面'
-            : '后面'
-      }`
+      `已将 "${dragNode.name}" 移动到 "${node.name}" ${dropPosition === 'inside' ? '内部' : dropPosition === 'before' ? '前面' : '后面'}`
     )
     await loadMenus()
   }
@@ -828,52 +682,23 @@
     handleAddMenu(menuNode?.id)
   }
 
-  // 修复展开收起方法 - 使用自定义实现
   const expandAll = (): void => {
-    if (treeRef.value) {
-      // 尝试调用 C_Tree 的方法，如果不存在则使用备用方案
-      if (typeof treeRef.value.expandAll === 'function') {
-        treeRef.value.expandAll()
-        isAllExpanded.value = true
-      } else if (typeof treeRef.value.collapseAll === 'function') {
-        if (isAllExpanded.value) {
-          treeRef.value.collapseAll()
-          isAllExpanded.value = false
-        } else {
-          // 备用方案：手动设置展开的 keys
-          const getAllKeys = (menus: MenuData[]): string[] => {
-            const keys: string[] = []
-            menus.forEach(menu => {
-              keys.push(menu.id)
-              if (menu.children) {
-                keys.push(...getAllKeys(menu.children))
-              }
-            })
-            return keys
+    if (isAllExpanded.value) {
+      expandedKeys.value = []
+      isAllExpanded.value = false
+    } else {
+      const getAllKeys = (menus: MenuData[]): string[] => {
+        const keys: string[] = []
+        menus.forEach(menu => {
+          keys.push(menu.id)
+          if (menu.children) {
+            keys.push(...getAllKeys(menu.children))
           }
-          expandedKeys.value = getAllKeys(menuList.value)
-          isAllExpanded.value = true
-        }
-      } else {
-        // 完全的备用方案
-        if (isAllExpanded.value) {
-          expandedKeys.value = []
-          isAllExpanded.value = false
-        } else {
-          const getAllKeys = (menus: MenuData[]): string[] => {
-            const keys: string[] = []
-            menus.forEach(menu => {
-              keys.push(menu.id)
-              if (menu.children) {
-                keys.push(...getAllKeys(menu.children))
-              }
-            })
-            return keys
-          }
-          expandedKeys.value = getAllKeys(menuList.value)
-          isAllExpanded.value = true
-        }
+        })
+        return keys
       }
+      expandedKeys.value = getAllKeys(menuList.value)
+      isAllExpanded.value = true
     }
   }
 
@@ -917,6 +742,25 @@
     showModal.value = true
   }
 
+  const handleEditPermission = (permission: ButtonPermission): void => {
+    modalMode.value = 'edit'
+    Object.assign(formData, {
+      id: permission.id,
+      name: permission.name,
+      type: 'button' as const,
+      parentId: permission.menuId,
+      path: '',
+      component: '',
+      icon: 'mdi:button-cursor',
+      permission: permission.permission,
+      sort: 0,
+      status: 1,
+      hidden: 0,
+      remark: permission.remark || '',
+    })
+    showModal.value = true
+  }
+
   const handleDeleteMenu = async (id: string): Promise<void> => {
     try {
       await deleteMenuApi(id)
@@ -927,20 +771,56 @@
     }
   }
 
+  const handleDeletePermission = async (id: string): Promise<void> => {
+    try {
+      await deleteButtonPermissionApi(id)
+      message.success('删除权限成功')
+      if (selectedMenu.value) {
+        const response = await getButtonPermissionsApi(selectedMenu.value.id)
+        selectedMenuButtonPermissions.value = response.data
+      }
+    } catch {
+      message.error('删除权限失败')
+    }
+  }
+
   const handleSaveMenu = async (): Promise<boolean> => {
     try {
       await formRef.value?.validate()
 
-      if (modalMode.value === 'add') {
-        await addMenuApi(formData)
-        message.success('添加成功')
+      if (formData.type === 'button') {
+        const permissionData = {
+          id: formData.id,
+          menuId: formData.parentId!,
+          name: formData.name,
+          permission: formData.permission,
+          remark: formData.remark,
+        }
+
+        if (modalMode.value === 'add') {
+          await addButtonPermissionApi(permissionData)
+          message.success('添加权限成功')
+        } else {
+          await updateButtonPermissionApi(permissionData as ButtonPermission)
+          message.success('修改权限成功')
+        }
+
+        if (selectedMenu.value) {
+          const response = await getButtonPermissionsApi(selectedMenu.value.id)
+          selectedMenuButtonPermissions.value = response.data
+        }
       } else {
-        await updateMenuApi(formData)
-        message.success('修改成功')
+        if (modalMode.value === 'add') {
+          await addMenuApi(formData)
+          message.success('添加成功')
+        } else {
+          await updateMenuApi(formData)
+          message.success('修改成功')
+        }
+        await loadMenus()
       }
 
       showModal.value = false
-      await loadMenus()
       return true
     } catch (error) {
       if (error instanceof Array) return false
@@ -955,23 +835,9 @@
   }
 
   const resetFormData = (): void => {
-    Object.assign(formData, {
-      id: undefined,
-      name: '',
-      type: 'menu' as MenuType,
-      parentId: null,
-      path: '',
-      component: '',
-      icon: '',
-      permission: '',
-      sort: 0,
-      status: 1,
-      hidden: 0,
-      remark: '',
-    })
+    Object.assign(formData, DEFAULT_FORM_DATA)
   }
 
-  // API方法
   const loadMenus = async (): Promise<void> => {
     loading.value = true
     try {
@@ -982,290 +848,6 @@
     } finally {
       loading.value = false
     }
-  }
-
-  const getMenuListApi = async (): Promise<ApiResponse<MenuData[]>> => {
-    const routeData: RouteConfig[] = [
-      {
-        path: '/dashboard',
-        name: 'dashboard',
-        component: 'layout',
-        meta: {
-          icon: 'monitor-dashboard',
-          title: '仪表盘',
-          hidden: false,
-          description: '系统数据统计和分析展示',
-        },
-        children: [
-          {
-            path: 'analysis',
-            name: 'dashboard-analysis',
-            component: '/dashboard/analysis/index',
-            meta: {
-              icon: 'google-analytics',
-              title: '分析页',
-              hidden: false,
-              description: '数据分析和图表展示页面',
-            },
-            children: [
-              {
-                path: '',
-                name: 'analysis-export',
-                meta: {
-                  title: '导出数据',
-                  permission: 'dashboard:analysis:export',
-                },
-              },
-              {
-                path: '',
-                name: 'analysis-refresh',
-                meta: {
-                  title: '刷新数据',
-                  permission: 'dashboard:analysis:refresh',
-                },
-              },
-              {
-                path: '',
-                name: 'analysis-print',
-                meta: {
-                  title: '打印报表',
-                  permission: 'dashboard:analysis:print',
-                },
-              },
-            ],
-          },
-          {
-            path: 'workbench',
-            name: 'dashboard-workbench',
-            component: '/dashboard/workbench/index',
-            meta: {
-              icon: 'view-dashboard',
-              title: '工作台',
-              hidden: false,
-              description: '个人工作台和快捷操作',
-            },
-            children: [
-              {
-                path: '',
-                name: 'workbench-todo',
-                meta: {
-                  title: '待办事项',
-                  permission: 'dashboard:workbench:todo',
-                },
-              },
-              {
-                path: '',
-                name: 'workbench-message',
-                meta: {
-                  title: '消息通知',
-                  permission: 'dashboard:workbench:message',
-                },
-              },
-            ],
-          },
-        ],
-      },
-      {
-        path: '/sys-manage',
-        name: 'sys-manage',
-        component: 'layout',
-        meta: {
-          icon: 'cog',
-          title: '系统管理',
-          hidden: false,
-          description: '系统基础设置和权限管理',
-        },
-        children: [
-          {
-            path: 'menu-manage',
-            name: 'sys-menu-manage',
-            component: '/sys-manage/menu-manage/index',
-            meta: {
-              icon: 'menu',
-              title: '菜单管理',
-              hidden: false,
-              description: '系统菜单配置和权限设置',
-            },
-            children: [
-              {
-                path: '',
-                name: 'menu-add',
-                meta: { title: '新增菜单', permission: 'sys:menu:add' },
-              },
-              {
-                path: '',
-                name: 'menu-edit',
-                meta: { title: '编辑菜单', permission: 'sys:menu:edit' },
-              },
-              {
-                path: '',
-                name: 'menu-delete',
-                meta: { title: '删除菜单', permission: 'sys:menu:delete' },
-              },
-            ],
-          },
-          {
-            path: 'user-manage',
-            name: 'sys-user-manage',
-            component: '/sys-manage/user-manage/index',
-            meta: {
-              icon: 'account-group',
-              title: '用户管理',
-              hidden: false,
-              description: '系统用户信息管理',
-            },
-            children: [
-              {
-                path: '',
-                name: 'user-add',
-                meta: { title: '添加用户', permission: 'sys:user:add' },
-              },
-              {
-                path: '',
-                name: 'user-edit',
-                meta: { title: '编辑用户', permission: 'sys:user:edit' },
-              },
-              {
-                path: '',
-                name: 'user-delete',
-                meta: { title: '删除用户', permission: 'sys:user:delete' },
-              },
-            ],
-          },
-          {
-            path: 'role-manage',
-            name: 'sys-role-manage',
-            component: '/sys-manage/role-manage/index',
-            meta: {
-              icon: 'account-key',
-              title: '角色管理',
-              hidden: false,
-              description: '系统角色和权限配置',
-            },
-            children: [
-              {
-                path: '',
-                name: 'role-add',
-                meta: { title: '添加角色', permission: 'sys:role:add' },
-              },
-              {
-                path: '',
-                name: 'role-edit',
-                meta: { title: '编辑角色', permission: 'sys:role:edit' },
-              },
-              {
-                path: '',
-                name: 'role-delete',
-                meta: { title: '删除角色', permission: 'sys:role:delete' },
-              },
-            ],
-          },
-        ],
-      },
-      {
-        path: '/content',
-        name: 'content',
-        component: 'layout',
-        meta: {
-          icon: 'file-document-multiple',
-          title: '内容管理',
-          hidden: false,
-          description: '文章、资讯等内容管理',
-        },
-        children: [
-          {
-            path: 'article',
-            name: 'content-article',
-            component: '/content/article/index',
-            meta: {
-              icon: 'file-document',
-              title: '文章管理',
-              hidden: false,
-              description: '文章内容的发布和管理',
-            },
-            children: [
-              {
-                path: '',
-                name: 'article-add',
-                meta: { title: '新增文章', permission: 'content:article:add' },
-              },
-              {
-                path: '',
-                name: 'article-edit',
-                meta: { title: '编辑文章', permission: 'content:article:edit' },
-              },
-              {
-                path: '',
-                name: 'article-delete',
-                meta: {
-                  title: '删除文章',
-                  permission: 'content:article:delete',
-                },
-              },
-            ],
-          },
-          {
-            path: 'category',
-            name: 'content-category',
-            component: '/content/category/index',
-            meta: {
-              icon: 'folder-multiple',
-              title: '分类管理',
-              hidden: false,
-              description: '内容分类配置管理',
-            },
-            children: [
-              {
-                path: '',
-                name: 'category-add',
-                meta: { title: '添加分类', permission: 'content:category:add' },
-              },
-              {
-                path: '',
-                name: 'category-edit',
-                meta: {
-                  title: '编辑分类',
-                  permission: 'content:category:edit',
-                },
-              },
-              {
-                path: '',
-                name: 'category-delete',
-                meta: {
-                  title: '删除分类',
-                  permission: 'content:category:delete',
-                },
-              },
-            ],
-          },
-        ],
-      },
-    ]
-
-    return new Promise(resolve => {
-      setTimeout(() => {
-        const menuData = routeData.map((route, index) =>
-          createMenuFromRoute(route, null, index + 1)
-        )
-        resolve({ code: '0', data: menuData, msg: '成功' })
-      }, 800)
-    })
-  }
-
-  // 简化的API方法
-  const addMenuApi = async (data: FormData): Promise<void> => {
-    console.log('添加菜单:', data)
-    return new Promise(resolve => setTimeout(resolve, 500))
-  }
-
-  const updateMenuApi = async (data: FormData): Promise<void> => {
-    console.log('更新菜单:', data)
-    return new Promise(resolve => setTimeout(resolve, 500))
-  }
-
-  const deleteMenuApi = async (id: string): Promise<void> => {
-    console.log('删除菜单:', id)
-    return new Promise(resolve => setTimeout(resolve, 500))
   }
 
   // 生命周期

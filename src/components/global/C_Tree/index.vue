@@ -14,7 +14,11 @@
           class="search-input"
         >
           <template #prefix>
-            <div class="i-mdi-magnify text-gray-400"></div>
+            <C_Icon
+              name="mdi:magnify"
+              :size="16"
+              color="#9CA3AF"
+            />
           </template>
         </NInput>
       </div>
@@ -26,13 +30,19 @@
             @click="handleAdd()"
           >
             <template #icon>
-              <div class="i-mdi-plus"></div>
+              <C_Icon
+                name="mdi:plus"
+                :size="16"
+              />
             </template>
             {{ addText }}
           </NButton>
           <NButton @click="toggleExpandAll">
             <template #icon>
-              <div class="i-mdi-file-tree"></div>
+              <C_Icon
+                name="mdi:file-tree"
+                :size="16"
+              />
             </template>
             {{ isAllExpanded ? '收起全部' : '展开全部' }}
           </NButton>
@@ -41,7 +51,10 @@
             @click="handleRefresh"
           >
             <template #icon>
-              <div class="i-mdi-refresh"></div>
+              <C_Icon
+                name="mdi:refresh"
+                :size="16"
+              />
             </template>
             刷新
           </NButton>
@@ -74,7 +87,18 @@
 </template>
 
 <script setup lang="ts">
-  // 手动定义需要的类型，避免导入问题
+  import C_Icon from '@/components/global/C_Icon/index.vue'
+
+  // 预设模式类型
+  type TreeMode = 'menu' | 'file' | 'org' | 'custom'
+
+  // 树节点状态类型
+  type StatusType = 'success' | 'warning' | 'error' | 'info'
+
+  // 按钮类型
+  type ButtonType = 'primary' | 'info' | 'warning' | 'error' | 'default'
+
+  // 基础树选项类型
   interface TreeOption {
     [key: string]: any
     id?: string | number
@@ -83,6 +107,7 @@
     children?: TreeOption[]
   }
 
+  // 拖拽信息类型
   interface DropInfo {
     node: TreeOption
     dragNode: TreeOption
@@ -95,17 +120,18 @@
     [key: string]: any
     id: string | number
     name: string
+    type?: string
     children?: TreeNodeData[]
   }
 
-  // 状态配置类型
+  // 状态配置类型 - 修复语法错误
   interface StatusConfig {
     field: string
     values: Record<
       string | number,
       {
         text: string
-        type: 'success' | 'warning' | 'error' | 'info'
+        type: StatusType
       }
     >
   }
@@ -115,21 +141,29 @@
     key: string
     text: string
     icon: string
-    type?: 'primary' | 'info' | 'warning' | 'error'
+    type?: ButtonType
     show?: (node: TreeNodeData) => boolean
     confirm?: string
+  }
+
+  // 图标配置类型
+  interface IconConfig {
+    default?: string
+    typeMap?: Record<string, string>
+    colorMap?: Record<string, string>
   }
 
   // Props定义
   interface Props {
     // 数据相关
     data: TreeNodeData[]
+    mode?: TreeMode
     keyField?: string
     labelField?: string
     childrenField?: string
 
     // 搜索相关
-    searchPattern?: string // 外部传入的搜索模式
+    searchPattern?: string
     searchable?: boolean
     searchPlaceholder?: string
 
@@ -143,6 +177,7 @@
 
     // 自定义配置
     iconField?: string
+    iconConfig?: IconConfig
     statusConfigs?: StatusConfig[]
     actions?: ActionConfig[]
 
@@ -152,7 +187,121 @@
     defaultSelectedKeys?: (string | number)[]
   }
 
+  // 预设配置
+  const presetConfigs: Record<TreeMode, Partial<Props>> = {
+    menu: {
+      draggable: true,
+      showLine: true,
+      iconConfig: {
+        typeMap: {
+          directory: 'mdi:folder',
+          menu: 'mdi:file-document',
+          button: 'mdi:button-cursor',
+        },
+        colorMap: {
+          directory: '#1890ff',
+          menu: '#52c41a',
+          button: '#fa8c16',
+        },
+      },
+      actions: [
+        {
+          key: 'add',
+          text: '新增子菜单',
+          icon: 'mdi:plus',
+          type: 'primary',
+        },
+        {
+          key: 'edit',
+          text: '编辑',
+          icon: 'mdi:pencil',
+          type: 'info',
+        },
+        {
+          key: 'delete',
+          text: '删除',
+          icon: 'mdi:delete',
+          type: 'error',
+          confirm: '确认删除该菜单吗？',
+        },
+      ],
+    },
+    file: {
+      draggable: false,
+      showLine: false,
+      iconConfig: {
+        typeMap: {
+          folder: 'mdi:folder',
+          file: 'mdi:file-document',
+          image: 'mdi:file-image',
+          video: 'mdi:file-video',
+          audio: 'mdi:file-music',
+        },
+        colorMap: {
+          folder: '#FFB020',
+          file: '#666',
+          image: '#52c41a',
+          video: '#1890ff',
+          audio: '#722ed1',
+        },
+      },
+      actions: [
+        {
+          key: 'open',
+          text: '打开',
+          icon: 'mdi:folder-open',
+          type: 'primary',
+        },
+        {
+          key: 'rename',
+          text: '重命名',
+          icon: 'mdi:rename-box',
+          type: 'info',
+        },
+        {
+          key: 'delete',
+          text: '删除',
+          icon: 'mdi:delete',
+          type: 'error',
+          confirm: '确认删除该文件吗？',
+        },
+      ],
+    },
+    org: {
+      draggable: false,
+      showLine: true,
+      iconConfig: {
+        typeMap: {
+          department: 'mdi:domain',
+          user: 'mdi:account',
+          manager: 'mdi:account-tie',
+        },
+        colorMap: {
+          department: '#1890ff',
+          user: '#52c41a',
+          manager: '#fa8c16',
+        },
+      },
+      actions: [
+        {
+          key: 'add',
+          text: '新增下级',
+          icon: 'mdi:plus',
+          type: 'primary',
+        },
+        {
+          key: 'edit',
+          text: '编辑',
+          icon: 'mdi:pencil',
+          type: 'info',
+        },
+      ],
+    },
+    custom: {},
+  }
+
   const props = withDefaults(defineProps<Props>(), {
+    mode: 'custom',
     keyField: 'id',
     labelField: 'name',
     childrenField: 'children',
@@ -166,28 +315,13 @@
     addText: '新增',
     refreshable: true,
     iconField: 'icon',
+    iconConfig: () => ({
+      default: 'mdi:circle-outline',
+      typeMap: {},
+      colorMap: {},
+    }),
     statusConfigs: () => [],
-    actions: () => [
-      {
-        key: 'add',
-        text: '新增',
-        icon: 'i-mdi-plus',
-        type: 'primary',
-      },
-      {
-        key: 'edit',
-        text: '编辑',
-        icon: 'i-mdi-pencil',
-        type: 'info',
-      },
-      {
-        key: 'delete',
-        text: '删除',
-        icon: 'i-mdi-delete',
-        type: 'error',
-        confirm: '确认删除吗？',
-      },
-    ],
+    actions: () => [],
     defaultExpandAll: false,
     defaultExpandedKeys: () => [],
     defaultSelectedKeys: () => [],
@@ -211,12 +345,25 @@
   const selectedKeys = ref<(string | number)[]>(props.defaultSelectedKeys)
   const isAllExpanded = ref(props.defaultExpandAll)
 
+  // 合并配置
+  const mergedConfig = computed(() => {
+    const preset = presetConfigs[props.mode] || {}
+    return {
+      ...preset,
+      ...props,
+      iconConfig: {
+        ...preset.iconConfig,
+        ...props.iconConfig,
+      },
+      actions: props.actions?.length ? props.actions : preset.actions || [],
+    }
+  })
+
   // 计算属性
   const treeData = computed((): TreeOption[] => {
     return props.data as TreeOption[]
   })
 
-  // 搜索模式：优先使用外部传入的，否则使用内部的
   const currentSearchPattern = computed(() => {
     return props.searchPattern || internalSearchPattern.value
   })
@@ -253,19 +400,43 @@
     return keys
   }
 
+  // 获取节点图标
+  const getNodeIcon = (node: TreeNodeData): string => {
+    const config = mergedConfig.value.iconConfig!
+
+    if (node[props.iconField || 'icon']) {
+      return node[props.iconField || 'icon']
+    }
+
+    if (node.type && config.typeMap?.[node.type]) {
+      return config.typeMap[node.type]
+    }
+
+    return config.default || 'mdi:circle-outline'
+  }
+
+  // 获取节点图标颜色
+  const getNodeIconColor = (node: TreeNodeData): string => {
+    const config = mergedConfig.value.iconConfig!
+
+    if (node.type && config.colorMap?.[node.type]) {
+      return config.colorMap[node.type]
+    }
+
+    return '#666'
+  }
+
   // 渲染函数
   const renderPrefix = ({ option }: { option: TreeOption }) => {
     const node = option as TreeNodeData
-    const iconClass = node[props.iconField || 'icon'] || getDefaultIcon(node)
+    const iconName = getNodeIcon(node)
+    const iconColor = getNodeIconColor(node)
 
-    return h('div', {
-      class: `${iconClass} mr-3 text-lg flex-shrink-0`,
-      style: {
-        display: 'flex',
-        alignItems: 'center',
-        lineHeight: '1',
-        color: getIconColor(node),
-      },
+    return h(C_Icon, {
+      name: iconName,
+      size: 18,
+      color: iconColor,
+      class: 'mr-3 flex-shrink-0',
     })
   }
 
@@ -313,8 +484,9 @@
 
   const renderSuffix = ({ option }: { option: TreeOption }) => {
     const node = option as TreeNodeData
+    const actions = mergedConfig.value.actions || []
 
-    const actionButtons = (props.actions || [])
+    const actionButtons = actions
       .filter(action => !action.show || action.show(node))
       .map(action => {
         const buttonProps = {
@@ -332,9 +504,9 @@
           },
         }
 
-        const iconEl = h('div', {
-          class: `${action.icon}`,
-          style: { fontSize: '12px' },
+        const iconEl = h(C_Icon, {
+          name: action.icon,
+          size: 12,
         })
 
         if (action.confirm) {
@@ -399,22 +571,6 @@
         ),
       ]
     )
-  }
-
-  // 根据节点类型获取默认图标
-  const getDefaultIcon = (node: TreeNodeData) => {
-    if (node.type === 'directory') return 'i-mdi-folder'
-    if (node.type === 'menu') return 'i-mdi-file-document'
-    if (node.type === 'button') return 'i-mdi-button-cursor'
-    return 'i-mdi-circle-outline'
-  }
-
-  // 根据节点类型获取图标颜色
-  const getIconColor = (node: TreeNodeData) => {
-    if (node.type === 'directory') return '#1890ff'
-    if (node.type === 'menu') return '#52c41a'
-    if (node.type === 'button') return '#fa8c16'
-    return '#666'
   }
 
   // 事件处理
