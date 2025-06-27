@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-26 19:06:26
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-26 19:28:24
+ * @LastEditTime: 2025-06-27 09:20:21
  * @FilePath: \Robot_Admin\src\views\iframe\blank-docs.vue
  * @Description: 外链内嵌文档处理页面（勿改勿删☘️不想写守卫里面，就这里玩咯）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -19,7 +19,7 @@
         <div class="mb-4">
           <i class="mdi mdi-open-in-new text-4xl text-blue-500"></i>
         </div>
-        <p class="text-lg mb-4">{{ route.meta?.title || '外部页面' }}</p>
+        <p class="text-lg mb-4">{{ routeTitle }}</p>
         <button
           @click="openExternal"
           class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
@@ -39,7 +39,7 @@
       frameborder="0"
       allowfullscreen
       :sandbox="sandboxRules"
-      :title="route.meta?.title"
+      :title="routeTitle"
     />
 
     <!-- 无内容 -->
@@ -60,7 +60,14 @@
   const router = useRouter()
 
   const frameSrc = computed(() => {
-    return (route.meta?.link as string) || ''
+    const link = route.meta?.link
+    return typeof link === 'string' ? link : ''
+  })
+
+  // 路由标题的计算属性
+  const routeTitle = computed(() => {
+    const title = route.meta?.title
+    return typeof title === 'string' ? title : '外部页面'
   })
 
   // 默认为外部页面，只有明确设置 external: false 才内嵌
@@ -76,14 +83,15 @@
   // 处理自动跳转的函数
   const handleAutoRedirect = () => {
     if (isExternal.value && autoOpen.value && frameSrc.value) {
-      const target = route.meta?.target || '_blank'
+      const target = route.meta?.target
+      const targetWindow = typeof target === 'string' ? target : '_blank'
 
-      if (target === '_self') {
+      if (targetWindow === '_self') {
         // 同窗口跳转，直接替换当前页面
         window.location.replace(frameSrc.value)
       } else {
         // 新窗口打开
-        window.open(frameSrc.value, target)
+        window.open(frameSrc.value, targetWindow)
 
         // 自动返回上一页
         nextTick(() => {
@@ -113,13 +121,15 @@
   const sandboxRules = computed(() => {
     const defaultRules =
       'allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation'
-    return route.meta?.sandbox || defaultRules
+    const sandbox = route.meta?.sandbox
+    return typeof sandbox === 'string' ? sandbox : defaultRules
   })
 
   const openExternal = () => {
     if (frameSrc.value) {
-      const target = route.meta?.target || '_blank'
-      window.open(frameSrc.value, target)
+      const target = route.meta?.target
+      const targetWindow = typeof target === 'string' ? target : '_blank'
+      window.open(frameSrc.value, targetWindow)
     }
   }
 </script>

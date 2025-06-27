@@ -705,6 +705,20 @@
             "affix": false,
             "keepAlive": false
           }
+        },
+        {
+          "path": "blog",
+          "name": "iframe-blog",
+          "component": "/iframe/blank-docs",
+          "meta": {
+            "icon": "mdi:blog",
+            "title": "CHENY 博客",
+            "link": "https://www.yangchenyu.com/",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
         }
       ]
     }

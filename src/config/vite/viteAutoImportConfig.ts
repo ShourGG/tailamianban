@@ -43,6 +43,7 @@ export default AutoImport({
         'NButton',
         'NButtonGroup',
         'NModal',
+        'NPopconfirm',
       ],
     },
   ],
