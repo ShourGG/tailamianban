@@ -685,7 +685,7 @@
           "meta": {
             "icon": "mdi:github",
             "title": "Github 仓库",
-            "link": "https://github.com/ChenyCHENYU/Robot-Admin",
+            "link": "https://github.com/ChenyCHENYU/Robot_Admin",
             "hidden": false,
             "full": false,
             "affix": false,
@@ -699,7 +699,7 @@
           "meta": {
             "icon": "mdi:gitlab",
             "title": "Gitee 仓库",
-            "link": "https://gitee.com/ChenyCHENYU/Robot-Admin",
+            "link": "https://gitee.com/ycyplus163/Robot_Admin",
             "hidden": false,
             "full": false,
             "affix": false,
