@@ -111,7 +111,6 @@
         }
       }
 
-      // ✅ 修复2：在外层增加更强的选择器，确保样式生效
       :deep(.n-tree-node) {
         &:hover {
           .tree-actions {
@@ -120,7 +119,6 @@
         }
       }
 
-      // ✅ 修复3：直接针对 tree-actions 的样式，确保过渡效果正常
       :deep(.tree-actions) {
         opacity: 0;
         transition: opacity 0.2s ease;
@@ -130,16 +128,10 @@
         }
       }
 
-      // ✅ 修复4：如果上面都不行，强制显示（调试用）
-      // 取消注释下面这行来强制显示所有操作按钮
-      // :deep(.tree-actions) {
-      //   opacity: 1 !important;
-      // }
     }
   }
 }
 
-// ✅ 修复5：增加全局样式，确保在任何情况下都能生效
 .c-tree {
   // 确保tree-actions在hover时显示
   :deep(.n-tree-node-content:hover .tree-actions),
@@ -171,7 +163,6 @@
       }
     }
 
-    // ✅ 移动端直接显示操作按钮，不需要hover
     :deep(.tree-actions) {
       opacity: 1 !important;
     }

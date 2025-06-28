@@ -507,6 +507,7 @@
         const iconEl = h(C_Icon, {
           name: action.icon,
           size: 12,
+          title: action.text, // 直接使用 action.text 作为 tooltip
         })
 
         if (action.confirm) {
@@ -530,23 +531,11 @@
               default: () => action.confirm,
             }
           )
+        } else {
+          return h(NButton, buttonProps, {
+            icon: () => iconEl,
+          })
         }
-
-        const button = h(NButton, buttonProps, {
-          icon: () => iconEl,
-        })
-
-        return h(
-          NTooltip,
-          {
-            placement: 'top',
-            showArrow: false,
-          },
-          {
-            trigger: () => button,
-            default: () => action.text,
-          }
-        )
       })
 
     return h(
