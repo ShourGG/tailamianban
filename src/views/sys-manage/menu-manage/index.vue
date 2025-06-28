@@ -801,20 +801,12 @@
 
   const expandAll = (): void => {
     if (isAllExpanded.value) {
-      expandedKeys.value = []
+      // 调用组件的 collapseAll 方法
+      treeRef.value?.collapseAll()
       isAllExpanded.value = false
     } else {
-      const getAllKeys = (menus: MenuData[]): string[] => {
-        const keys: string[] = []
-        menus.forEach(menu => {
-          keys.push(menu.id)
-          if (menu.children) {
-            keys.push(...getAllKeys(menu.children))
-          }
-        })
-        return keys
-      }
-      expandedKeys.value = getAllKeys(menuList.value)
+      // 调用组件的 expandAll 方法
+      treeRef.value?.expandAll()
       isAllExpanded.value = true
     }
   }
