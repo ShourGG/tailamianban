@@ -36,22 +36,25 @@ const handleRouteError = (error: unknown, customMsg?: string): string => {
   return LOGIN_PATH
 }
 
-// 外部链接处理已移至组件层面，此处不再需要
-
 // 设置页面标题
 const setPageTitle = (title?: string): void => {
   document.title = title ? `${title} | ${DEFAULT_TITLE}` : DEFAULT_TITLE
 }
 
-// 处理未登录用户
-const handleUnauthenticated = (path: string): string => {
-  return WHITE_LIST.includes(path) ? path : LOGIN_PATH
-}
-
 // 初始化动态路由
 const handleDynamicRouterInit = async (fullPath: string): Promise<string> => {
   try {
-    await initDynamicRouter()
+    const success = await initDynamicRouter()
+    if (!success) {
+      throw new Error('动态路由初始化失败')
+    }
+
+    // 再次检查菜单列表
+    const { authMenuList } = s_permissionStore()
+    if (!authMenuList.length) {
+      throw new Error('菜单数据为空')
+    }
+
     return fullPath
   } catch (error) {
     return handleRouteError(error, '动态路由加载失败')
@@ -69,24 +72,27 @@ router.beforeEach(
       const { authMenuList } = s_permissionStore()
       const meta = to.meta as ExtendedRouteMeta
 
-      // 未登录处理
+      // 1. 未登录处理
       if (!token) {
-        return handleUnauthenticated(to.path)
+        // 如果访问的是白名单页面，直接允许访问
+        if (WHITE_LIST.includes(to.path)) {
+          return true
+        }
+        // 否则重定向到登录页
+        return LOGIN_PATH
       }
 
-      // 已登录但访问登录页
+      // 2. 已登录但访问登录页
       if (to.path === LOGIN_PATH) {
         return '/'
       }
 
-      // 动态路由初始化
+      // 3. 动态路由初始化
       if (!authMenuList.length) {
         return await handleDynamicRouterInit(to.fullPath)
       }
 
-      // 外部链接处理已移至组件层面
-
-      // 设置页面标题
+      // 4. 正常访问
       setPageTitle(meta.title)
       return true
     } catch (error) {
