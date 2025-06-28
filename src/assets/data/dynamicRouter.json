@@ -621,6 +621,19 @@
           }
         },
         {
+          "path": "dictionary-manage",
+          "name": "sys-dictionary-manage",
+          "component": "/sys-manage/dictionary-manage/index",
+          "meta": {
+            "icon": "material-symbols:dictionary-outline-rounded",
+            "title": "字典管理",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
+        },
+        {
           "path": "excelImport",
           "name": "sys-excel-import",
           "component": "/sys-manage/import/index",
