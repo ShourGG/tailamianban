@@ -1,3 +1,13 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-06-27 23:29:15
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-06-28 17:11:42
+ * @FilePath: \Robot_Admin\src\components\global\C_Tree\index.vue
+ * @Description: 树型组件
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <div class="c-tree">
     <!-- 工具栏 -->
@@ -17,7 +27,6 @@
             <C_Icon
               name="mdi:magnify"
               :size="16"
-              color="#9CA3AF"
             />
           </template>
         </NInput>
@@ -124,7 +133,7 @@
     children?: TreeNodeData[]
   }
 
-  // 状态配置类型 - 修复语法错误
+  // 状态配置类型
   interface StatusConfig {
     field: string
     values: Record<
@@ -187,7 +196,7 @@
     defaultSelectedKeys?: (string | number)[]
   }
 
-  // 预设配置
+  // 预设配置 - 只包含图标映射，颜色由外部传入
   const presetConfigs: Record<TreeMode, Partial<Props>> = {
     menu: {
       draggable: true,
@@ -197,11 +206,6 @@
           directory: 'mdi:folder',
           menu: 'mdi:file-document',
           button: 'mdi:button-cursor',
-        },
-        colorMap: {
-          directory: '#1890ff',
-          menu: '#52c41a',
-          button: '#fa8c16',
         },
       },
       actions: [
@@ -237,13 +241,6 @@
           video: 'mdi:file-video',
           audio: 'mdi:file-music',
         },
-        colorMap: {
-          folder: '#FFB020',
-          file: '#666',
-          image: '#52c41a',
-          video: '#1890ff',
-          audio: '#722ed1',
-        },
       },
       actions: [
         {
@@ -275,11 +272,6 @@
           department: 'mdi:domain',
           user: 'mdi:account',
           manager: 'mdi:account-tie',
-        },
-        colorMap: {
-          department: '#1890ff',
-          user: '#52c41a',
-          manager: '#fa8c16',
         },
       },
       actions: [
@@ -415,15 +407,17 @@
     return config.default || 'mdi:circle-outline'
   }
 
-  // 获取节点图标颜色
+  // 获取节点图标颜色 - 优先使用传入的 colorMap，否则使用主题默认色
   const getNodeIconColor = (node: TreeNodeData): string => {
     const config = mergedConfig.value.iconConfig!
 
+    // 只有当外部传入了 colorMap 且节点类型匹配时才使用特定颜色
     if (node.type && config.colorMap?.[node.type]) {
       return config.colorMap[node.type]
     }
 
-    return '#666'
+    // 默认使用主题颜色，不污染组件
+    return 'currentColor'
   }
 
   // 渲染函数
@@ -435,7 +429,7 @@
     return h(C_Icon, {
       name: iconName,
       size: 18,
-      color: iconColor,
+      color: iconColor, // 使用 colorMap 中的颜色
       class: 'mr-3 flex-shrink-0',
     })
   }

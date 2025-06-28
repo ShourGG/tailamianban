@@ -1,304 +1,400 @@
 <template>
   <div class="menu-management">
     <!-- 搜索和操作栏 -->
-    <div class="header-actions">
-      <div class="search-section">
+    <NCard class="header-card">
+      <NSpace
+        justify="space-between"
+        align="center"
+      >
         <NInput
           v-model:value="searchPattern"
           placeholder="搜索菜单名称"
           clearable
-          class="search-input"
+          style="width: 300px"
         >
           <template #prefix>
             <C_Icon
               name="mdi:magnify"
               :size="16"
-              color="#9CA3AF"
             />
           </template>
         </NInput>
-      </div>
-      <div class="action-buttons">
-        <NButton
-          type="primary"
-          @click="handleAddMenu()"
-        >
-          <template #icon>
-            <C_Icon
-              name="mdi:plus"
-              :size="16"
-            />
-          </template>
-          新增菜单
-        </NButton>
-        <NButton @click="expandAll">
-          <template #icon>
-            <C_Icon
-              name="mdi:file-tree"
-              :size="16"
-            />
-          </template>
-          {{ isAllExpanded ? '收起全部' : '展开全部' }}
-        </NButton>
-        <NButton @click="refreshMenus">
-          <template #icon>
-            <C_Icon
-              name="mdi:refresh"
-              :size="16"
-            />
-          </template>
-          刷新
-        </NButton>
-      </div>
-    </div>
+
+        <NSpace>
+          <NButton
+            type="primary"
+            @click="handleAddMenu()"
+          >
+            <template #icon>
+              <C_Icon
+                name="mdi:plus"
+                :size="16"
+              />
+            </template>
+            新增菜单
+          </NButton>
+          <NButton @click="expandAll">
+            <template #icon>
+              <C_Icon
+                name="mdi:file-tree"
+                :size="16"
+              />
+            </template>
+            {{ isAllExpanded ? '收起全部' : '展开全部' }}
+          </NButton>
+          <NButton @click="refreshMenus">
+            <template #icon>
+              <C_Icon
+                name="mdi:refresh"
+                :size="16"
+              />
+            </template>
+            刷新
+          </NButton>
+        </NSpace>
+      </NSpace>
+    </NCard>
 
     <!-- 主要内容区域 -->
     <div class="main-content">
-      <!-- 左侧菜单树 -->
-      <div class="left-panel">
-        <div class="panel-header">
-          <h3 class="panel-title">菜单结构</h3>
-        </div>
-        <div class="tree-container">
-          <C_Tree
-            ref="treeRef"
-            mode="menu"
-            :data="filteredMenuList"
-            :search-pattern="searchPattern"
-            :searchable="false"
-            :show-toolbar="false"
-            :status-configs="menuStatusConfigs"
-            :default-expanded-keys="expandedKeys"
-            :default-selected-keys="selectedKeys"
-            @node-select="handleNodeSelect"
-            @node-action="handleNodeAction"
-            @node-drop="handleNodeDrop"
-            @add="handleAddFromTree"
-            class="menu-tree"
-          />
-        </div>
-      </div>
-
-      <!-- 右侧详情面板 -->
-      <div class="right-panel">
-        <div class="panel-header">
-          <h3 class="panel-title">
-            {{
-              selectedMenu
-                ? `${getMenuTypeText(selectedMenu.type)} - ${selectedMenu.name}`
-                : '选择菜单查看详情'
-            }}
-          </h3>
-          <div
-            v-if="selectedMenu"
-            class="header-actions"
+      <NGrid
+        :cols="24"
+        :x-gap="16"
+        responsive="screen"
+      >
+        <!-- 左侧菜单树 -->
+        <NGi
+          :span="10"
+          :md="12"
+          :sm="24"
+        >
+          <NCard
+            title="菜单结构"
+            class="content-card"
           >
-            <NButton
-              size="small"
-              @click="handleEditMenu(selectedMenu)"
-            >
-              <template #icon>
-                <C_Icon
-                  name="mdi:pencil"
-                  :size="14"
-                />
-              </template>
-              编辑
-            </NButton>
-          </div>
-        </div>
-
-        <!-- 未选择状态 -->
-        <div
-          v-if="!selectedMenu"
-          class="empty-state"
-        >
-          <div class="empty-icon">
-            <C_Icon
-              name="mdi:menu"
-              :size="72"
-              color="#D1D5DB"
+            <C_Tree
+              ref="treeRef"
+              mode="menu"
+              :data="filteredMenuList"
+              :search-pattern="searchPattern"
+              :searchable="false"
+              :show-toolbar="false"
+              :status-configs="menuStatusConfigs"
+              :icon-config="menuIconConfig"
+              :default-expanded-keys="expandedKeys"
+              :default-selected-keys="selectedKeys"
+              @node-select="handleNodeSelect"
+              @node-action="handleNodeAction"
+              @node-drop="handleNodeDrop"
+              @add="handleAddFromTree"
+              class="menu-tree"
             />
-          </div>
-          <p class="empty-text">请从左侧选择一个菜单节点查看详细信息</p>
-        </div>
+          </NCard>
+        </NGi>
 
-        <!-- 选中菜单详情 -->
-        <div
-          v-else
-          class="detail-content"
+        <!-- 右侧详情面板 -->
+        <NGi
+          :span="14"
+          :md="12"
+          :sm="24"
         >
-          <!-- 基本信息 -->
-          <div class="info-section">
-            <h4 class="section-title">基本信息</h4>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="label">菜单名称：</span>
-                <span class="value">{{ selectedMenu.name }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">菜单类型：</span>
-                <NTag
-                  :type="getMenuTypeConfig(selectedMenu.type).color"
+          <NCard class="content-card">
+            <template #header>
+              <NSpace
+                justify="space-between"
+                align="center"
+              >
+                <NText>
+                  {{
+                    selectedMenu
+                      ? `${getMenuTypeText(selectedMenu.type)} - ${selectedMenu.name}`
+                      : '选择菜单查看详情'
+                  }}
+                </NText>
+                <NButton
+                  v-if="selectedMenu"
                   size="small"
+                  @click="handleEditMenu(selectedMenu)"
                 >
                   <template #icon>
                     <C_Icon
-                      :name="getMenuTypeConfig(selectedMenu.type).icon"
-                      :size="12"
+                      name="mdi:pencil"
+                      :size="14"
                     />
                   </template>
-                  {{ getMenuTypeText(selectedMenu.type) }}
-                </NTag>
-              </div>
-              <div
-                v-if="selectedMenu.path"
-                class="info-item"
-              >
-                <span class="label">路由路径：</span>
-                <NTag
-                  type="info"
-                  size="small"
-                  >{{ selectedMenu.path }}</NTag
-                >
-              </div>
-              <div
-                v-if="selectedMenu.component"
-                class="info-item"
-              >
-                <span class="label">组件路径：</span>
-                <span class="value">{{ selectedMenu.component }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">排序：</span>
-                <span class="value">{{ selectedMenu.sort }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">状态：</span>
-                <NTag
-                  :type="selectedMenu.status === 1 ? 'success' : 'error'"
-                  size="small"
-                >
-                  {{ selectedMenu.status === 1 ? '启用' : '禁用' }}
-                </NTag>
-              </div>
-              <div
-                v-if="selectedMenu.type !== 'button'"
-                class="info-item"
-              >
-                <span class="label">显示状态：</span>
-                <NTag
-                  :type="selectedMenu.hidden === 0 ? 'success' : 'warning'"
-                  size="small"
-                >
-                  {{ selectedMenu.hidden === 0 ? '显示' : '隐藏' }}
-                </NTag>
-              </div>
-            </div>
-          </div>
+                  编辑
+                </NButton>
+              </NSpace>
+            </template>
 
-          <!-- 按钮权限列表 -->
-          <div
-            v-if="selectedMenu.type === 'menu' && buttonPermissions.length > 0"
-            class="permissions-section"
-          >
-            <div class="section-header">
-              <h4 class="section-title">按钮权限</h4>
-              <NButton
+            <!-- 未选择状态 -->
+            <NEmpty
+              v-if="!selectedMenu"
+              description="请从左侧选择一个菜单节点查看详细信息"
+              class="mt-80px"
+            >
+              <template #icon>
+                <C_Icon
+                  name="mdi:menu"
+                  :size="72"
+                  class="mt-80px"
+                />
+              </template>
+            </NEmpty>
+
+            <!-- 选中菜单详情 -->
+            <NSpace
+              v-else
+              vertical
+              :size="24"
+            >
+              <!-- 基本信息 -->
+              <NCard
+                title="基本信息"
                 size="small"
-                type="primary"
-                @click="handleAddPermission"
               >
-                <template #icon>
-                  <C_Icon
-                    name="mdi:plus"
-                    :size="14"
-                  />
-                </template>
-                添加权限
-              </NButton>
-            </div>
-            <div class="permissions-list">
-              <div
-                v-for="permission in buttonPermissions"
-                :key="permission.id"
-                class="permission-item"
-              >
-                <div class="permission-info">
-                  <div class="permission-name">
-                    <C_Icon
-                      name="mdi:button-cursor"
-                      :size="16"
-                      color="#fa8c16"
-                      class="mr-2"
-                    />
-                    {{ permission.name }}
-                  </div>
-                  <div class="permission-code">{{ permission.permission }}</div>
-                </div>
-                <div class="permission-actions">
-                  <NButton
-                    size="tiny"
-                    @click="handleEditPermission(permission)"
-                  >
-                    <template #icon>
-                      <C_Icon
-                        name="mdi:pencil"
-                        :size="12"
-                      />
-                    </template>
-                  </NButton>
-                  <NPopconfirm
-                    @positive-click="handleDeletePermission(permission.id)"
-                  >
-                    <template #trigger>
-                      <NButton
-                        size="tiny"
-                        type="error"
+                <NGrid
+                  :cols="2"
+                  :x-gap="16"
+                  :y-gap="12"
+                >
+                  <NGi>
+                    <NSpace align="center">
+                      <NText depth="3">菜单名称：</NText>
+                      <NText>{{ selectedMenu.name }}</NText>
+                    </NSpace>
+                  </NGi>
+                  <NGi>
+                    <NSpace align="center">
+                      <NText depth="3">菜单类型：</NText>
+                      <NTag
+                        :type="getMenuTypeConfig(selectedMenu.type).color"
+                        size="small"
                       >
                         <template #icon>
                           <C_Icon
-                            name="mdi:delete"
+                            :name="getMenuTypeConfig(selectedMenu.type).icon"
                             :size="12"
+                            :color="getMenuTypeIconColor(selectedMenu.type)"
                           />
                         </template>
-                      </NButton>
-                    </template>
-                    确认删除该权限吗？
-                  </NPopconfirm>
-                </div>
-              </div>
-            </div>
-          </div>
+                        {{ getMenuTypeText(selectedMenu.type) }}
+                      </NTag>
+                    </NSpace>
+                  </NGi>
+                  <NGi v-if="selectedMenu.path">
+                    <NSpace align="center">
+                      <NText depth="3">路由路径：</NText>
+                      <NTag
+                        type="info"
+                        size="small"
+                        >{{ selectedMenu.path }}</NTag
+                      >
+                    </NSpace>
+                  </NGi>
+                  <NGi v-if="selectedMenu.component">
+                    <NSpace align="center">
+                      <NText depth="3">组件路径：</NText>
+                      <NText>{{ selectedMenu.component }}</NText>
+                    </NSpace>
+                  </NGi>
+                  <NGi>
+                    <NSpace align="center">
+                      <NText depth="3">排序：</NText>
+                      <NText>{{ selectedMenu.sort }}</NText>
+                    </NSpace>
+                  </NGi>
+                  <NGi>
+                    <NSpace align="center">
+                      <NText depth="3">状态：</NText>
+                      <NTag
+                        :type="selectedMenu.status === 1 ? 'success' : 'error'"
+                        size="small"
+                      >
+                        {{ selectedMenu.status === 1 ? '启用' : '禁用' }}
+                      </NTag>
+                    </NSpace>
+                  </NGi>
+                  <NGi v-if="selectedMenu.type !== 'button'">
+                    <NSpace align="center">
+                      <NText depth="3">显示状态：</NText>
+                      <NTag
+                        :type="
+                          selectedMenu.hidden === 0 ? 'success' : 'warning'
+                        "
+                        size="small"
+                      >
+                        {{ selectedMenu.hidden === 0 ? '显示' : '隐藏' }}
+                      </NTag>
+                    </NSpace>
+                  </NGi>
+                </NGrid>
+              </NCard>
 
-          <!-- 子菜单统计 -->
-          <div
-            v-if="selectedMenu.type === 'directory' && childrenStats"
-            class="stats-section"
-          >
-            <h4 class="section-title">子菜单统计</h4>
-            <div class="stats-grid">
-              <div class="stat-item">
-                <div class="stat-number">{{ childrenStats.directories }}</div>
-                <div class="stat-label">目录</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-number">{{ childrenStats.menus }}</div>
-                <div class="stat-label">菜单</div>
-              </div>
-            </div>
-          </div>
+              <!-- 按钮权限列表 -->
+              <NCard
+                v-if="
+                  selectedMenu.type === 'menu' && buttonPermissions.length > 0
+                "
+                size="small"
+              >
+                <template #header>
+                  <NSpace
+                    justify="space-between"
+                    align="center"
+                  >
+                    <NText>按钮权限</NText>
+                    <NButton
+                      size="small"
+                      type="primary"
+                      @click="handleAddPermission"
+                    >
+                      <template #icon>
+                        <C_Icon
+                          name="mdi:plus"
+                          :size="14"
+                        />
+                      </template>
+                      添加权限
+                    </NButton>
+                  </NSpace>
+                </template>
 
-          <!-- 备注信息 -->
-          <div
-            v-if="selectedMenu.remark"
-            class="remark-section"
-          >
-            <h4 class="section-title">备注信息</h4>
-            <div class="remark-content">{{ selectedMenu.remark }}</div>
-          </div>
-        </div>
-      </div>
+                <NSpace
+                  vertical
+                  :size="12"
+                >
+                  <NCard
+                    v-for="permission in buttonPermissions"
+                    :key="permission.id"
+                    size="small"
+                    hoverable
+                  >
+                    <NSpace
+                      justify="space-between"
+                      align="center"
+                    >
+                      <NSpace
+                        vertical
+                        :size="6"
+                      >
+                        <NSpace align="center">
+                          <C_Icon
+                            name="mdi:button-cursor"
+                            :size="16"
+                            color="#fa8c16"
+                          />
+                          <NText strong>{{ permission.name }}</NText>
+                        </NSpace>
+                        <NTag
+                          size="small"
+                          type="info"
+                        >
+                          {{ permission.permission }}
+                        </NTag>
+                      </NSpace>
+
+                      <NSpace>
+                        <NButton
+                          size="tiny"
+                          @click="handleEditPermission(permission)"
+                        >
+                          <template #icon>
+                            <C_Icon
+                              name="mdi:pencil"
+                              :size="12"
+                              title="编辑"
+                            />
+                          </template>
+                        </NButton>
+                        <NPopconfirm
+                          @positive-click="
+                            handleDeletePermission(permission.id)
+                          "
+                        >
+                          <template #trigger>
+                            <NButton
+                              size="tiny"
+                              type="error"
+                            >
+                              <template #icon>
+                                <C_Icon
+                                  name="mdi:delete"
+                                  :size="12"
+                                  title="删除"
+                                />
+                              </template>
+                            </NButton>
+                          </template>
+                          确认删除该权限吗？
+                        </NPopconfirm>
+                      </NSpace>
+                    </NSpace>
+                  </NCard>
+                </NSpace>
+              </NCard>
+
+              <!-- 子菜单统计 -->
+              <NCard
+                v-if="selectedMenu.type === 'directory' && childrenStats"
+                title="子菜单统计"
+                size="small"
+              >
+                <NGrid
+                  :cols="3"
+                  :x-gap="16"
+                >
+                  <NGi>
+                    <NStatistic label="目录">
+                      <template #default>
+                        <NText
+                          :style="{
+                            fontSize: '28px',
+                            fontWeight: 'bold',
+                            color: getMenuTypeIconColor('directory'),
+                          }"
+                        >
+                          {{ childrenStats.directories }}
+                        </NText>
+                      </template>
+                    </NStatistic>
+                  </NGi>
+                  <NGi>
+                    <NStatistic label="菜单">
+                      <template #default>
+                        <NText
+                          :style="{
+                            fontSize: '28px',
+                            fontWeight: 'bold',
+                            color: getMenuTypeIconColor('menu'),
+                          }"
+                        >
+                          {{ childrenStats.menus }}
+                        </NText>
+                      </template>
+                    </NStatistic>
+                  </NGi>
+                  <NGi>
+                    <NStatistic
+                      label="总计"
+                      :value="childrenStats.directories + childrenStats.menus"
+                    />
+                  </NGi>
+                </NGrid>
+              </NCard>
+
+              <!-- 备注信息 -->
+              <NCard
+                v-if="selectedMenu.remark"
+                title="备注信息"
+                size="small"
+              >
+                <NText>{{ selectedMenu.remark }}</NText>
+              </NCard>
+            </NSpace>
+          </NCard>
+        </NGi>
+      </NGrid>
     </div>
 
     <!-- 添加/编辑菜单弹窗 -->
@@ -310,7 +406,7 @@
       negative-text="取消"
       @positive-click="handleSaveMenu"
       @negative-click="handleCancelModal"
-      :style="{ width: '600px' }"
+      style="width: 600px"
     >
       <NForm
         ref="formRef"
@@ -318,7 +414,6 @@
         :rules="formRules"
         label-placement="left"
         label-width="100px"
-        class="menu-form"
       >
         <NFormItem
           label="菜单类型"
@@ -326,37 +421,34 @@
         >
           <NRadioGroup v-model:value="formData.type">
             <NRadio value="directory">
-              <div class="flex items-center">
+              <NSpace align="center">
                 <C_Icon
                   name="mdi:folder"
                   :size="16"
                   color="#1890ff"
-                  class="mr-2"
                 />
-                目录
-              </div>
+                <NText>目录</NText>
+              </NSpace>
             </NRadio>
             <NRadio value="menu">
-              <div class="flex items-center">
+              <NSpace align="center">
                 <C_Icon
                   name="mdi:file-document"
                   :size="16"
                   color="#52c41a"
-                  class="mr-2"
                 />
-                菜单
-              </div>
+                <NText>菜单</NText>
+              </NSpace>
             </NRadio>
             <NRadio value="button">
-              <div class="flex items-center">
+              <NSpace align="center">
                 <C_Icon
                   name="mdi:button-cursor"
                   :size="16"
                   color="#fa8c16"
-                  class="mr-2"
                 />
-                按钮
-              </div>
+                <NText>按钮</NText>
+              </NSpace>
             </NRadio>
           </NRadioGroup>
         </NFormItem>
@@ -420,7 +512,6 @@
               <C_Icon
                 :name="formData.icon || 'mdi:menu'"
                 :size="16"
-                color="#9CA3AF"
               />
             </template>
           </NInput>
@@ -551,6 +642,20 @@
   )
   const menuStatusConfigs = computed(() => MENU_STATUS_CONFIGS)
 
+  // 菜单专用的图标配置 - 通过 props 传递，保持 C_Tree 组件的通用性
+  const menuIconConfig = computed(() => ({
+    typeMap: {
+      directory: 'mdi:folder',
+      menu: 'mdi:file-document',
+      button: 'mdi:button-cursor',
+    },
+    colorMap: {
+      directory: '#1890ff', // 蓝色 - 目录
+      menu: '#52c41a', // 绿色 - 菜单
+      button: '#fa8c16', // 橙色 - 按钮
+    },
+  }))
+
   const selectedMenu = computed(() => {
     if (selectedKeys.value.length === 0) return null
     return findMenuById(menuList.value, selectedKeys.value[0])
@@ -628,6 +733,18 @@
       button: { icon: 'mdi:button-cursor', color: 'warning' as const },
     }
     return configMap[type]
+  }
+
+  // 获取菜单类型对应的图标颜色
+  const getMenuTypeIconColor = (
+    type: 'directory' | 'menu' | 'button'
+  ): string => {
+    const colorMap = {
+      directory: '#1890ff',
+      menu: '#52c41a',
+      button: '#fa8c16',
+    }
+    return colorMap[type]
   }
 
   const findMenuById = (menus: MenuData[], id: string): MenuData | null => {
