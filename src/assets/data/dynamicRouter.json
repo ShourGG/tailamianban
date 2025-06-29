@@ -540,19 +540,6 @@
       },
       "children": [
         {
-          "path": "user-manage",
-          "name": "user-manage",
-          "component": "/user-manage/index",
-          "meta": {
-            "icon": "mdi:user-badge",
-            "title": "用户管理",
-            "hidden": false,
-            "full": false,
-            "affix": false,
-            "keepAlive": false
-          }
-        },
-        {
           "path": "user-manage-detail/:id",
           "name": "user-manage-detail",
           "component": "/user-manage-detail/index",
@@ -627,6 +614,19 @@
           "meta": {
             "icon": "material-symbols:dictionary-outline-rounded",
             "title": "字典管理",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
+        },
+        {
+          "path": "user-manage",
+          "name": "sys-user-manage",
+          "component": "/sys-manage/user-manage/index",
+          "meta": {
+            "icon": "mdi:user-badge",
+            "title": "用户管理",
             "hidden": false,
             "full": false,
             "affix": false,

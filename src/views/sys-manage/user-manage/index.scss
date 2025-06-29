@@ -1,0 +1,167 @@
+  .user-management {
+    padding: 16px;
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .main-content {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .content-card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      :deep(.n-card__content) {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+    }
+
+    .dept-tree {
+      flex: 1;
+      overflow: auto;
+
+      :deep(.c-tree-container) {
+        border: none;
+        padding: 0;
+        height: 100%;
+      }
+
+      :deep(.tree-instance .n-tree .n-tree-node) {
+        margin-bottom: 4px;
+
+        .n-tree-node-content {
+          padding: 12px 8px;
+          border-radius: 6px;
+          transition: all 0.2s ease;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+        }
+      }
+    }
+
+    // 用户名禁用状态样式 - 优化版
+    .username-cell {
+      &.disabled-user {
+        position: relative;
+        font-weight: 500;
+
+        &::after {
+          content: '已禁用';
+          position: absolute;
+          top: -2px;
+          right: -8px;
+          font-size: 10px;
+          color: #ff4d4f;
+          background: #fff1f0;
+          border: 1px solid #ffccc7;
+          border-radius: 2px;
+          padding: 0 2px;
+          transform: scale(0.8);
+        }
+      }
+    }
+
+    // 简化禁用状态样式
+    .disabled-text {
+      opacity: 0.6;
+      color: #999 !important;
+      text-decoration: line-through;
+    }
+
+    .disabled-tag {
+      opacity: 0.5;
+      filter: grayscale(80%);
+
+      :deep(.n-tag__content) {
+        text-decoration: line-through;
+      }
+    }
+
+    // 表格样式
+    :deep(.n-data-table) {
+      .n-data-table-td {
+        padding: 12px 8px;
+      }
+
+      .n-data-table-th {
+        background-color: var(--n-color-hover);
+      }
+
+      // 禁用行样式
+      .disabled-row {
+        background-color: #fafafa !important;
+        opacity: 0.7;
+
+        &:hover {
+          background-color: #f0f0f0 !important;
+        }
+
+        td {
+          background-color: transparent !important;
+        }
+      }
+
+      // 操作列不换行
+      .n-data-table-td:last-child {
+        .n-space {
+          flex-wrap: nowrap !important;
+        }
+      }
+    }
+
+    // 用户详情样式
+    .user-detail {
+      padding: 16px;
+      position: relative;
+
+      .disabled-card {
+        opacity: 0.7;
+        background-color: #fafafa;
+
+        :deep(.n-card__header) {
+          background-color: #f0f0f0;
+        }
+      }
+
+      .disabled-avatar {
+        opacity: 0.5;
+        filter: grayscale(100%);
+      }
+
+      .disabled-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .disabled-text {
+        opacity: 0.6;
+        color: var(--n-text-color-disabled) !important;
+        text-decoration: line-through;
+      }
+
+      .disabled-tag {
+        opacity: 0.6;
+        filter: grayscale(50%);
+
+        :deep(.n-tag__content) {
+          text-decoration: line-through;
+        }
+      }
+    }
+  }
