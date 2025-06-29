@@ -189,7 +189,10 @@
             <NCard
               title="权限信息"
               size="small"
-              v-if="currentRole.permissionNames?.length"
+              v-if="
+                currentRole.permissionNames &&
+                currentRole.permissionNames.length > 0
+              "
               :class="{ 'disabled-card': currentRole.status === 0 }"
             >
               <NSpace>
@@ -271,7 +274,7 @@
       negative-text="取消"
       @positive-click="handleSaveRole"
       @negative-click="handleCancelModal"
-      style="width: 800px"
+      style="width: 1000px"
     >
       <NForm
         ref="formRef"
@@ -284,7 +287,7 @@
           :cols="2"
           :x-gap="16"
         >
-          <!-- 表单字段 -->
+          <!-- 基础表单字段 -->
           <NGi
             v-for="field in getFormFields()"
             :key="field.key"
@@ -303,22 +306,173 @@
           </NGi>
         </NGrid>
 
-        <!-- 权限分配 -->
+        <!-- 优化后的权限分配 -->
         <NFormItem
           label="权限分配"
           path="permissionIds"
         >
-          <NTree
-            :data="permissionTreeData"
-            :checked-keys="formData.permissionIds"
-            checkable
-            cascade
-            key-field="id"
-            label-field="name"
-            children-field="children"
-            @update:checked-keys="handlePermissionChange"
-            style="max-height: 300px; overflow: auto"
-          />
+          <div class="permission-assignment">
+            <!-- 权限分配工具栏 -->
+            <div class="permission-toolbar">
+              <NSpace>
+                <NInput
+                  v-model:value="permissionSearchKeyword"
+                  placeholder="搜索权限"
+                  clearable
+                  style="width: 200px"
+                >
+                  <template #prefix>
+                    <C_Icon
+                      name="mdi:magnify"
+                      :size="16"
+                    />
+                  </template>
+                </NInput>
+
+                <NSelect
+                  v-model:value="selectedPermissionModule"
+                  placeholder="选择模块"
+                  clearable
+                  style="width: 150px"
+                  :options="permissionModuleOptions"
+                />
+
+                <NButtonGroup>
+                  <NButton
+                    size="small"
+                    @click="handleSelectAll"
+                    >全选</NButton
+                  >
+                  <NButton
+                    size="small"
+                    @click="handleSelectNone"
+                    >全不选</NButton
+                  >
+                  <NButton
+                    size="small"
+                    @click="handleExpandAll"
+                  >
+                    {{ isPermissionTreeExpanded ? '收起' : '展开' }}
+                  </NButton>
+                </NButtonGroup>
+
+                <NButton
+                  size="small"
+                  type="primary"
+                  @click="showPermissionTemplate = true"
+                >
+                  <template #icon>
+                    <C_Icon
+                      name="mdi:bookmark"
+                      :size="14"
+                    />
+                  </template>
+                  权限模板
+                </NButton>
+              </NSpace>
+            </div>
+
+            <!-- 权限分配主体 -->
+            <div class="permission-content">
+              <!-- 左侧：权限树 -->
+              <div class="permission-tree-section">
+                <div class="section-header">
+                  <NText strong>可选权限</NText>
+                  <NTag
+                    size="small"
+                    type="info"
+                    >{{ filteredPermissionCount }} 项</NTag
+                  >
+                </div>
+
+                <div class="permission-tree-container">
+                  <NTree
+                    ref="permissionTreeRef"
+                    :data="filteredPermissionTreeData"
+                    :checked-keys="formData.permissionIds || []"
+                    :expanded-keys="expandedPermissionKeys"
+                    checkable
+                    cascade
+                    virtual-scroll
+                    block-line
+                    key-field="id"
+                    label-field="name"
+                    children-field="children"
+                    :node-props="getPermissionNodeProps"
+                    @update:checked-keys="handlePermissionChange"
+                    @update:expanded-keys="handleExpandedKeysChange"
+                    style="height: 300px"
+                  />
+                </div>
+              </div>
+
+              <!-- 右侧：已选权限 -->
+              <div class="selected-permissions-section">
+                <div class="section-header">
+                  <NText strong>已选权限</NText>
+                  <NTag
+                    size="small"
+                    type="success"
+                    >{{ (formData.permissionIds || []).length }} 项</NTag
+                  >
+                </div>
+
+                <div class="selected-permissions-container">
+                  <div
+                    v-if="(formData.permissionIds || []).length === 0"
+                    class="empty-permissions"
+                  >
+                    <C_Icon
+                      name="mdi:shield-off"
+                      :size="32"
+                      color="#ccc"
+                    />
+                    <NText depth="3">暂无选择权限</NText>
+                  </div>
+
+                  <div
+                    v-else
+                    class="selected-permissions-list"
+                  >
+                    <div
+                      v-for="group in selectedPermissionGroups"
+                      :key="group.module"
+                      class="permission-group"
+                    >
+                      <div class="group-header">
+                        <C_Icon
+                          :name="group.icon"
+                          :size="16"
+                        />
+                        <NText strong>{{ group.module }}</NText>
+                        <NTag size="small">{{ group.permissions.length }}</NTag>
+                        <NButton
+                          text
+                          size="tiny"
+                          type="error"
+                          @click="handleRemovePermissionGroup(group.module)"
+                        >
+                          移除全部
+                        </NButton>
+                      </div>
+
+                      <div class="group-permissions">
+                        <NTag
+                          v-for="permission in group.permissions"
+                          :key="permission.id"
+                          size="small"
+                          closable
+                          @close="handleRemovePermission(permission.id)"
+                        >
+                          {{ permission.name }}
+                        </NTag>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </NFormItem>
 
         <NFormItem
@@ -334,6 +488,92 @@
         </NFormItem>
       </NForm>
     </NModal>
+
+    <!-- 权限模板弹窗 -->
+    <NModal
+      v-model:show="showPermissionTemplate"
+      preset="dialog"
+      title="选择权限模板"
+      positive-text="应用模板"
+      negative-text="取消"
+      @positive-click="handleApplyPermissionTemplate"
+      style="width: 600px"
+    >
+      <div class="permission-templates">
+        <NGrid
+          :cols="1"
+          :y-gap="12"
+        >
+          <NGi
+            v-for="template in permissionTemplates"
+            :key="template.id"
+          >
+            <NCard
+              size="small"
+              :class="{ 'template-selected': selectedTemplate === template.id }"
+              hoverable
+              @click="selectedTemplate = template.id"
+            >
+              <template #header>
+                <NSpace align="center">
+                  <NRadio :checked="selectedTemplate === template.id" />
+                  <C_Icon
+                    :name="template.icon"
+                    :size="18"
+                  />
+                  <NText strong>{{ template.name }}</NText>
+                  <NTag
+                    size="small"
+                    type="info"
+                    >{{ template.permissions.length }} 项权限</NTag
+                  >
+                </NSpace>
+              </template>
+
+              <NText depth="3">{{ template.description }}</NText>
+
+              <template #footer>
+                <NSpace size="small">
+                  <NTag
+                    v-for="perm in template.permissions.slice(0, 3)"
+                    :key="perm"
+                    size="small"
+                    type="primary"
+                  >
+                    {{ getPermissionNameById(perm) }}
+                  </NTag>
+                  <NTag
+                    v-if="template.permissions.length > 3"
+                    size="small"
+                    type="default"
+                  >
+                    +{{ template.permissions.length - 3 }}
+                  </NTag>
+                </NSpace>
+              </template>
+            </NCard>
+          </NGi>
+        </NGrid>
+      </div>
+    </NModal>
+
+    <!-- 角色用户列表弹窗 -->
+    <NModal
+      v-model:show="showRoleUsers"
+      preset="dialog"
+      :title="`${currentRole?.name} - 用户列表`"
+      positive-text="关闭"
+      @positive-click="showRoleUsers = false"
+      style="width: 800px"
+    >
+      <NDataTable
+        :columns="roleUserColumns"
+        :data="roleUserList"
+        :pagination="{ pageSize: 10 }"
+        size="small"
+        striped
+      />
+    </NModal>
   </div>
 </template>
 
@@ -346,11 +586,15 @@
     type PermissionData,
     type SearchForm,
     type RoleType,
+    type RoleUserData,
+    type PermissionTemplate,
     ROLE_FORM_RULES,
     DEFAULT_ROLE_FORM_DATA,
     UI_CONFIG,
+    PERMISSION_TEMPLATES,
     getRoleListApi,
     getPermissionListApi,
+    getRoleUsersApi,
     MOCK_ROLE_DATA,
     MOCK_PERMISSION_DATA,
   } from './data'
@@ -433,18 +677,129 @@
     showQuickJumper: true,
   })
 
+  // ==================== 权限分配相关数据 ====================
+  const permissionSearchKeyword = ref('')
+  const selectedPermissionModule = ref<string | null>(null)
+  const isPermissionTreeExpanded = ref(false)
+  const expandedPermissionKeys = ref<string[]>([])
+  const showPermissionTemplate = ref(false)
+  const selectedTemplate = ref<string | null>(null)
+  const showRoleUsers = ref(false)
+  const roleUserList = reactive<RoleUserData[]>([])
+  const permissionTemplates = reactive<PermissionTemplate[]>([
+    ...PERMISSION_TEMPLATES,
+  ])
+
   // ==================== 计算属性 ====================
   const modalTitle = computed(() =>
     modalMode.value === 'add' ? '新增角色' : '编辑角色'
   )
-
-  const permissionTreeData = computed(() => permissionList)
 
   const paginationReactive = computed(() => ({
     ...pagination,
     onChange: (page: number) => handlePageChange(page),
     onUpdatePageSize: (pageSize: number) => handlePageSizeChange(pageSize),
   }))
+
+  const permissionModuleOptions = computed(() => {
+    const modules = new Set<string>()
+    const extractModules = (permissions: PermissionData[]) => {
+      permissions.forEach(perm => {
+        if (perm.children) {
+          modules.add(perm.name)
+          extractModules(perm.children)
+        }
+      })
+    }
+    extractModules(permissionList)
+    return Array.from(modules).map(name => ({ label: name, value: name }))
+  })
+
+  const filteredPermissionTreeData = computed(() => {
+    let filtered = [...permissionList]
+
+    // 按模块筛选
+    if (selectedPermissionModule.value) {
+      filtered = filtered.filter(
+        perm => perm.name === selectedPermissionModule.value
+      )
+    }
+
+    // 按关键词搜索
+    if (permissionSearchKeyword.value) {
+      const keyword = permissionSearchKeyword.value.toLowerCase()
+      const filterByKeyword = (
+        permissions: PermissionData[]
+      ): PermissionData[] => {
+        return permissions
+          .filter(perm => {
+            const matchSelf =
+              perm.name.toLowerCase().includes(keyword) ||
+              perm.code.toLowerCase().includes(keyword)
+
+            if (perm.children) {
+              const filteredChildren = filterByKeyword(perm.children)
+              if (filteredChildren.length > 0) {
+                return { ...perm, children: filteredChildren }
+              }
+            }
+
+            return matchSelf
+          })
+          .map(perm => ({
+            ...perm,
+            children: perm.children
+              ? filterByKeyword(perm.children)
+              : undefined,
+          }))
+      }
+      filtered = filterByKeyword(filtered)
+    }
+
+    return filtered
+  })
+
+  const filteredPermissionCount = computed(() => {
+    const countPermissions = (permissions: PermissionData[]): number => {
+      return permissions.reduce((count, perm) => {
+        return count + 1 + (perm.children ? countPermissions(perm.children) : 0)
+      }, 0)
+    }
+    return countPermissions(filteredPermissionTreeData.value)
+  })
+
+  const selectedPermissionGroups = computed(() => {
+    const groups: {
+      [key: string]: {
+        module: string
+        icon: string
+        permissions: PermissionData[]
+      }
+    } = {}
+
+    // 安全地处理权限ID数组
+    const permissionIds = formData.permissionIds || []
+
+    permissionIds.forEach(id => {
+      const permission = findPermissionById(permissionList, id)
+      if (permission) {
+        // 找到顶级模块
+        const topLevel = findTopLevelPermission(permissionList, id)
+        if (topLevel) {
+          if (!groups[topLevel.name]) {
+            groups[topLevel.name] = {
+              module: topLevel.name,
+              icon: topLevel.icon || 'mdi:folder',
+              permissions: [],
+            }
+          }
+          groups[topLevel.name].permissions.push(permission)
+        }
+      }
+    })
+
+    return Object.values(groups)
+  })
 
   // ==================== 辅助函数 ====================
   const getPermissionNameById = (permissionId: string): string =>
@@ -459,6 +814,20 @@
       if (permission.children) {
         const found = findPermissionById(permission.children, id)
         if (found) return found
+      }
+    }
+    return null
+  }
+
+  const findTopLevelPermission = (
+    permissions: PermissionData[],
+    targetId: string
+  ): PermissionData | null => {
+    for (const perm of permissions) {
+      if (perm.id === targetId) return perm
+      if (perm.children) {
+        const found = findPermissionById(perm.children, targetId)
+        if (found) return perm
       }
     }
     return null
@@ -496,6 +865,25 @@
   const getRowClassName = (row: RoleData) =>
     row.status === 0 ? 'disabled-row' : ''
 
+  const getAllPermissionIds = (permissions: PermissionData[]): string[] => {
+    const ids: string[] = []
+    const collect = (perms: PermissionData[]) => {
+      perms.forEach(perm => {
+        ids.push(perm.id)
+        if (perm.children) {
+          collect(perm.children)
+        }
+      })
+    }
+    collect(permissions)
+    return ids
+  }
+
+  // 安全获取权限数量的函数
+  const getPermissionCount = (role: RoleData): number => {
+    return role.permissionNames?.length || 0
+  }
+
   // ==================== 渲染函数 ====================
   const createTagRenderer =
     (getConfig: (value: any) => any, valueKey: string) => (row: RoleData) =>
@@ -525,47 +913,120 @@
         row[key] || fallback
       )
 
+  // 优化权限显示 - 悬停提示
   const createPermissionsRenderer = (row: RoleData) => {
+    // 添加类型安全检查
     if (!row.permissionNames || row.permissionNames.length === 0) {
-      return h('div', '-')
+      return h('div', { class: { 'disabled-text': row.status === 0 } }, '-')
     }
 
-    const displayCount = 2
-    const permissions = row.permissionNames
-    const displayPermissions = permissions.slice(0, displayCount)
-    const hasMore = permissions.length > displayCount
-
     return h(
-      NSpace,
-      { size: 4 },
+      NTooltip,
       {
-        default: () => [
-          ...displayPermissions.map(permission =>
-            h(
-              NTag,
-              {
-                key: permission,
-                size: 'small',
-                type: 'primary',
-                class: { 'disabled-tag': row.status === 0 },
-              },
-              { default: () => permission }
-            )
-          ),
-          ...(hasMore
-            ? [
+        trigger: 'hover',
+        placement: 'top',
+        style: { maxWidth: '300px' },
+      },
+      {
+        trigger: () =>
+          h(
+            NSpace,
+            { size: 4 },
+            {
+              default: () => [
                 h(
                   NTag,
                   {
                     size: 'small',
-                    type: 'default',
+                    type: 'primary',
                     class: { 'disabled-tag': row.status === 0 },
                   },
-                  { default: () => `+${permissions.length - displayCount}` }
-                ),
-              ]
-            : []),
-        ],
+                  { default: () => row.permissionNames![0] }
+                ), // 使用非空断言，因为已经检查过了
+                ...(row.permissionNames!.length > 1
+                  ? [
+                      h(
+                        NTag,
+                        {
+                          size: 'small',
+                          type: 'default',
+                          class: { 'disabled-tag': row.status === 0 },
+                        },
+                        { default: () => `+${row.permissionNames!.length - 1}` }
+                      ),
+                    ]
+                  : []),
+              ],
+            }
+          ),
+        default: () =>
+          h('div', { style: { padding: '8px' } }, [
+            h(
+              'div',
+              {
+                style: {
+                  fontWeight: 'bold',
+                  marginBottom: '8px',
+                  borderBottom: '1px solid #f0f0f0',
+                  paddingBottom: '4px',
+                },
+              },
+              `权限列表 (${row.permissionNames!.length})`
+            ),
+            h(
+              'div',
+              { style: { maxHeight: '200px', overflowY: 'auto' } },
+              row.permissionNames!.map(name =>
+                h(
+                  'div',
+                  {
+                    style: {
+                      padding: '2px 0',
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                  },
+                  [
+                    h(C_Icon, {
+                      name: 'mdi:shield-check',
+                      size: 12,
+                      style: { marginRight: '6px', color: '#18a058' },
+                    }),
+                    h('span', name),
+                  ]
+                )
+              )
+            ),
+          ]),
+      }
+    )
+  }
+
+  // 优化用户数显示 - 点击查看详情
+  const createUserCountRenderer = (row: RoleData) => {
+    if (!row.userCount || row.userCount === 0) {
+      return h('div', { class: { 'disabled-text': row.status === 0 } }, [
+        h(C_Icon, {
+          name: 'mdi:account-group',
+          size: 14,
+          style: { marginRight: '4px' },
+        }),
+        h('span', '0'),
+      ])
+    }
+
+    return h(
+      NButton,
+      {
+        text: true,
+        type: 'primary',
+        size: 'small',
+        class: { 'disabled-text': row.status === 0 },
+        onClick: () => handleViewRoleUsers(row),
+      },
+      {
+        icon: () => h(C_Icon, { name: 'mdi:account-group', size: 14 }),
+        default: () => `${row.userCount} 人`,
       }
     )
   }
@@ -678,27 +1139,13 @@
       title: '权限',
       key: 'permissionNames',
       width: 200,
-      render: createPermissionsRenderer,
+      render: (row: RoleData) => createPermissionsRenderer(row),
     },
     {
       title: '用户数',
       key: 'userCount',
       width: 80,
-      render: row =>
-        h(
-          'div',
-          {
-            class: { 'disabled-text': row.status === 0 },
-          },
-          [
-            h(C_Icon, {
-              name: COMPONENT_CONFIG.icons.users,
-              size: 14,
-              style: { marginRight: '4px' },
-            }),
-            h('span', row.userCount || 0),
-          ]
-        ),
+      render: createUserCountRenderer,
     },
     {
       title: '排序',
@@ -724,6 +1171,29 @@
       width: 200,
       fixed: 'right',
       render: createActionButtons,
+    },
+  ]
+
+  // 角色用户列表表格配置
+  const roleUserColumns = [
+    { title: '用户名', key: 'username', width: 120 },
+    { title: '昵称', key: 'nickname', width: 120 },
+    { title: '邮箱', key: 'email', width: 200 },
+    { title: '手机号', key: 'phone', width: 120 },
+    { title: '部门', key: 'deptName', width: 120 },
+    {
+      title: '状态',
+      key: 'status',
+      width: 80,
+      render: (row: RoleUserData) =>
+        h(
+          NTag,
+          {
+            type: row.status === 1 ? 'success' : 'error',
+            size: 'small',
+          },
+          { default: () => (row.status === 1 ? '正常' : '禁用') }
+        ),
     },
   ]
 
@@ -765,6 +1235,13 @@
       key: 'userCount',
       label: '用户数量',
       value: `${role.userCount || 0} 人`,
+      component: 'div',
+      props: { class: { 'disabled-text': role.status === 0 } },
+    },
+    {
+      key: 'permissionCount',
+      label: '权限数量',
+      value: `${getPermissionCount(role)} 项`,
       component: 'div',
       props: { class: { 'disabled-text': role.status === 0 } },
     },
@@ -885,6 +1362,82 @@
     },
   ]
 
+  // ==================== 权限分配相关方法 ====================
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const getPermissionNodeProps = (info: { option: PermissionData }) => {
+    return {
+      style: {
+        padding: '4px 8px',
+      },
+    }
+  }
+
+  const handleExpandedKeysChange = (keys: string[]) => {
+    expandedPermissionKeys.value = keys
+  }
+
+  const handlePermissionChange = (checkedKeys: string[]) => {
+    formData.permissionIds = checkedKeys
+  }
+
+  const handleSelectAll = () => {
+    const allIds = getAllPermissionIds(filteredPermissionTreeData.value)
+    formData.permissionIds = [
+      ...new Set([...(formData.permissionIds || []), ...allIds]),
+    ]
+  }
+
+  const handleSelectNone = () => {
+    formData.permissionIds = []
+  }
+
+  const handleExpandAll = () => {
+    if (isPermissionTreeExpanded.value) {
+      expandedPermissionKeys.value = []
+    } else {
+      expandedPermissionKeys.value = getAllPermissionIds(permissionList)
+    }
+    isPermissionTreeExpanded.value = !isPermissionTreeExpanded.value
+  }
+
+  const handleRemovePermission = (permissionId: string) => {
+    formData.permissionIds = (formData.permissionIds || []).filter(
+      id => id !== permissionId
+    )
+  }
+
+  const handleRemovePermissionGroup = (moduleName: string) => {
+    const topLevel = permissionList.find(p => p.name === moduleName)
+    if (topLevel) {
+      const moduleIds = getAllPermissionIds([topLevel])
+      formData.permissionIds = (formData.permissionIds || []).filter(
+        id => !moduleIds.includes(id)
+      )
+    }
+  }
+
+  const handleApplyPermissionTemplate = () => {
+    const template = permissionTemplates.find(
+      t => t.id === selectedTemplate.value
+    )
+    if (template) {
+      formData.permissionIds = [...template.permissions]
+      showPermissionTemplate.value = false
+      message.success(`已应用 ${template.name}`)
+    }
+  }
+
+  const handleViewRoleUsers = async (role: RoleData) => {
+    currentRole.value = role
+    try {
+      const response = await getRoleUsersApi(role.id)
+      roleUserList.splice(0, roleUserList.length, ...response.data)
+      showRoleUsers.value = true
+    } catch {
+      message.error('获取用户列表失败')
+    }
+  }
+
   // ==================== 组合式函数 ====================
   const useBatchOperations = () => {
     const handleBatchOperation = (
@@ -960,16 +1513,19 @@
       roleData: RoleFormData,
       existingRole?: RoleData
     ): RoleData => {
+      // 安全地获取权限名称
+      const permissionNames = (roleData.permissionIds || [])
+        .map(id => getPermissionNameById(id))
+        .filter(Boolean)
+
       const baseData = {
         name: roleData.name,
         code: roleData.code,
         type: roleData.type,
         status: roleData.status,
         description: roleData.description || undefined,
-        permissionIds: roleData.permissionIds,
-        permissionNames: roleData.permissionIds.map(id =>
-          getPermissionNameById(id)
-        ),
+        permissionIds: roleData.permissionIds || [],
+        permissionNames,
         sort: roleData.sort,
         remark: roleData.remark || undefined,
       }
@@ -1088,10 +1644,6 @@
   const refreshData = async () => {
     await Promise.all([loadRoles(), loadPermissions()])
     message.success('刷新成功')
-  }
-
-  const handlePermissionChange = (checkedKeys: string[]) => {
-    formData.permissionIds = checkedKeys
   }
 
   const handleAddRoleModal = () => {
