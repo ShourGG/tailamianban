@@ -634,6 +634,19 @@
           }
         },
         {
+          "path": "role-manage",
+          "name": "sys-role-manage",
+          "component": "/sys-manage/role-manage/index",
+          "meta": {
+            "icon": "oui:app-users-roles",
+            "title": "角色管理",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
+        },
+        {
           "path": "excelImport",
           "name": "sys-excel-import",
           "component": "/sys-manage/import/index",
