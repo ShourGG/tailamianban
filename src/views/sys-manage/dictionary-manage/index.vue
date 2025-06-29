@@ -169,12 +169,13 @@
             <NEmpty
               v-if="!selectedDict"
               description="请从左侧选择一个字典项查看详细信息"
-              style="margin-top: 80px"
+              class="mt-80px"
             >
               <template #icon>
                 <C_Icon
                   name="mdi:book-open-variant"
                   :size="72"
+                  class="mt--80px"
                 />
               </template>
             </NEmpty>

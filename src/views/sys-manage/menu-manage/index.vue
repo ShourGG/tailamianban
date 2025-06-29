@@ -137,7 +137,7 @@
                 <C_Icon
                   name="mdi:menu"
                   :size="72"
-                  class="mt-80px"
+                  class="mt--80px"
                 />
               </template>
             </NEmpty>
