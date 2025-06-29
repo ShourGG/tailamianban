@@ -16,7 +16,7 @@
           >
             <template #prefix>
               <C_Icon
-                name="mdi:magnify"
+                :name="COMPONENT_CONFIG.icons.search"
                 :size="16"
               />
             </template>
@@ -27,7 +27,7 @@
             placeholder="用户类型"
             clearable
             style="width: 120px"
-            :options="userTypeOptions"
+            :options="UI_CONFIG.userType"
             @update:value="handleSearch"
           />
 
@@ -36,7 +36,7 @@
             placeholder="用户状态"
             clearable
             style="width: 120px"
-            :options="userStatusOptions"
+            :options="UI_CONFIG.userStatus"
             @update:value="handleSearch"
           />
 
@@ -57,7 +57,7 @@
           >
             <template #icon>
               <C_Icon
-                name="mdi:plus"
+                :name="COMPONENT_CONFIG.icons.plus"
                 :size="16"
               />
             </template>
@@ -66,7 +66,7 @@
           <NButton @click="expandAll">
             <template #icon>
               <C_Icon
-                name="mdi:file-tree"
+                :name="COMPONENT_CONFIG.icons.tree"
                 :size="16"
               />
             </template>
@@ -75,7 +75,7 @@
           <NButton @click="refreshData">
             <template #icon>
               <C_Icon
-                name="mdi:refresh"
+                :name="COMPONENT_CONFIG.icons.refresh"
                 :size="16"
               />
             </template>
@@ -148,11 +148,13 @@
                     v-if="selectedUsers.length > 0"
                     type="warning"
                     size="small"
-                    @click="handleBatchToggleStatus"
+                    @click="
+                      () => handleBatchOperation('toggle', batchToggleUsers)
+                    "
                   >
                     <template #icon>
                       <C_Icon
-                        name="mdi:toggle-switch"
+                        :name="COMPONENT_CONFIG.icons.toggle"
                         :size="14"
                       />
                     </template>
@@ -162,11 +164,13 @@
                     v-if="selectedUsers.length > 0"
                     type="error"
                     size="small"
-                    @click="handleBatchDelete"
+                    @click="
+                      () => handleBatchOperation('delete', batchDeleteUsers)
+                    "
                   >
                     <template #icon>
                       <C_Icon
-                        name="mdi:delete"
+                        :name="COMPONENT_CONFIG.icons.delete"
                         :size="14"
                       />
                     </template>
@@ -217,7 +221,7 @@
             vertical
             :size="24"
           >
-            <!-- 用户头像和基本信息 -->
+            <!-- 基本信息 -->
             <NCard
               title="基本信息"
               size="small"
@@ -235,7 +239,7 @@
                   <NAvatar
                     :size="80"
                     :src="currentUser.avatar"
-                    :fallback-src="defaultAvatar"
+                    :fallback-src="COMPONENT_CONFIG.defaultAvatar"
                     :class="{ 'disabled-avatar': currentUser.status === 0 }"
                   >
                     {{ currentUser.nickname?.charAt(0) }}
@@ -245,7 +249,7 @@
                     class="disabled-overlay"
                   >
                     <C_Icon
-                      name="mdi:cancel"
+                      :name="COMPONENT_CONFIG.icons.cancel"
                       :size="24"
                       color="#ff4d4f"
                     />
@@ -257,111 +261,18 @@
                   :x-gap="16"
                   :y-gap="12"
                 >
-                  <NGi>
+                  <NGi
+                    v-for="field in getUserDetailFields(currentUser)"
+                    :key="field.key"
+                  >
                     <NSpace align="center">
-                      <NText depth="3">用户名：</NText>
-                      <NText
-                        :class="{ 'disabled-text': currentUser.status === 0 }"
+                      <NText depth="3">{{ field.label }}：</NText>
+                      <component
+                        :is="field.component"
+                        v-bind="field.props"
                       >
-                        {{ currentUser.username }}
-                      </NText>
-                    </NSpace>
-                  </NGi>
-                  <NGi>
-                    <NSpace align="center">
-                      <NText depth="3">昵称：</NText>
-                      <NText
-                        :class="{ 'disabled-text': currentUser.status === 0 }"
-                      >
-                        {{ currentUser.nickname }}
-                      </NText>
-                    </NSpace>
-                  </NGi>
-                  <NGi>
-                    <NSpace align="center">
-                      <NText depth="3">用户类型：</NText>
-                      <NTag
-                        :type="getUserTypeConfig(currentUser.userType).type"
-                        size="small"
-                        :class="{ 'disabled-tag': currentUser.status === 0 }"
-                      >
-                        <template #icon>
-                          <C_Icon
-                            :name="getUserTypeConfig(currentUser.userType).icon"
-                            :size="10"
-                          />
-                        </template>
-                        {{ getUserTypeConfig(currentUser.userType).text }}
-                      </NTag>
-                    </NSpace>
-                  </NGi>
-                  <NGi>
-                    <NSpace align="center">
-                      <NText depth="3">邮箱：</NText>
-                      <NText
-                        :class="{ 'disabled-text': currentUser.status === 0 }"
-                      >
-                        {{ currentUser.email || '-' }}
-                      </NText>
-                    </NSpace>
-                  </NGi>
-                  <NGi>
-                    <NSpace align="center">
-                      <NText depth="3">手机号：</NText>
-                      <NText
-                        :class="{ 'disabled-text': currentUser.status === 0 }"
-                      >
-                        {{ currentUser.phone || '-' }}
-                      </NText>
-                    </NSpace>
-                  </NGi>
-                  <NGi>
-                    <NSpace align="center">
-                      <NText depth="3">所属部门：</NText>
-                      <NTag
-                        type="info"
-                        size="small"
-                        :class="{ 'disabled-tag': currentUser.status === 0 }"
-                      >
-                        {{ currentUser.deptName || '-' }}
-                      </NTag>
-                    </NSpace>
-                  </NGi>
-                  <NGi v-if="currentUser.userType === 'external'">
-                    <NSpace align="center">
-                      <NText depth="3">公司名称：</NText>
-                      <NText
-                        :class="{ 'disabled-text': currentUser.status === 0 }"
-                      >
-                        {{ currentUser.companyName || '-' }}
-                      </NText>
-                    </NSpace>
-                  </NGi>
-                  <NGi v-if="currentUser.userType === 'external'">
-                    <NSpace align="center">
-                      <NText depth="3">联系人：</NText>
-                      <NText
-                        :class="{ 'disabled-text': currentUser.status === 0 }"
-                      >
-                        {{ currentUser.contactPerson || '-' }}
-                      </NText>
-                    </NSpace>
-                  </NGi>
-                  <NGi>
-                    <NSpace align="center">
-                      <NText depth="3">用户状态：</NText>
-                      <NTag
-                        :type="getUserStatusConfig(currentUser.status).type"
-                        size="small"
-                      >
-                        <template #icon>
-                          <C_Icon
-                            :name="getUserStatusConfig(currentUser.status).icon"
-                            :size="10"
-                          />
-                        </template>
-                        {{ getUserStatusConfig(currentUser.status).text }}
-                      </NTag>
+                        {{ field.value }}
+                      </component>
                     </NSpace>
                   </NGi>
                 </NGrid>
@@ -385,7 +296,7 @@
                 >
                   <template #icon>
                     <C_Icon
-                      name="mdi:account-key"
+                      :name="COMPONENT_CONFIG.icons.role"
                       :size="12"
                     />
                   </template>
@@ -404,33 +315,16 @@
                 :cols="1"
                 :y-gap="12"
               >
-                <NGi>
+                <NGi
+                  v-for="timeField in getTimeFields(currentUser)"
+                  :key="timeField.key"
+                >
                   <NSpace align="center">
-                    <NText depth="3">创建时间：</NText>
+                    <NText depth="3">{{ timeField.label }}：</NText>
                     <NText
                       :class="{ 'disabled-text': currentUser.status === 0 }"
                     >
-                      {{ currentUser.createTime }}
-                    </NText>
-                  </NSpace>
-                </NGi>
-                <NGi v-if="currentUser.updateTime">
-                  <NSpace align="center">
-                    <NText depth="3">更新时间：</NText>
-                    <NText
-                      :class="{ 'disabled-text': currentUser.status === 0 }"
-                    >
-                      {{ currentUser.updateTime }}
-                    </NText>
-                  </NSpace>
-                </NGi>
-                <NGi v-if="currentUser.lastLoginTime">
-                  <NSpace align="center">
-                    <NText depth="3">最后登录：</NText>
-                    <NText
-                      :class="{ 'disabled-text': currentUser.status === 0 }"
-                    >
-                      {{ currentUser.lastLoginTime }}
+                      {{ timeField.value }}
                     </NText>
                   </NSpace>
                 </NGi>
@@ -444,9 +338,9 @@
               size="small"
               :class="{ 'disabled-card': currentUser.status === 0 }"
             >
-              <NText :class="{ 'disabled-text': currentUser.status === 0 }">{{
-                currentUser.remark
-              }}</NText>
+              <NText :class="{ 'disabled-text': currentUser.status === 0 }">
+                {{ currentUser.remark }}
+              </NText>
             </NCard>
 
             <!-- 操作按钮 -->
@@ -454,9 +348,8 @@
               <NButton
                 type="primary"
                 @click="showUserDetail = false"
+                >关闭</NButton
               >
-                关闭
-              </NButton>
             </NSpace>
           </NSpace>
         </div>
@@ -485,165 +378,21 @@
           :cols="2"
           :x-gap="16"
         >
-          <NGi>
+          <!-- 表单字段 -->
+          <NGi
+            v-for="field in getFormFields()"
+            :key="field.key"
+          >
             <NFormItem
-              label="用户类型"
-              path="userType"
+              :label="field.label"
+              :path="field.path"
+              v-if="field.condition"
             >
-              <NSelect
-                v-model:value="formData.userType"
-                :options="userTypeOptions"
-                placeholder="请选择用户类型"
-                @update:value="handleUserTypeChange"
+              <component
+                :is="field.component"
+                v-bind="field.props"
+                v-model:value="formData[field.key]"
               />
-            </NFormItem>
-          </NGi>
-          <NGi>
-            <NFormItem
-              label="用户名"
-              path="username"
-            >
-              <NInput
-                v-model:value="formData.username"
-                placeholder="请输入用户名"
-                :disabled="modalMode === 'edit'"
-              >
-                <template
-                  #suffix
-                  v-if="modalMode === 'edit'"
-                >
-                  <NTooltip>
-                    <template #trigger>
-                      <C_Icon
-                        name="mdi:information"
-                        :size="16"
-                      />
-                    </template>
-                    用户名作为登录凭证，创建后不可修改
-                  </NTooltip>
-                </template>
-              </NInput>
-            </NFormItem>
-          </NGi>
-          <NGi>
-            <NFormItem
-              label="昵称"
-              path="nickname"
-            >
-              <NInput
-                v-model:value="formData.nickname"
-                placeholder="请输入昵称"
-              />
-            </NFormItem>
-          </NGi>
-          <NGi>
-            <NFormItem
-              label="邮箱"
-              path="email"
-            >
-              <NInput
-                v-model:value="formData.email"
-                placeholder="请输入邮箱"
-              />
-            </NFormItem>
-          </NGi>
-          <NGi>
-            <NFormItem
-              label="手机号"
-              path="phone"
-            >
-              <NInput
-                v-model:value="formData.phone"
-                placeholder="请输入手机号"
-              />
-            </NFormItem>
-          </NGi>
-
-          <!-- 内部用户显示部门选择 -->
-          <NGi v-if="formData.userType === 'internal'">
-            <NFormItem
-              label="所属部门"
-              path="deptId"
-            >
-              <NTreeSelect
-                v-model:value="formData.deptId"
-                :options="deptTreeOptions"
-                placeholder="请选择部门"
-                clearable
-                check-strategy="child"
-                key-field="id"
-                label-field="name"
-                children-field="children"
-              />
-            </NFormItem>
-          </NGi>
-
-          <!-- 外部用户显示公司信息 -->
-          <NGi v-if="formData.userType === 'external'">
-            <NFormItem
-              label="公司名称"
-              path="companyName"
-            >
-              <NInput
-                v-model:value="formData.companyName"
-                placeholder="请输入公司名称"
-              />
-            </NFormItem>
-          </NGi>
-
-          <NGi v-if="formData.userType === 'external'">
-            <NFormItem
-              label="联系人"
-              path="contactPerson"
-            >
-              <NInput
-                v-model:value="formData.contactPerson"
-                placeholder="请输入联系人"
-              />
-            </NFormItem>
-          </NGi>
-
-          <NGi>
-            <NFormItem
-              label="用户角色"
-              path="roleIds"
-            >
-              <NSelect
-                v-model:value="formData.roleIds"
-                :options="filteredRoleOptions"
-                placeholder="请选择角色"
-                multiple
-                clearable
-              />
-            </NFormItem>
-          </NGi>
-
-          <NGi v-if="modalMode === 'add'">
-            <NFormItem
-              label="初始密码"
-              path="password"
-            >
-              <NInput
-                v-model:value="formData.password"
-                type="password"
-                placeholder="请输入初始密码"
-                show-password-on="click"
-              />
-            </NFormItem>
-          </NGi>
-          <NGi>
-            <NFormItem
-              label="用户状态"
-              path="status"
-            >
-              <NSwitch
-                v-model:value="formData.status"
-                :checked-value="1"
-                :unchecked-value="0"
-              >
-                <template #checked>正常</template>
-                <template #unchecked>禁用</template>
-              </NSwitch>
             </NFormItem>
           </NGi>
         </NGrid>
@@ -706,9 +455,13 @@
 </template>
 
 <script setup lang="ts">
-  import type { FormInst, DataTableColumns } from 'naive-ui/es'
-  import { Icon } from '@iconify/vue'
+  import {
+    type FormInst,
+    type DataTableColumns,
+    NTreeSelect,
+  } from 'naive-ui/es'
   import C_Tree from '@/components/global/C_Tree/index.vue'
+  import C_Icon from '@/components/global/C_Icon/index.vue'
   import {
     type UserData,
     type UserFormData,
@@ -721,6 +474,7 @@
     RESET_PASSWORD_RULES,
     DEFAULT_USER_FORM_DATA,
     DEFAULT_RESET_PASSWORD_FORM,
+    UI_CONFIG,
     getUserListApi,
     getDeptListApi,
     getUserRolesApi,
@@ -729,194 +483,30 @@
     MOCK_ROLE_DATA,
   } from './data'
 
-  // 创建 C_Icon 组件
-  const C_Icon = defineComponent({
-    name: 'C_Icon',
-    props: {
-      name: {
-        type: String,
-        required: true,
-      },
-      size: {
-        type: [String, Number],
-        default: 16,
-      },
-      color: {
-        type: String,
-        default: '',
-      },
+  // ==================== 组件配置 ====================
+  const COMPONENT_CONFIG = {
+    icons: {
+      search: 'mdi:magnify',
+      plus: 'mdi:plus',
+      refresh: 'mdi:refresh',
+      tree: 'mdi:file-tree',
+      toggle: 'mdi:toggle-switch',
+      delete: 'mdi:delete',
+      edit: 'mdi:pencil',
+      eye: 'mdi:eye',
+      pause: 'mdi:pause',
+      play: 'mdi:play',
+      key: 'mdi:key',
+      cancel: 'mdi:cancel',
+      role: 'mdi:account-key',
+      check: 'mdi:check-circle',
+      info: 'mdi:information',
     },
-    /**
-     * @description: 渲染组件
-     */
-    setup(props) {
-      return () =>
-        h(Icon, {
-          icon: props.name,
-          width: props.size,
-          height: props.size,
-          color: props.color,
-        })
-    },
-  })
-
-  const message = useMessage()
-  const dialog = useDialog()
-
-  // 响应式数据
-  const loading = ref(false)
-  const showModal = ref(false)
-  const showUserDetail = ref(false)
-  const showResetPasswordModal = ref(false)
-  const modalMode = ref<'add' | 'edit'>('add')
-  const formRef = ref<FormInst | null>(null)
-  const resetPasswordFormRef = ref<FormInst | null>(null)
-  const tableRef = ref()
-  const deptTreeRef = ref<InstanceType<typeof C_Tree> | null>(null)
-  const expandedDeptKeys = ref<string[]>([])
-  const selectedDeptKeys = ref<string[]>([])
-  const selectedUsers = ref<string[]>([])
-  const isAllExpanded = ref(false)
-  const currentUser = ref<UserData | null>(null)
-  const currentResetUserId = ref<string>('')
-
-  // 数据
-  const userList = reactive<UserData[]>([])
-  const deptList = reactive<DeptData[]>([])
-  const userRoleOptions = ref<{ label: string; value: string }[]>([])
-
-  // 表单数据
-  const formData = reactive<UserFormData>({ ...DEFAULT_USER_FORM_DATA })
-  const formRules = USER_FORM_RULES
-  const resetPasswordForm = reactive<ResetPasswordForm>({
-    ...DEFAULT_RESET_PASSWORD_FORM,
-  })
-  const resetPasswordRules = RESET_PASSWORD_RULES
-
-  // 搜索表单
-  const searchForm = reactive<SearchForm>({
-    keyword: '',
-    status: null,
-    roleId: null,
-    deptId: null,
-    userType: null,
-  })
-
-  // 分页
-  const pagination = reactive({
-    page: 1,
-    pageSize: 20,
-    itemCount: 0,
-    showSizePicker: true,
-    pageSizes: [10, 20, 50, 100],
-    showQuickJumper: true,
-  })
-
-  // 用户详情相关
-  const defaultAvatar =
-    'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg'
-
-  // ==================== 计算属性 ====================
-  const modalTitle = computed(() =>
-    modalMode.value === 'add' ? '新增用户' : '编辑用户'
-  )
-
-  const selectedDept = computed(() => {
-    if (!selectedDeptKeys.value.length) return null
-    return findDeptById(deptList, selectedDeptKeys.value[0])
-  })
-
-  const deptIconConfig = computed(() => ({
-    typeMap: { dept: 'mdi:office-building', external: 'mdi:account-group' },
-    colorMap: { dept: '#1890ff', external: '#52c41a' },
-  }))
-
-  // 合并选项配置
-  const optionsConfig = computed(() => ({
-    userType: [
-      { label: '内部员工', value: 'internal' },
-      { label: '外部客户', value: 'external' },
-      { label: '合作伙伴', value: 'partner' },
-      { label: '访客', value: 'guest' },
-    ],
-    userStatus: [
-      { label: '正常', value: 1 },
-      { label: '禁用', value: 0 },
-    ],
-    filteredRoles:
-      formData.userType === 'external'
-        ? userRoleOptions.value.filter(role =>
-            ['role_4', 'role_5'].includes(role.value)
-          )
-        : userRoleOptions.value,
-  }))
-
-  const userTypeOptions = computed(() => optionsConfig.value.userType)
-  const userStatusOptions = computed(() => optionsConfig.value.userStatus)
-  const filteredRoleOptions = computed(() => optionsConfig.value.filteredRoles)
-
-  const deptTreeOptions = computed((): DeptTreeOption[] =>
-    convertDeptListToTreeOptions(deptList)
-  )
-
-  const paginationReactive = computed(() => ({
-    ...pagination,
-    onChange: (page: number) => handlePageChange(page),
-    onUpdatePageSize: (pageSize: number) => handlePageSizeChange(pageSize),
-  }))
-
-  // ==================== 辅助函数 ====================
-  const getRoleNameById = (roleId: string): string => {
-    return MOCK_ROLE_DATA.find(r => r.id === roleId)?.name || ''
-  }
-
-  const getDeptNameById = (deptId: string): string => {
-    const findDeptName = (depts: DeptData[], id: string): string | null => {
-      for (const dept of depts) {
-        if (dept.id === id) return dept.name
-        if (dept.children) {
-          const found = findDeptName(dept.children, id)
-          if (found) return found
-        }
-      }
-      return null
-    }
-    return findDeptName(MOCK_DEPT_DATA, deptId) || '未知部门'
-  }
-
-  // 更新用户状态的通用函数
-  const updateUserInList = (userId: string, updates: Partial<UserData>) => {
-    // 更新MOCK_USER_DATA
-    const mockUserIndex = MOCK_USER_DATA.findIndex(u => u.id === userId)
-    if (mockUserIndex !== -1) {
-      MOCK_USER_DATA[mockUserIndex] = {
-        ...MOCK_USER_DATA[mockUserIndex],
-        ...updates,
-      }
-    }
-
-    // 更新本地userList
-    const userIndex = userList.findIndex(u => u.id === userId)
-    if (userIndex !== -1) {
-      userList[userIndex] = { ...userList[userIndex], ...updates }
-    }
-
-    // 更新用户详情（如果打开）
-    if (currentUser.value && currentUser.value.id === userId) {
-      currentUser.value = { ...currentUser.value, ...updates }
-    }
-  }
-
-  const getUserStatusConfig = (status: number) => {
-    const configs = {
+    statusConfig: {
       1: { text: '正常', type: 'success' as const, icon: 'mdi:check-circle' },
       0: { text: '禁用', type: 'error' as const, icon: 'mdi:pause-circle' },
-    }
-    return configs[status as keyof typeof configs] || configs[1]
-  }
-
-  const getUserTypeConfig = (userType: UserType) => {
-    const configs = {
+    },
+    userTypeConfig: {
       internal: { text: '内部', type: 'info' as const, icon: 'mdi:account' },
       external: {
         text: '外部',
@@ -933,13 +523,151 @@
         type: 'default' as const,
         icon: 'mdi:account-outline',
       },
+    },
+    defaultAvatar: 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+    batchConfig: {
+      delete: {
+        title: '批量删除',
+        content: '确认删除选中的用户吗？此操作不可恢复！',
+        type: 'error' as const,
+      },
+      toggle: {
+        title: '批量状态操作',
+        content: '确认对选中的用户进行状态切换吗？',
+        type: 'warning' as const,
+      },
+    },
+  } as const
+
+  const message = useMessage()
+  const dialog = useDialog()
+
+  // ==================== 响应式数据 ====================
+  const loading = ref(false)
+  const showModal = ref(false)
+  const showUserDetail = ref(false)
+  const showResetPasswordModal = ref(false)
+  const modalMode = ref<'add' | 'edit'>('add')
+  const formRef = ref<FormInst | null>(null)
+  const resetPasswordFormRef = ref<FormInst | null>(null)
+  const tableRef = ref()
+  const deptTreeRef = ref<InstanceType<typeof C_Tree> | null>(null)
+  const expandedDeptKeys = ref<string[]>([])
+  const selectedDeptKeys = ref<string[]>([])
+  const selectedUsers = ref<string[]>([])
+  const isAllExpanded = ref(false)
+  const currentUser = ref<UserData | null>(null)
+  const currentResetUserId = ref<string>('')
+
+  const userList = reactive<UserData[]>([])
+  const deptList = reactive<DeptData[]>([])
+  const userRoleOptions = ref<{ label: string; value: string }[]>([])
+
+  const formData = reactive<UserFormData>({ ...DEFAULT_USER_FORM_DATA })
+  const formRules = USER_FORM_RULES
+  const resetPasswordForm = reactive<ResetPasswordForm>({
+    ...DEFAULT_RESET_PASSWORD_FORM,
+  })
+  const resetPasswordRules = RESET_PASSWORD_RULES
+
+  const searchForm = reactive<SearchForm>({
+    keyword: '',
+    status: null,
+    roleId: null,
+    deptId: null,
+    userType: null,
+  })
+
+  const pagination = reactive({
+    page: 1,
+    pageSize: 20,
+    itemCount: 0,
+    showSizePicker: true,
+    pageSizes: [10, 20, 50, 100],
+    showQuickJumper: true,
+  })
+
+  // ==================== 计算属性 ====================
+  const modalTitle = computed(() =>
+    modalMode.value === 'add' ? '新增用户' : '编辑用户'
+  )
+  const selectedDept = computed(() => {
+    if (!selectedDeptKeys.value.length) return null
+    return findDeptById(deptList, selectedDeptKeys.value[0])
+  })
+
+  const deptIconConfig = computed(() => ({
+    typeMap: { dept: 'mdi:office-building', external: 'mdi:account-group' },
+    colorMap: { dept: '#1890ff', external: '#52c41a' },
+  }))
+
+  const filteredRoleOptions = computed(() =>
+    formData.userType === 'external'
+      ? userRoleOptions.value.filter(role =>
+          ['role_4', 'role_5'].includes(role.value)
+        )
+      : userRoleOptions.value
+  )
+
+  const deptTreeOptions = computed((): DeptTreeOption[] =>
+    convertDeptListToTreeOptions(deptList)
+  )
+
+  const paginationReactive = computed(() => ({
+    ...pagination,
+    onChange: (page: number) => handlePageChange(page),
+    onUpdatePageSize: (pageSize: number) => handlePageSizeChange(pageSize),
+  }))
+
+  // ==================== 辅助函数 ====================
+  const getRoleNameById = (roleId: string): string =>
+    MOCK_ROLE_DATA.find(r => r.id === roleId)?.name || ''
+
+  const getDeptNameById = (deptId: string): string => {
+    const findDeptName = (depts: DeptData[], id: string): string | null => {
+      for (const dept of depts) {
+        if (dept.id === id) return dept.name
+        if (dept.children) {
+          const found = findDeptName(dept.children, id)
+          if (found) return found
+        }
+      }
+      return null
     }
-    return configs[userType] || configs.internal
+    return findDeptName(MOCK_DEPT_DATA, deptId) || '未知部门'
   }
 
-  const getRowClassName = (row: UserData) => {
-    return row.status === 0 ? 'disabled-row' : ''
+  const updateUserInList = (userId: string, updates: Partial<UserData>) => {
+    // 更新所有相关的数据源
+    const updateTargets = [
+      { data: MOCK_USER_DATA, key: 'id' },
+      { data: userList, key: 'id' },
+    ]
+
+    updateTargets.forEach(({ data, key }) => {
+      const index = data.findIndex((item: any) => item[key] === userId)
+      if (index !== -1) {
+        data[index] = { ...data[index], ...updates }
+      }
+    })
+
+    // 更新当前用户详情
+    if (currentUser.value?.id === userId) {
+      currentUser.value = { ...currentUser.value, ...updates }
+    }
   }
+
+  const getUserStatusConfig = (status: number) =>
+    COMPONENT_CONFIG.statusConfig[
+      status as keyof typeof COMPONENT_CONFIG.statusConfig
+    ] || COMPONENT_CONFIG.statusConfig[1]
+
+  const getUserTypeConfig = (userType: UserType) =>
+    COMPONENT_CONFIG.userTypeConfig[userType] ||
+    COMPONENT_CONFIG.userTypeConfig.internal
+
+  const getRowClassName = (row: UserData) =>
+    row.status === 0 ? 'disabled-row' : ''
 
   const findDeptById = (depts: DeptData[], id: string): DeptData | null => {
     for (const dept of depts) {
@@ -952,16 +680,167 @@
     return null
   }
 
-  const convertDeptListToTreeOptions = (
-    depts: DeptData[]
-  ): DeptTreeOption[] => {
-    return depts.map(dept => ({
+  const convertDeptListToTreeOptions = (depts: DeptData[]): DeptTreeOption[] =>
+    depts.map(dept => ({
       id: dept.id,
       name: dept.name,
       children: dept.children
         ? convertDeptListToTreeOptions(dept.children)
         : undefined,
     }))
+
+  // ==================== 渲染函数 ====================
+  const createTagRenderer =
+    (getConfig: (value: any) => any, valueKey: string) => (row: UserData) =>
+      h(
+        NTag,
+        {
+          type: getConfig(row[valueKey as keyof UserData]).type,
+          size: 'small',
+          class: { 'disabled-tag': row.status === 0 },
+        },
+        {
+          icon: () =>
+            h(C_Icon, {
+              name: getConfig(row[valueKey as keyof UserData]).icon,
+              size: 10,
+            }),
+          default: () => getConfig(row[valueKey as keyof UserData]).text,
+        }
+      )
+
+  const createTextRenderer =
+    (key: keyof UserData, fallback = '-') =>
+    (row: UserData) =>
+      h(
+        'div',
+        { class: { 'disabled-text': row.status === 0 } },
+        row[key] || fallback
+      )
+
+  const createUsernameRenderer = (row: UserData) =>
+    h(
+      'div',
+      {
+        class: ['username-cell', { 'disabled-user': row.status === 0 }],
+        style:
+          row.status === 0
+            ? {
+                textDecoration: 'line-through',
+                color: '#999',
+                backgroundColor: '#f5f5f5',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                display: 'inline-block',
+                border: '1px solid #e0e0e0',
+              }
+            : undefined,
+      },
+      row.username
+    )
+
+  const createRolesRenderer = (row: UserData) => {
+    if (!row.roleNames || row.roleNames.length === 0) {
+      return h('div', '-')
+    }
+    return h(
+      NSpace,
+      { size: 4 },
+      {
+        default: () =>
+          row.roleNames!.map(role =>
+            h(
+              NTag,
+              {
+                key: role,
+                size: 'small',
+                type: 'info',
+                class: { 'disabled-tag': row.status === 0 },
+              },
+              { default: () => role }
+            )
+          ),
+      }
+    )
+  }
+
+  const createActionButtons = (row: UserData) => {
+    const buttons = [
+      {
+        icon: COMPONENT_CONFIG.icons.eye,
+        text: '详情',
+        type: 'info' as const,
+        onClick: () => handleViewUser(row),
+      },
+      {
+        icon: COMPONENT_CONFIG.icons.edit,
+        text: '编辑',
+        onClick: () => handleEditUser(row),
+      },
+      {
+        icon:
+          row.status === 1
+            ? COMPONENT_CONFIG.icons.pause
+            : COMPONENT_CONFIG.icons.play,
+        text: row.status === 1 ? '禁用' : '启用',
+        type: row.status === 1 ? ('warning' as const) : ('success' as const),
+        onClick: () => handleToggleUserStatus(row),
+      },
+      {
+        icon: COMPONENT_CONFIG.icons.key,
+        text: '重置',
+        type: 'warning' as const,
+        onClick: () => handleShowResetPassword(row),
+        disabled: row.status === 0,
+      },
+    ]
+
+    return h(
+      'div',
+      { style: { display: 'flex', gap: '4px', flexWrap: 'nowrap' } },
+      [
+        ...buttons.map(btn =>
+          h(
+            NButton,
+            {
+              size: 'tiny',
+              type: btn.type,
+              disabled: btn.disabled,
+              onClick: btn.onClick,
+            },
+            {
+              icon: () => h(C_Icon, { name: btn.icon, size: 12 }),
+              default: () => btn.text,
+            }
+          )
+        ),
+        h(
+          NPopconfirm,
+          {
+            onPositiveClick: () => handleDeleteUser(row.id),
+          },
+          {
+            trigger: () =>
+              h(
+                NButton,
+                {
+                  size: 'tiny',
+                  type: 'error',
+                },
+                {
+                  icon: () =>
+                    h(C_Icon, {
+                      name: COMPONENT_CONFIG.icons.delete,
+                      size: 12,
+                    }),
+                  default: () => '删除',
+                }
+              ),
+            default: () => '确认删除该用户吗？',
+          }
+        ),
+      ]
+    )
   }
 
   // ==================== 表格列配置 ====================
@@ -971,86 +850,32 @@
       title: '用户类型',
       key: 'userType',
       width: 100,
-      render: row => {
-        const config = getUserTypeConfig(row.userType)
-        return h(
-          NTag,
-          {
-            type: config.type,
-            size: 'small',
-            class: { 'disabled-tag': row.status === 0 },
-          },
-          {
-            icon: () => h(C_Icon, { name: config.icon, size: 10 }),
-            default: () => config.text,
-          }
-        )
-      },
+      render: createTagRenderer(getUserTypeConfig, 'userType'),
     },
     {
       title: '用户名',
       key: 'username',
       width: 120,
       fixed: 'left',
-      render: row =>
-        h(
-          'div',
-          {
-            class: ['username-cell', { 'disabled-user': row.status === 0 }],
-            style:
-              row.status === 0
-                ? {
-                    textDecoration: 'line-through',
-                    color: '#999',
-                    backgroundColor: '#f5f5f5',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    display: 'inline-block',
-                    border: '1px solid #e0e0e0',
-                  }
-                : undefined,
-          },
-          row.username
-        ),
+      render: createUsernameRenderer,
     },
     {
       title: '昵称',
       key: 'nickname',
       width: 120,
-      render: row =>
-        h(
-          'div',
-          {
-            class: { 'disabled-text': row.status === 0 },
-          },
-          row.nickname
-        ),
+      render: createTextRenderer('nickname'),
     },
     {
       title: '邮箱',
       key: 'email',
       width: 180,
-      render: row =>
-        h(
-          'div',
-          {
-            class: { 'disabled-text': row.status === 0 },
-          },
-          row.email || '-'
-        ),
+      render: createTextRenderer('email'),
     },
     {
       title: '手机号',
       key: 'phone',
       width: 120,
-      render: row =>
-        h(
-          'div',
-          {
-            class: { 'disabled-text': row.status === 0 },
-          },
-          row.phone || '-'
-        ),
+      render: createTextRenderer('phone'),
     },
     {
       title: '部门/公司',
@@ -1071,269 +896,430 @@
       title: '角色',
       key: 'roleNames',
       width: 150,
-      render: row => {
-        if (!row.roleNames || row.roleNames.length === 0) {
-          return h('div', '-')
-        }
-        return h(
-          NSpace,
-          { size: 4 },
-          {
-            default: () =>
-              row.roleNames!.map(role =>
-                h(
-                  NTag,
-                  {
-                    key: role,
-                    size: 'small',
-                    type: 'info',
-                    class: { 'disabled-tag': row.status === 0 },
-                  },
-                  { default: () => role }
-                )
-              ),
-          }
-        )
-      },
+      render: createRolesRenderer,
     },
     {
       title: '状态',
       key: 'status',
       width: 80,
-      render: row => {
-        const config = getUserStatusConfig(row.status)
-        return h(
-          NTag,
-          { type: config.type, size: 'small' },
-          {
-            icon: () => h(C_Icon, { name: config.icon, size: 10 }),
-            default: () => config.text,
-          }
-        )
-      },
+      render: createTagRenderer(getUserStatusConfig, 'status'),
     },
     {
       title: '创建时间',
       key: 'createTime',
       width: 160,
-      render: row =>
-        h(
-          'div',
-          {
-            class: { 'disabled-text': row.status === 0 },
-          },
-          row.createTime
-        ),
+      render: createTextRenderer('createTime'),
     },
     {
       title: '操作',
       key: 'actions',
       width: 250,
       fixed: 'right',
-      render: row =>
-        h(
-          'div',
-          { style: { display: 'flex', gap: '4px', flexWrap: 'nowrap' } },
-          [
-            h(
-              NButton,
-              {
-                size: 'tiny',
-                type: 'info',
-                onClick: () => handleViewUser(row),
-              },
-              {
-                icon: () => h(C_Icon, { name: 'mdi:eye', size: 12 }),
-                default: () => '详情',
-              }
-            ),
-            h(
-              NButton,
-              {
-                size: 'tiny',
-                onClick: () => handleEditUser(row),
-              },
-              {
-                icon: () => h(C_Icon, { name: 'mdi:pencil', size: 12 }),
-                default: () => '编辑',
-              }
-            ),
-            h(
-              NButton,
-              {
-                size: 'tiny',
-                type: row.status === 1 ? 'warning' : 'success',
-                onClick: () => handleToggleUserStatus(row),
-              },
-              {
-                icon: () =>
-                  h(C_Icon, {
-                    name: row.status === 1 ? 'mdi:pause' : 'mdi:play',
-                    size: 12,
-                  }),
-                default: () => (row.status === 1 ? '禁用' : '启用'),
-              }
-            ),
-            h(
-              NButton,
-              {
-                size: 'tiny',
-                type: 'warning',
-                onClick: () => handleShowResetPassword(row),
-                disabled: row.status === 0,
-              },
-              {
-                icon: () => h(C_Icon, { name: 'mdi:key', size: 12 }),
-                default: () => '重置',
-              }
-            ),
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => handleDeleteUser(row.id),
-              },
-              {
-                trigger: () =>
-                  h(
-                    NButton,
-                    {
-                      size: 'tiny',
-                      type: 'error',
-                    },
-                    {
-                      icon: () => h(C_Icon, { name: 'mdi:delete', size: 12 }),
-                      default: () => '删除',
-                    }
-                  ),
-                default: () => '确认删除该用户吗？',
-              }
-            ),
-          ]
-        ),
+      render: createActionButtons,
     },
   ]
 
-  // ==================== 批量操作通用函数 ====================
-  const handleBatchOperation = (
-    type: 'delete' | 'toggle',
-    title: string,
-    content: string,
-    confirmText: string,
-    operation: () => void
-  ) => {
-    if (selectedUsers.value.length === 0) {
-      message.warning('请先选择用户')
-      return
-    }
-
-    dialog[type === 'delete' ? 'error' : 'warning']({
-      title,
-      content,
-      positiveText: confirmText,
-      negativeText: '取消',
-      onPositiveClick: async () => {
-        try {
-          operation()
-          message.success(`${type === 'delete' ? '批量删除' : '批量操作'}成功`)
-          selectedUsers.value = []
-          await loadUsers()
-        } catch {
-          message.error(`${type === 'delete' ? '批量删除' : '批量操作'}失败`)
-        }
+  // ==================== 用户详情字段配置 ====================
+  const getUserDetailFields = (user: UserData) => [
+    {
+      key: 'username',
+      label: '用户名',
+      value: user.username,
+      component: 'div',
+      props: { class: { 'disabled-text': user.status === 0 } },
+    },
+    {
+      key: 'nickname',
+      label: '昵称',
+      value: user.nickname,
+      component: 'div',
+      props: { class: { 'disabled-text': user.status === 0 } },
+    },
+    {
+      key: 'userType',
+      label: '用户类型',
+      value: getUserTypeConfig(user.userType).text,
+      component: NTag,
+      props: {
+        type: getUserTypeConfig(user.userType).type,
+        size: 'small',
+        class: { 'disabled-tag': user.status === 0 },
       },
-    })
+    },
+    {
+      key: 'email',
+      label: '邮箱',
+      value: user.email || '-',
+      component: 'div',
+      props: { class: { 'disabled-text': user.status === 0 } },
+    },
+    {
+      key: 'phone',
+      label: '手机号',
+      value: user.phone || '-',
+      component: 'div',
+      props: { class: { 'disabled-text': user.status === 0 } },
+    },
+    {
+      key: 'deptName',
+      label: '所属部门',
+      value: user.deptName || '-',
+      component: NTag,
+      props: {
+        type: 'info',
+        size: 'small',
+        class: { 'disabled-tag': user.status === 0 },
+      },
+    },
+    ...(user.userType === 'external'
+      ? [
+          {
+            key: 'companyName',
+            label: '公司名称',
+            value: user.companyName || '-',
+            component: 'div',
+            props: { class: { 'disabled-text': user.status === 0 } },
+          },
+          {
+            key: 'contactPerson',
+            label: '联系人',
+            value: user.contactPerson || '-',
+            component: 'div',
+            props: { class: { 'disabled-text': user.status === 0 } },
+          },
+        ]
+      : []),
+    {
+      key: 'status',
+      label: '用户状态',
+      value: getUserStatusConfig(user.status).text,
+      component: NTag,
+      props: { type: getUserStatusConfig(user.status).type, size: 'small' },
+    },
+  ]
+
+  const getTimeFields = (user: UserData) => [
+    { key: 'createTime', label: '创建时间', value: user.createTime },
+    ...(user.updateTime
+      ? [{ key: 'updateTime', label: '更新时间', value: user.updateTime }]
+      : []),
+    ...(user.lastLoginTime
+      ? [{ key: 'lastLoginTime', label: '最后登录', value: user.lastLoginTime }]
+      : []),
+  ]
+
+  // ==================== 表单字段配置 ====================
+  const getFormFields = (): Array<{
+    key: keyof UserFormData
+    label: string
+    path: string
+    component: any
+    props: any
+    condition: boolean
+  }> => [
+    {
+      key: 'userType' as keyof UserFormData,
+      label: '用户类型',
+      path: 'userType',
+      component: NSelect,
+      props: {
+        options: UI_CONFIG.userType,
+        placeholder: '请选择用户类型',
+        onUpdateValue: handleUserTypeChange,
+      },
+      condition: true,
+    },
+    {
+      key: 'username' as keyof UserFormData,
+      label: '用户名',
+      path: 'username',
+      component: NInput,
+      props: {
+        placeholder: '请输入用户名',
+        disabled: modalMode.value === 'edit',
+        ...(modalMode.value === 'edit' && {
+          suffix: () =>
+            h(
+              NTooltip,
+              {},
+              {
+                trigger: () =>
+                  h(C_Icon, { name: COMPONENT_CONFIG.icons.info, size: 16 }),
+                default: () => '用户名作为登录凭证，创建后不可修改',
+              }
+            ),
+        }),
+      },
+      condition: true,
+    },
+    {
+      key: 'nickname' as keyof UserFormData,
+      label: '昵称',
+      path: 'nickname',
+      component: NInput,
+      props: { placeholder: '请输入昵称' },
+      condition: true,
+    },
+    {
+      key: 'email' as keyof UserFormData,
+      label: '邮箱',
+      path: 'email',
+      component: NInput,
+      props: { placeholder: '请输入邮箱' },
+      condition: true,
+    },
+    {
+      key: 'phone' as keyof UserFormData,
+      label: '手机号',
+      path: 'phone',
+      component: NInput,
+      props: { placeholder: '请输入手机号' },
+      condition: true,
+    },
+    {
+      key: 'deptId' as keyof UserFormData,
+      label: '所属部门',
+      path: 'deptId',
+      component: NTreeSelect,
+      props: {
+        options: deptTreeOptions.value,
+        placeholder: '请选择部门',
+        clearable: true,
+        checkStrategy: 'child',
+        keyField: 'id',
+        labelField: 'name',
+        childrenField: 'children',
+      },
+      condition: formData.userType === 'internal',
+    },
+    {
+      key: 'companyName' as keyof UserFormData,
+      label: '公司名称',
+      path: 'companyName',
+      component: NInput,
+      props: { placeholder: '请输入公司名称' },
+      condition: formData.userType === 'external',
+    },
+    {
+      key: 'contactPerson' as keyof UserFormData,
+      label: '联系人',
+      path: 'contactPerson',
+      component: NInput,
+      props: { placeholder: '请输入联系人' },
+      condition: formData.userType === 'external',
+    },
+    {
+      key: 'roleIds' as keyof UserFormData,
+      label: '用户角色',
+      path: 'roleIds',
+      component: NSelect,
+      props: {
+        options: filteredRoleOptions.value,
+        placeholder: '请选择角色',
+        multiple: true,
+        clearable: true,
+      },
+      condition: true,
+    },
+    {
+      key: 'password' as keyof UserFormData,
+      label: '初始密码',
+      path: 'password',
+      component: NInput,
+      props: {
+        type: 'password',
+        placeholder: '请输入初始密码',
+        showPasswordOn: 'click',
+      },
+      condition: modalMode.value === 'add',
+    },
+    {
+      key: 'status' as keyof UserFormData,
+      label: '用户状态',
+      path: 'status',
+      component: NSwitch,
+      props: {
+        checkedValue: 1,
+        uncheckedValue: 0,
+        ...(modalMode.value === 'edit' && {
+          checked: () => '正常',
+          unchecked: () => '禁用',
+        }),
+      },
+      condition: true,
+    },
+  ]
+
+  // ==================== 组合式函数 ====================
+  const useBatchOperations = () => {
+    const handleBatchOperation = (
+      operation: 'delete' | 'toggle',
+      actionFn: (ids: string[]) => void
+    ) => {
+      if (selectedUsers.value.length === 0) {
+        message.warning('请先选择用户')
+        return
+      }
+
+      const config = COMPONENT_CONFIG.batchConfig[operation]
+      const content = `${config.content.replace('选中的用户', `选中的 ${selectedUsers.value.length} 个用户`)}`
+
+      dialog[config.type]({
+        title: config.title,
+        content,
+        positiveText: '确认',
+        negativeText: '取消',
+        onPositiveClick: async () => {
+          try {
+            actionFn(selectedUsers.value)
+            message.success(
+              `批量${operation === 'delete' ? '删除' : '操作'}成功`
+            )
+            selectedUsers.value = []
+            await loadUsers()
+          } catch {
+            message.error(`批量${operation === 'delete' ? '删除' : '操作'}失败`)
+          }
+        },
+      })
+    }
+
+    const batchDeleteUsers = (ids: string[]) => {
+      ids.forEach(id => {
+        const userIndex = MOCK_USER_DATA.findIndex(user => user.id === id)
+        if (userIndex !== -1) {
+          MOCK_USER_DATA.splice(userIndex, 1)
+        }
+      })
+    }
+
+    const batchToggleUsers = (ids: string[]) => {
+      ids.forEach(id => {
+        const user = MOCK_USER_DATA.find(u => u.id === id)
+        if (user) {
+          updateUserInList(id, {
+            status: user.status === 1 ? 0 : 1,
+            updateTime: new Date().toLocaleString(),
+          })
+        }
+      })
+    }
+
+    return { handleBatchOperation, batchDeleteUsers, batchToggleUsers }
   }
 
-  // ==================== 用户操作函数 ====================
-  // 拆分添加用户函数
-  const handleAddUserData = async (
-    userData: UserFormData
-  ): Promise<boolean> => {
-    const existingUser = MOCK_USER_DATA.find(
-      user => user.username === userData.username
-    )
-    if (existingUser) {
-      message.error('用户名已存在')
-      return false
+  const useUserOperations = () => {
+    // 提取用户数据构建逻辑，降低复杂度
+    const buildUserData = (
+      userData: UserFormData,
+      existingUser?: UserData
+    ): UserData => {
+      const baseData = {
+        nickname: userData.nickname,
+        email: userData.email || undefined,
+        phone: userData.phone || undefined,
+        userType: userData.userType,
+        deptId: userData.deptId || undefined,
+        deptName: userData.deptId
+          ? getDeptNameById(userData.deptId)
+          : undefined,
+        roleIds: userData.roleIds,
+        roleNames: userData.roleIds.map(id => getRoleNameById(id)),
+        status: userData.status,
+        remark: userData.remark || undefined,
+        companyName: userData.companyName || undefined,
+        contactPerson: userData.contactPerson || undefined,
+      }
+
+      if (existingUser) {
+        return {
+          ...existingUser,
+          ...baseData,
+          updateTime: new Date().toLocaleString(),
+        }
+      }
+
+      return {
+        id: `user_${Date.now()}`,
+        username: userData.username,
+        createTime: new Date().toLocaleString(),
+        ...baseData,
+      }
     }
 
-    const newUser: UserData = {
-      id: `user_${Date.now()}`,
-      username: userData.username,
-      nickname: userData.nickname,
-      email: userData.email || undefined,
-      phone: userData.phone || undefined,
-      userType: userData.userType,
-      deptId: userData.deptId || undefined,
-      deptName: userData.deptId ? getDeptNameById(userData.deptId) : undefined,
-      roleIds: userData.roleIds,
-      roleNames: userData.roleIds.map(id => getRoleNameById(id)),
-      status: userData.status,
-      remark: userData.remark || undefined,
-      companyName: userData.companyName || undefined,
-      contactPerson: userData.contactPerson || undefined,
-      createTime: new Date().toLocaleString(),
+    // 提取验证逻辑
+    const validateUserData = (
+      userData: UserFormData,
+      mode: 'add' | 'edit'
+    ): { valid: boolean; error?: string } => {
+      if (mode === 'edit' && !userData.id) {
+        return { valid: false, error: '用户ID不存在' }
+      }
+
+      if (mode === 'add') {
+        const existingUser = MOCK_USER_DATA.find(
+          user => user.username === userData.username
+        )
+        if (existingUser) {
+          return { valid: false, error: '用户名已存在' }
+        }
+      }
+
+      return { valid: true }
     }
 
-    MOCK_USER_DATA.push(newUser)
-    message.success('添加成功')
-    return true
+    const handleAddUserData = async (
+      userData: UserFormData
+    ): Promise<boolean> => {
+      const validation = validateUserData(userData, 'add')
+      if (!validation.valid) {
+        message.error(validation.error!)
+        return false
+      }
+
+      const newUser = buildUserData(userData)
+      MOCK_USER_DATA.push(newUser)
+      message.success('添加成功')
+      return true
+    }
+
+    const handleUpdateUserData = async (
+      userData: UserFormData
+    ): Promise<boolean> => {
+      const validation = validateUserData(userData, 'edit')
+      if (!validation.valid) {
+        message.error(validation.error!)
+        return false
+      }
+
+      const userIndex = MOCK_USER_DATA.findIndex(
+        user => user.id === userData.id
+      )
+      if (userIndex === -1) {
+        message.error('用户不存在')
+        return false
+      }
+
+      const existingUser = MOCK_USER_DATA[userIndex]
+      const updatedUser = buildUserData(userData, existingUser)
+
+      MOCK_USER_DATA[userIndex] = updatedUser
+
+      if (currentUser.value?.id === userData.id) {
+        currentUser.value = { ...updatedUser }
+      }
+
+      message.success('修改成功')
+      return true
+    }
+
+    return { handleAddUserData, handleUpdateUserData }
   }
 
-  // 拆分更新用户函数
-  const handleUpdateUserData = async (
-    userData: UserFormData
-  ): Promise<boolean> => {
-    if (!userData.id) {
-      message.error('用户ID不存在')
-      return false
-    }
-
-    const userIndex = MOCK_USER_DATA.findIndex(user => user.id === userData.id)
-    if (userIndex === -1) {
-      message.error('用户不存在')
-      return false
-    }
-
-    const existingUser = MOCK_USER_DATA[userIndex]
-    const updatedUser = buildUpdatedUser(existingUser, userData)
-
-    MOCK_USER_DATA[userIndex] = updatedUser
-    updateCurrentUserIfNeeded(userData.id, updatedUser)
-
-    message.success('修改成功')
-    return true
-  }
-
-  // 辅助函数：构建更新后的用户对象
-  const buildUpdatedUser = (
-    existingUser: UserData,
-    userData: UserFormData
-  ): UserData => {
-    return {
-      ...existingUser,
-      nickname: userData.nickname,
-      email: userData.email || undefined,
-      phone: userData.phone || undefined,
-      userType: userData.userType,
-      deptId: userData.deptId || undefined,
-      deptName: userData.deptId ? getDeptNameById(userData.deptId) : undefined,
-      roleIds: userData.roleIds,
-      roleNames: userData.roleIds.map(id => getRoleNameById(id)),
-      status: userData.status,
-      remark: userData.remark || undefined,
-      companyName: userData.companyName || undefined,
-      contactPerson: userData.contactPerson || undefined,
-      updateTime: new Date().toLocaleString(),
-    }
-  }
-
-  // 辅助函数：如果需要，更新当前用户详情
-  const updateCurrentUserIfNeeded = (userId: string, updatedUser: UserData) => {
-    if (currentUser.value && currentUser.value.id === userId) {
-      currentUser.value = { ...updatedUser }
-    }
-  }
+  // ==================== 使用组合式函数 ====================
+  const { handleBatchOperation, batchDeleteUsers, batchToggleUsers } =
+    useBatchOperations()
+  const { handleAddUserData, handleUpdateUserData } = useUserOperations()
 
   // ==================== 事件处理函数 ====================
   const handleDeptSelect = (node: any, keys: (string | number)[]) => {
@@ -1438,7 +1424,6 @@
         status: newStatus,
         updateTime: new Date().toLocaleString(),
       })
-
       message.success(`${statusText}成功`)
     } catch (error) {
       console.error('状态切换失败:', error)
@@ -1452,7 +1437,6 @@
       if (userIndex !== -1) {
         MOCK_USER_DATA.splice(userIndex, 1)
       }
-
       message.success('删除成功')
       await loadUsers()
     } catch {
@@ -1478,7 +1462,6 @@
         currentResetUserId.value,
         resetPasswordForm.newPassword
       )
-
       message.success('密码重置成功')
       showResetPasswordModal.value = false
       return true
@@ -1489,48 +1472,9 @@
     }
   }
 
-  const handleBatchToggleStatus = () => {
-    handleBatchOperation(
-      'toggle',
-      '批量状态操作',
-      `确认对选中的 ${selectedUsers.value.length} 个用户进行状态切换吗？`,
-      '确认',
-      () => {
-        selectedUsers.value.forEach(id => {
-          const user = MOCK_USER_DATA.find(u => u.id === id)
-          if (user) {
-            updateUserInList(id, {
-              status: user.status === 1 ? 0 : 1,
-              updateTime: new Date().toLocaleString(),
-            })
-          }
-        })
-      }
-    )
-  }
-
-  const handleBatchDelete = () => {
-    handleBatchOperation(
-      'delete',
-      '批量删除',
-      `确认删除选中的 ${selectedUsers.value.length} 个用户吗？此操作不可恢复！`,
-      '确认删除',
-      () => {
-        selectedUsers.value.forEach(id => {
-          const userIndex = MOCK_USER_DATA.findIndex(user => user.id === id)
-          if (userIndex !== -1) {
-            MOCK_USER_DATA.splice(userIndex, 1)
-          }
-        })
-      }
-    )
-  }
-
-  // 简化后的保存函数
   const handleSaveUser = async (): Promise<boolean> => {
     try {
       await formRef.value?.validate()
-
       const success =
         modalMode.value === 'add'
           ? await handleAddUserData(formData)
@@ -1540,7 +1484,6 @@
         showModal.value = false
         await loadUsers()
       }
-
       return success
     } catch (error) {
       if (error instanceof Array) return false
