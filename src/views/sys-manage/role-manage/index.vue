@@ -494,14 +494,14 @@
       key: 'name' as keyof RoleFormData,
       label: '角色名称',
       path: 'name',
-      component: 'NInput',
+      component: NInput, // 改为真实组件
       props: { placeholder: '请输入角色名称' },
     },
     {
       key: 'code' as keyof RoleFormData,
       label: '角色编码',
       path: 'code',
-      component: 'NInput',
+      component: NInput, // 改为真实组件
       props: {
         placeholder: '请输入角色编码',
         disabled: modalMode.value === 'edit',
@@ -511,7 +511,7 @@
       key: 'type' as keyof RoleFormData,
       label: '角色类型',
       path: 'type',
-      component: 'NSelect',
+      component: NSelect, // 改为真实组件
       props: {
         options: UI_CONFIG.roleType,
         placeholder: '请选择角色类型',
@@ -522,7 +522,7 @@
       key: 'sort' as keyof RoleFormData,
       label: '排序',
       path: 'sort',
-      component: 'NInputNumber',
+      component: NInputNumber, // 改为真实组件
       props: {
         placeholder: '请输入排序值',
         min: 0,
@@ -534,7 +534,7 @@
       key: 'status' as keyof RoleFormData,
       label: '角色状态',
       path: 'status',
-      component: 'NSwitch',
+      component: NSwitch, // 改为真实组件
       props: {
         checkedValue: 1,
         uncheckedValue: 0,

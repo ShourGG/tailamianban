@@ -22,12 +22,7 @@
       font-size: 14px;
       color: var(--n-text-color-disabled);
     }
-  }
-
-  .header-actions {
-    display: flex;
-    align-items: center;
-  }
+                }
 }
 
 .tree-permission-layout {
@@ -102,6 +97,7 @@
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: box-shadow 0.3s ease;
 
       &:hover {
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
@@ -410,7 +406,7 @@
   // ==================== 响应式设计 ====================
   @media (max-width: 1400px) {
     .child-permissions-grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
     }
   }
 
@@ -426,7 +422,7 @@
       }
     }
 
-    .module-header {
+                                .permission-module .module-header {
       flex-direction: column;
       align-items: stretch;
       gap: 16px;
@@ -439,7 +435,7 @@
 
   @media (max-width: 768px) {
     .child-permissions-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr !important;
     }
 
     .child-permissions {

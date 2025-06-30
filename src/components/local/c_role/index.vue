@@ -1,7 +1,7 @@
 <template>
   <NDrawer
     v-model:show="showDrawer"
-    :width="1600"
+    :width="1200"
     placement="right"
     :mask-closable="false"
   >
@@ -60,7 +60,7 @@
             >
               <template #prefix>
                 <C_Icon
-                  :name="PERMISSION_CONFIG.icons.search"
+                  name="mdi:magnify"
                   :size="18"
                 />
               </template>
@@ -144,18 +144,15 @@
               <span class="stat-value">{{ selectedModulesCount }}</span>
             </div>
             <NDivider vertical />
-            <div class="stat-item">
-              <span class="stat-label">菜单权限:</span>
-              <span class="stat-value">{{ typeStatistics.menu }}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">按钮权限:</span>
-              <span class="stat-value">{{ typeStatistics.button }}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">接口权限:</span>
-              <span class="stat-value">{{ typeStatistics.api }}</span>
-            </div>
+            <template
+              v-for="[type, label] in typeStatOptions"
+              :key="type"
+            >
+              <div class="stat-item">
+                <span class="stat-label">{{ label }}权限:</span>
+                <span class="stat-value">{{ typeStatistics[type] }}</span>
+              </div>
+            </template>
           </NSpace>
         </div>
 
@@ -172,7 +169,7 @@
                 <div class="module-title-section">
                   <NButton
                     text
-                    @click="() => toggleModuleExpand(module.id)"
+                    @click="() => toggleExpand(module.id, moduleExpandState)"
                     class="expand-button"
                   >
                     <template #icon>
@@ -292,7 +289,9 @@
                             size="tiny"
                             type="info"
                           >
-                            {{ getFilteredChildPermissions(permission).length }}
+                            {{
+                              getFilteredChildPermissions(permission).length
+                            }}
                             个子权限
                           </NTag>
                         </div>
@@ -315,7 +314,9 @@
                       v-if="hasValidChildren(permission)"
                       text
                       size="small"
-                      @click.stop="() => togglePermissionExpand(permission.id)"
+                      @click.stop="
+                        () => toggleExpand(permission.id, permissionExpandState)
+                      "
                     >
                       <template #icon>
                         <C_Icon
@@ -511,12 +512,6 @@
     permissions: PermissionData[]
   }
 
-  interface TypeStatistics {
-    menu: number
-    button: number
-    api: number
-  }
-
   const props = defineProps<Props>()
   const emit = defineEmits<Emits>()
 
@@ -541,6 +536,13 @@
   const moduleExpandState = reactive<Record<string, boolean>>({})
   const permissionExpandState = reactive<Record<string, boolean>>({})
 
+  // 常量定义
+  const typeStatOptions = [
+    ['menu', '菜单'],
+    ['button', '按钮'],
+    ['api', '接口'],
+  ] as const
+
   // 核心计算属性
   const showDrawer = computed<boolean>({
     get: () => props.show,
@@ -552,7 +554,7 @@
     set: (value: string[]) => emit('update:selectedIds', value),
   })
 
-  // 过滤模块 - 优化性能，减少重复计算
+  // 过滤模块
   const filteredModules = computed<PermissionData[]>(() => {
     const { permissions } = props
     const keyword = searchKeyword.value?.toLowerCase()
@@ -565,23 +567,22 @@
 
       // 搜索过滤
       if (keyword) {
-        const moduleMatches =
-          name.toLowerCase().includes(keyword) ||
-          code.toLowerCase().includes(keyword)
-        const hasMatchingChild = hasMatchingPermissionInTree(children, keyword)
-        if (!moduleMatches && !hasMatchingChild) return false
+        const moduleMatches = [name, code].some(field =>
+          field.toLowerCase().includes(keyword)
+        )
+        if (!moduleMatches && !hasMatchingPermissionInTree(children, keyword))
+          return false
       }
 
       // 类型过滤
-      if (typeFilter && !hasPermissionTypeInTree(children, typeFilter)) {
+      if (typeFilter && !hasPermissionTypeInTree(children, typeFilter))
         return false
-      }
 
       return true
     })
   })
 
-  // 统计数据 - 使用独立的computed属性
+  // 统计数据
   const totalCount = computed<number>(
     () => getAllPermissionIds(props.permissions).length
   )
@@ -595,12 +596,12 @@
     return moduleIds.size
   })
 
-  const typeStatistics = computed<TypeStatistics>(() => {
-    const stats: TypeStatistics = { menu: 0, button: 0, api: 0 }
+  const typeStatistics = computed(() => {
+    const stats = { menu: 0, button: 0, api: 0 }
     selectedIds.value.forEach(id => {
       const permission = findPermissionById(props.permissions, id)
-      if (permission?.type && stats.hasOwnProperty(permission.type)) {
-        stats[permission.type as keyof TypeStatistics]++
+      if (permission?.type && permission.type in stats) {
+        stats[permission.type as keyof typeof stats]++
       }
     })
     return stats
@@ -624,15 +625,61 @@
     return Object.values(groups)
   })
 
-  // 工具方法 - 模块相关
+  // 工具方法 - 简化版本
+  const isPermissionSelected = (permissionId: string): boolean =>
+    selectedIds.value.includes(permissionId)
+
+  const isSearchMatch = (permission: PermissionData): boolean => {
+    if (!searchKeyword.value) return false
+    const keyword = searchKeyword.value.toLowerCase()
+    return [
+      permission.name,
+      permission.code,
+      permission.description || '',
+    ].some(field => field.toLowerCase().includes(keyword))
+  }
+
+  const hasValidChildren = (permission: PermissionData): boolean =>
+    getFilteredChildPermissions(permission).length > 0
+
+  const getFilteredChildPermissions = (
+    permission: PermissionData
+  ): PermissionData[] => {
+    const { children = [] } = permission
+    const keyword = searchKeyword.value?.toLowerCase()
+    const typeFilter = permissionTypeFilter.value
+
+    return children.filter(child => {
+      if (typeFilter && child.type !== typeFilter) return false
+      if (keyword) {
+        return [child.name, child.code, child.description || ''].some(field =>
+          field.toLowerCase().includes(keyword)
+        )
+      }
+      return true
+    })
+  }
+
+  const isPermissionPartiallySelected = (
+    permission: PermissionData
+  ): boolean => {
+    const { children = [] } = permission
+    const childIds = children.map(child => child.id)
+    const selectedChildIds = childIds.filter(id =>
+      selectedIds.value.includes(id)
+    )
+    return (
+      selectedChildIds.length > 0 && selectedChildIds.length < childIds.length
+    )
+  }
+
+  // 模块相关方法
   const getModulePermissionCount = (module: PermissionData): number =>
     getModulePermissions(module).length
 
-  const getModuleSelectedCount = (module: PermissionData): number => {
-    const modulePermissions = getModulePermissions(module)
-    return modulePermissions.filter(p => selectedIds.value.includes(p.id))
+  const getModuleSelectedCount = (module: PermissionData): number =>
+    getModulePermissions(module).filter(p => selectedIds.value.includes(p.id))
       .length
-  }
 
   const getModuleSelectionPercentage = (module: PermissionData): number => {
     const total = getModulePermissionCount(module)
@@ -665,85 +712,18 @@
     return selectedCount > 0 && selectedCount < modulePermissions.length
   }
 
-  // 工具方法 - 权限相关
-  const isPermissionSelected = (permissionId: string): boolean =>
-    selectedIds.value.includes(permissionId)
-
-  // 修复 TypeScript 错误 - 确保返回值始终为 boolean
-  const isSearchMatch = (permission: PermissionData): boolean => {
-    if (!searchKeyword.value) return false
-
-    const keyword = searchKeyword.value.toLowerCase()
-    const { name, code, description } = permission
-
-    return (
-      name.toLowerCase().includes(keyword) ||
-      code.toLowerCase().includes(keyword) ||
-      Boolean(description?.toLowerCase().includes(keyword))
-    )
-  }
-
-  const hasValidChildren = (permission: PermissionData): boolean =>
-    getFilteredChildPermissions(permission).length > 0
-
-  const getFilteredChildPermissions = (
-    permission: PermissionData
-  ): PermissionData[] => {
-    const { children = [] } = permission
-    const keyword = searchKeyword.value?.toLowerCase()
-    const typeFilter = permissionTypeFilter.value
-
-    return children.filter(child => {
-      // 类型过滤
-      if (typeFilter && child.type !== typeFilter) return false
-
-      // 搜索过滤
-      if (keyword) {
-        const { name, code, description } = child
-        return (
-          name.toLowerCase().includes(keyword) ||
-          code.toLowerCase().includes(keyword) ||
-          Boolean(description?.toLowerCase().includes(keyword))
-        )
-      }
-
-      return true
-    })
-  }
-
-  const isPermissionPartiallySelected = (
-    permission: PermissionData
-  ): boolean => {
-    const { children = [] } = permission
-    const childIds = children.map(child => child.id)
-    const selectedChildIds = childIds.filter(id =>
-      selectedIds.value.includes(id)
-    )
-    return (
-      selectedChildIds.length > 0 && selectedChildIds.length < childIds.length
-    )
-  }
-
-  // 事件处理 - 使用 Set 优化性能
-  const toggleModuleExpand = (moduleId: string): void => {
-    moduleExpandState[moduleId] = !moduleExpandState[moduleId]
-  }
-
-  const togglePermissionExpand = (permissionId: string): void => {
-    permissionExpandState[permissionId] = !permissionExpandState[permissionId]
+  // 事件处理 - 简化版本
+  const toggleExpand = (id: string, state: Record<string, boolean>): void => {
+    state[id] = !state[id]
   }
 
   const handleToggleExpandAll = (expanded: boolean): void => {
     expandAll.value = expanded
-
     props.permissions.forEach(({ id, children = [] }) => {
       moduleExpandState[id] = expanded
-
       children.forEach(permission => {
-        const { id: permissionId, children: permissionChildren = [] } =
-          permission
-        if (permissionChildren.length > 0) {
-          permissionExpandState[permissionId] = expanded
+        if (permission.children?.length) {
+          permissionExpandState[permission.id] = expanded
         }
       })
     })
@@ -759,10 +739,9 @@
     permissionId: string,
     checked: boolean
   ): void => {
-    updateSelectedIds(ids => {
-      if (checked) ids.add(permissionId)
-      else ids.delete(permissionId)
-    })
+    updateSelectedIds(ids =>
+      checked ? ids.add(permissionId) : ids.delete(permissionId)
+    )
   }
 
   const handleToggleMenuPermission = (
@@ -770,7 +749,6 @@
     checked: boolean
   ): void => {
     const { id, children = [] } = permission
-
     updateSelectedIds(ids => {
       if (checked) {
         ids.add(id)
@@ -787,14 +765,10 @@
     checked: boolean
   ): void => {
     const modulePermissions = getModulePermissions(module)
-    const moduleIds = modulePermissions.map(p => p.id)
-
     updateSelectedIds(ids => {
-      if (checked) {
-        moduleIds.forEach(id => ids.add(id))
-      } else {
-        moduleIds.forEach(id => ids.delete(id))
-      }
+      modulePermissions.forEach(p =>
+        checked ? ids.add(p.id) : ids.delete(p.id)
+      )
     })
   }
 
