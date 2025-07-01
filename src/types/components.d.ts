@@ -101,6 +101,7 @@ declare module 'vue' {
     NNotificationProvider: typeof import('naive-ui')['NNotificationProvider']
     NOption: typeof import('naive-ui')['NOption']
     NPageHeader: typeof import('naive-ui')['NPageHeader']
+    NPagination: typeof import('naive-ui')['NPagination']
     NPopconfirm: typeof import('naive-ui')['NPopconfirm']
     NPopover: typeof import('naive-ui')['NPopover']
     NPre: typeof import('naive-ui')['NPre']

@@ -85,52 +85,43 @@
                 共 {{ pagination.itemCount }} 个
               </NTag>
             </NText>
-            <NSpace v-if="selectedRoles.length > 0">
-              <NButton
-                type="warning"
-                size="small"
-                @click="handleBatchToggle"
-              >
-                <template #icon>
-                  <C_Icon
-                    :name="ICONS.toggle"
-                    :size="14"
-                  />
-                </template>
-                批量操作
-              </NButton>
-              <NButton
-                type="error"
-                size="small"
-                @click="handleBatchDelete"
-              >
-                <template #icon>
-                  <C_Icon
-                    :name="ICONS.delete"
-                    :size="14"
-                  />
-                </template>
-                批量删除
-              </NButton>
-            </NSpace>
           </NSpace>
         </template>
 
-        <!-- 角色表格 -->
-        <NDataTable
-          v-model:checked-row-keys="selectedRoles"
-          :columns="roleColumns"
+        <!-- 使用 C_Table 组件 -->
+        <C_Table
+          ref="tableRef"
+          :columns="tableColumns"
           :data="roleList"
-          :pagination="paginationReactive"
           :loading="loading"
-          :row-key="(row: RoleData) => row.id"
-          :scroll-x="1400"
+          :row-key="rowKey"
+          :actions="tableActions"
+          edit-mode="modal"
+          modal-title="编辑角色"
+          :modal-width="800"
           size="small"
-          remote
           striped
-          @update:page="handlePageChange"
-          @update:page-size="handlePageSizeChange"
+          bordered
+          single-line
+          @save="handleTableSave"
         />
+
+        <!-- 分页器 -->
+        <NSpace
+          justify="end"
+          style="margin-top: 16px"
+        >
+          <NPagination
+            v-model:page="pagination.page"
+            v-model:page-size="pagination.pageSize"
+            :item-count="pagination.itemCount"
+            :page-sizes="pagination.pageSizes"
+            show-size-picker
+            show-quick-jumper
+            @update:page="handlePageChange"
+            @update:page-size="handlePageSizeChange"
+          />
+        </NSpace>
       </NCard>
     </div>
 
@@ -354,8 +345,9 @@
 </template>
 
 <script setup lang="ts">
-  import { type FormInst, type DataTableColumns } from 'naive-ui/es'
+  import type { FormInst, DataTableColumns } from 'naive-ui/es'
   import C_Icon from '@/components/global/C_Icon/index.vue'
+  import C_Table from '@/components/global/C_Table/index.vue'
   import {
     type RoleData,
     type RoleFormData,
@@ -380,7 +372,6 @@
   } from './data'
 
   const message = useMessage()
-  const dialog = useDialog()
 
   // ==================== 响应式数据 ====================
   const loading = ref(false)
@@ -391,7 +382,7 @@
   const showRoleUsers = ref(false)
   const modalMode = ref<'add' | 'edit'>('add')
   const formRef = ref<FormInst | null>(null)
-  const selectedRoles = ref<string[]>([])
+  const tableRef = ref()
   const selectedPermissionIds = ref<string[]>([])
   const selectedTemplate = ref<string | null>(null)
   const currentRole = ref<RoleData | null>(null)
@@ -426,12 +417,6 @@
   const modalTitle = computed(() =>
     modalMode.value === 'add' ? '新增角色' : '编辑角色'
   )
-
-  const paginationReactive = computed(() => ({
-    ...pagination,
-    onChange: (page: number) => handlePageChange(page),
-    onUpdatePageSize: (pageSize: number) => handlePageSizeChange(pageSize),
-  }))
 
   const roleDetailFields = computed(() => {
     if (!currentRole.value) return []
@@ -494,14 +479,14 @@
       key: 'name' as keyof RoleFormData,
       label: '角色名称',
       path: 'name',
-      component: NInput, // 改为真实组件
+      component: NInput,
       props: { placeholder: '请输入角色名称' },
     },
     {
       key: 'code' as keyof RoleFormData,
       label: '角色编码',
       path: 'code',
-      component: NInput, // 改为真实组件
+      component: NInput,
       props: {
         placeholder: '请输入角色编码',
         disabled: modalMode.value === 'edit',
@@ -511,7 +496,7 @@
       key: 'type' as keyof RoleFormData,
       label: '角色类型',
       path: 'type',
-      component: NSelect, // 改为真实组件
+      component: NSelect,
       props: {
         options: UI_CONFIG.roleType,
         placeholder: '请选择角色类型',
@@ -522,7 +507,7 @@
       key: 'sort' as keyof RoleFormData,
       label: '排序',
       path: 'sort',
-      component: NInputNumber, // 改为真实组件
+      component: NInputNumber,
       props: {
         placeholder: '请输入排序值',
         min: 0,
@@ -534,7 +519,7 @@
       key: 'status' as keyof RoleFormData,
       label: '角色状态',
       path: 'status',
-      component: NSwitch, // 改为真实组件
+      component: NSwitch,
       props: {
         checkedValue: 1,
         uncheckedValue: 0,
@@ -542,119 +527,229 @@
     },
   ])
 
-  // ==================== 渲染函数 ====================
-  const createPermissionsRenderer = (row: RoleData) => {
-    if (!row.permissionNames || row.permissionNames.length === 0) {
-      return h('div', { class: { 'disabled-text': row.status === 0 } }, '-')
-    }
-
-    return h(
-      NTooltip,
-      { trigger: 'hover', placement: 'top', style: { maxWidth: '300px' } },
-      {
-        trigger: () =>
-          h(
-            NSpace,
-            { size: 4 },
-            {
-              default: () => [
-                h(
-                  NTag,
-                  {
-                    size: 'small',
-                    type: 'primary',
-                    class: { 'disabled-tag': row.status === 0 },
-                  },
-                  { default: () => row.permissionNames![0] }
-                ),
-                ...(row.permissionNames!.length > 1
-                  ? [
-                      h(
-                        NTag,
-                        {
-                          size: 'small',
-                          type: 'default',
-                          class: { 'disabled-tag': row.status === 0 },
-                        },
-                        { default: () => `+${row.permissionNames!.length - 1}` }
-                      ),
-                    ]
-                  : []),
-              ],
-            }
-          ),
-        default: () =>
-          h('div', { style: { padding: '8px' } }, [
-            h(
-              'div',
-              {
-                style: {
-                  fontWeight: 'bold',
-                  marginBottom: '8px',
-                  borderBottom: '1px solid #f0f0f0',
-                  paddingBottom: '4px',
-                },
-              },
-              `权限列表 (${row.permissionNames!.length})`
-            ),
-            h(
-              'div',
-              { style: { maxHeight: '200px', overflowY: 'auto' } },
-              row.permissionNames!.map(name =>
-                h(
-                  'div',
-                  {
-                    style: {
-                      padding: '2px 0',
-                      display: 'flex',
-                      alignItems: 'center',
-                    },
-                  },
-                  [
-                    h(C_Icon, {
-                      name: 'mdi:shield-check',
-                      size: 12,
-                      style: { marginRight: '6px', color: '#18a058' },
-                    }),
-                    h('span', name),
-                  ]
-                )
-              )
-            ),
-          ]),
-      }
-    )
-  }
-
-  const createUserCountRenderer = (row: RoleData) => {
-    if (!row.userCount || row.userCount === 0) {
-      return h('div', { class: { 'disabled-text': row.status === 0 } }, [
-        h(C_Icon, {
-          name: ICONS.users,
-          size: 14,
-          style: { marginRight: '4px' },
-        }),
-        h('span', '0'),
-      ])
-    }
-
-    return h(
-      NButton,
-      {
-        text: true,
-        type: 'primary',
-        size: 'small',
-        class: { 'disabled-text': row.status === 0 },
-        onClick: () => handleViewRoleUsers(row),
-      },
-      {
-        icon: () => h(C_Icon, { name: ICONS.users, size: 14 }),
-        default: () => `${row.userCount} 人`,
-      }
-    )
-  }
+  // ==================== 行键配置 ====================
+  const rowKey = (row: any) => row.id
 
   // ==================== 表格列配置 ====================
+  const tableColumns = computed(() => [
+    {
+      key: 'type',
+      title: '角色类型',
+      width: 100,
+      editable: false,
+      render: (row: any) =>
+        h(
+          NTag,
+          {
+            type: ROLE_TYPE_CONFIG[row.type as keyof typeof ROLE_TYPE_CONFIG]
+              .type,
+            size: 'small',
+          },
+          {
+            icon: () =>
+              h(C_Icon, {
+                name: ROLE_TYPE_CONFIG[
+                  row.type as keyof typeof ROLE_TYPE_CONFIG
+                ].icon,
+                size: 10,
+              }),
+            default: () =>
+              ROLE_TYPE_CONFIG[row.type as keyof typeof ROLE_TYPE_CONFIG].text,
+          }
+        ),
+    },
+    {
+      key: 'name',
+      title: '角色名称',
+      width: 120,
+      editable: true,
+      required: true,
+    },
+    { key: 'code', title: '角色编码', width: 120, editable: false },
+    {
+      key: 'description',
+      title: '描述',
+      width: 180,
+      editable: true,
+      editType: 'textarea' as const,
+    },
+    {
+      key: 'permissionNames',
+      title: '权限',
+      width: 200,
+      align: 'center' as const,
+      editable: false,
+      render: (row: any) => {
+        if (!row.permissionNames?.length) {
+          return h('div', { style: { textAlign: 'center' } }, '-')
+        }
+
+        return h('div', { style: { textAlign: 'center' } }, [
+          h(
+            NTooltip,
+            {
+              trigger: 'hover',
+              placement: 'top',
+              style: { maxWidth: '300px' },
+            },
+            {
+              trigger: () =>
+                h(NSpace, { size: 4, justify: 'center' }, () => [
+                  h(
+                    NTag,
+                    { size: 'small', type: 'primary' },
+                    () => row.permissionNames[0]
+                  ),
+                  row.permissionNames.length > 1 &&
+                    h(
+                      NTag,
+                      { size: 'small', type: 'default' },
+                      () => `+${row.permissionNames.length - 1}`
+                    ),
+                ]),
+              default: () =>
+                h('div', { style: { padding: '8px' } }, [
+                  h(
+                    'div',
+                    {
+                      style: {
+                        fontWeight: 'bold',
+                        marginBottom: '8px',
+                        borderBottom: '1px solid #f0f0f0',
+                        paddingBottom: '4px',
+                      },
+                    },
+                    `权限列表 (${row.permissionNames.length})`
+                  ),
+                  h(
+                    'div',
+                    { style: { maxHeight: '200px', overflowY: 'auto' } },
+                    row.permissionNames.map((name: string) =>
+                      h(
+                        'div',
+                        {
+                          style: {
+                            padding: '2px 0',
+                            display: 'flex',
+                            alignItems: 'center',
+                          },
+                        },
+                        [
+                          h(C_Icon, {
+                            name: 'mdi:shield-check',
+                            size: 12,
+                            style: { marginRight: '6px', color: '#18a058' },
+                          }),
+                          h('span', name),
+                        ]
+                      )
+                    )
+                  ),
+                ]),
+            }
+          ),
+        ])
+      },
+    },
+    {
+      key: 'userCount',
+      title: '用户数',
+      width: 80,
+      align: 'center' as const,
+      editable: false,
+      render: (row: any) =>
+        row.userCount
+          ? h(
+              NButton,
+              {
+                text: true,
+                type: 'primary',
+                size: 'small',
+                onClick: () => handleViewRoleUsers(row),
+              },
+              () => `${row.userCount} 人`
+            )
+          : h('span', '0'),
+    },
+    {
+      key: 'sort',
+      title: '排序',
+      width: 80,
+      editable: true,
+      editType: 'number' as const,
+    },
+    {
+      key: 'status',
+      title: '状态',
+      width: 80,
+      editable: true,
+      editType: 'switch' as const,
+      render: (row: any) =>
+        h(
+          NTag,
+          {
+            type: STATUS_CONFIG[row.status as keyof typeof STATUS_CONFIG].type,
+            size: 'small',
+          },
+          () => STATUS_CONFIG[row.status as keyof typeof STATUS_CONFIG].text
+        ),
+    },
+    { key: 'createTime', title: '创建时间', width: 160, editable: false },
+  ])
+
+  // ==================== 表格操作配置 ====================
+  const tableActions = computed(() => ({
+    detail: {
+      onView: (row: any) => viewRole(row),
+    },
+    edit: {
+      onEdit: (row: any) => editRole(row),
+    },
+    delete: {
+      onDelete: async (row: any) => {
+        if (row.type === 'system') {
+          message.warning('系统角色不能删除')
+          return Promise.reject('系统角色不能删除') // 阻止后续执行
+        }
+        await deleteRole(row.id)
+      },
+      confirmText: (row: any) =>
+        row.type === 'system'
+          ? '系统角色不可删除'
+          : `确认删除角色"${row.name}"吗？`,
+    },
+    custom: [
+      {
+        key: 'permission',
+        label: '权限',
+        icon: 'mdi:shield-account',
+        type: 'primary' as const,
+        onClick: (row: any) => openPermissionDrawer(row),
+      },
+      {
+        key: 'enable',
+        label: '启用',
+        icon: 'mdi:play',
+        type: 'success' as const,
+        onClick: (row: any) => toggleRoleStatus(row),
+        show: (row: any) =>
+          row.status === 0 &&
+          !(row.type === 'system' && row.code === 'super_admin'),
+      },
+      {
+        key: 'disable',
+        label: '禁用',
+        icon: 'mdi:pause',
+        type: 'warning' as const,
+        onClick: (row: any) => toggleRoleStatus(row),
+        show: (row: any) =>
+          row.status === 1 &&
+          !(row.type === 'system' && row.code === 'super_admin'),
+      },
+    ],
+  }))
+
+  // ==================== 表格用户列配置 ====================
   const roleUserColumns: DataTableColumns<RoleUserData> = [
     { title: '用户名', key: 'username', width: 120 },
     { title: '昵称', key: 'nickname', width: 120 },
@@ -674,151 +769,26 @@
     },
   ]
 
-  const roleColumns: DataTableColumns<RoleData> = [
-    { type: 'selection', disabled: (row: RoleData) => row.type === 'system' },
-    {
-      title: '角色类型',
-      key: 'type',
-      width: 100,
-      render: (row: RoleData) =>
-        h(
-          NTag,
-          {
-            type: ROLE_TYPE_CONFIG[row.type].type,
-            size: 'small',
-          },
-          {
-            icon: () =>
-              h(C_Icon, { name: ROLE_TYPE_CONFIG[row.type].icon, size: 10 }),
-            default: () => ROLE_TYPE_CONFIG[row.type].text,
-          }
-        ),
-    },
-    { title: '角色名称', key: 'name', width: 120, fixed: 'left' },
-    { title: '角色编码', key: 'code', width: 120 },
-    { title: '描述', key: 'description', width: 180 },
-    {
-      title: '权限',
-      key: 'permissionNames',
-      width: 200,
-      render: createPermissionsRenderer,
-    },
-    {
-      title: '用户数',
-      key: 'userCount',
-      width: 80,
-      render: createUserCountRenderer,
-    },
-    { title: '排序', key: 'sort', width: 80 },
-    {
-      title: '状态',
-      key: 'status',
-      width: 80,
-      render: (row: RoleData) =>
-        h(
-          NTag,
-          {
-            type: STATUS_CONFIG[row.status as keyof typeof STATUS_CONFIG].type,
-            size: 'small',
-          },
-          {
-            icon: () =>
-              h(C_Icon, {
-                name: STATUS_CONFIG[row.status as keyof typeof STATUS_CONFIG]
-                  .icon,
-                size: 10,
-              }),
-            default: () =>
-              STATUS_CONFIG[row.status as keyof typeof STATUS_CONFIG].text,
-          }
-        ),
-    },
-    { title: '创建时间', key: 'createTime', width: 160 },
-    {
-      title: '操作',
-      key: 'actions',
-      width: 240,
-      fixed: 'right',
-      render: (row: RoleData) =>
-        h('div', { style: { display: 'flex', gap: '4px' } }, [
-          h(
-            NButton,
-            { size: 'tiny', type: 'info', onClick: () => viewRole(row) },
-            {
-              icon: () => h(C_Icon, { name: ICONS.eye, size: 12 }),
-              default: () => '详情',
-            }
-          ),
-          h(
-            NButton,
-            {
-              size: 'tiny',
-              type: 'primary',
-              onClick: () => openPermissionDrawer(row),
-            },
-            {
-              icon: () => h(C_Icon, { name: ICONS.permission, size: 12 }),
-              default: () => '权限',
-            }
-          ),
-          h(
-            NButton,
-            { size: 'tiny', onClick: () => editRole(row) },
-            {
-              icon: () => h(C_Icon, { name: ICONS.edit, size: 12 }),
-              default: () => '编辑',
-            }
-          ),
-          h(
-            NButton,
-            {
-              size: 'tiny',
-              type: row.status === 1 ? 'warning' : 'success',
-              disabled: row.type === 'system' && row.code === 'super_admin',
-              onClick: () => toggleRoleStatus(row),
-            },
-            {
-              icon: () =>
-                h(C_Icon, {
-                  name: row.status === 1 ? ICONS.pause : ICONS.play,
-                  size: 12,
-                }),
-              default: () => (row.status === 1 ? '禁用' : '启用'),
-            }
-          ),
-          h(
-            NPopconfirm,
-            {
-              onPositiveClick: () => deleteRole(row.id),
-              disabled: row.type === 'system',
-            },
-            {
-              trigger: () =>
-                h(
-                  NButton,
-                  {
-                    size: 'tiny',
-                    type: 'error',
-                    disabled: row.type === 'system',
-                  },
-                  {
-                    icon: () => h(C_Icon, { name: ICONS.delete, size: 12 }),
-                    default: () => '删除',
-                  }
-                ),
-              default: () =>
-                row.type === 'system'
-                  ? '系统角色不可删除'
-                  : '确认删除该角色吗？',
-            }
-          ),
-        ]),
-    },
-  ]
-
   // ==================== 工具函数 ====================
   const getPermissionNameById = (permissionId: string): string =>
     findPermissionById(MOCK_PERMISSION_DATA, permissionId)?.name || ''
+
+  // ==================== C_Table 事件处理 ====================
+  const handleTableSave = async (rowData: any) => {
+    try {
+      updateRoleInList(rowData.id, {
+        name: rowData.name,
+        description: rowData.description || undefined,
+        status: rowData.status,
+        sort: rowData.sort,
+        updateTime: new Date().toLocaleString(),
+      })
+      message.success('修改成功')
+      await loadRoles()
+    } catch {
+      message.error('保存失败')
+    }
+  }
 
   // ==================== 事件处理 ====================
   const handleSearch = () => {
@@ -868,7 +838,7 @@
     Object.assign(formData, DEFAULT_ROLE_FORM_DATA)
   }
 
-  const editRole = (role: RoleData) => openRoleModal(role)
+  const editRole = (role: any) => openRoleModal(role)
 
   const viewRole = (role: RoleData) => {
     currentRole.value = role
@@ -887,21 +857,15 @@
       updateTime: new Date().toLocaleString(),
     })
     message.success(`${newStatus === 1 ? '启用' : '禁用'}成功`)
+    await loadRoles() // 刷新数据
   }
 
   const deleteRole = async (id: string) => {
-    const role = MOCK_ROLE_DATA.find(r => r.id === id)
-    if (role?.type === 'system') {
-      message.warning('系统角色不能删除')
-      return
-    }
-
     const roleIndex = MOCK_ROLE_DATA.findIndex(role => role.id === id)
     if (roleIndex !== -1) {
       MOCK_ROLE_DATA.splice(roleIndex, 1)
+      await loadRoles()
     }
-    message.success('删除成功')
-    await loadRoles()
   }
 
   const handleSaveRole = async (): Promise<boolean> => {
@@ -951,70 +915,6 @@
     } catch {
       return false
     }
-  }
-
-  // 批量操作
-  const handleBatchToggle = () => {
-    if (selectedRoles.value.length === 0) {
-      message.warning('请先选择角色')
-      return
-    }
-
-    dialog.warning({
-      title: '批量状态操作',
-      content: `确认对选中的 ${selectedRoles.value.length} 个角色进行状态切换吗？`,
-      positiveText: '确认',
-      negativeText: '取消',
-      onPositiveClick: async () => {
-        selectedRoles.value.forEach(id => {
-          const role = MOCK_ROLE_DATA.find(r => r.id === id)
-          if (role && role.type !== 'system') {
-            updateRoleInList(id, {
-              status: role.status === 1 ? 0 : 1,
-              updateTime: new Date().toLocaleString(),
-            })
-          }
-        })
-        message.success('批量操作成功')
-        selectedRoles.value = []
-        await loadRoles()
-      },
-    })
-  }
-
-  const handleBatchDelete = () => {
-    if (selectedRoles.value.length === 0) {
-      message.warning('请先选择角色')
-      return
-    }
-
-    const systemRoles = selectedRoles.value.filter(id => {
-      const role = MOCK_ROLE_DATA.find(r => r.id === id)
-      return role?.type === 'system'
-    })
-
-    if (systemRoles.length > 0) {
-      message.warning('不能删除系统角色')
-      return
-    }
-
-    dialog.error({
-      title: '批量删除',
-      content: `确认删除选中的 ${selectedRoles.value.length} 个角色吗？此操作不可恢复！`,
-      positiveText: '确认',
-      negativeText: '取消',
-      onPositiveClick: async () => {
-        selectedRoles.value.forEach(id => {
-          const roleIndex = MOCK_ROLE_DATA.findIndex(role => role.id === id)
-          if (roleIndex !== -1) {
-            MOCK_ROLE_DATA.splice(roleIndex, 1)
-          }
-        })
-        message.success('批量删除成功')
-        selectedRoles.value = []
-        await loadRoles()
-      },
-    })
   }
 
   // 权限分配
