@@ -1,3 +1,13 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-07-01 22:39:10
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-07-02 00:47:07
+ * @FilePath: \Robot_Admin\src\views\sys-manage\permission-manage\index.vue
+ * @Description: 权限演示页面
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <div class="permission-management">
     <!-- 搜索筛选区域 -->
