@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-17 10:52:35
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-17 23:53:29
+ * @LastEditTime: 2025-07-01 20:14:01
  * @FilePath: \Robot_Admin\src\composables\Table\useDynamicRow.ts
  * @Description: 表格动态行操作 Hooks -  增行、插行、删除行、复制行、调整行、单选功能、打印功能
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -20,6 +20,7 @@ import {
   type PrintWatermarkOptions,
 } from '@/hooks/usePrintWatermark'
 import type { TableColumn, DataRecord } from '@/types/modules/table'
+import C_Icon from '@/components/global/C_Icon/index.vue'
 
 // ================= 类型定义 =================
 export interface DynamicRowsOptions<T extends DataRecord = DataRecord> {
@@ -530,7 +531,7 @@ export function useDynamicRows<T extends DataRecord = DataRecord>(
             },
           },
           {
-            icon: () => h(NIcon, () => h('i', { class: 'i-mdi:printer' })),
+            icon: () => h(C_Icon, { name: 'mdi:printer', title: '打印' }),
             default: () => '打印',
           }
         )
@@ -552,7 +553,7 @@ export function useDynamicRows<T extends DataRecord = DataRecord>(
             type: 'primary',
           },
           {
-            icon: () => h(NIcon, () => h('i', { class: 'i-mdi:plus' })),
+            icon: () => h(C_Icon, { name: 'mdi:plus', title: '增行' }),
             default: () => '增行',
           }
         )
@@ -578,9 +579,11 @@ export function useDynamicRows<T extends DataRecord = DataRecord>(
                 },
                 {
                   icon: () =>
-                    h(NIcon, () =>
-                      h('i', { class: 'i-mdi:table-row-plus-after' })
-                    ),
+                    h(C_Icon, {
+                      name: 'mdi:table-row-plus-after',
+                      title: '插行',
+                    }),
+
                   default: () => '插行',
                 }
               ),
@@ -608,7 +611,8 @@ export function useDynamicRows<T extends DataRecord = DataRecord>(
                   ghost: true,
                 },
                 {
-                  icon: () => h(NIcon, () => h('i', { class: 'i-mdi:delete' })),
+                  icon: () =>
+                    h(C_Icon, { name: 'mdi:delete', title: '删除行' }),
                   default: () => '删除行',
                 }
               ),
@@ -637,7 +641,7 @@ export function useDynamicRows<T extends DataRecord = DataRecord>(
                 },
                 {
                   icon: () =>
-                    h(NIcon, () => h('i', { class: 'i-mdi:content-copy' })),
+                    h(C_Icon, { name: 'mdi:content-copy', title: '复制行' }),
                   default: () => '复制行',
                 }
               ),
@@ -666,7 +670,7 @@ export function useDynamicRows<T extends DataRecord = DataRecord>(
                 },
                 {
                   icon: () =>
-                    h(NIcon, () => h('i', { class: 'i-mdi:arrow-up' })),
+                    h(C_Icon, { name: 'mdi:arrow-up', title: '上移' }),
                   default: () => '上移',
                 }
               ),
@@ -691,7 +695,7 @@ export function useDynamicRows<T extends DataRecord = DataRecord>(
                 },
                 {
                   icon: () =>
-                    h(NIcon, () => h('i', { class: 'i-mdi:arrow-down' })),
+                    h(C_Icon, { name: 'mdi:arrow-down', title: '下移' }),
                   default: () => '下移',
                 }
               ),
