@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-26 13:38:13
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-30 11:53:08
+ * @LastEditTime: 2025-07-01 22:31:55
  * @FilePath: \Robot_Admin\src\components\global\C_TagsView\index.vue
  * @Description: 标签页组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -30,10 +30,15 @@
           :data-path="tag.path"
           @close.stop="handleClose(tag, index)"
           @click="navigateToTag(tag)"
-          @contextmenu.prevent="e => showContextMenu(e, tag, index)"
+          @contextmenu.prevent="
+            (e: MouseEvent) => showContextMenu(e, tag, index)
+          "
         >
           <template #icon>
-            <i :class="[`i-${tag.icon}`, 'w12px h12px']"></i>
+            <C_Icon
+              :name="tag.icon"
+              :size="12"
+            />
           </template>
           {{ tag.title }}
         </NTag>
@@ -56,6 +61,15 @@
   import { useRoute, useRouter } from 'vue-router'
   import { s_appStore } from '@/stores/app'
 
+  interface Tag {
+    path: string
+    title: string
+    icon?: string
+    meta?: {
+      affix?: boolean
+    }
+  }
+
   // 初始化 store、路由和路由器
   const appStore = s_appStore()
   const route = useRoute()
@@ -73,7 +87,7 @@
    * @param {Tag} tag - 要检查的标签
    * @returns {boolean} 如果标签是当前活动路由则返回 true，否则返回 false
    */
-  const isActive = (tag: Tag) => tag.path === route.path
+  const isActive = (tag: Tag): boolean => tag.path === route.path
 
   /**
    * * @description: 检查标签是否为固定标签

@@ -1,3 +1,12 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-05-30 19:38:16
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-07-01 22:26:57
+ * @FilePath: \Robot_Admin\src\components\global\C_Breadcrumb\index.vue
+ * @Description: 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
 <template>
   <div
     id="guide-breadcrumb"
@@ -14,7 +23,10 @@
           @select="router.push"
         >
           <div class="trigger">
-            <span :class="[item.icon, 'vertical-top']"></span>
+            <C_Icon
+              :name="item.icon"
+              class="vertical-top"
+            />
             {{ item.label }}
           </div>
         </NDropdown>
@@ -22,8 +34,11 @@
           v-else
           :to="item.key"
         >
-          <span :class="[item.icon, 'vertical-top mr-1']"></span
-          >{{ item.label }}
+          <C_Icon
+            :name="item.icon"
+            class="vertical-top mr-1"
+          />
+          {{ item.label }}
         </RouterLink>
       </NBreadcrumbItem>
     </NBreadcrumb>
