@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-14 22:06:22
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-18 14:14:23
+ * @LastEditTime: 2025-07-01 15:27:09
  * @FilePath: \Robot_Admin\src\components\global\C_Table\data.ts
  * @Description: 表格数据处理模块
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -19,12 +19,9 @@ import type { FormOption, ComponentType } from '@/types/modules/form'
 import type { FieldRule } from '@/utils/v_verify'
 import type { DynamicRowsOptions } from '@/composables/Table/useDynamicRow'
 import type { VNodeChild } from 'vue'
+import C_Icon from '@/components/global/C_Icon/index.vue'
 
 // ================= 类型定义 =================
-
-/**
- * @description: 表格预设配置接口
- */
 export interface TablePresetConfig<T extends DataRecord = DataRecord> {
   dynamicRows?: DynamicRowsOptions<T> | boolean
   expandable?: ExpandableConfig<T> | boolean
@@ -32,9 +29,6 @@ export interface TablePresetConfig<T extends DataRecord = DataRecord> {
   edit?: EditConfig | boolean
 }
 
-/**
- * @description: 展开功能配置接口
- */
 export interface ExpandableConfig<T extends DataRecord = DataRecord> {
   enabled?: boolean
   defaultExpanded?: DataTableRowKey[]
@@ -48,9 +42,6 @@ export interface ExpandableConfig<T extends DataRecord = DataRecord> {
   rowExpandable?: (row: T) => boolean
 }
 
-/**
- * @description: 选择功能配置接口
- */
 export interface SelectionConfig<T extends DataRecord = DataRecord> {
   enabled?: boolean
   defaultChecked?: DataTableRowKey[]
@@ -66,9 +57,6 @@ export interface SelectionConfig<T extends DataRecord = DataRecord> {
   }
 }
 
-/**
- * @description: 编辑功能配置接口
- */
 export interface EditConfig {
   enabled?: boolean
   mode?: 'row' | 'cell' | 'modal' | 'both' | 'none'
@@ -78,10 +66,6 @@ export interface EditConfig {
 }
 
 // ================= 编辑组件映射 =================
-
-/**
- * @description: 编辑组件映射表
- */
 export const EDIT_COMPONENTS: Record<EditType, any> = {
   number: NInputNumber,
   switch: NSwitch,
@@ -95,209 +79,178 @@ export const EDIT_COMPONENTS: Record<EditType, any> = {
   textarea: (props: any) => h(NInput, { ...props, type: 'textarea', rows: 3 }),
 }
 
-// ================= 配置处理工具函数 =================
+// ================= 配置处理工具 =================
 
 /**
- * @description: 处理动态行配置
- * @param preset - 预设配置对象
- * @param props - 组件属性
- * @return 处理后的动态行配置
+ * * @description 通用配置获取工具
+ * ? @param preset - 预设配置值
+ * ? @param prop - 属性配置值
+ * ? @param fallback - 默认回退值
+ * ! @return 最终配置值
  */
-export function processDynamicRowsConfig<T extends DataRecord>(
-  preset: TablePresetConfig<T>,
-  props: any
-): DynamicRowsOptions<T> | undefined {
-  if (!preset.dynamicRows && !props.dynamicRowsOptions) return undefined
+const getValue = (preset: any, prop: any, fallback: any) =>
+  preset ?? prop ?? fallback
 
-  if (preset.dynamicRows) {
-    return typeof preset.dynamicRows === 'boolean'
-      ? ({
-          enableRadioSelection: true,
-          enableAdd: true,
-          enableInsert: true,
-          enableDelete: true,
-          enableCopy: true,
-          enableMove: true,
-          enablePrint: true,
-        } as DynamicRowsOptions<T>)
-      : preset.dynamicRows
+/**
+ * * @description 创建配置构建器高阶函数
+ * ? @param defaults - 默认配置对象
+ * ! @return 配置构建函数
+ */
+const createConfigBuilder =
+  <T extends Record<string, any>>(defaults: T) =>
+  (preset: any, props: any, mapping: Record<keyof T, [string, string]>) => {
+    const result = { ...defaults }
+    Object.entries(mapping).forEach(([key, [presetKey, propKey]]) => {
+      const typedKey = key as keyof T
+      result[typedKey] = getValue(
+        preset[presetKey],
+        props[propKey],
+        defaults[typedKey]
+      )
+    })
+    return result
   }
 
-  return props.dynamicRowsOptions
-}
-
 /**
- * @description: 处理展开功能配置
- * @param preset - 预设配置对象
- * @param props - 组件属性
- * @return 处理后的展开配置
+ * * @description 构建动态行配置
+ * ? @param preset - 预设配置对象
+ * ? @param props - 组件属性对象
+ * ! @return 处理后的动态行配置对象
  */
-export function processExpandConfig<T extends DataRecord>(
-  preset: TablePresetConfig<T>,
-  props: any
-) {
-  const expandConfig = preset.expandable
-    ? typeof preset.expandable === 'boolean'
-      ? { enabled: true }
-      : preset.expandable
-    : {}
+const buildDynamicConfig = (preset: any, props: any) => {
+  const defaultDynamicRows = {
+    enableRadioSelection: true,
+    enableAdd: true,
+    enableInsert: true,
+    enableDelete: true,
+    enableCopy: true,
+    enableMove: true,
+    enablePrint: true,
+  }
 
   return {
-    expandable: expandConfig.enabled ?? props.expandable,
-    defaultExpandedKeys:
-      expandConfig.defaultExpanded ?? props.defaultExpandedKeys,
-    onLoadExpandData: expandConfig.onLoadData ?? props.onLoadExpandData,
-    renderExpandContent:
-      expandConfig.renderContent ?? props.renderExpandContent,
-    rowExpandable: expandConfig.rowExpandable ?? props.rowExpandable,
+    dynamicRows:
+      preset.dynamicRows === true
+        ? defaultDynamicRows
+        : preset.dynamicRows || props.dynamicRowsOptions,
   }
 }
 
 /**
- * @description: 处理基础选择配置
- * @param selectionConfig - 选择配置对象
- * @param props - 组件属性
- * @return 处理后的基础选择配置
+ * * @description 展开配置构建器
  */
-export function processBasicSelectionConfig(selectionConfig: any, props: any) {
-  return {
-    enableSelection: selectionConfig.enabled ?? props.enableSelection,
-    defaultCheckedKeys:
-      selectionConfig.defaultChecked ?? props.defaultCheckedKeys,
-    rowCheckable: selectionConfig.rowCheckable ?? props.rowCheckable,
-    maxSelection: selectionConfig.maxSelection ?? props.maxSelection,
-  }
-}
+const buildExpandConfig = createConfigBuilder({
+  expandable: false,
+  defaultExpandedKeys: undefined,
+  onLoadExpandData: undefined,
+  renderExpandContent: undefined,
+  rowExpandable: undefined,
+})
 
 /**
- * @description: 处理子选择配置
- * @param selectionConfig - 选择配置对象
- * @param props - 组件属性
- * @return 处理后的子选择配置
+ * * @description 编辑配置构建器
  */
-export function processChildSelectionConfig(selectionConfig: any, props: any) {
-  return {
-    enableChildSelection:
-      selectionConfig.childSelection?.enabled ?? props.enableChildSelection,
-    childRowCheckable:
-      selectionConfig.childSelection?.childRowCheckable ??
-      props.childRowCheckable,
-  }
-}
+const buildEditConfig = createConfigBuilder({
+  editable: true,
+  editMode: 'both',
+  showRowActions: true,
+  modalTitle: '编辑数据',
+  modalWidth: 600,
+})
 
 /**
- * @description: 处理父子联动配置
- * @param selectionConfig - 选择配置对象
- * @param props - 组件属性
- * @return 处理后的父子联动配置
+ * * @description 选择配置构建器
  */
-export function processParentChildLinkConfig(selectionConfig: any, props: any) {
-  return {
-    enableParentChildLink:
-      selectionConfig.parentChildLink?.enabled ?? props.enableParentChildLink,
-    parentChildLinkMode:
-      selectionConfig.parentChildLink?.mode ?? props.parentChildLinkMode,
-  }
-}
+const buildSelectionConfig = createConfigBuilder({
+  enableSelection: false,
+  defaultCheckedKeys: undefined,
+  rowCheckable: undefined,
+  maxSelection: undefined,
+  enableChildSelection: false,
+  childRowCheckable: undefined,
+  enableParentChildLink: false,
+  parentChildLinkMode: 'loose',
+})
 
 /**
- * @description: 处理选择功能配置
- * @param preset - 预设配置对象
- * @param props - 组件属性
- * @return 处理后的选择配置
- */
-export function processSelectionConfig<T extends DataRecord>(
-  preset: TablePresetConfig<T>,
-  props: any
-) {
-  const selectionConfig = preset.selection
-    ? typeof preset.selection === 'boolean'
-      ? { enabled: true }
-      : preset.selection
-    : {}
-
-  return {
-    ...processBasicSelectionConfig(selectionConfig, props),
-    ...processChildSelectionConfig(selectionConfig, props),
-    ...processParentChildLinkConfig(selectionConfig, props),
-  }
-}
-
-/**
- * @description: 处理编辑功能配置
- * @param preset - 预设配置对象
- * @param props - 组件属性
- * @return 处理后的编辑配置
- */
-export function processEditConfig<T extends DataRecord>(
-  preset: TablePresetConfig<T>,
-  props: any
-) {
-  const editConfig = preset.edit
-    ? typeof preset.edit === 'boolean'
-      ? { enabled: true }
-      : preset.edit
-    : {}
-
-  return {
-    editable: editConfig.enabled ?? props.editable,
-    editMode: editConfig.mode ?? props.editMode,
-    showRowActions: editConfig.showRowActions ?? props.showRowActions,
-    modalTitle: editConfig.modalTitle ?? props.modalTitle,
-    modalWidth: editConfig.modalWidth ?? props.modalWidth,
-  }
-}
-
-/**
- * @description: 创建统一配置对象
- * @param props - 组件属性
- * @return 合并后的统一配置
+ * * @description 创建统一配置对象
+ * ? @param props - 组件属性对象
+ * ! @return 统一的配置对象
  */
 export function createUnifiedConfig(props: any) {
   const preset = props.preset || {}
+  const exp = preset.expandable || {}
+  const sel = preset.selection || {}
+  const edit = preset.edit || {}
+  const child = sel.childSelection || {}
+  const link = sel.parentChildLink || {}
 
   return {
-    dynamicRows: processDynamicRowsConfig(preset, props),
-    ...processExpandConfig(preset, props),
-    ...processSelectionConfig(preset, props),
-    ...processEditConfig(preset, props),
+    ...buildDynamicConfig(preset, props),
+    ...buildExpandConfig(exp, props, {
+      expandable: ['enabled', 'expandable'],
+      defaultExpandedKeys: ['defaultExpanded', 'defaultExpandedKeys'],
+      onLoadExpandData: ['onLoadData', 'onLoadExpandData'],
+      renderExpandContent: ['renderContent', 'renderExpandContent'],
+      rowExpandable: ['rowExpandable', 'rowExpandable'],
+    }),
+    ...buildEditConfig(edit, props, {
+      editable: ['enabled', 'editable'],
+      editMode: ['mode', 'editMode'],
+      showRowActions: ['showRowActions', 'showRowActions'],
+      modalTitle: ['modalTitle', 'modalTitle'],
+      modalWidth: ['modalWidth', 'modalWidth'],
+    }),
+    ...buildSelectionConfig({ sel, child, link }, props, {
+      enableSelection: ['sel.enabled', 'enableSelection'],
+      defaultCheckedKeys: ['sel.defaultChecked', 'defaultCheckedKeys'],
+      rowCheckable: ['sel.rowCheckable', 'rowCheckable'],
+      maxSelection: ['sel.maxSelection', 'maxSelection'],
+      enableChildSelection: ['child.enabled', 'enableChildSelection'],
+      childRowCheckable: ['child.childRowCheckable', 'childRowCheckable'],
+      enableParentChildLink: ['link.enabled', 'enableParentChildLink'],
+      parentChildLinkMode: ['link.mode', 'parentChildLinkMode'],
+    }),
   }
 }
 
 // ================= 编辑模式检查器 =================
 
 /**
- * @description: 编辑模式检查器工厂函数
- * @param config - 统一配置对象
- * @return 编辑模式检查器
+ * * @description 创建编辑模式检查器
+ * ? @param config - 表格配置对象
+ * ! @return 编辑模式检查方法集合
  */
 export const createEditModeChecker = (config: any) => ({
   /**
-   * @description: 检查是否为不可编辑模式
+   * * @description 检查列是否不可编辑
+   * ? @param column - 列配置对象
+   * ! @return 是否不可编辑
    */
   isNonEditable: (column: TableColumn) =>
     !config.editable || column.editable === false || config.editMode === 'none',
 
   /**
-   * @description: 检查是否为行编辑模式
+   * * @description 检查是否为行编辑模式
+   * ! @return 是否为行编辑模式
    */
-  isRowEditMode: () => config.editMode === 'row' || config.editMode === 'both',
+  isRowEditMode: () => ['row', 'both'].includes(config.editMode),
 
   /**
-   * @description: 检查是否为单元格编辑模式
+   * * @description 检查是否为单元格编辑模式
+   * ! @return 是否为单元格编辑模式
    */
-  isCellEditMode: () =>
-    config.editMode === 'cell' || config.editMode === 'both',
+  isCellEditMode: () => ['cell', 'both'].includes(config.editMode),
 })
 
 // ================= 渲染工具函数 =================
 
 /**
- * @description: 渲染编辑组件
- * @param column - 列配置
- * @param value - 当前值
- * @param onUpdate - 更新回调
- * @return 渲染的编辑组件
+ * * @description 渲染编辑组件
+ * ? @param column - 列配置对象
+ * ? @param value - 当前值
+ * ? @param onUpdate - 更新回调函数
+ * ! @return 渲染的编辑组件
  */
 export function renderEditComponent(
   column: TableColumn,
@@ -316,71 +269,18 @@ export function renderEditComponent(
     ...column.editProps,
   }
 
-  const editType = column.editType || 'input'
-  const Component = EDIT_COMPONENTS[editType] || EDIT_COMPONENTS.input
-
+  const Component =
+    EDIT_COMPONENTS[column.editType || 'input'] || EDIT_COMPONENTS.input
   return h(Component, componentProps)
 }
 
 /**
- * @description: 渲染单元格编辑操作按钮
- * @param onSave - 保存回调
- * @param onCancel - 取消回调
- * @return 渲染的操作按钮组
- */
-export function renderCellEditActions(
-  onSave: () => void,
-  onCancel: () => void
-): VNodeChild {
-  const buttonClass =
-    'flex items-center justify-center w-6 h-6 rounded-md hover:scale-110 active:scale-95 transition-all duration-200 flex-shrink-0'
-
-  return h(
-    'div',
-    {
-      class:
-        'absolute top-1/2 right-1 -translate-y-1/2 flex items-center gap-1 bg-white/95 backdrop-blur-sm border border-gray-200/80 rounded-md px-2 py-1 shadow-md z-50 opacity-90 hover:opacity-100 hover:bg-white hover:shadow-lg hover:border-gray-300 transition-all duration-200',
-    },
-    [
-      h(
-        'button',
-        {
-          class: `${buttonClass} text-green-600 hover:text-green-700 hover:bg-green-50`,
-          title: '保存',
-          type: 'button',
-          onClick: (e: Event) => {
-            e.stopPropagation()
-            e.preventDefault()
-            onSave()
-          },
-        },
-        [h('i', { class: 'i-mdi:check w-4 h-4' })]
-      ),
-      h(
-        'button',
-        {
-          class: `${buttonClass} text-red-600 hover:text-red-700 hover:bg-red-50`,
-          title: '取消',
-          type: 'button',
-          onClick: (e: Event) => {
-            e.stopPropagation()
-            e.preventDefault()
-            onCancel()
-          },
-        },
-        [h('i', { class: 'i-mdi:close w-4 h-4' })]
-      ),
-    ]
-  )
-}
-
-/**
- * @description: 渲染单元格显示内容
- * @param column - 列配置
- * @param rowData - 行数据
- * @param rowIndex - 行索引
- * @param value - 单元格值
- * @return 渲染的显示内容
+ * * @description 渲染显示单元格
+ * ? @param column - 列配置对象
+ * ? @param rowData - 行数据对象
+ * ? @param rowIndex - 行索引
+ * ? @param value - 单元格值
+ * ! @return 渲染的显示内容
  */
 export function renderDisplayCell(
   column: TableColumn,
@@ -388,20 +288,52 @@ export function renderDisplayCell(
   rowIndex: number,
   value: unknown
 ): VNodeChild {
-  if (column.render) {
-    return column.render(rowData, rowIndex) ?? String(value ?? '')
-  }
-  return String(value ?? '')
+  return column.render
+    ? (column.render(rowData, rowIndex) ?? String(value ?? ''))
+    : String(value ?? '')
 }
 
 /**
- * @description: 渲染单元格编辑内容
- * @param column - 列配置
- * @param value - 当前值
- * @param onUpdate - 更新回调
- * @param onSave - 保存回调
- * @param onCancel - 取消回调
- * @return 渲染的编辑内容
+ * * @description 创建操作按钮
+ * ? @param name - 按钮名称
+ * ? @param title - 按钮标题
+ * ? @param onClick - 点击回调函数
+ * ! @return 渲染的按钮元素
+ */
+const createActionButton = (
+  name: string,
+  title: string,
+  onClick: (e: Event) => void
+) =>
+  h(
+    'button',
+    {
+      class: `cell-action-btn cell-action-${name}`,
+      title,
+      type: 'button',
+      onClick: (e: Event) => {
+        e.stopPropagation()
+        e.preventDefault()
+        onClick(e)
+      },
+    },
+    [
+      h(C_Icon, {
+        name: `mdi:${name === 'save' ? 'check' : 'close'}`,
+        title: `${name === 'save' ? '保存' : '取消'}`,
+        size: 12,
+      }),
+    ]
+  )
+
+/**
+ * * @description 渲染编辑状态单元格
+ * ? @param column - 列配置对象
+ * ? @param value - 当前值
+ * ? @param onUpdate - 更新回调函数
+ * ? @param onSave - 保存回调函数
+ * ? @param onCancel - 取消回调函数
+ * ! @return 渲染的编辑状态单元格
  */
 export function renderEditingCell(
   column: TableColumn,
@@ -410,26 +342,25 @@ export function renderEditingCell(
   onSave: () => void,
   onCancel: () => void
 ): VNodeChild {
-  return h(
-    'div',
-    { class: 'relative w-full min-h-9 flex items-center overflow-visible' },
-    [
-      h('div', { class: 'flex-1 min-w-0 pr-20' }, [
-        renderEditComponent(column, value, onUpdate),
-      ]),
-      renderCellEditActions(onSave, onCancel),
-    ]
-  )
+  return h('div', { class: 'cell-editing-container' }, [
+    h('div', { class: 'cell-editing-input' }, [
+      renderEditComponent(column, value, onUpdate),
+    ]),
+    h('div', { class: 'cell-editing-actions' }, [
+      createActionButton('save', '保存', onSave),
+      createActionButton('cancel', '取消', onCancel),
+    ]),
+  ])
 }
 
 /**
- * @description: 渲染可编辑单元格
- * @param column - 列配置
- * @param rowData - 行数据
- * @param rowIndex - 行索引
- * @param value - 单元格值
- * @param onStartEdit - 开始编辑回调
- * @return 渲染的可编辑单元格
+ * * @description 渲染可编辑单元格
+ * ? @param column - 列配置对象
+ * ? @param rowData - 行数据对象
+ * ? @param rowIndex - 行索引
+ * ? @param value - 单元格值
+ * ? @param onStartEdit - 开始编辑回调函数
+ * ! @return 渲染的可编辑单元格
  */
 export function renderEditableCell(
   column: TableColumn,
@@ -438,16 +369,18 @@ export function renderEditableCell(
   value: unknown,
   onStartEdit: () => void
 ): VNodeChild {
+  const displayValue = column.render
+    ? (column.render(rowData, rowIndex) ?? String(value ?? ''))
+    : String(value ?? '')
+
   return h('div', { class: 'cell-edit-wrapper' }, [
-    h(
-      'span',
-      { class: 'cell-value' },
-      column.render
-        ? (column.render(rowData, rowIndex) ?? String(value ?? ''))
-        : String(value ?? '')
-    ),
-    h('i', {
-      class: 'i-mdi:square-edit-outline cell-edit-icon ml-4px',
+    h('span', { class: 'cell-value' }, displayValue),
+    h(C_Icon, {
+      name: 'mdi:square-edit-outline',
+      title: '编辑',
+      class: 'cell-edit-icon',
+      size: 14,
+      clickable: true,
       onClick: (e: Event) => {
         e.stopPropagation()
         onStartEdit()
@@ -456,292 +389,106 @@ export function renderEditableCell(
   ])
 }
 
-// ================= 操作按钮渲染 =================
+// ================= 显示值处理器 =================
 
 /**
- * @description: 渲染行编辑按钮
- * @param isEditing - 是否正在编辑
- * @param onEdit - 开始编辑回调
- * @param onSave - 保存回调
- * @param onCancel - 取消回调
- * @return 渲染的行编辑按钮组
+ * * @description 显示值处理器映射表
  */
-export function renderRowEditButtons(
-  isEditing: boolean,
-  onEdit: () => void,
-  onSave: () => void,
-  onCancel: () => void
-): VNodeChild[] {
-  if (isEditing) {
-    return [
-      h(
-        NButton,
-        {
-          size: 'small',
-          type: 'primary',
-          quaternary: true,
-          onClick: onSave,
-        },
-        () => [
-          h(NIcon, { size: 14 }, () => h('i', { class: 'i-mdi:check' })),
-          '保存',
-        ]
-      ),
-      h(
-        NButton,
-        {
-          size: 'small',
-          quaternary: true,
-          onClick: onCancel,
-        },
-        () => [
-          h(NIcon, { size: 14 }, () => h('i', { class: 'i-mdi:close' })),
-          '取消',
-        ]
-      ),
-    ]
-  }
-
-  return [
-    h(
-      NButton,
-      {
-        size: 'small',
-        type: 'primary',
-        quaternary: true,
-        onClick: onEdit,
-      },
-      () => [
-        h(NIcon, { size: 14 }, () => h('i', { class: 'i-mdi:pencil' })),
-        '编辑',
-      ]
-    ),
-  ]
-}
-
-/**
- * @description: 渲染模态框编辑按钮
- * @param onEdit - 开始编辑回调
- * @return 渲染的模态框编辑按钮
- */
-export function renderModalEditButton(onEdit: () => void): VNodeChild {
-  return h(
-    NButton,
-    {
-      size: 'small',
-      type: 'primary',
-      quaternary: true,
-      onClick: onEdit,
-    },
-    () => [
-      h(NIcon, { size: 14 }, () => h('i', { class: 'i-mdi:pencil' })),
-      '编辑',
-    ]
-  )
-}
-
-/**
- * @description: 渲染自定义操作按钮
- * @param rowActions - 行操作配置数组
- * @param rowData - 行数据
- * @param rowIndex - 行索引
- * @param onViewDetail - 查看详情回调
- * @return 渲染的自定义操作按钮组
- */
-export function renderCustomActionButtons(
-  rowActions: any[],
-  rowData: DataRecord,
-  rowIndex: number,
-  onViewDetail: (data: DataRecord) => void
-): VNodeChild[] {
-  return rowActions
-    .filter(action => action.show?.(rowData, rowIndex) !== false)
-    .map(action => {
-      const onClick =
-        action.label === '查看'
-          ? () => onViewDetail(rowData)
-          : () => action.onClick(rowData, rowIndex)
-
-      return h(
-        NButton,
-        {
-          size: 'small',
-          type: action.type || 'default',
-          quaternary: true,
-          onClick,
-        },
-        () => [
-          action.icon &&
-            h(NIcon, { size: 14 }, () => h('i', { class: action.icon })),
-          action.label,
-        ]
-      )
-    })
-}
-
-/**
- * @description: 渲染操作按钮组
- * @param buttons - 按钮数组
- * @return 渲染的按钮组
- */
-export function renderActionButtons(buttons: VNodeChild[]): VNodeChild {
-  return h(NSpace, { size: 2, wrap: false }, () => buttons)
-}
-
-// ================= 工具函数 =================
-
-/**
- * @description: 检查保存参数是否有效
- * @param rowData - 行数据
- * @param rowIndex - 行索引
- * @param dataLength - 数据长度
- * @return 是否有效
- */
-export function isValidSaveParams(
-  rowData: DataRecord,
-  rowIndex: number,
-  dataLength: number
-): boolean {
-  return !!(rowData && rowIndex >= 0 && rowIndex < dataLength)
-}
-
-/**
- * @description: 获取描述信息的跨度
- * @param column - 列配置
- * @return 跨度值
- */
-export function getDescriptionSpan(column: TableColumn): number {
-  return column.key === 'description' || column.editProps?.type === 'textarea'
-    ? 2
-    : 1
-}
-
-// ================= 原有功能保持不变 =================
-
-/**
- * 生成表单选项配置
- */
-export const generateFormOptions = (columns: TableColumn[]): FormOption[] => {
-  return columns.map(column => {
-    // 确保 rules 类型与 FieldRule[] 兼容
-    const rules: FieldRule[] = []
-
-    // 如果字段是必需的，添加必填规则
-    if (column.required) {
-      rules.push({
-        required: true,
-        message: `请输入${column.title}`,
-        trigger: ['blur', 'input'],
-        // 关键：确保 validator 属性存在且类型正确
-        validator: async (rule: any, value: any) => {
-          if (!value && value !== 0 && value !== false) {
-            throw new Error(`请输入${column.title}`)
-          }
-        },
-      })
-    }
-
-    // 正确的组件类型映射
-    const getComponentType = (editType?: string): ComponentType => {
-      switch (editType) {
-        case 'number':
-          return 'inputNumber'
-        case 'date':
-          return 'datePicker'
-        case 'textarea':
-          return 'textarea'
-        case 'select':
-          return 'select'
-        case 'switch':
-          return 'switch'
-        case 'input':
-        default:
-          return 'input'
-      }
-    }
-
-    const formOption: FormOption = {
-      prop: column.key,
-      label: column.title || column.key,
-      type: getComponentType(column.editType),
-      placeholder: `请输入${column.title}`,
-      rules, // 现在类型完全兼容
-      attrs: column.editProps || {},
-      layout: { span: 1 },
-      show: true,
-    }
-
-    return formOption
-  })
-}
-
-/**
- * 显示值处理器映射表 - 修复参数问题
- */
-const displayValueHandlers = {
-  switch: (value: any) => (value ? '是' : '否'),
-
-  select: (value: any, column: TableColumn) => {
+const VALUE_HANDLERS = {
+  switch: (value: any): string => (value ? '是' : '否'),
+  select: (value: any, column: TableColumn): string => {
     const options = column.editProps?.options || []
     const option = options.find((opt: any) => opt.value === value)
     return option?.label || String(value)
   },
-
-  date: (value: any) => {
-    if (value instanceof Date) {
-      return value.toLocaleDateString('zh-CN')
-    }
-    return String(value)
-  },
-}
+  date: (value: any): string =>
+    value instanceof Date ? value.toLocaleDateString('zh-CN') : String(value),
+} as const
 
 /**
- * 获取显示值 - 修复 select 处理器调用
+ * * @description 获取显示值
+ * ? @param column - 列配置对象
+ * ? @param data - 数据对象
+ * ! @return 格式化后的显示值
  */
 export const getDisplayValue = (
   column: TableColumn,
   data: Record<string, any>
 ): string => {
   const value = data[column.key]
+  if (value === null || value === undefined) return '-'
 
-  // 处理空值
-  if (value === null || value === undefined) {
-    return '-'
-  }
-
-  // 根据类型进行处理
-  if (column.editType === 'select') {
-    return displayValueHandlers.select(value, column)
-  }
-
-  // 获取其他类型的处理器
-  const handler =
-    displayValueHandlers[column.editType as keyof typeof displayValueHandlers]
-
-  // 使用处理器或默认转换
+  const handler = VALUE_HANDLERS[column.editType as keyof typeof VALUE_HANDLERS]
   return handler ? handler(value, column) : String(value)
 }
 
+// ================= 表单和工具函数 =================
+
 /**
- * 获取表格 Props - 移除不存在的属性
+ * * @description 生成表单选项配置
+ * ? @param columns - 列配置数组
+ * ! @return 表单选项配置数组
  */
-export const getTableProps = (props: TableProps): Partial<DataTableProps> => {
-  return {
-    striped: props.striped,
-    bordered: props.bordered,
-    singleLine: props.singleLine,
-    size: props.size,
-    loading: props.loading,
-    scrollX: props.scrollX,
-    maxHeight: props.maxHeight,
+export const generateFormOptions = (columns: TableColumn[]): FormOption[] => {
+  const typeMap: Record<string, ComponentType> = {
+    number: 'inputNumber',
+    date: 'datePicker',
+    textarea: 'textarea',
+    select: 'select',
+    switch: 'switch',
   }
+
+  return columns.map(column => {
+    const rules: FieldRule[] = column.required
+      ? [
+          {
+            required: true,
+            message: `请输入${column.title}`,
+            trigger: ['blur', 'input'],
+            validator: async (rule: any, value: any) => {
+              if (!value && value !== 0 && value !== false) {
+                throw new Error(`请输入${column.title}`)
+              }
+            },
+          },
+        ]
+      : []
+
+    return {
+      prop: column.key,
+      label: column.title || column.key,
+      type: typeMap[column.editType || 'input'] || 'input',
+      placeholder: `请输入${column.title}`,
+      rules,
+      attrs: column.editProps || {},
+      layout: { span: 1 },
+      show: true,
+    }
+  })
 }
 
 /**
- * 处理列配置
+ * * @description 获取表格属性配置
+ * ? @param props - 组件属性对象
+ * ! @return 表格属性配置
  */
-export const processColumnConfig = (columns: TableColumn[]): TableColumn[] => {
-  return columns.map(column => ({
+export const getTableProps = (props: TableProps): Partial<DataTableProps> => ({
+  striped: props.striped,
+  bordered: props.bordered,
+  singleLine: props.singleLine,
+  size: props.size,
+  loading: props.loading,
+  scrollX: props.scrollX,
+  maxHeight: props.maxHeight,
+})
+
+/**
+ * * @description 处理列配置
+ * ? @param columns - 原始列配置数组
+ * ! @return 处理后的列配置数组
+ */
+export const processColumnConfig = (columns: TableColumn[]): TableColumn[] =>
+  columns.map(column => ({
     ...column,
     title: column.title || column.key,
     key: column.key,
@@ -749,4 +496,11 @@ export const processColumnConfig = (columns: TableColumn[]): TableColumn[] => {
     align: column.align || 'center',
     titleAlign: column.titleAlign || 'center',
   }))
-}
+
+/**
+ * * @description 获取描述项跨度
+ * ? @param column - 列配置对象
+ * ! @return 描述项跨度值
+ */
+export const getDescriptionSpan = (column: TableColumn): number =>
+  column.key === 'description' || column.editProps?.type === 'textarea' ? 2 : 1

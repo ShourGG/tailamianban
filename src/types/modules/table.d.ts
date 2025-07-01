@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-17 18:27:13
+ * @LastEditTime: 2025-07-01 15:26:05
  * @FilePath: \Robot_Admin\src\types\modules\table.d.ts
  * @Description: 表格类型系统
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -13,12 +13,8 @@ import type { VNodeChild, Ref, ComputedRef } from 'vue'
 import type { FormItemRule } from 'naive-ui/es/form'
 
 // ================= 核心类型定义 =================
-
-// 🔥 统一数据记录类型 - 所有组件和 Hook 都使用这个
 export type DataRecord = Record<string, unknown>
-
 export type EditMode = 'row' | 'cell' | 'both' | 'modal' | 'none'
-
 export type EditType =
   | 'input'
   | 'textarea'
@@ -28,7 +24,6 @@ export type EditType =
   | 'switch'
   | 'email'
   | 'mobile'
-
 export type ButtonType =
   | 'default'
   | 'primary'
@@ -36,33 +31,40 @@ export type ButtonType =
   | 'success'
   | 'warning'
   | 'error'
-
 export type ParentChildLinkMode = 'strict' | 'loose'
 
-// ================= 数据映射类型 =================
+// ================= 工具类型 =================
+export type ValueOf<T> = T[keyof T]
+export type OptionalKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? K : never
+}[keyof T]
+export type RequiredKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
+}[keyof T]
+export type SafeRecord<K extends string | number | symbol, V> = { [P in K]: V }
 
-// 通用选项类型
-export interface SelectOption {
+// 基础选项接口
+export interface BaseOption {
   label: string
   value: string | number
   disabled?: boolean
 }
 
-// 预设数据映射类型
-export interface DataMapping {
-  [key: string]: string
+// 基础配置接口
+export interface BaseConfig<T extends DataRecord = DataRecord> {
+  enabled?: boolean
+  rowCheckable?: (row: T) => boolean
 }
 
-// 常用数据映射
-export interface CommonMappings {
-  gender: DataMapping
-  department: DataMapping
-  status: DataMapping
-}
+// ================= 数据映射类型 =================
+export interface SelectOption extends BaseOption {}
+
+export interface DataMapping extends SafeRecord<string, string> {}
+
+export interface CommonMappings
+  extends SafeRecord<'gender' | 'department' | 'status', DataMapping> {}
 
 // ================= 编辑相关类型 =================
-
-// 编辑属性配置
 export interface EditProps {
   min?: number
   max?: number
@@ -80,7 +82,6 @@ export interface EditProps {
   readonly?: boolean
 }
 
-// 表格列配置 - 使用统一的 DataRecord 约束
 export interface TableColumn<T extends DataRecord = DataRecord>
   extends Omit<DataTableColumns<T>[number], 'key' | 'render'> {
   key: keyof T | string
@@ -93,9 +94,9 @@ export interface TableColumn<T extends DataRecord = DataRecord>
   render?: (rowData: T, rowIndex: number) => VNodeChild
 }
 
-// 行操作配置 - 使用统一的 DataRecord 约束
 export interface RowAction<T extends DataRecord = DataRecord> {
   label: string
+  key?: string
   icon?: string
   type?: ButtonType
   onClick: (row: T, index: number) => void
@@ -103,9 +104,7 @@ export interface RowAction<T extends DataRecord = DataRecord> {
   disabled?: (row: T, index: number) => boolean
 }
 
-// ================= 🔥 展开和选择功能类型定义 =================
-
-// 子选择状态
+// ================= 选择和展开功能类型 =================
 export interface ChildSelectionState {
   selectedKeys: DataTableRowKey[]
   isAllChecked: boolean
@@ -113,51 +112,37 @@ export interface ChildSelectionState {
   clearAll: () => void
 }
 
-// 展开配置选项 - 使用统一的 DataRecord 约束
 export interface ExpandConfig<T extends DataRecord = DataRecord, C = any> {
-  // 数据加载函数
   onLoadData?: (row: T) => Promise<C[]> | C[]
-
-  // 内容渲染函数
   renderContent?: (
     row: T,
     expandData: C[],
     loading: boolean,
     childSelection?: ChildSelectionState
   ) => VNodeChild
-
-  // 行可展开判断
   rowExpandable?: (row: T) => boolean
 }
 
-// 选择配置选项 - 使用统一的 DataRecord 约束
-export interface SelectionConfig<T extends DataRecord = DataRecord> {
-  // 基础选择配置
+export interface SelectionConfig<T extends DataRecord = DataRecord>
+  extends BaseConfig<T> {
   enableSelection?: boolean
   defaultCheckedKeys?: DataTableRowKey[]
-  rowCheckable?: (row: T) => boolean
   maxSelection?: number
-
-  // 子选择配置
   enableChildSelection?: boolean
   childRowCheckable?: (childRow: any, parentRow: T) => boolean
-
-  // 父子联动配置
   enableParentChildLink?: boolean
   parentChildLinkMode?: ParentChildLinkMode
 }
 
-// ================= 表格组件类型 - 增强版 =================
-
-// 表格属性 - 使用统一的 DataRecord 约束
-export interface TableProps<T extends DataRecord = DataRecord> {
-  // 数据相关
+// ================= 表格组件核心类型 =================
+export interface TableBaseProps<T extends DataRecord = DataRecord> {
   columns: TableColumn<T>[]
   data: T[]
   rowKey?: (row: T) => DataTableRowKey
   loading?: boolean
+}
 
-  // 显示相关
+export interface TableDisplayProps {
   maxHeight?: number | string
   minHeight?: number | string
   scrollX?: number | string
@@ -165,8 +150,9 @@ export interface TableProps<T extends DataRecord = DataRecord> {
   bordered?: boolean
   singleLine?: boolean
   size?: 'small' | 'medium' | 'large'
+}
 
-  // 编辑相关
+export interface TableEditProps<T extends DataRecord = DataRecord> {
   editable?: boolean
   editMode?: EditMode
   onSave?: (
@@ -175,19 +161,14 @@ export interface TableProps<T extends DataRecord = DataRecord> {
     columnKey?: string
   ) => void | Promise<void>
   onCancel?: (rowData: T, rowIndex: number) => void
-
-  // 行操作
   showRowActions?: boolean
   rowActions?: RowAction<T>[]
-
-  // 模态框相关
   modalTitle?: string
   modalWidth?: number
-
-  // 列宽配置
   columnWidth?: number
+}
 
-  // 🔥 展开功能配置
+export interface TableExpandProps<T extends DataRecord = DataRecord> {
   expandable?: boolean
   onLoadExpandData?: (row: T) => Promise<any[]> | any[]
   renderExpandContent?: (
@@ -198,82 +179,89 @@ export interface TableProps<T extends DataRecord = DataRecord> {
   ) => VNodeChild
   rowExpandable?: (row: T) => boolean
   defaultExpandedKeys?: DataTableRowKey[]
+}
 
-  // 🔥 选择功能配置
+export interface TableSelectionProps<T extends DataRecord = DataRecord>
+  extends BaseConfig<T> {
   enableSelection?: boolean
   defaultCheckedKeys?: DataTableRowKey[]
-  rowCheckable?: (row: T) => boolean
   maxSelection?: number
-
-  // 🔥 子表格选择配置
   enableChildSelection?: boolean
   childRowCheckable?: (childRow: any, parentRow: T) => boolean
-
-  // 🔥 父子联动配置
   enableParentChildLink?: boolean
   parentChildLinkMode?: ParentChildLinkMode
 }
 
-// 表格事件回调类型 - 使用统一的 DataRecord 约束
-export interface TableEmits<T extends DataRecord = DataRecord> {
-  'update:data': [data: T[]]
-  save: [rowData: T, rowIndex: number, columnKey?: string]
-  cancel: [rowData: T, rowIndex: number]
+// 组合所有属性的完整表格属性接口
+export interface TableProps<T extends DataRecord = DataRecord>
+  extends TableBaseProps<T>,
+    TableDisplayProps,
+    TableEditProps<T>,
+    TableExpandProps<T>,
+    TableSelectionProps<T> {}
 
-  // 🔥 展开事件
+// ================= 事件系统 =================
+export interface TableExpandEvents<T extends DataRecord = DataRecord> {
   'expand-change': [
     expandedKeys: DataTableRowKey[],
     row?: T,
     expanded?: boolean,
   ]
+}
 
-  // 🔥 选择事件
+export interface TableSelectionEvents<T extends DataRecord = DataRecord> {
   'selection-change': [
     checkedKeys: DataTableRowKey[],
     checkedRows: T[],
     childSelections?: Map<DataTableRowKey, DataTableRowKey[]>,
   ]
-
-  // 🔥 子选择事件
   'child-selection-change': [
     parentKey: DataTableRowKey,
     childKeys: DataTableRowKey[],
     childRows: any[],
   ]
-
-  // 🔥 父子联动事件
   'parent-child-link-change': [
     parentKey: DataTableRowKey,
     shouldSelect: boolean,
   ]
 }
 
-// 表格实例方法 - 使用统一的 DataRecord 约束
-export interface TableInstance<T extends DataRecord = DataRecord> {
-  // 编辑功能
+export interface TableEditEvents<T extends DataRecord = DataRecord> {
+  'update:data': [data: T[]]
+  save: [rowData: T, rowIndex: number, columnKey?: string]
+  cancel: [rowData: T, rowIndex: number]
+}
+
+export interface TableEmits<T extends DataRecord = DataRecord>
+  extends TableExpandEvents<T>,
+    TableSelectionEvents<T>,
+    TableEditEvents<T> {}
+
+// ================= 实例方法系统 =================
+export interface TableEditMethods<T extends DataRecord = DataRecord> {
   startEdit: (rowKey: DataTableRowKey, columnKey?: string) => void
   cancelEdit: () => void
   saveEdit: () => Promise<void>
   isEditing: (rowKey: DataTableRowKey, columnKey?: string) => boolean
   getEditingData: () => any
+}
 
-  // 🔥 展开功能
+export interface TableExpandMethods<T extends DataRecord = DataRecord> {
   expandRow: (rowKey: DataTableRowKey) => Promise<void>
   collapseRow: (rowKey: DataTableRowKey) => void
   toggleExpand: (rowKey: DataTableRowKey) => Promise<void>
   expandAll: () => Promise<void>
   collapseAll: () => void
   isExpanded: (rowKey: DataTableRowKey) => boolean
+}
 
-  // 🔥 选择功能
+export interface TableSelectionMethods<T extends DataRecord = DataRecord> {
   selectRow: (rowKey: DataTableRowKey) => void
   unselectRow: (rowKey: DataTableRowKey) => void
   selectAll: () => void
   clearSelection: () => void
   isRowSelected: (rowKey: DataTableRowKey) => boolean
   getSelectedRows: () => T[]
-
-  // 🔥 子选择功能
   selectChildRow: (
     parentKey: DataTableRowKey,
     childKey: DataTableRowKey
@@ -288,44 +276,21 @@ export interface TableInstance<T extends DataRecord = DataRecord> {
   clearAllSelections: () => void
 }
 
-// ================= useTableExpand 类型 =================
+export interface TableInstance<T extends DataRecord = DataRecord>
+  extends TableEditMethods<T>,
+    TableExpandMethods<T>,
+    TableSelectionMethods<T> {}
 
-// useTableExpand 配置选项 - 使用统一的 DataRecord 约束
+// ================= useTableExpand Hook类型 =================
 export interface UseTableExpandOptions<
   T extends DataRecord = DataRecord,
   C = any,
-> {
-  // 基础数据
+> extends ExpandConfig<T, C>,
+    SelectionConfig<T> {
   data: Ref<T[]> | ComputedRef<T[]>
   rowKey: (row: T) => DataTableRowKey
   childRowKey?: (child: C) => DataTableRowKey
-
-  // 展开配置
   defaultExpandedKeys?: DataTableRowKey[]
-  onLoadData?: (row: T) => Promise<C[]> | C[]
-  renderContent?: (
-    row: T,
-    expandData: C[],
-    loading: boolean,
-    childSelection?: ChildSelectionState
-  ) => VNodeChild
-  rowExpandable?: (row: T) => boolean
-
-  // 选择配置
-  enableSelection?: boolean
-  defaultCheckedKeys?: DataTableRowKey[]
-  rowCheckable?: (row: T) => boolean
-  maxSelection?: number
-
-  // 子选择配置
-  enableChildSelection?: boolean
-  childRowCheckable?: (child: C, parent: T) => boolean
-
-  // 父子联动配置
-  enableParentChildLink?: boolean
-  parentChildLinkMode?: ParentChildLinkMode
-
-  // 事件回调
   onExpandChange?: (
     expandedKeys: DataTableRowKey[],
     row?: T,
@@ -343,43 +308,34 @@ export interface UseTableExpandOptions<
   ) => void
 }
 
-// useTableExpand 返回类型 - 使用统一的 DataRecord 约束
 export interface UseTableExpandReturn<
   T extends DataRecord = DataRecord,
   C = any,
 > {
-  // 基础状态
+  // 响应式状态
   expandedKeys: Ref<DataTableRowKey[]>
   checkedKeys: Ref<DataTableRowKey[]>
   childSelections: Ref<Map<DataTableRowKey, DataTableRowKey[]>>
+  expandDataMap: Ref<Map<DataTableRowKey, C[]>>
+  loadingMap: Ref<Map<DataTableRowKey, boolean>>
 
   // 计算属性
   selectedRowsCount: ComputedRef<number>
   totalChildSelections: ComputedRef<number>
 
-  // 展开方法
+  // 方法
   expandAll: () => Promise<void>
   collapseAll: () => void
   expandRow: (key: DataTableRowKey) => Promise<void>
   handleExpandChange: (keys: DataTableRowKey[]) => void
-
-  // 选择方法
   selectAll: () => void
   clearSelection: () => void
   clearAllSelections: () => void
   handleSelectionChange: (keys: DataTableRowKey[]) => void
-
-  // 渲染方法
   getTableColumns: (originalColumns: TableColumn<T>[]) => any[]
-
-  // 数据映射（供 C_Table 使用）
-  expandDataMap: Ref<Map<DataTableRowKey, C[]>>
-  loadingMap: Ref<Map<DataTableRowKey, boolean>>
 }
 
-// ================= 演示页面专用类型 =================
-
-// 测试记录类型
+// ================= 演示和测试类型 =================
 export interface TestRecord extends DataRecord {
   id: number
   name: string
@@ -389,7 +345,6 @@ export interface TestRecord extends DataRecord {
   hasChildren: boolean
 }
 
-// 子数据类型
 export interface ChildData extends DataRecord {
   id: number
   project?: string
@@ -401,36 +356,47 @@ export interface ChildData extends DataRecord {
   version?: string
 }
 
-// 选中的子数据分组
 export interface SelectedChildGroup {
   parentKey: number
   parentName: string
   children: ChildData[]
 }
 
-// 配置状态类型
 export interface DemoConfig {
   enableSelection: boolean
   enableChildSelection: boolean
   parentChildLinkMode: ParentChildLinkMode
 }
 
-// ================= 工具类型 =================
+// ================= 向后兼容性保证 =================
 
-// 提取对象值类型
-export type ValueOf<T> = T[keyof T]
-
-// 可选键类型
-export type OptionalKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? K : never
-}[keyof T]
-
-// 必需键类型
-export type RequiredKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
-}[keyof T]
-
-// 安全的键值对类型
-export type SafeRecord<K extends string | number | symbol, V> = {
-  [P in K]: V
+// 原有的接口继续导出，确保向后兼容
+export {
+  type DataRecord,
+  type EditMode,
+  type EditType,
+  type ButtonType,
+  type ParentChildLinkMode,
+  type SelectOption,
+  type DataMapping,
+  type CommonMappings,
+  type EditProps,
+  type TableColumn,
+  type RowAction,
+  type ChildSelectionState,
+  type ExpandConfig,
+  type SelectionConfig,
+  type TableProps,
+  type TableEmits,
+  type TableInstance,
+  type UseTableExpandOptions,
+  type UseTableExpandReturn,
+  type TestRecord,
+  type ChildData,
+  type SelectedChildGroup,
+  type DemoConfig,
+  type ValueOf,
+  type OptionalKeys,
+  type RequiredKeys,
+  type SafeRecord,
 }

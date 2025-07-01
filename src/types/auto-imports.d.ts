@@ -16,6 +16,7 @@ declare global {
   const NCollapse: (typeof import('naive-ui'))['NCollapse']
   const NCollapseItem: (typeof import('naive-ui'))['NCollapseItem']
   const NDatePicker: (typeof import('naive-ui'))['NDatePicker']
+  const NDropdown: (typeof import('naive-ui'))['NDropdown']
   const NIcon: (typeof import('naive-ui'))['NIcon']
   const NInput: (typeof import('naive-ui'))['NInput']
   const NInputNumber: (typeof import('naive-ui'))['NInputNumber']
@@ -148,6 +149,7 @@ declare module 'vue' {
       (typeof import('naive-ui'))['NCollapseItem']
     >
     readonly NDatePicker: UnwrapRef<(typeof import('naive-ui'))['NDatePicker']>
+    readonly NDropdown: UnwrapRef<(typeof import('naive-ui'))['NDropdown']>
     readonly NIcon: UnwrapRef<(typeof import('naive-ui'))['NIcon']>
     readonly NInput: UnwrapRef<(typeof import('naive-ui'))['NInput']>
     readonly NInputNumber: UnwrapRef<

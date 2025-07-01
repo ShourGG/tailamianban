@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-18 14:06:17
+ * @LastEditTime: 2025-07-01 15:03:03
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
  * @Description: 超级表格组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -11,12 +11,10 @@
 <template>
   <div class="c-table-wrapper">
     <!-- 动态行工具栏 -->
-    <div
+    <component
       v-if="tableManager.dynamicRowsState"
-      class="dynamic-rows-toolbar"
-    >
-      <component :is="tableManager.dynamicRowsState.renderToolbar()" />
-    </div>
+      :is="tableManager.dynamicRowsState.renderToolbar()"
+    />
 
     <!-- 表格主体 -->
     <NDataTable
@@ -29,8 +27,8 @@
       :expanded-row-keys="tableManager.expandedKeys.value"
       :checked-row-keys="tableManager.checkedKeys.value"
       :render-expand="renderExpandFunction"
-      @update:expanded-row-keys="handleExpandedRowKeysChange"
-      @update:checked-row-keys="handleCheckedRowKeysChange"
+      @update:expanded-row-keys="tableManager.expandState?.handleExpandChange"
+      @update:checked-row-keys="tableManager.expandState?.handleSelectionChange"
     />
 
     <!-- 编辑模态框 -->
@@ -47,13 +45,13 @@
       <C_Form
         v-if="
           tableManager.editStates.modalEdit.isModalVisible.value &&
-          formOptions.length > 0
+          formOptions.length
         "
         ref="cFormRef"
         :key="formKey"
         :model-value="tableManager.editStates.modalEdit.editingData"
         :options="formOptions"
-        :layout-type="'grid'"
+        layout-type="grid"
         :layout-config="{ grid: { cols: 2, xGap: 16, yGap: 16 } }"
         :show-default-actions="false"
         @update:model-value="handleFormUpdate"
@@ -115,6 +113,7 @@
 
 <script setup lang="ts">
   import type { VNodeChild, ComponentPublicInstance } from 'vue'
+  import C_Icon from '@/components/global/C_Icon/index.vue'
   import { type DataTableRowKey, type DataTableColumn } from 'naive-ui/es'
   import type {
     TableColumn,
@@ -138,24 +137,47 @@
     renderDisplayCell,
     renderEditingCell,
     renderEditableCell,
-    renderRowEditButtons,
-    renderModalEditButton,
-    renderCustomActionButtons,
-    renderActionButtons,
     type TablePresetConfig,
   } from './data'
 
+  // ================= 类型定义 =================
   interface CFormInstance {
     validate: () => Promise<void>
   }
 
-  // ================= 类型定义 =================
+  export interface TableActions<T extends DataRecord = DataRecord> {
+    edit?:
+      | false
+      | {
+          api?: string
+          onEdit?: (row: T, index: number) => void | Promise<void>
+        }
+    delete?:
+      | false
+      | {
+          api?: string
+          onDelete?: (row: T, index: number) => void | Promise<void>
+          confirmText?: string | ((row: T) => string)
+        }
+    detail?:
+      | false
+      | {
+          onView?: (row: T, index: number) => void
+        }
+    custom?: Array<{
+      key: string
+      label: string
+      icon?: string
+      type?: 'default' | 'primary' | 'info' | 'success' | 'warning' | 'error'
+      onClick: (row: T, index: number) => void | Promise<void>
+      show?: (row: T, index: number) => boolean
+    }>
+  }
 
   interface EnhancedTableProps<T extends DataRecord = DataRecord>
     extends TableProps<T> {
     preset?: TablePresetConfig<T>
-
-    // 保留原有配置方式（向下兼容）
+    actions?: TableActions<T>
     expandable?: boolean
     onLoadExpandData?: (row: T) => Promise<any[]> | any[]
     renderExpandContent?: (
@@ -166,23 +188,18 @@
     ) => VNodeChild
     rowExpandable?: (row: T) => boolean
     defaultExpandedKeys?: DataTableRowKey[]
-
     enableSelection?: boolean
     defaultCheckedKeys?: DataTableRowKey[]
     rowCheckable?: (row: T) => boolean
     maxSelection?: number
-
     enableChildSelection?: boolean
     childRowCheckable?: (childRow: any, parentRow: T) => boolean
-
     enableParentChildLink?: boolean
     parentChildLinkMode?: ParentChildLinkMode
-
     dynamicRowsOptions?: DynamicRowsOptions<T>
   }
 
-  // ================= Props 定义 =================
-
+  // ================= Props & Emit =================
   const props = withDefaults(defineProps<EnhancedTableProps>(), {
     rowKey: (row: DataRecord) => row.id,
     loading: false,
@@ -203,6 +220,7 @@
     parentChildLinkMode: 'loose',
     dynamicRowsOptions: undefined,
     preset: undefined,
+    actions: () => ({}),
   })
 
   const emit = defineEmits<
@@ -218,20 +236,37 @@
     }
   >()
 
-  // ================= 核心状态 =================
-
+  // ================= 响应式状态 =================
   const tableRef = ref<ComponentPublicInstance>()
   const cFormRef = ref<CFormInstance>()
   const viewModalVisible = ref(false)
   const viewingData = ref<DataRecord>({})
   const submitLoading = ref(false)
+  const message = useMessage()
+  const dialog = useDialog()
 
-  // ================= 配置和计算属性 =================
+  // ================= 计算属性 =================
+  const config = computed(() => ({
+    ...createUnifiedConfig(props),
+    parentChildLinkMode: props.parentChildLinkMode as ParentChildLinkMode,
+  }))
 
-  const config = computed(() => createUnifiedConfig(props))
+  const editableColumns = computed(() =>
+    props.columns.filter((col): col is TableColumn => col.editable !== false)
+  )
+  const displayColumns = computed(() =>
+    processColumnConfig(props.columns).filter(col => col.key !== '_actions')
+  )
+  const tableProps = computed(() => getTableProps(props))
+  const formKey = computed(
+    () =>
+      `edit-form-${tableManager.editStates.modalEdit.editingRowKey.value || 'new'}`
+  )
+  const formOptions = computed(() => generateFormOptions(editableColumns.value))
+  const renderExpandFunction = computed(() => undefined)
+  const editModeChecker = computed(() => createEditModeChecker(config.value))
 
-  // ================= 表格管理器初始化 =================
-
+  // ================= 表格管理器 =================
   const tableManager = useTableManager({
     config: config.value,
     data: () => props.data,
@@ -239,38 +274,19 @@
     emit,
   })
 
-  // ================= 计算属性 =================
+  // ================= 工具函数 =================
+  const isActionEnabled = (
+    actionKey: 'edit' | 'delete' | 'detail'
+  ): boolean => {
+    return props.actions?.[actionKey] !== false
+  }
 
-  const editableColumns = computed(() =>
-    props.columns.filter((col): col is TableColumn => col.editable !== false)
-  )
-
-  const displayColumns = computed(() =>
-    processColumnConfig(props.columns).filter(col => col.key !== '_actions')
-  )
-
-  const tableProps = computed(() => getTableProps(props))
-  const formKey = computed(
-    () =>
-      `edit-form-${tableManager.editStates.modalEdit.editingRowKey.value || 'new'}`
-  )
-  const formOptions = computed(() => generateFormOptions(editableColumns.value))
-
-  const renderExpandFunction = computed(() => undefined)
-
-  // ================= 事件处理函数 =================
-
-  /**
-   * @description: 处理模态框编辑数据更新
-   */
-  function handleFormUpdate(value: DataRecord) {
+  // ================= 事件处理 =================
+  const handleFormUpdate = (value: DataRecord) => {
     Object.assign(tableManager.editStates.modalEdit.editingData, value)
   }
 
-  /**
-   * @description: 处理模态框保存操作
-   */
-  async function handleModalSave() {
+  const handleModalSave = async () => {
     if (!cFormRef.value) return
 
     submitLoading.value = true
@@ -282,41 +298,98 @@
     }
   }
 
-  /**
-   * @description: 处理展开行键变化
-   */
-  function handleExpandedRowKeysChange(keys: DataTableRowKey[]) {
-    tableManager.expandState?.handleExpandChange(keys)
+  // ================= 内置操作处理 =================
+  const handleBuiltinEdit = async (row: DataRecord, index: number) => {
+    const editConfig = props.actions?.edit
+
+    if (editConfig && typeof editConfig === 'object') {
+      if (editConfig.onEdit) {
+        try {
+          await editConfig.onEdit(row, index)
+        } catch (error) {
+          console.error('编辑失败:', error)
+          message.error('编辑失败')
+        }
+      } else if (editConfig.api) {
+        try {
+          console.log(`调用编辑API: ${editConfig.api}/${row.id}`, row)
+          message.success('编辑成功')
+        } catch (error) {
+          console.error('编辑失败:', error)
+          message.error('编辑失败')
+        }
+      }
+    } else {
+      tableManager.editStates.modalEdit.startEdit(props.rowKey(row))
+    }
   }
 
-  /**
-   * @description: 处理选中行键变化
-   */
-  function handleCheckedRowKeysChange(keys: DataTableRowKey[]) {
-    tableManager.expandState?.handleSelectionChange(keys)
+  const handleBuiltinDelete = async (row: DataRecord, index: number) => {
+    const deleteConfig = props.actions?.delete
+    const confirmText =
+      deleteConfig &&
+      typeof deleteConfig === 'object' &&
+      deleteConfig.confirmText
+        ? typeof deleteConfig.confirmText === 'function'
+          ? deleteConfig.confirmText(row)
+          : deleteConfig.confirmText
+        : '确定要删除这条记录吗？'
+
+    dialog.warning({
+      title: '确认删除',
+      content: confirmText,
+      positiveText: '确定',
+      negativeText: '取消',
+      onPositiveClick: async () => {
+        try {
+          if (deleteConfig && typeof deleteConfig === 'object') {
+            if (deleteConfig.onDelete) {
+              await deleteConfig.onDelete(row, index)
+            } else if (deleteConfig.api) {
+              console.log(`调用删除API: ${deleteConfig.api}/${row.id}`)
+            }
+          } else {
+            console.log('默认删除行为:', row)
+          }
+
+          message.success('删除成功')
+          emit('row-delete', row, index)
+        } catch (error) {
+          console.error('删除失败:', error)
+          message.error('删除失败')
+        }
+      },
+    })
+  }
+
+  const handleBuiltinDetail = (row: DataRecord, index: number) => {
+    const detailConfig = props.actions?.detail
+
+    if (
+      detailConfig &&
+      typeof detailConfig === 'object' &&
+      detailConfig.onView
+    ) {
+      detailConfig.onView(row, index)
+    } else {
+      viewingData.value = { ...row }
+      viewModalVisible.value = true
+    }
   }
 
   // ================= 渲染函数 =================
-
-  const editModeChecker = computed(() => createEditModeChecker(config.value))
-
-  /**
-   * @description: 渲染单元格
-   */
-  function renderCell(
+  const renderCell = (
     column: TableColumn,
     rowData: DataRecord,
     rowIndex: number
-  ): VNodeChild {
+  ): VNodeChild => {
     const value = rowData[column.key]
     const rowKey = props.rowKey(rowData)
 
-    // 不可编辑
     if (editModeChecker.value.isNonEditable(column)) {
       return renderDisplayCell(column, rowData, rowIndex, value)
     }
 
-    // 行编辑模式
     if (
       editModeChecker.value.isRowEditMode() &&
       tableManager.editStates.rowEdit.isEditingRow(rowKey)
@@ -335,9 +408,13 @@
       )
     }
 
-    // 单元格编辑模式
     if (editModeChecker.value.isCellEditMode()) {
-      return tableManager.editStates.cellEdit.isEditingCell(rowKey, column.key)
+      const isEditingCell = tableManager.editStates.cellEdit.isEditingCell(
+        rowKey,
+        column.key
+      )
+
+      return isEditingCell
         ? renderEditingCell(
             column,
             tableManager.editStates.cellEdit.getEditingCellValue(
@@ -361,57 +438,171 @@
     return renderDisplayCell(column, rowData, rowIndex, value)
   }
 
-  /**
-   * @description: 渲染操作按钮
-   */
-  function renderActions(rowData: DataRecord, rowIndex: number): VNodeChild {
-    const rowKey = props.rowKey(rowData)
+  const createActionButton = (config: {
+    icon: string
+    type?: string
+    title?: string
+    onClick: () => void
+  }) => {
+    return h(
+      NButton,
+      {
+        size: 'small',
+        type: config.type || 'primary',
+        quaternary: true,
+        onClick: config.onClick,
+      },
+      () => [h(C_Icon, { name: config.icon, size: 14, title: config.title })]
+    )
+  }
+
+  const renderRowEditActions = (rowKey: any): VNodeChild[] => {
+    const isEditing = tableManager.editStates.rowEdit.isEditingRow(rowKey)
+
+    return isEditing
+      ? [
+          createActionButton({
+            icon: 'mdi:check',
+            title: '保存',
+            onClick: () => tableManager.editStates.rowEdit.saveEditRow(),
+          }),
+          createActionButton({
+            icon: 'mdi:close',
+            title: '取消',
+            type: 'default',
+            onClick: () => tableManager.editStates.rowEdit.cancelEditRow(),
+          }),
+        ]
+      : [
+          createActionButton({
+            icon: 'mdi:pencil',
+            title: '编辑',
+            onClick: () => tableManager.editStates.rowEdit.startEditRow(rowKey),
+          }),
+        ]
+  }
+
+  const renderBuiltinActions = (
+    rowData: DataRecord,
+    rowIndex: number
+  ): VNodeChild[] => {
     const actions: VNodeChild[] = []
 
-    // 行编辑按钮
-    if (editModeChecker.value.isRowEditMode()) {
-      actions.push(
-        ...renderRowEditButtons(
-          tableManager.editStates.rowEdit.isEditingRow(rowKey),
-          () => tableManager.editStates.rowEdit.startEditRow(rowKey),
-          () => tableManager.editStates.rowEdit.saveEditRow(),
-          () => tableManager.editStates.rowEdit.cancelEditRow()
-        )
-      )
-    }
-
-    // 模态框编辑按钮
     if (config.value.editMode === 'modal') {
       actions.push(
-        renderModalEditButton(() =>
-          tableManager.editStates.modalEdit.startEdit(rowKey)
-        )
+        createActionButton({
+          icon: 'mdi:pencil',
+          title: '编辑',
+          onClick: () => handleBuiltinEdit(rowData, rowIndex),
+        })
       )
     }
 
-    // 自定义操作按钮
-    if (
-      !tableManager.editStates.rowEdit.isEditingRow(rowKey) &&
-      props.rowActions?.length
-    ) {
+    if (isActionEnabled('delete')) {
       actions.push(
-        ...renderCustomActionButtons(
-          props.rowActions,
-          rowData,
-          rowIndex,
-          (data: DataRecord) => {
-            viewingData.value = { ...data }
-            viewModalVisible.value = true
-          }
-        )
+        createActionButton({
+          icon: 'mdi:delete',
+          type: 'error',
+          title: '删除',
+          onClick: () => handleBuiltinDelete(rowData, rowIndex),
+        })
       )
     }
 
-    return renderActionButtons(actions)
+    if (isActionEnabled('detail')) {
+      actions.push(
+        createActionButton({
+          icon: 'mdi:eye',
+          type: 'info',
+          title: '详情',
+          onClick: () => handleBuiltinDetail(rowData, rowIndex),
+        })
+      )
+    }
+
+    return actions
+  }
+
+  const renderMoreActions = (
+    rowData: DataRecord,
+    rowIndex: number
+  ): VNodeChild | null => {
+    const customActions =
+      props.actions?.custom?.filter(
+        action => action.show?.(rowData, rowIndex) !== false
+      ) || []
+
+    const legacyActions =
+      !Object.keys(props.actions || {}).length && props.rowActions?.length
+        ? props.rowActions.filter(
+            action => action.show?.(rowData, rowIndex) !== false
+          )
+        : []
+
+    const moreActions = [...customActions, ...legacyActions]
+
+    if (!moreActions.length) return null
+
+    const dropdownOptions = moreActions.map(action => ({
+      key: action.key || action.label,
+      label: action.label,
+      icon: () =>
+        action.icon
+          ? h(C_Icon, { name: action.icon.replace('i-', ''), size: 14 })
+          : null,
+      props: {
+        onClick: () => {
+          if (action.label === '查看') {
+            viewingData.value = { ...rowData }
+            viewModalVisible.value = true
+          } else {
+            action.onClick(rowData, rowIndex)
+          }
+        },
+      },
+    }))
+
+    return h(
+      NDropdown,
+      { options: dropdownOptions, trigger: 'click' },
+      {
+        default: () =>
+          createActionButton({
+            icon: 'mdi:dots-horizontal',
+            type: 'default',
+            title: '更多',
+            onClick: () => {},
+          }),
+      }
+    )
+  }
+
+  const renderActions = (rowData: DataRecord, rowIndex: number): VNodeChild => {
+    const rowKey = props.rowKey(rowData)
+
+    if (editModeChecker.value.isRowEditMode()) {
+      const isEditing = tableManager.editStates.rowEdit.isEditingRow(rowKey)
+      if (isEditing) {
+        return h(NSpace, { size: 2, wrap: false }, () =>
+          renderRowEditActions(rowKey)
+        )
+      }
+    }
+
+    const actions: VNodeChild[] = [
+      ...(editModeChecker.value.isRowEditMode()
+        ? renderRowEditActions(rowKey)
+        : []),
+      ...renderBuiltinActions(rowData, rowIndex),
+    ]
+
+    const moreAction = renderMoreActions(rowData, rowIndex)
+    if (moreAction) actions.push(moreAction)
+
+    return h(NSpace, { size: 2, wrap: false }, () => actions)
   }
 
   // ================= 计算列配置 =================
-
   const computedColumns = computed((): DataTableColumn[] => {
     let columns: DataTableColumn[] = props.columns.map(column => ({
       ...column,
@@ -439,16 +630,13 @@
     }
 
     // 操作列
-    if (
-      config.value.showRowActions &&
-      (config.value.editable || props.rowActions?.length)
-    ) {
+    if (config.value.showRowActions) {
       columns.push({
         key: '_actions',
         title: '操作',
         align: 'center' as const,
         titleAlign: 'center' as const,
-        width: 120,
+        width: 200,
         render: renderActions,
       })
     }
@@ -456,11 +644,9 @@
     return columns
   })
 
-  // ================= 暴露方法 =================
-
+  // ================= 组件暴露 =================
   defineExpose<
     TableInstance & {
-      // 动态行操作方法
       addRow: () => void
       insertRow: () => void
       deleteRow: () => void
