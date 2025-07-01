@@ -15,6 +15,7 @@ declare global {
   const NCode: (typeof import('naive-ui'))['NCode']
   const NCollapse: (typeof import('naive-ui'))['NCollapse']
   const NCollapseItem: (typeof import('naive-ui'))['NCollapseItem']
+  const NDataTable: (typeof import('naive-ui'))['NDataTable']
   const NDatePicker: (typeof import('naive-ui'))['NDatePicker']
   const NDropdown: (typeof import('naive-ui'))['NDropdown']
   const NIcon: (typeof import('naive-ui'))['NIcon']
@@ -148,6 +149,7 @@ declare module 'vue' {
     readonly NCollapseItem: UnwrapRef<
       (typeof import('naive-ui'))['NCollapseItem']
     >
+    readonly NDataTable: UnwrapRef<(typeof import('naive-ui'))['NDataTable']>
     readonly NDatePicker: UnwrapRef<(typeof import('naive-ui'))['NDatePicker']>
     readonly NDropdown: UnwrapRef<(typeof import('naive-ui'))['NDropdown']>
     readonly NIcon: UnwrapRef<(typeof import('naive-ui'))['NIcon']>

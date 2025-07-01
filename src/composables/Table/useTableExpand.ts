@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-15 19:30:00
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-18 14:19:28
+ * @LastEditTime: 2025-07-01 18:07:10
  * @FilePath: \Robot_Admin\src\composables\Table\useTableExpand.ts
- * @Description: 表格展开功能
+ * @Description: 表格展开功能 - 修复版本
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 import type { VNodeChild, Ref } from 'vue'
@@ -24,7 +24,6 @@ const useExpandState = <T extends DataRecord, C>(
   const expandedKeys = ref<DataTableRowKey[]>([
     ...(options.defaultExpandedKeys || []),
   ])
-  // 使用 any 避免 UnwrapRefSimple 类型问题
   const expandDataMap = ref(new Map<DataTableRowKey, any>()) as Ref<
     Map<DataTableRowKey, C[]>
   >
@@ -112,9 +111,26 @@ const useExpandLogic = <T extends DataRecord, C>(
     }
   }
 
+  // 🔥 关键修复：确保展开时触发数据加载
+  const handleRowExpand = async (row: T, expanded: boolean): Promise<void> => {
+    const key = utils.getRowKey(row)
+
+    if (expanded) {
+      // 展开时确保数据加载
+      await loadData(row)
+      if (!state.expandedKeys.value.includes(key)) {
+        state.expandedKeys.value = [...state.expandedKeys.value, key]
+      }
+    } else {
+      // 收起时移除展开状态
+      state.expandedKeys.value = state.expandedKeys.value.filter(k => k !== key)
+    }
+
+    options.onExpandChange?.(state.expandedKeys.value)
+  }
+
   const expandAll = async (): Promise<void> => {
     const expandableRows = utils.data.value.filter(utils.isRowExpandable)
-    // 使用 Promise.allSettled 替代 Promise.all 避免 await-in-loop 警告
     await Promise.allSettled(expandableRows.map(loadData))
     state.expandedKeys.value = expandableRows.map(utils.getRowKey)
     options.onExpandChange?.(state.expandedKeys.value)
@@ -126,13 +142,36 @@ const useExpandLogic = <T extends DataRecord, C>(
     options.onExpandChange?.(state.expandedKeys.value)
   }
 
-  const handleExpandChange = (keys: DataTableRowKey[]): void => {
+  const handleExpandChange = async (keys: DataTableRowKey[]): Promise<void> => {
+    const newExpandedKeys = keys.filter(
+      key => !state.expandedKeys.value.includes(key)
+    )
+    const collapsedKeys = state.expandedKeys.value.filter(
+      key => !keys.includes(key)
+    )
+
+    // 改为并行处理新展开的行
+    await Promise.all(
+      newExpandedKeys.map(async key => {
+        const row = utils.findRow(key)
+        if (row) {
+          await loadData(row)
+        }
+      })
+    )
+
+    // 处理收起的行
+    for (const key of collapsedKeys) {
+      state.childSelections.value.delete(key)
+    }
+
     state.expandedKeys.value = keys
     options.onExpandChange?.(keys)
   }
 
   return {
     loadData,
+    handleRowExpand,
     expandAll,
     collapseAll,
     handleExpandChange,
@@ -411,13 +450,27 @@ const useRenderer = <T extends DataRecord, C>(
   state: ReturnType<typeof useExpandState<T, C>>,
   utils: ReturnType<typeof useDataUtils<T, C>>,
   childLogic: ReturnType<typeof useChildSelectionLogic<T, C>>,
+  expandLogic: ReturnType<typeof useExpandLogic<T, C>>,
   options: UseTableExpandOptions<T, C>
 ) => {
-  // 降低复杂度：拆分 renderExpandContent 函数
+  // 🔥 关键修复：确保展开时触发数据加载
   const renderExpandContent = (row: T): VNodeChild => {
     const key = utils.getRowKey(row)
     const expandData = state.expandDataMap.value.get(key) || []
     const loading = state.loadingMap.value.get(key) || false
+
+    // 🔥 关键修复：如果展开了但没有数据也没在加载，主动加载
+    if (
+      !expandData.length &&
+      !loading &&
+      state.expandedKeys.value.includes(key)
+    ) {
+      // 使用 nextTick 避免在渲染过程中修改状态
+      nextTick(() => {
+        expandLogic.loadData(row)
+      })
+    }
+
     const childSelection = createChildSelectionState(
       key,
       state,
@@ -502,7 +555,7 @@ export function useTableExpand<
     parentChildLink,
     options
   )
-  const renderer = useRenderer(state, utils, childLogic, options)
+  const renderer = useRenderer(state, utils, childLogic, expandLogic, options)
 
   // 监听选择变化
   if (options.onSelectionChange && options.enableSelection) {
@@ -544,7 +597,6 @@ export function useTableExpand<
     const keysToLoad = options.defaultExpandedKeys || []
     if (keysToLoad.length === 0) return
 
-    // 使用 Promise.allSettled 替代循环中的 await
     const loadPromises = keysToLoad.map(async key => {
       const row = utils.findRow(key)
       if (row && !state.expandDataMap.value.has(key)) {

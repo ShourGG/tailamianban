@@ -78,16 +78,25 @@
 
       <!-- 主表格 -->
       <NCard title="主数据表格">
-        <NDataTable
-          :columns="tableColumns"
+        <C_Table
+          ref="tableRef"
+          :columns="dataColumns"
           :data="tableData"
-          :row-key="getRowKey"
-          :expanded-row-keys="expandedKeys"
-          :checked-row-keys="checkedKeys"
+          :rowKey="getRowKey"
           size="small"
           striped
-          @update:expanded-row-keys="handleExpandChange"
-          @update:checked-row-keys="handleSelectionChange"
+          expandable
+          :enableSelection="config.enableSelection"
+          :enableChildSelection="config.enableChildSelection"
+          :enableParentChildLink="
+            config.enableSelection && config.enableChildSelection
+          "
+          :parentChildLinkMode="config.parentChildLinkMode"
+          :onLoadExpandData="loadChildData"
+          :renderExpandContent="renderExpandContent"
+          :rowExpandable="isRowExpandable"
+          :rowCheckable="isRowCheckable"
+          :showRowActions="false"
         />
       </NCard>
     </NSpace>
@@ -95,47 +104,16 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    type DataTableRowKey,
-    NSpace,
-    NCard,
-    NCheckbox,
-    NRadioGroup,
-    NRadio,
-    NButtonGroup,
-    NButton,
-    NTag,
-    NDataTable,
-    NH1,
-    NSpin,
-  } from 'naive-ui/es'
-
-  // ================= 类型定义 =================
-  interface TestRecord {
-    id: number
-    name: string
-    department: string
-    role: string
-    status: string
-    hasChildren: boolean
-  }
-
-  interface ChildData {
-    id: number
-    project?: string
-    requirement?: string
-    service?: string
-    progress?: string
-    status: string
-    priority?: string
-    version?: string
-  }
-
-  interface DemoConfig {
-    enableSelection: boolean
-    enableChildSelection: boolean
-    parentChildLinkMode: 'strict' | 'loose'
-  }
+  import { type DataTableRowKey } from 'naive-ui/es'
+  import type { VNodeChild } from 'vue'
+  import type {
+    DataRecord,
+    TableColumn,
+    TestRecord,
+    ChildData,
+    DemoConfig,
+  } from '@/types/modules/table'
+  import C_Table from '@/components/global/C_Table/index.vue'
 
   // ================= 配置状态 =================
   const config = reactive<DemoConfig>({
@@ -213,240 +191,147 @@
   }
 
   // ================= 状态管理 =================
-  const expandedKeys = ref<DataTableRowKey[]>([])
-  const checkedKeys = ref<DataTableRowKey[]>([])
-  const childSelections = ref(new Map<DataTableRowKey, DataTableRowKey[]>())
-  const expandDataMap = ref(new Map<DataTableRowKey, ChildData[]>())
-  const loadingMap = ref(new Map<DataTableRowKey, boolean>())
+  const tableRef = ref()
 
   // ================= 工具函数 =================
-  const getRowKey = (row: TestRecord): DataTableRowKey => row.id
-
-  const getChildRowKey = (child: ChildData): DataTableRowKey => child.id
-
-  // ================= 父子联动逻辑 =================
-  const updateParentSelection = (
-    parentKey: DataTableRowKey,
-    childKeys: DataTableRowKey[],
-    totalChildren: number
-  ) => {
-    if (!config.enableSelection || !config.enableChildSelection) return
-
-    const shouldSelect =
-      config.parentChildLinkMode === 'strict'
-        ? childKeys.length === totalChildren && totalChildren > 0
-        : childKeys.length > 0
-
-    const currentKeys = checkedKeys.value
-    const isSelected = currentKeys.includes(parentKey)
-
-    if (shouldSelect && !isSelected) {
-      checkedKeys.value = [...currentKeys, parentKey]
-    } else if (!shouldSelect && isSelected) {
-      checkedKeys.value = currentKeys.filter((k: any) => k !== parentKey)
-    }
-  }
-
-  const handleChildSelectionChange = (
-    parentKey: DataTableRowKey,
-    keys: DataTableRowKey[]
-  ) => {
-    childSelections.value.set(parentKey, keys)
-    const expandData = expandDataMap.value.get(parentKey) || []
-    updateParentSelection(parentKey, keys, expandData.length)
-  }
+  const getRowKey = (row: DataRecord): DataTableRowKey => (row as TestRecord).id
+  const isRowExpandable = (row: DataRecord): boolean =>
+    (row as TestRecord).hasChildren
+  const isRowCheckable = (row: DataRecord): boolean =>
+    (row as TestRecord).status === '在职'
 
   // ================= 数据加载 =================
-  const loadChildData = async (row: TestRecord): Promise<ChildData[]> => {
-    const key = row.id
-
-    if (expandDataMap.value.has(key)) {
-      return expandDataMap.value.get(key)!
-    }
-
-    loadingMap.value.set(key, true)
-
+  const loadChildData = async (row: DataRecord): Promise<ChildData[]> => {
+    const testRow = row as TestRecord
     try {
       // 模拟异步加载
       await new Promise(resolve => setTimeout(resolve, 300))
-      const data = mockChildData[row.id] || []
-      expandDataMap.value.set(key, data)
-
-      // 初始化子选择状态
-      if (config.enableChildSelection && !childSelections.value.has(key)) {
-        childSelections.value.set(key, [])
-      }
-
+      const data = mockChildData[testRow.id] || []
       return data
     } catch (error) {
       console.error('加载子数据失败:', error)
       return []
-    } finally {
-      loadingMap.value.set(key, false)
     }
   }
 
   // ================= 展开渲染逻辑 =================
-  const createSpinView = () => {
-    return h('div', { class: 'flex justify-center items-center py-4' }, [
-      h(NSpin, { size: 'small' }),
-      h('span', { class: 'ml-2' }, '加载中...'),
-    ])
-  }
+  const renderExpandContent = (
+    row: DataRecord,
+    expandData: ChildData[], // 使用具体的类型
+    loading: boolean
+  ): VNodeChild => {
+    const testRow = row as TestRecord
 
-  const createEmptyView = () => {
-    return h('div', { class: 'text-center py-4 text-gray-400' }, '暂无数据')
-  }
-
-  const createChildTable = (
-    key: DataTableRowKey,
-    row: TestRecord,
-    expandData: ChildData[]
-  ) => {
-    const selectedChildKeys = childSelections.value.get(key) || []
-    const columns: any[] = []
-
-    if (config.enableChildSelection) {
-      columns.push({ type: 'selection', multiple: true })
+    // 加载中状态
+    if (loading) {
+      return h('div', { class: 'flex justify-center items-center py-4' }, [
+        h(NSpin, { size: 'small' }),
+        h('span', { class: 'ml-2' }, '加载中...'),
+      ])
     }
 
-    columns.push(
+    // 空数据状态
+    if (!expandData || !expandData.length) {
+      return h('div', { class: 'text-center py-4 text-gray-400' }, '暂无数据')
+    }
+
+    // 构建子表格列配置
+    const childColumns: TableColumn<ChildData>[] = [
       {
         title: '序号',
         key: '_index',
         width: 60,
-        render: (_: any, index: number) => index + 1,
+        render: (_: ChildData, index: number) => index + 1,
       },
-      {
-        key: expandData[0].project
-          ? 'project'
-          : expandData[0].requirement
-            ? 'requirement'
-            : 'service',
-        title: '名称',
-        width: 150,
-      },
-      { key: 'status', title: '状态', width: 100 }
-    )
+    ]
+
+    // 动态添加数据列
+    const firstItem = expandData[0]
+    if (firstItem.project) {
+      childColumns.push(
+        { key: 'project', title: '项目名称', width: 150 },
+        { key: 'progress', title: '进度', width: 100 }
+      )
+    } else if (firstItem.requirement) {
+      childColumns.push(
+        { key: 'requirement', title: '需求名称', width: 150 },
+        { key: 'priority', title: '优先级', width: 100 }
+      )
+    } else if (firstItem.service) {
+      childColumns.push(
+        { key: 'service', title: '服务名称', width: 150 },
+        { key: 'version', title: '版本', width: 100 }
+      )
+    }
+
+    childColumns.push({ key: 'status', title: '状态', width: 100 })
 
     return h('div', { class: 'p-4 bg-gray-50' }, [
       h(
         'div',
         { class: 'mb-2 text-sm text-gray-600' },
-        `${row.name} 的详细信息 (${expandData.length} 条)`
+        `${testRow.name} 的详细信息 (${expandData.length} 条)`
       ),
-      h(NDataTable, {
+      h(C_Table, {
         data: expandData,
-        columns,
+        columns: childColumns as TableColumn<DataRecord>[],
         size: 'small',
         striped: true,
-        checkedRowKeys: selectedChildKeys,
-        rowKey: getChildRowKey,
-        onUpdateCheckedRowKeys: config.enableChildSelection
-          ? (keys: DataTableRowKey[]) => handleChildSelectionChange(key, keys)
-          : undefined,
+        rowKey: (child: DataRecord) => (child as ChildData).id,
+        enableSelection: config.enableChildSelection,
+        showRowActions: false,
       }),
     ])
   }
 
-  const renderExpand = (row: TestRecord) => {
-    const key = row.id
-    const expandData = expandDataMap.value.get(key) || []
-    const loading = loadingMap.value.get(key) || false
-
-    // 确保数据已加载
-    if (!expandDataMap.value.has(key) && !loading) {
-      loadChildData(row)
-    }
-
-    if (loading) return createSpinView()
-    if (!expandData.length) return createEmptyView()
-    return createChildTable(key, row, expandData)
-  }
-
   // ================= 表格列配置 =================
-  const tableColumns = computed(() => {
-    const columns: any[] = []
-
-    // 选择列
-    if (config.enableSelection) {
-      columns.push({
-        type: 'selection',
-        disabled: (row: TestRecord) => row.status !== '在职',
-        multiple: true,
-      })
-    }
-
-    // 展开列
-    columns.push({
-      type: 'expand',
-      expandable: (row: TestRecord) => row.hasChildren,
-      renderExpand,
-    })
-
-    // 数据列
-    columns.push(
-      {
-        title: '序号',
-        key: '_index',
-        width: 60,
-        render: (_: any, index: number) => index + 1,
+  const dataColumns = computed<TableColumn<DataRecord>[]>(() => [
+    {
+      title: '序号',
+      key: '_index',
+      width: 60,
+      render: (_: DataRecord, index: number) => index + 1,
+    },
+    { key: 'name', title: '姓名', width: 120 },
+    { key: 'department', title: '部门', width: 120 },
+    { key: 'role', title: '角色', width: 150 },
+    {
+      key: 'status',
+      title: '状态',
+      width: 100,
+      render: (row: DataRecord) => {
+        const testRow = row as TestRecord
+        return h(
+          NTag,
+          {
+            type: testRow.status === '在职' ? 'success' : 'error',
+            size: 'small',
+          },
+          () => testRow.status
+        )
       },
-      { key: 'name', title: '姓名', width: 120 },
-      { key: 'department', title: '部门', width: 120 },
-      { key: 'role', title: '角色', width: 150 },
-      {
-        key: 'status',
-        title: '状态',
-        width: 100,
-        render: (row: TestRecord) =>
-          h(
-            NTag,
-            {
-              type: row.status === '在职' ? 'success' : 'error',
-              size: 'small',
-            },
-            () => row.status
-          ),
-      }
-    )
-
-    return columns
-  })
-
-  // ================= 事件处理 =================
-  const handleExpandChange = (keys: DataTableRowKey[]) => {
-    expandedKeys.value = keys
-  }
-
-  const handleSelectionChange = (keys: DataTableRowKey[]) => {
-    checkedKeys.value = keys
-  }
+    },
+  ])
 
   // ================= 操作方法 =================
-  const handleExpandAll = async () => {
-    const expandableRows = tableData.value.filter(row => row.hasChildren)
-    await Promise.allSettled(expandableRows.map(loadChildData))
-    expandedKeys.value = expandableRows.map(row => row.id)
+  const handleExpandAll = () => {
+    tableRef.value?.expandAll()
   }
 
   const handleCollapseAll = () => {
-    expandedKeys.value = []
-    childSelections.value.clear()
+    tableRef.value?.collapseAll()
   }
 
   const handleSelectAll = () => {
-    const selectableRows = tableData.value.filter(row => row.status === '在职')
-    checkedKeys.value = selectableRows.map(row => row.id)
+    tableRef.value?.selectAll()
   }
 
   const handleClearSelection = () => {
-    checkedKeys.value = []
+    tableRef.value?.clearSelection()
   }
 
   const handleClearAllSelections = () => {
-    checkedKeys.value = []
-    childSelections.value.clear()
+    tableRef.value?.clearAllSelections()
   }
 </script>
 

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-17 15:11:10
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-01 12:26:02
+ * @LastEditTime: 2025-07-01 16:02:03
  * @FilePath: \Robot_Admin\src\config\vite\viteAutoImportConfig.ts
  * @Description: Vite 自动导入配置
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -45,6 +45,7 @@ export default AutoImport({
         'NModal',
         'NPopconfirm',
         'NDropdown',
+        'NDataTable',
       ],
     },
   ],
