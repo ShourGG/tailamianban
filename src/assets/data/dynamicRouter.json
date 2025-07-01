@@ -414,10 +414,22 @@
             "affix": false,
             "keepAlive": false
           }
+        },
+        {
+          "path": "excel-import",
+          "name": "sys-excel-import",
+          "component": "/demo/import/index",
+          "meta": {
+            "icon": "mdi:microsoft-excel",
+            "title": "Excel导入",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
         }
       ]
     },
-
     {
       "path": "/directives",
       "name": "directives",
@@ -526,61 +538,6 @@
       ]
     },
     {
-      "path": "/user",
-      "name": "user",
-      "component": "layout",
-      "redirect": "/user/user-manage",
-      "meta": {
-        "icon": "mdi:user-tie",
-        "title": "用户模块",
-        "hidden": false,
-        "full": false,
-        "affix": false,
-        "keepAlive": false
-      },
-      "children": [
-        {
-          "path": "user-manage-detail/:id",
-          "name": "user-manage-detail",
-          "component": "/user-manage-detail/index",
-          "meta": {
-            "icon": "",
-            "title": "用户信息",
-            "hidden": true,
-            "full": false,
-            "affix": false,
-            "keepAlive": false
-          }
-        },
-        {
-          "path": "role-list",
-          "name": "user-role-list",
-          "component": "/role-list/index",
-          "meta": {
-            "icon": "mdi:user-group",
-            "title": "角色列表",
-            "hidden": false,
-            "full": false,
-            "affix": false,
-            "keepAlive": false
-          }
-        },
-        {
-          "path": "permission-list",
-          "name": "user-permission-list",
-          "component": "/permission-list/index",
-          "meta": {
-            "icon": "mdi:account-multiple-check-outline",
-            "title": "权限列表",
-            "hidden": false,
-            "full": false,
-            "affix": false,
-            "keepAlive": false
-          }
-        }
-      ]
-    },
-    {
       "path": "/sys-manage",
       "name": "sys-manage",
       "component": "layout",
@@ -647,12 +604,12 @@
           }
         },
         {
-          "path": "excelImport",
-          "name": "sys-excel-import",
-          "component": "/sys-manage/import/index",
+          "path": "permission-manage",
+          "name": "sys-permission-manage",
+          "component": "/sys-manage/permission-manage/index",
           "meta": {
-            "icon": "mdi:microsoft-excel",
-            "title": "Excel导入",
+            "icon": "mdi:account-multiple-check-outline",
+            "title": "权限管理",
             "hidden": false,
             "full": false,
             "affix": false,
