@@ -49,6 +49,19 @@
           }
         },
         {
+          "path": "statistics",
+          "name": "dashboard-statistics",
+          "component": "/dashboard/statistics/index",
+          "meta": {
+            "icon": "uil:statistics",
+            "title": "统计页",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
+        },
+        {
           "path": "profile",
           "name": "dashboard-profile",
           "component": "/dashboard/profile/index",
