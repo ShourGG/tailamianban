@@ -40,30 +40,45 @@
 
           <p class="project-description">
             完全免费，基于 Vue 3 + TypeScript + Naive UI
-            构建的高性能、可扩展的企业级管理平台
-            支持微服务架构、多租户、RBAC权限管理、数据可视化等企业级功能
+            构建的高性能、可扩展的企业级管理平台，
+            支持微服务架构、多租户、RBAC权限管理、数据可视化等功能，
+            开源不易，若对你有帮助，请给点个Star
           </p>
 
           <div class="project-stats">
             <div class="stat-item">
-              <div class="stat-icon">⭐</div>
-              <div class="stat-number">2.3K</div>
-              <div class="stat-label">Stars</div>
+              <C_Icon
+                name="fluent-color:approvals-app-16"
+                size="30"
+              />
+              <div class="stat-number">当前</div>
+              <div class="stat-label">Monomer</div>
             </div>
             <div class="stat-item">
-              <div class="stat-icon">🍴</div>
-              <div class="stat-number">567</div>
-              <div class="stat-label">Forks</div>
+              <C_Icon
+                name="fluent-color:animal-paw-print-20"
+                size="30"
+              />
+              <div class="stat-number">接下来</div>
+              <div class="stat-label">Monorepo</div>
             </div>
             <div class="stat-item">
-              <div class="stat-icon">👁️</div>
-              <div class="stat-number">15.8K</div>
-              <div class="stat-label">Views</div>
+              <C_Icon
+                name="fluent-color:flag-24"
+                size="30"
+              />
+
+              <div class="stat-number">计划</div>
+              <div class="stat-label">MicroApp</div>
             </div>
             <div class="stat-item">
-              <div class="stat-icon">📦</div>
-              <div class="stat-number">45</div>
-              <div class="stat-label">Releases</div>
+              <C_Icon
+                name="fluent-color:beach-28"
+                size="30"
+              />
+
+              <div class="stat-number">最后</div>
+              <div class="stat-label">NestJS</div>
             </div>
           </div>
 
@@ -131,22 +146,20 @@
             </div>
 
             <div class="author-info">
-              <h3 class="author-name">前端架构师 & 全栈开发者</h3>
-              <p class="author-bio">
-                专注现代化Web开发，擅长Vue生态系统与Node.js后端架构
-              </p>
+              <h3 class="author-name">前端咔啦咪 & 敏捷追光者</h3>
+              <p class="author-bio"> I‘M CHENY，希望可以这个应用可以帮到你 </p>
               <div class="author-stats">
                 <div class="author-stat">
                   <div class="stat-number">5+</div>
-                  <div class="stat-label">年经验</div>
+                  <div class="stat-label">⭐Star</div>
                 </div>
                 <div class="author-stat">
                   <div class="stat-number">50+</div>
-                  <div class="stat-label">项目</div>
+                  <div class="stat-label">🍴Forks</div>
                 </div>
                 <div class="author-stat">
                   <div class="stat-number">1K+</div>
-                  <div class="stat-label">Star</div>
+                  <div class="stat-label">👁️Views</div>
                 </div>
               </div>
             </div>
