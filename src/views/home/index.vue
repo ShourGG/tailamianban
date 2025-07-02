@@ -1199,8 +1199,6 @@
 
   // 主要内容区域 - 简洁设计
   .main-container {
-    max-width: 1400px;
-    margin: 0 auto;
     padding: 4rem 2rem;
     display: grid;
     grid-template-columns: 2fr 1fr;
