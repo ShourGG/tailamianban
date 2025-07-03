@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-03 09:13:12
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-03 13:44:16
+ * @LastEditTime: 2025-07-03 18:27:14
  * @FilePath: \Robot_Admin\src\components\global\C_WorkFlow\index.vue
  * @Description: 工作（审批流）流组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -39,9 +39,7 @@
         ></template>
         验证流程
       </NButton>
-
       <div class="toolbar-divider"></div>
-
       <NButton
         size="small"
         @click="fitView"
@@ -119,9 +117,72 @@
       @positive-click="saveNodeConfig"
       @negative-click="showNodeConfig = false"
     >
+      <!-- 发起人配置 -->
+      <div
+        v-if="currentNode?.type === 'start'"
+        class="config-content"
+      >
+        <div class="config-section">
+          <h4 class="section-title">
+            <div class="i-mdi:account-star w-4 h-4"></div>
+            选择发起人
+          </h4>
+
+          <NInput
+            v-model:value="searchKeyword"
+            placeholder="搜索用户姓名或部门"
+            clearable
+            class="search-input"
+          >
+            <template #prefix
+              ><div class="i-mdi:magnify w-4 h-4"></div
+            ></template>
+          </NInput>
+
+          <div class="user-tree-container">
+            <NTree
+              :data="departmentUserTree"
+              :checked-keys="selectedUsers"
+              :selectable="false"
+              checkable
+              :cascade="false"
+              :virtual-scroll="true"
+              style="max-height: 300px"
+              @update:checked-keys="handleUserSelect"
+            />
+          </div>
+
+          <div
+            v-if="selectedUsers.length > 0"
+            class="selected-users"
+          >
+            <h5>已选择发起人</h5>
+            <div class="selected-user-tags">
+              <NTag
+                v-for="user in selectedInitiators"
+                :key="user.id"
+                closable
+                type="primary"
+                @close="selectedUsers = []"
+              >
+                <div class="user-tag-content">
+                  <NAvatar
+                    :src="user.avatar"
+                    :fallback-src="getDefaultAvatar(user.name)"
+                    size="small"
+                  />
+                  <span class="user-name">{{ user.name }}</span>
+                  <span class="user-dept">{{ user.department }}</span>
+                </div>
+              </NTag>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 审批人配置 -->
       <div
-        v-if="currentNode?.type === 'approval'"
+        v-else-if="currentNode?.type === 'approval'"
         class="config-content"
       >
         <div class="config-section">
@@ -406,12 +467,12 @@
             <h4>💡 常见问题解决方案：</h4>
             <ul>
               <li
-                ><strong>审批人未设置：</strong>
-                点击审批节点，在弹窗中选择审批人员</li
+                ><strong>审批人未设置：</strong
+                >点击审批节点，在弹窗中选择审批人员</li
               >
               <li
-                ><strong>条件分支未配置：</strong>
-                点击条件节点，添加至少一个条件分支</li
+                ><strong>条件分支未配置：</strong
+                >点击条件节点，添加至少一个条件分支</li
               >
               <li
                 ><strong>节点连接断开：</strong> 检查节点之间的连线是否正确</li
@@ -516,11 +577,12 @@
   const conditions = ref<Condition[]>([])
   const validationErrors = ref<ValidationError[]>([])
   const showValidationErrors = ref(false)
+  const currentAddNodeId = ref<string | null>(null)
 
   // 计算属性
   const nodeTypes = computed(() => NODE_TYPES)
-
   const configTitle = computed(() => {
+    if (currentNode.value?.type === 'start') return '发起人设置'
     const type = currentNode.value?.type as keyof typeof CONFIG_TITLES
     return CONFIG_TITLES[type] || '节点设置'
   })
@@ -529,7 +591,6 @@
     const tree: any[] = []
     const deptMap = new Map()
 
-    // 创建部门节点
     props.departments?.forEach(dept => {
       if (!deptMap.has(dept.id)) {
         deptMap.set(dept.id, {
@@ -542,7 +603,6 @@
       }
     })
 
-    // 添加用户到对应部门
     const filteredUsers =
       props.users?.filter(
         user =>
@@ -575,38 +635,98 @@
   const selectedApprovers = computed(
     () => props.users?.filter(u => selectedUsers.value.includes(u.id)) || []
   )
-
   const selectedCopyUserList = computed(
     () => props.users?.filter(u => selectedCopyUsers.value.includes(u.id)) || []
   )
+  const selectedInitiators = computed(
+    () => props.users?.filter(u => selectedUsers.value.includes(u.id)) || []
+  )
 
   const workflowStats = computed(() => {
-    const totalNodes = nodes.value.length
-    const approvalNodes = nodes.value.filter(n => n.type === 'approval').length
-    const copyNodes = nodes.value.filter(n => n.type === 'copy').length
-    const conditionNodes = nodes.value.filter(
-      n => n.type === 'condition'
-    ).length
-
-    return { totalNodes, approvalNodes, copyNodes, conditionNodes }
+    const stats = {
+      totalNodes: nodes.value.length,
+      approvalNodes: 0,
+      copyNodes: 0,
+      conditionNodes: 0,
+    }
+    nodes.value.forEach(n => {
+      if (n.type === 'approval') stats.approvalNodes++
+      else if (n.type === 'copy') stats.copyNodes++
+      else if (n.type === 'condition') stats.conditionNodes++
+    })
+    return stats
   })
 
-  // 方法
-  const handleShowAddMenu = (position: MenuPosition): void => {
+  // 方法定义
+  const handleShowAddMenu = (position: MenuPosition, nodeId?: string): void => {
     try {
-      const x = typeof position.x === 'number' ? position.x : 0
-      const y = typeof position.y === 'number' ? position.y : 0
-      menuPosition.value = { x, y }
+      menuPosition.value = {
+        x: typeof position.x === 'number' ? position.x : 0,
+        y: typeof position.y === 'number' ? position.y : 0,
+      }
+      currentAddNodeId.value = nodeId || null
       showAddMenu.value = true
     } catch (error) {
       console.error('Error showing add menu:', error)
     }
   }
 
+  const deleteNode = (nodeId: string): void => {
+    if (nodeId === 'start-1') {
+      message?.warning?.('不能删除开始节点')
+      return
+    }
+
+    const nodeIndex = nodes.value.findIndex(n => n.id === nodeId)
+    if (nodeIndex === -1) return
+
+    const incomingEdges = edges.value.filter(edge => edge.target === nodeId)
+    const outgoingEdges = edges.value.filter(edge => edge.source === nodeId)
+
+    nodes.value.splice(nodeIndex, 1)
+    edges.value = edges.value.filter(
+      edge => edge.source !== nodeId && edge.target !== nodeId
+    )
+
+    incomingEdges.forEach(inEdge => {
+      outgoingEdges.forEach(outEdge => {
+        edges.value.push({
+          id: generateEdgeId(inEdge.source, outEdge.target),
+          source: inEdge.source,
+          target: outEdge.target,
+          animated: true,
+          type: 'default',
+        })
+      })
+    })
+
+    nodes.value.forEach((node, index) => {
+      if (index >= nodeIndex) {
+        node.position.y -= 120
+      }
+    })
+
+    emitChange()
+    message?.success?.('节点已删除')
+
+    nextTick(() => {
+      setTimeout(() => {
+        vueFlowRef.value?.fitView?.({ padding: 60, duration: 400 })
+      }, 100)
+    })
+  }
+
   provide('showAddMenu', handleShowAddMenu)
+  provide('deleteNode', deleteNode)
 
   const handleUserSelect = (keys: string[]) => {
-    selectedUsers.value = keys.filter(key => !key.startsWith('dept-'))
+    const userKeys = keys.filter(key => !key.startsWith('dept-'))
+    selectedUsers.value =
+      currentNode.value?.type === 'start'
+        ? userKeys.length > 0
+          ? [userKeys[userKeys.length - 1]]
+          : []
+        : userKeys
   }
 
   const handleCopyUserSelect = (keys: string[]) => {
@@ -623,48 +743,90 @@
     )
   }
 
-  const addCondition = () => {
-    conditions.value.push(createDefaultCondition())
+  const addCondition = () => conditions.value.push(createDefaultCondition())
+  const removeCondition = (index: number) => conditions.value.splice(index, 1)
+
+  // 拆分节点添加逻辑
+  const getTargetNodeInfo = () => {
+    let targetNodeIndex = nodes.value.length - 1
+    let targetNode = nodes.value[targetNodeIndex]
+
+    if (currentAddNodeId.value) {
+      const foundIndex = nodes.value.findIndex(
+        n => n.id === currentAddNodeId.value
+      )
+      if (foundIndex !== -1) {
+        targetNodeIndex = foundIndex
+        targetNode = nodes.value[targetNodeIndex]
+      }
+    }
+    return { targetNodeIndex, targetNode }
   }
 
-  const removeCondition = (index: number) => {
-    conditions.value.splice(index, 1)
+  const createNewNode = (
+    type: NodeType,
+    targetNode: WorkflowNode | null
+  ): WorkflowNode => ({
+    id: `${type}-${Date.now()}`,
+    type,
+    position: {
+      x: targetNode?.position.x || 150,
+      y: (targetNode?.position.y || 130) + 120,
+    },
+    data: {
+      title: NODE_TITLES[type],
+      status: 'pending',
+      ...(type === 'approval' && { approvers: [], approvalMode: 'any' }),
+      ...(type === 'copy' && { copyUsers: [] }),
+      ...(type === 'condition' && { conditions: [] }),
+    },
+  })
+
+  const handleEdgeReconnection = (
+    targetNode: WorkflowNode,
+    newNode: WorkflowNode
+  ) => {
+    const targetOutgoingEdges = edges.value.filter(
+      edge => edge.source === targetNode.id
+    )
+    edges.value = edges.value.filter(edge => edge.source !== targetNode.id)
+
+    edges.value.push({
+      id: generateEdgeId(targetNode.id, newNode.id),
+      source: targetNode.id,
+      target: newNode.id,
+      animated: true,
+      type: 'default',
+    })
+
+    targetOutgoingEdges.forEach(edge => {
+      edges.value.push({
+        id: generateEdgeId(newNode.id, edge.target),
+        source: newNode.id,
+        target: edge.target,
+        animated: true,
+        type: 'default',
+      })
+    })
   }
 
   const addNode = (type: NodeType): void => {
     try {
-      const lastNode = nodes.value[nodes.value.length - 1]
-      const newX = lastNode ? lastNode.position.x : 150
-      const newY = lastNode ? lastNode.position.y + 120 : 250
+      const { targetNodeIndex, targetNode } = getTargetNodeInfo()
+      const newNode = createNewNode(type, targetNode)
 
-      const newNode: WorkflowNode = {
-        id: `${type}-${Date.now()}`,
-        type,
-        position: { x: newX, y: newY },
-        data: {
-          title: NODE_TITLES[type],
-          status: 'pending',
-          ...(type === 'approval' && { approvers: [], approvalMode: 'any' }),
-          ...(type === 'copy' && { copyUsers: [] }),
-          ...(type === 'condition' && { conditions: [] }),
-        },
+      nodes.value.splice(targetNodeIndex + 1, 0, newNode)
+
+      for (let i = targetNodeIndex + 2; i < nodes.value.length; i++) {
+        nodes.value[i].position.y += 120
       }
 
-      nodes.value.push(newNode)
-
-      if (nodes.value.length > 1) {
-        const lastNode = nodes.value[nodes.value.length - 2]
-        const newEdge: WorkflowEdge = {
-          id: generateEdgeId(lastNode.id, newNode.id),
-          source: lastNode.id,
-          target: newNode.id,
-          animated: true,
-          type: 'default',
-        }
-        edges.value.push(newEdge)
+      if (targetNode) {
+        handleEdgeReconnection(targetNode, newNode)
       }
 
       showAddMenu.value = false
+      currentAddNodeId.value = null
       emitChange()
 
       nextTick(() => {
@@ -678,27 +840,48 @@
     }
   }
 
+  // 拆分节点点击处理逻辑
+  const configureStartNode = (node: WorkflowNode) => {
+    const { initiator } = node.data as any
+    selectedUsers.value = initiator ? [initiator.id] : []
+  }
+
+  const configureApprovalNode = (node: WorkflowNode) => {
+    const approvers = (node.data as any).approvers || []
+    selectedUsers.value = approvers.map((u: User) => u.id)
+    approvalMode.value = (node.data as any).approvalMode || 'any'
+  }
+
+  const configureCopyNode = (node: WorkflowNode) => {
+    const copyUsers = (node.data as any).copyUsers || []
+    selectedCopyUsers.value = copyUsers.map((u: User) => u.id)
+  }
+
+  const configureConditionNode = (node: WorkflowNode) => {
+    conditions.value = (node.data as any).conditions || []
+  }
+
   const onNodeClick = (event: NodeMouseEvent): void => {
     try {
       const node = event.node as WorkflowNode
-      if (node.type !== 'start') {
-        currentNode.value = node
-        searchKeyword.value = ''
+      currentNode.value = node
+      searchKeyword.value = ''
 
-        if (node.type === 'approval') {
-          const approvers = (node.data as any).approvers || []
-          selectedUsers.value = approvers.map((u: User) => u.id)
-          approvalMode.value = (node.data as any).approvalMode || 'any'
-        } else if (node.type === 'copy') {
-          const copyUsers = (node.data as any).copyUsers || []
-          selectedCopyUsers.value = copyUsers.map((u: User) => u.id)
-        } else if (node.type === 'condition') {
-          conditions.value = (node.data as any).conditions || []
-        }
-
-        showNodeConfig.value = true
-        emit('node-click', node)
+      const nodeConfigurators = {
+        start: configureStartNode,
+        approval: configureApprovalNode,
+        copy: configureCopyNode,
+        condition: configureConditionNode,
       }
+
+      const configurator =
+        nodeConfigurators[node.type as keyof typeof nodeConfigurators]
+      if (configurator) {
+        configurator(node)
+      }
+
+      showNodeConfig.value = true
+      emit('node-click', node)
     } catch (error) {
       console.error('Error handling node click:', error)
     }
@@ -708,47 +891,92 @@
     showAddMenu.value = false
   }
 
+  // 拆分配置保存逻辑
+  const saveStartNodeConfig = async (): Promise<boolean> => {
+    if (selectedUsers.value.length === 0) {
+      message.error('请选择发起人')
+      return false
+    }
+
+    const selectedUser = props.users?.find(u => u.id === selectedUsers.value[0])
+    if (selectedUser && currentNode.value) {
+      ;(currentNode.value.data as any).initiator = selectedUser
+      message.success(`已设置发起人：${selectedUser.name}`)
+      return true
+    }
+    return false
+  }
+
+  const saveApprovalNodeConfig = async (): Promise<boolean> => {
+    if (selectedUsers.value.length === 0) {
+      message.error('请至少选择一个审批人')
+      return false
+    }
+
+    const selectedUserObjs = selectedApprovers.value
+    if (currentNode.value) {
+      ;(currentNode.value.data as any).approvers = selectedUserObjs
+      ;(currentNode.value.data as any).approvalMode = approvalMode.value
+      message.success(`已设置 ${selectedUserObjs.length} 个审批人`)
+      return true
+    }
+    return false
+  }
+
+  const saveCopyNodeConfig = async (): Promise<boolean> => {
+    const selectedUserObjs = selectedCopyUserList.value
+    if (currentNode.value) {
+      ;(currentNode.value.data as any).copyUsers = selectedUserObjs
+      message.success(`已设置 ${selectedUserObjs.length} 个抄送人`)
+      return true
+    }
+    return false
+  }
+
+  const saveConditionNodeConfig = async (): Promise<boolean> => {
+    if (conditions.value.length === 0) {
+      message.error('请至少添加一个条件分支')
+      return false
+    }
+
+    const validConditions = conditions.value.filter(
+      c => c.name && c.field && c.operator && c.value
+    )
+    if (validConditions.length === 0) {
+      message.error('请完善条件配置')
+      return false
+    }
+
+    if (currentNode.value) {
+      ;(currentNode.value.data as any).conditions = validConditions
+      message.success(`已设置 ${validConditions.length} 个条件分支`)
+      return true
+    }
+    return false
+  }
+
   const saveNodeConfig = async (): Promise<boolean> => {
     if (!currentNode.value) return false
 
     configLoading.value = true
 
     try {
-      if (currentNode.value.type === 'approval') {
-        if (selectedUsers.value.length === 0) {
-          message.error('请至少选择一个审批人')
-          return false
-        }
-
-        const selectedUserObjs = selectedApprovers.value
-        ;(currentNode.value.data as any).approvers = selectedUserObjs
-        ;(currentNode.value.data as any).approvalMode = approvalMode.value
-        message.success(`已设置 ${selectedUserObjs.length} 个审批人`)
-      } else if (currentNode.value.type === 'copy') {
-        const selectedUserObjs = selectedCopyUserList.value
-        ;(currentNode.value.data as any).copyUsers = selectedUserObjs
-        message.success(`已设置 ${selectedUserObjs.length} 个抄送人`)
-      } else if (currentNode.value.type === 'condition') {
-        if (conditions.value.length === 0) {
-          message.error('请至少添加一个条件分支')
-          return false
-        }
-
-        const validConditions = conditions.value.filter(
-          c => c.name && c.field && c.operator && c.value
-        )
-        if (validConditions.length === 0) {
-          message.error('请完善条件配置')
-          return false
-        }
-
-        ;(currentNode.value.data as any).conditions = validConditions
-        message.success(`已设置 ${validConditions.length} 个条件分支`)
+      const nodeSavers = {
+        start: saveStartNodeConfig,
+        approval: saveApprovalNodeConfig,
+        copy: saveCopyNodeConfig,
+        condition: saveConditionNodeConfig,
       }
 
-      showNodeConfig.value = false
-      emitChange()
-      return true
+      const saver =
+        nodeSavers[currentNode.value.type as keyof typeof nodeSavers]
+      const success = saver ? await saver() : false
+
+      if (success) {
+        showNodeConfig.value = false
+        emitChange()
+      }
+      return success
     } catch (error) {
       message.error('保存配置失败')
       console.error('Save node config error:', error)
@@ -805,7 +1033,6 @@
         })
         message?.success?.('已适应窗口大小')
       } else {
-        console.warn('VueFlow instance not ready')
         message?.warning?.('画布未准备就绪，请稍后重试')
       }
     } catch (error) {
@@ -875,7 +1102,6 @@
       }
     })
 
-    // 检查节点连接
     const connectedNodes = new Set<string>()
     edges.value.forEach(edge => {
       connectedNodes.add(edge.source)
@@ -911,11 +1137,9 @@
       })
 
       setTimeout(() => {
-        if (node.type !== 'start') {
-          currentNode.value = node
-          showNodeConfig.value = true
-          showValidationErrors.value = false
-        }
+        currentNode.value = node
+        showNodeConfig.value = true
+        showValidationErrors.value = false
       }, 900)
 
       message?.info?.(`已定位到节点：${node.data.title}`)
@@ -937,7 +1161,6 @@
     emit('change', data)
   }
 
-  // 监听器
   watch(
     () => props.modelValue,
     newValue => {
@@ -968,6 +1191,7 @@
     getCurrentWorkflowData,
     saveWorkflow,
     previewWorkflow,
+    deleteNode,
     stats: workflowStats,
   })
 </script>

@@ -15,7 +15,19 @@
       :class="data.status"
     ></div>
 
-    <div class="node-card">
+    <!-- 删除按钮 -->
+    <div
+      class="delete-btn"
+      @click="handleDelete"
+      title="删除节点"
+    >
+      <div class="i-mdi:close w-3 h-3"></div>
+    </div>
+
+    <div
+      class="node-card"
+      @click="handleNodeClick"
+    >
       <div class="node-header">
         <div class="node-icon">
           <i class="i-mdi:account text-white text-12px"></i>
@@ -78,6 +90,7 @@
     <div
       class="add-node-btn"
       @click="showAddMenu"
+      title="添加下一个节点"
     >
       <i class="i-mdi:plus text-16px font-bold"></i>
     </div>
@@ -99,6 +112,7 @@
   }
 
   interface Props {
+    id: string
     data: {
       title: string
       approvers?: Approver[]
@@ -110,7 +124,11 @@
   const props = defineProps<Props>()
 
   const showAddMenuFn = inject('showAddMenu') as
-    | ((position: { x: number; y: number }) => void)
+    | ((position: { x: number; y: number }, nodeId?: string) => void)
+    | undefined
+
+  const deleteNodeFn = inject('deleteNode') as
+    | ((nodeId: string) => void)
     | undefined
 
   // 使用安全的访问方式和默认值
@@ -132,15 +150,31 @@
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleNodeClick = (event: MouseEvent) => {
+    // 不阻止事件冒泡，让VueFlow的node-click事件自然触发
+    console.log('Node clicked:', props.id)
+  }
+
   const showAddMenu = (event: MouseEvent) => {
-    event.stopPropagation()
+    event.stopPropagation() // 阻止事件冒泡到节点点击
     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
 
     if (showAddMenuFn) {
-      showAddMenuFn({
-        x: rect.left + rect.width / 2,
-        y: rect.bottom + 10,
-      })
+      showAddMenuFn(
+        {
+          x: rect.left + rect.width / 2,
+          y: rect.bottom + 10,
+        },
+        props.id
+      )
+    }
+  }
+
+  const handleDelete = (event: MouseEvent) => {
+    event.stopPropagation() // 阻止事件冒泡到节点点击
+    if (deleteNodeFn) {
+      deleteNodeFn(props.id)
     }
   }
 </script>
@@ -172,6 +206,42 @@
     }
   }
 
+  .delete-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ff4d4f;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100; /* 确保在所有元素之上 */
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s ease;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
+
+    &:hover {
+      transform: scale(1);
+      background: #ff7875;
+      box-shadow: 0 4px 12px rgba(255, 77, 79, 0.5);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .approval-node:hover .delete-btn {
+    opacity: 1;
+    transform: scale(1);
+  }
+
   .node-card {
     background: white;
     border-radius: 12px;
@@ -181,6 +251,7 @@
     border: 2px solid transparent;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    cursor: pointer;
 
     &:hover {
       transform: translateY(-2px);
@@ -342,6 +413,7 @@
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
 
     &:hover {
       transform: translateX(-50%) scale(1.1);
