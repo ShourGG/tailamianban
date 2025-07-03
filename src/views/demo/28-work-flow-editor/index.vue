@@ -1,477 +1,764 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-07-03 09:23:53
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-07-03 16:10:03
+ * @FilePath: \Robot_Admin\src\views\demo\28-work-flow-editor\index.vue
+ * @Description: 审批流演示页面
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
-  <div class="workflow-page">
-    <div class="page-header">
-      <h2>审批流设计器</h2>
-      <p>拖拽添加节点，设置审批人员，构建你的审批流程</p>
-    </div>
+  <div class="workflow-demo-page">
+    <!-- 页面头部 -->
+    <header class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h1>🚀 工作流设计器演示</h1>
+          <p>拖拽构建审批流程，支持多种场景模板，实时预览工作流数据</p>
+        </div>
+        <div class="header-actions">
+          <NButton
+            type="primary"
+            @click="saveAllWorkflows"
+          >
+            <template #icon><div class="i-mdi:content-save"></div></template>
+            保存所有流程
+          </NButton>
+          <NButton @click="exportAllWorkflows">
+            <template #icon><div class="i-mdi:download"></div></template>
+            批量导出
+          </NButton>
+        </div>
+      </div>
+    </header>
 
-    <!-- 工作流组件 -->
-    <div class="workflow-container">
-      <C_WorkFlow
-        v-model="workflowData"
-        :users="userList"
-        :roles="roleList"
-        :departments="deptList"
-        @change="handleWorkflowChange"
-        @node-click="handleNodeClick"
-      />
-    </div>
-
-    <!-- 数据预览区 -->
-    <div class="data-preview">
-      <NCard
-        title="当前工作流数据"
-        size="small"
-      >
-        <template #header-extra>
-          <NSpace>
-            <NButton
-              size="small"
-              @click="saveWorkflow"
-              >保存流程</NButton
-            >
-            <NButton
-              size="small"
-              @click="exportWorkflow"
-              >导出数据</NButton
-            >
-            <NButton
-              size="small"
-              @click="clearWorkflow"
-              >清空</NButton
-            >
-          </NSpace>
-        </template>
-
+    <!-- 场景选择标签 -->
+    <section class="scenario-section">
+      <div class="container">
         <NTabs
-          type="line"
-          size="small"
+          v-model:value="currentScenario"
+          type="card"
+          size="large"
+          @update:value="handleScenarioChange"
         >
           <NTabPane
-            name="preview"
-            tab="可视化预览"
+            v-for="scenario in workflowScenarios"
+            :key="scenario.id"
+            :name="scenario.id"
+            :tab="scenario.name"
           >
-            <div class="workflow-preview">
-              <div v-if="workflowData?.nodes?.length > 0">
-                <div
-                  v-for="node in workflowData.nodes"
-                  :key="node.id"
-                  class="node-info"
-                >
-                  <NBadge
-                    :value="getNodeStatusText(node.data?.status)"
-                    :type="getNodeStatusType(node.data?.status)"
-                  >
-                    <NTag>{{ node.data?.title }}</NTag>
-                  </NBadge>
-                  <span
-                    v-if="node.data?.approvers?.length"
-                    class="approvers"
-                  >
-                    ({{
-                      node.data.approvers.map((u: User) => u.name).join(', ')
-                    }})
-                  </span>
-                </div>
+            <template #tab>
+              <div class="scenario-tab">
+                <div :class="scenario.icon"></div>
+                <span>{{ scenario.name }}</span>
               </div>
-              <NEmpty
-                v-else
-                description="暂无流程数据"
-              />
-            </div>
-          </NTabPane>
-
-          <NTabPane
-            name="json"
-            tab="JSON数据"
-          >
-            <NCode
-              :code="JSON.stringify(workflowData, null, 2)"
-              language="json"
-            />
+            </template>
           </NTabPane>
         </NTabs>
-      </NCard>
-    </div>
+      </div>
+    </section>
+
+    <!-- 主要内容区 -->
+    <main class="main-content">
+      <div class="container">
+        <div class="content-layout">
+          <!-- 工作流设计器 -->
+          <div class="workflow-designer">
+            <div class="designer-header">
+              <div class="designer-title">
+                <div
+                  :class="currentScenarioData?.icon"
+                  class="title-icon"
+                ></div>
+                <div>
+                  <h3>{{ currentScenarioData?.name }}</h3>
+                  <p>{{ currentScenarioData?.description }}</p>
+                </div>
+              </div>
+              <div class="designer-actions">
+                <NButton
+                  size="small"
+                  @click="resetWorkflow"
+                  quaternary
+                >
+                  <template #icon><div class="i-mdi:refresh"></div></template>
+                  重置
+                </NButton>
+                <NButton
+                  size="small"
+                  type="primary"
+                  @click="loadTemplate"
+                >
+                  <template #icon
+                    ><div class="i-mdi:magic-staff"></div
+                  ></template>
+                  加载模板
+                </NButton>
+              </div>
+            </div>
+
+            <div class="workflow-container">
+              <C_WorkFlow
+                v-model="workflowData"
+                :users="userList"
+                :roles="roleList"
+                :departments="deptList"
+                @change="handleWorkflowChange"
+                @node-click="handleNodeClick"
+              />
+            </div>
+          </div>
+
+          <!-- 侧边面板 -->
+          <aside class="sidebar">
+            <!-- 流程统计 -->
+            <div class="sidebar-section stats-section">
+              <div class="section-header">
+                <div class="i-mdi:chart-bar"></div>
+                <h4>流程统计</h4>
+              </div>
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <div class="stat-value">{{ workflowStats.totalNodes }}</div>
+                  <div class="stat-label">总节点</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">{{
+                    workflowStats.approvalNodes
+                  }}</div>
+                  <div class="stat-label">审批</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">{{ workflowStats.copyNodes }}</div>
+                  <div class="stat-label">抄送</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">{{
+                    workflowStats.conditionNodes
+                  }}</div>
+                  <div class="stat-label">条件</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 流程预览 - 优化版 -->
+            <div class="sidebar-section preview-section">
+              <div class="section-header">
+                <div class="i-mdi:eye"></div>
+                <h4>流程预览</h4>
+                <div class="preview-controls">
+                  <NButton
+                    size="tiny"
+                    :type="previewExpanded ? 'primary' : 'default'"
+                    @click="togglePreviewExpanded"
+                    quaternary
+                  >
+                    <template #icon>
+                      <div
+                        :class="
+                          previewExpanded
+                            ? 'i-mdi:chevron-up'
+                            : 'i-mdi:chevron-down'
+                        "
+                      ></div>
+                    </template>
+                  </NButton>
+                </div>
+              </div>
+
+              <div
+                class="preview-content"
+                :class="{ expanded: previewExpanded }"
+              >
+                <div
+                  v-if="workflowData?.nodes?.length > 0"
+                  class="flow-timeline"
+                >
+                  <!-- 紧凑模式 -->
+                  <div
+                    v-if="!previewExpanded"
+                    class="flow-compact"
+                  >
+                    <div class="flow-steps">
+                      <div
+                        v-for="(node, index) in workflowData.nodes"
+                        :key="node.id"
+                        class="step-compact"
+                        :class="getNodeTypeClass(node.type)"
+                        @click="selectPreviewNode(node)"
+                        :title="`${node.data?.title} - ${getNodeDescription(node)}`"
+                      >
+                        <div class="step-icon">
+                          <div :class="getNodeIcon(node.type)"></div>
+                        </div>
+                        <div
+                          v-if="index < workflowData.nodes.length - 1"
+                          class="step-arrow"
+                        >
+                          <div class="i-mdi:chevron-right"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 选中节点的详细信息 -->
+                    <div
+                      v-if="selectedPreviewNode"
+                      class="selected-node-info"
+                    >
+                      <div class="node-title">{{
+                        selectedPreviewNode.data?.title
+                      }}</div>
+                      <div class="node-details">
+                        <div
+                          v-if="selectedPreviewNode.data?.approvers?.length"
+                          class="detail-item"
+                        >
+                          <span class="detail-label"
+                            >审批人：{{
+                              getUserNames(selectedPreviewNode.data.approvers)
+                            }}</span
+                          >
+                          <div class="user-list">
+                            <NAvatar
+                              v-for="user in selectedPreviewNode.data.approvers.slice(
+                                0,
+                                2
+                              )"
+                              :key="user.id"
+                              v-bind="createAvatarProps(user, 'tiny')"
+                            />
+                            <span
+                              v-if="
+                                selectedPreviewNode.data.approvers.length > 2
+                              "
+                              class="more-count"
+                            >
+                              +{{
+                                selectedPreviewNode.data.approvers.length - 2
+                              }}
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          v-if="selectedPreviewNode.data?.copyUsers?.length"
+                          class="detail-item"
+                        >
+                          <span class="detail-label"
+                            >抄送：{{
+                              getUserNames(selectedPreviewNode.data.copyUsers)
+                            }}</span
+                          >
+                          <div class="user-list">
+                            <NAvatar
+                              v-for="user in selectedPreviewNode.data.copyUsers.slice(
+                                0,
+                                2
+                              )"
+                              :key="user.id"
+                              v-bind="createAvatarProps(user, 'tiny')"
+                            />
+                            <span
+                              v-if="
+                                selectedPreviewNode.data.copyUsers.length > 2
+                              "
+                              class="more-count"
+                            >
+                              +{{
+                                selectedPreviewNode.data.copyUsers.length - 2
+                              }}
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          v-if="selectedPreviewNode.data?.conditions?.length"
+                          class="detail-item"
+                        >
+                          <span class="detail-label">条件:</span>
+                          <span class="condition-count"
+                            >{{
+                              selectedPreviewNode.data.conditions.length
+                            }}
+                            个分支</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 展开模式 -->
+                  <div
+                    v-else
+                    class="flow-expanded"
+                  >
+                    <div
+                      v-for="(node, index) in workflowData.nodes"
+                      :key="node.id"
+                      class="step-expanded"
+                    >
+                      <div
+                        class="step-connector"
+                        v-if="index > 0"
+                      ></div>
+                      <div
+                        class="step-node"
+                        :class="getNodeTypeClass(node.type)"
+                      >
+                        <div class="node-header">
+                          <div class="node-icon">
+                            <div :class="getNodeIcon(node.type)"></div>
+                          </div>
+                          <div class="node-title">{{ node.data?.title }}</div>
+                        </div>
+                        <div
+                          v-if="hasNodeContent(node)"
+                          class="node-content"
+                        >
+                          <div
+                            v-if="node.data?.approvers?.length"
+                            class="content-item"
+                          >
+                            <span class="content-label"
+                              >审批人：{{
+                                getUserNames(node.data.approvers)
+                              }}</span
+                            >
+                            <div class="user-avatars">
+                              <NAvatar
+                                v-for="user in node.data.approvers.slice(0, 3)"
+                                :key="user.id"
+                                v-bind="createAvatarProps(user, 'small')"
+                              />
+                              <span
+                                v-if="node.data.approvers.length > 3"
+                                class="more-users"
+                              >
+                                +{{ node.data.approvers.length - 3 }}
+                              </span>
+                            </div>
+                          </div>
+                          <div
+                            v-if="node.data?.copyUsers?.length"
+                            class="content-item"
+                          >
+                            <span class="content-label"
+                              >抄送人：{{
+                                getUserNames(node.data.copyUsers)
+                              }}</span
+                            >
+                            <div class="user-avatars">
+                              <NAvatar
+                                v-for="user in node.data.copyUsers.slice(0, 3)"
+                                :key="user.id"
+                                v-bind="createAvatarProps(user, 'small')"
+                              />
+                              <span
+                                v-if="node.data.copyUsers.length > 3"
+                                class="more-users"
+                              >
+                                +{{ node.data.copyUsers.length - 3 }}
+                              </span>
+                            </div>
+                          </div>
+                          <div
+                            v-if="node.data?.conditions?.length"
+                            class="content-item"
+                          >
+                            <span class="content-label">分支条件</span>
+                            <span class="condition-text"
+                              >{{ node.data.conditions.length }} 个分支</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <NEmpty
+                  v-else
+                  description="暂无流程数据"
+                  size="small"
+                />
+              </div>
+            </div>
+
+            <!-- 数据详情 -->
+            <div class="sidebar-section data-section">
+              <NTabs
+                type="line"
+                size="small"
+              >
+                <NTabPane
+                  name="json"
+                  tab="JSON 数据"
+                >
+                  <C_Code
+                    :code="workflowJsonData"
+                    language="json"
+                    title="工作流数据"
+                    :show-header="true"
+                    :show-line-numbers="true"
+                    :word-wrap="true"
+                    :show-fullscreen="true"
+                    :max-height="300"
+                    @copy="handleCodeCopy"
+                  />
+                </NTabPane>
+                <NTabPane
+                  name="config"
+                  tab="配置详情"
+                >
+                  <div class="config-details">
+                    <div
+                      v-if="workflowData?.config"
+                      class="config-item"
+                    >
+                      <span class="label">版本：</span>
+                      <span class="value">{{
+                        workflowData.config.version
+                      }}</span>
+                    </div>
+                    <div
+                      v-if="workflowData?.config?.createdAt"
+                      class="config-item"
+                    >
+                      <span class="label">创建时间：</span>
+                      <span class="value">{{
+                        formatDate(workflowData.config.createdAt)
+                      }}</span>
+                    </div>
+                    <div class="config-item">
+                      <span class="label">节点总数：</span>
+                      <span class="value">{{
+                        workflowData?.nodes?.length || 0
+                      }}</span>
+                    </div>
+                    <div class="config-item">
+                      <span class="label">连接数：</span>
+                      <span class="value">{{
+                        workflowData?.edges?.length || 0
+                      }}</span>
+                    </div>
+                    <div
+                      v-if="currentScenarioData"
+                      class="config-item"
+                    >
+                      <span class="label">场景类型：</span>
+                      <span class="value">{{ currentScenarioData.name }}</span>
+                    </div>
+                  </div>
+                </NTabPane>
+                <NTabPane
+                  name="validation"
+                  tab="验证结果"
+                >
+                  <div class="validation-results">
+                    <div
+                      v-if="validationResults.length === 0"
+                      class="validation-success"
+                    >
+                      <div class="i-mdi:check-circle"></div>
+                      <span>流程配置正确</span>
+                    </div>
+                    <div
+                      v-else
+                      class="validation-errors"
+                    >
+                      <div
+                        v-for="(error, index) in validationResults"
+                        :key="index"
+                        class="error-item"
+                      >
+                        <div class="i-mdi:alert-circle"></div>
+                        <div class="error-content">
+                          <div class="error-message">{{ error.message }}</div>
+                          <div class="error-node"
+                            >节点：{{ error.nodeName }}</div
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </NTabPane>
+              </NTabs>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
-  // 类型定义
-  interface User {
-    id: string
-    name: string
-    avatar?: string
-    department: string
-    role: string
-    email?: string
-    phone?: string
-  }
+  // 从 data.ts 导入数据和类型
+  import {
+    type User,
+    type ValidationError,
+    workflowScenarios,
+    userList,
+    roleList,
+    deptList,
+    NODE_DESCRIPTION_GENERATORS,
+    NODE_MAPS,
+    VALIDATION_RULES,
+  } from './data'
 
-  interface Role {
-    id: string
-    name: string
-    description?: string
-    level?: number
-  }
-
-  interface Department {
-    id: string
-    name: string
-    parentId?: string
-    manager?: string
-  }
-
-  // 消息提示
   const message = useMessage()
+  const currentScenario = ref('default-designer')
+  const workflowData = ref<any>(null)
+  const validationResults = ref<ValidationError[]>([])
 
-  // 响应式数据
-  const workflowData = ref()
+  // 新增预览相关的状态
+  const previewExpanded = ref(false)
+  const selectedPreviewNode = ref<any>(null)
 
-  // 完整的用户数据
-  const userList = ref<User[]>([
-    {
-      id: '1',
-      name: '张三',
-      avatar: 'https://avatars.githubusercontent.com/u/1?v=4',
-      department: '技术部',
-      role: '前端工程师',
-      email: 'zhangsan@company.com',
-      phone: '13800138001',
-    },
-    {
-      id: '2',
-      name: '李四',
-      avatar: 'https://avatars.githubusercontent.com/u/2?v=4',
-      department: '技术部',
-      role: '后端工程师',
-      email: 'lisi@company.com',
-      phone: '13800138002',
-    },
-    {
-      id: '3',
-      name: '王五',
-      avatar: 'https://avatars.githubusercontent.com/u/3?v=4',
-      department: '产品部',
-      role: '产品经理',
-      email: 'wangwu@company.com',
-      phone: '13800138003',
-    },
-    {
-      id: '4',
-      name: '赵六',
-      avatar: 'https://avatars.githubusercontent.com/u/4?v=4',
-      department: '技术部',
-      role: '技术总监',
-      email: 'zhaoliu@company.com',
-      phone: '13800138004',
-    },
-    {
-      id: '5',
-      name: '钱七',
-      avatar: 'https://avatars.githubusercontent.com/u/5?v=4',
-      department: '人事部',
-      role: 'HR经理',
-      email: 'qianqi@company.com',
-      phone: '13800138005',
-    },
-    {
-      id: '6',
-      name: '孙八',
-      avatar: 'https://avatars.githubusercontent.com/u/6?v=4',
-      department: '财务部',
-      role: '财务经理',
-      email: 'sunba@company.com',
-      phone: '13800138006',
-    },
-    {
-      id: '7',
-      name: '周九',
-      avatar: 'https://avatars.githubusercontent.com/u/7?v=4',
-      department: '设计部',
-      role: 'UI设计师',
-      email: 'zhoujiu@company.com',
-      phone: '13800138007',
-    },
-    {
-      id: '8',
-      name: '吴十',
-      avatar: 'https://avatars.githubusercontent.com/u/8?v=4',
-      department: '运营部',
-      role: '运营专员',
-      email: 'wushi@company.com',
-      phone: '13800138008',
-    },
-    {
-      id: '9',
-      name: '郑十一',
-      avatar: 'https://avatars.githubusercontent.com/u/9?v=4',
-      department: '产品部',
-      role: '产品总监',
-      email: 'zhengshiyi@company.com',
-      phone: '13800138009',
-    },
-    {
-      id: '10',
-      name: '陈十二',
-      avatar: 'https://avatars.githubusercontent.com/u/10?v=4',
-      department: '销售部',
-      role: '销售经理',
-      email: 'chenshier@company.com',
-      phone: '13800138010',
-    },
-  ])
+  // 计算属性
+  const currentScenarioData = computed(() =>
+    workflowScenarios.find(s => s.id === currentScenario.value)
+  )
 
-  // 角色数据
-  const roleList = ref<Role[]>([
-    {
-      id: '1',
-      name: '实习生',
-      description: '公司实习生',
-      level: 1,
-    },
-    {
-      id: '2',
-      name: '初级工程师',
-      description: '1-2年工作经验',
-      level: 2,
-    },
-    {
-      id: '3',
-      name: '中级工程师',
-      description: '2-5年工作经验',
-      level: 3,
-    },
-    {
-      id: '4',
-      name: '高级工程师',
-      description: '5-8年工作经验',
-      level: 4,
-    },
-    {
-      id: '5',
-      name: '技术专家',
-      description: '8年以上工作经验',
-      level: 5,
-    },
-    {
-      id: '6',
-      name: '项目经理',
-      description: '负责项目管理',
-      level: 4,
-    },
-    {
-      id: '7',
-      name: '产品经理',
-      description: '负责产品规划',
-      level: 4,
-    },
-    {
-      id: '8',
-      name: '部门经理',
-      description: '部门管理者',
-      level: 5,
-    },
-    {
-      id: '9',
-      name: '技术总监',
-      description: '技术部门负责人',
-      level: 6,
-    },
-    {
-      id: '10',
-      name: '产品总监',
-      description: '产品部门负责人',
-      level: 6,
-    },
-  ])
+  const workflowJsonData = computed(() =>
+    workflowData.value ? JSON.stringify(workflowData.value, null, 2) : '{}'
+  )
 
-  // 部门数据
-  const deptList = ref<Department[]>([
-    {
-      id: '1',
-      name: '技术部',
-      manager: '赵六',
-    },
-    {
-      id: '2',
-      name: '产品部',
-      manager: '郑十一',
-    },
-    {
-      id: '3',
-      name: '设计部',
-      manager: '周九',
-    },
-    {
-      id: '4',
-      name: '人事部',
-      manager: '钱七',
-    },
-    {
-      id: '5',
-      name: '财务部',
-      manager: '孙八',
-    },
-    {
-      id: '6',
-      name: '运营部',
-      manager: '吴十',
-    },
-    {
-      id: '7',
-      name: '销售部',
-      manager: '陈十二',
-    },
-    {
-      id: '8',
-      name: '前端组',
-      parentId: '1',
-      manager: '张三',
-    },
-    {
-      id: '9',
-      name: '后端组',
-      parentId: '1',
-      manager: '李四',
-    },
-    {
-      id: '10',
-      name: '测试组',
-      parentId: '1',
-    },
-  ])
+  const workflowStats = computed(() => {
+    if (!workflowData.value?.nodes) {
+      return {
+        totalNodes: 0,
+        approvalNodes: 0,
+        copyNodes: 0,
+        conditionNodes: 0,
+      }
+    }
 
-  // 事件处理
-  const handleWorkflowChange = (data: any) => {
-    console.log('工作流变化:', data)
-    workflowData.value = data
-    message.success('工作流已更新')
+    const { nodes } = workflowData.value
+    return {
+      totalNodes: nodes.length,
+      approvalNodes: nodes.filter((n: any) => n.type === 'approval').length,
+      copyNodes: nodes.filter((n: any) => n.type === 'copy').length,
+      conditionNodes: nodes.filter((n: any) => n.type === 'condition').length,
+    }
+  })
+
+  // ============ 工具函数 ============
+
+  // 生成默认头像URL
+  const generateDefaultAvatar = (name?: string): string => {
+    const safeName = name || '未知'
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(safeName)}&background=random`
   }
 
-  const handleNodeClick = (nodeData: any) => {
-    console.log('节点点击:', nodeData)
+  // 创建默认用户信息
+  const createDefaultUser = (user: any): User => {
+    const userId = user?.id || ''
+    const userName = user?.name || '未知用户'
+    const userDepartment = user?.department || ''
+    const userRole = user?.role || ''
+    const userAvatar = generateDefaultAvatar(userName)
+
+    return {
+      id: userId,
+      name: userName,
+      avatar: userAvatar,
+      department: userDepartment,
+      role: userRole,
+    }
+  }
+
+  // 从用户列表中查找用户
+  const findUserById = (userId: string): User | null => {
+    return userList.find(u => u.id === userId) || null
+  }
+
+  // 获取完整用户信息
+  const getFullUserInfo = (user: any): User => {
+    if (user?.avatar) return user
+
+    const fullUser = findUserById(user?.id)
+    return fullUser || createDefaultUser(user)
+  }
+
+  // 获取用户名列表的辅助函数
+  const getUserNames = (users: any[]): string => {
+    return users.map(user => getFullUserInfo(user).name).join('、')
+  }
+
+  // 创建头像组件的辅助函数
+  const createAvatarProps = (user: any, size: 'tiny' | 'small' = 'small') => {
+    const fullUser = getFullUserInfo(user)
+    return {
+      size,
+      src: fullUser.avatar,
+      title: fullUser.name,
+    }
+  }
+
+  // 获取节点描述
+  const getNodeDescription = (node: any): string => {
+    const parts: string[] = []
+
+    Object.entries(NODE_DESCRIPTION_GENERATORS).forEach(([key, generator]) => {
+      const count = node.data?.[key]?.length
+      if (count) parts.push(generator(count))
+    })
+
+    return parts.length > 0 ? parts.join(', ') : '无配置'
+  }
+
+  // 节点映射函数
+  const getNodeTypeClass = (type: string): string =>
+    NODE_MAPS.typeClass[type as keyof typeof NODE_MAPS.typeClass] ||
+    'node-default'
+  const getNodeIcon = (type: string): string =>
+    NODE_MAPS.icon[type as keyof typeof NODE_MAPS.icon] || 'i-mdi:circle'
+
+  // 验证错误创建器
+  const createValidationError = (
+    node: any,
+    field: string,
+    message: string
+  ): ValidationError => ({
+    nodeId: node.id,
+    nodeName: node.data?.title || '未知节点',
+    field,
+    message,
+    type: 'required' as const,
+  })
+
+  // 验证单个节点
+  const validateSingleNode = (node: any): ValidationError[] => {
+    const rule = VALIDATION_RULES[node.type as keyof typeof VALIDATION_RULES]
+    const errorMessage = rule?.(node)
+
+    return errorMessage
+      ? [createValidationError(node, node.type, errorMessage)]
+      : []
+  }
+
+  // 验证工作流
+  const validateWorkflow = (): void => {
+    const errors = workflowData.value?.nodes?.flatMap(validateSingleNode) || []
+    validationResults.value = errors
+  }
+
+  // 辅助函数：检查节点是否有内容
+  const hasNodeContent = (node: any): boolean =>
+    !!(
+      node.data?.approvers?.length ||
+      node.data?.copyUsers?.length ||
+      node.data?.conditions?.length
+    )
+
+  // ============ 预览相关方法 ============
+  const togglePreviewExpanded = (): void => {
+    previewExpanded.value = !previewExpanded.value
+    if (!previewExpanded.value) {
+      selectedPreviewNode.value = null
+    }
+  }
+
+  const selectPreviewNode = (node: any): void => {
+    selectedPreviewNode.value =
+      selectedPreviewNode.value?.id === node.id ? null : node
+  }
+
+  // ============ 业务逻辑方法 ============
+  const handleScenarioChange = (scenarioId: string): void => {
+    currentScenario.value = scenarioId
+    loadTemplate()
+  }
+
+  const loadTemplate = (): void => {
+    const scenario = workflowScenarios.find(s => s.id === currentScenario.value)
+    if (scenario?.template) {
+      workflowData.value = {
+        ...scenario.template,
+        config: {
+          version: '1.0',
+          createdAt: new Date().toISOString(),
+        },
+      }
+      message.success(`已加载 ${scenario.name} 模板`)
+      selectedPreviewNode.value = null
+    }
+  }
+
+  const resetWorkflow = (): void => {
+    workflowData.value = {
+      nodes: [
+        {
+          id: 'start-1',
+          type: 'start',
+          position: { x: 150, y: 100 },
+          data: { title: '发起人', status: 'active' },
+        },
+      ],
+      edges: [],
+      config: {
+        version: '1.0',
+        createdAt: new Date().toISOString(),
+      },
+    }
+    selectedPreviewNode.value = null
+    message.info('工作流已重置')
+  }
+
+  const handleWorkflowChange = (data: any): void => {
+    workflowData.value = data
+    validateWorkflow()
+
+    if (
+      selectedPreviewNode.value &&
+      !data?.nodes?.find((n: any) => n.id === selectedPreviewNode.value.id)
+    ) {
+      selectedPreviewNode.value = null
+    }
+  }
+
+  const handleNodeClick = (nodeData: any): void => {
     message.info(`点击了节点: ${nodeData.data?.title}`)
   }
 
-  // 工具栏操作
-  const saveWorkflow = () => {
-    if (!workflowData.value) {
-      message.warning('暂无工作流数据')
-      return
-    }
-
-    // 模拟保存到后端
-    console.log('保存工作流:', workflowData.value)
-    message.success('工作流保存成功')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleCodeCopy = (code: string): void => {
+    message.success('JSON 数据已复制到剪贴板')
   }
 
-  const exportWorkflow = () => {
+  const saveAllWorkflows = (): void => {
+    if (!workflowData.value) {
+      message.warning('暂无工作流数据')
+      return
+    }
+    message.success('所有工作流保存成功')
+  }
+
+  const exportAllWorkflows = (): void => {
     if (!workflowData.value) {
       message.warning('暂无工作流数据')
       return
     }
 
-    // 导出JSON文件
     const dataStr = JSON.stringify(workflowData.value, null, 2)
     const dataBlob = new Blob([dataStr], { type: 'application/json' })
     const url = URL.createObjectURL(dataBlob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `workflow-${Date.now()}.json`
+    link.download = `${currentScenario.value}-workflow-${Date.now()}.json`
     link.click()
     URL.revokeObjectURL(url)
 
     message.success('工作流导出成功')
   }
 
-  const clearWorkflow = () => {
-    workflowData.value = null
-    message.info('工作流已清空')
-  }
+  const formatDate = (dateStr: string): string =>
+    new Date(dateStr).toLocaleString('zh-CN')
 
-  // 辅助函数
-  const getNodeStatusText = (status?: string) => {
-    const statusMap: Record<string, string> = {
-      pending: '待处理',
-      approved: '已通过',
-      rejected: '已拒绝',
-      active: '进行中',
-    }
-    return statusMap[status || 'pending'] || '未知'
-  }
-
-  const getNodeStatusType = (status?: string) => {
-    const typeMap: Record<string, string> = {
-      pending: 'warning',
-      approved: 'success',
-      rejected: 'error',
-      active: 'info',
-    }
-    return typeMap[status || 'pending'] || 'default'
-  }
+  // 初始化
+  onMounted(() => {
+    loadTemplate()
+  })
 </script>
 
 <style scoped lang="scss">
-  .workflow-page {
-    padding: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .page-header {
-    margin-bottom: 24px;
-
-    h2 {
-      margin: 0 0 8px 0;
-      color: #262626;
-      font-size: 24px;
-      font-weight: 600;
-    }
-
-    p {
-      margin: 0;
-      color: #8c8c8c;
-      font-size: 14px;
-    }
-  }
-
-  .workflow-container {
-    margin-bottom: 24px;
-    border: 1px solid #e8e8e8;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  }
-
-  .data-preview {
-    .workflow-preview {
-      min-height: 100px;
-
-      .node-info {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-
-        .approvers {
-          font-size: 12px;
-          color: #8c8c8c;
-        }
-      }
-    }
-  }
-
-  // 响应式设计
-  @media (max-width: 768px) {
-    .workflow-page {
-      padding: 12px;
-    }
-
-    .page-header {
-      h2 {
-        font-size: 20px;
-      }
-    }
-  }
+  @use './index.scss';
 </style>
