@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-03 09:23:53
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-03 16:10:03
+ * @LastEditTime: 2025-07-03 19:41:22
  * @FilePath: \Robot_Admin\src\views\demo\28-work-flow-editor\index.vue
  * @Description: 审批流演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -309,6 +309,7 @@
                             <div :class="getNodeIcon(node.type)"></div>
                           </div>
                           <div class="node-title">{{ node.data?.title }}</div>
+                          <div>{{ node.data?.name }}</div>
                         </div>
                         <div
                           v-if="hasNodeContent(node)"
