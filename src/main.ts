@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-25 16:41:32
+ * @LastEditTime: 2025-07-03 09:21:40
  * @FilePath: \Robot_Admin\src\main.ts
  * @Description: 根入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -11,6 +11,8 @@
 import './assets/css/main.css'
 import '@/styles/index.scss'
 import 'virtual:uno.css'
+import '@vue-flow/core/dist/style.css'
+import '@vue-flow/core/dist/theme-default.css'
 import '@/router/permission'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'

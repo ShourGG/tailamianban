@@ -372,6 +372,19 @@
             "affix": false,
             "keepAlive": false
           }
+        },
+        {
+          "path": "work-flow-editor",
+          "name": "work-flow",
+          "component": "/demo/28-work-flow-editor/index",
+          "meta": {
+            "icon": "mdi:text-shadow",
+            "title": "工作流编辑器",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
         }
       ]
     },
