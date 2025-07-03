@@ -39,7 +39,9 @@ const renderMenuIcon = (item: MenuOptions) => {
 
   if (typeof icon === 'string') {
     return () =>
-      h('span', { class: 'inline-flex items-center' }, [h(Icon, { icon })])
+      h('span', { class: 'inline-flex items-center n-icon' }, [
+        h(Icon, { icon }),
+      ])
   }
 
   return typeof icon === 'function' ? icon() : undefined
