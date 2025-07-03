@@ -1,3 +1,13 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-07-03 09:35:46
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-07-03 13:49:43
+ * @FilePath: \Robot_Admin\src\components\global\C_WorkFlow\nodes\CopyNode.vue
+ * @Description: 复制节点组件
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <div class="copy-node">
     <div

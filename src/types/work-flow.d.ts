@@ -33,6 +33,7 @@ export interface Department {
 export interface Condition {
   id: string
   name: string
+  field: string
   operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains'
   value: string
 }
@@ -50,6 +51,15 @@ export type NodeType = 'start' | 'approval' | 'copy' | 'condition'
 
 // 审批模式类型
 export type ApprovalMode = 'any' | 'all' | 'sequence'
+
+// 验证错误类型 - 扩展更多错误类型
+export type ValidationErrorType =
+  | 'required' // 必填字段未填
+  | 'invalid' // 无效值
+  | 'incomplete' // 配置不完整
+  | 'warning' // 警告类型
+  | 'error' // 一般错误
+  | 'custom' // 自定义错误
 
 // 节点数据基础接口
 export interface BaseNodeData {
@@ -87,7 +97,7 @@ export type NodeData =
   | CopyNodeData
   | ConditionNodeData
 
-// 工作流节点接口
+// 扩展 Vue Flow 的 Node 类型
 export interface WorkflowNode {
   id: string
   type: NodeType
@@ -96,16 +106,42 @@ export interface WorkflowNode {
     y: number
   }
   data: NodeData
+  selected?: boolean
+  dragging?: boolean
+  connectable?: boolean
+  selectable?: boolean
+  deletable?: boolean
+  dragHandle?: string
+  width?: number
+  height?: number
+  parentNode?: string
+  zIndex?: number
+  extent?: 'parent' | [[number, number], [number, number]]
+  expandParent?: boolean
 }
 
-// 工作流边接口
+// 扩展 Vue Flow 的 Edge 类型
 export interface WorkflowEdge {
   id: string
   source: string
   target: string
+  sourceHandle?: string | null
+  targetHandle?: string | null
   type?: string
   animated?: boolean
+  hidden?: boolean
+  deletable?: boolean
+  selectable?: boolean
+  data?: any
+  style?: any
   label?: string
+  labelStyle?: any
+  labelShowBg?: boolean
+  labelBgStyle?: any
+  labelBgPadding?: [number, number]
+  labelBgBorderRadius?: number
+  markerStart?: string
+  markerEnd?: string
 }
 
 // 工作流数据接口
@@ -141,13 +177,17 @@ export interface WorkflowEmits {
   'validate-error': [errors: ValidationError[]]
 }
 
-// 验证错误接口
+// 验证错误接口 - 使用新的错误类型
 export interface ValidationError {
   nodeId: string
   nodeName: string
   field: string
   message: string
-  type: 'required' | 'invalid' | 'custom'
+  type: ValidationErrorType
+  // 可选的额外信息
+  details?: string
+  severity?: 'low' | 'medium' | 'high'
+  fixSuggestion?: string
 }
 
 // 菜单位置接口
@@ -170,29 +210,101 @@ export interface NodeConfigFormData {
   }
 }
 
-// Vue Flow 扩展类型
-declare module '@vue-flow/core' {
-  interface Node {
-    id: string
-    type: string
-    position: { x: number; y: number }
-    data: any
-  }
+// 验证规则接口
+export interface ValidationRule {
+  field: string
+  type: 'required' | 'min' | 'max' | 'pattern' | 'custom'
+  message: string
+  validator?: (value: any, data: any) => boolean
+}
 
-  interface Edge {
-    id: string
-    source: string
-    target: string
-    type?: string
-    animated?: boolean
+// 工作流配置接口
+export interface WorkflowConfig {
+  title?: string
+  description?: string
+  version?: string
+  allowedNodeTypes?: NodeType[]
+  maxNodes?: number
+  enableValidation?: boolean
+  validationRules?: Record<string, ValidationRule[]>
+  theme?: {
+    primaryColor?: string
+    backgroundColor?: string
+    nodeColors?: Record<NodeType, string>
   }
+}
+
+// 工作流统计信息接口
+export interface WorkflowStats {
+  totalNodes: number
+  approvalNodes: number
+  copyNodes: number
+  conditionNodes: number
+  totalEdges: number
+  validationErrors: number
+  lastModified?: string
+}
+
+// 节点模板接口
+export interface NodeTemplate {
+  id: string
+  name: string
+  type: NodeType
+  description?: string
+  defaultData: Partial<NodeData>
+  icon?: string
+  category?: string
 }
 
 // 工具函数类型
 export interface WorkflowUtils {
   validateWorkflow: (data: WorkflowData) => ValidationError[]
-  exportWorkflow: (data: WorkflowData) => string
-  importWorkflow: (jsonStr: string) => WorkflowData
+  exportWorkflow: (data: WorkflowData, format?: 'json' | 'yaml') => string
+  importWorkflow: (content: string, format?: 'json' | 'yaml') => WorkflowData
   generateNodeId: (type: NodeType) => string
   generateEdgeId: (sourceId: string, targetId: string) => string
+  cloneWorkflow: (data: WorkflowData) => WorkflowData
+  mergeWorkflows: (workflows: WorkflowData[]) => WorkflowData
 }
+
+// API 响应接口
+export interface WorkflowApiResponse<T = any> {
+  success: boolean
+  data?: T
+  message?: string
+  errors?: ValidationError[]
+  timestamp?: string
+}
+
+// 工作流历史记录接口
+export interface WorkflowHistory {
+  id: string
+  workflowId: string
+  version: number
+  data: WorkflowData
+  changes: {
+    type: 'create' | 'update' | 'delete'
+    nodeId?: string
+    edgeId?: string
+    description: string
+  }[]
+  createdBy: string
+  createdAt: string
+}
+
+// 导出所有类型的联合类型，方便使用
+export type AllWorkflowTypes =
+  | User
+  | Role
+  | Department
+  | Condition
+  | WorkflowNode
+  | WorkflowEdge
+  | WorkflowData
+  | ValidationError
+  | MenuPosition
+  | NodeConfigFormData
+  | WorkflowConfig
+  | WorkflowStats
+  | NodeTemplate
+  | WorkflowHistory

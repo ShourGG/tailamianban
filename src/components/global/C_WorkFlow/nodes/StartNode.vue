@@ -1,3 +1,13 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-07-03 09:14:16
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-07-03 13:50:06
+ * @FilePath: \Robot_Admin\src\components\global\C_WorkFlow\nodes\StartNode.vue
+ * @Description: 开始节点组件
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <div class="start-node">
     <div class="node-content">

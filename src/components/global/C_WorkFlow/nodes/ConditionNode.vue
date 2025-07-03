@@ -1,3 +1,13 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-07-03 09:36:09
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-07-03 13:49:20
+ * @FilePath: \Robot_Admin\src\components\global\C_WorkFlow\nodes\ConditionNode.vue
+ * @Description: 条件节点组件
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <div class="condition-node">
     <div
