@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-03 09:23:53
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-03 19:41:22
+ * @LastEditTime: 2025-07-04 16:08:05
  * @FilePath: \Robot_Admin\src\views\demo\28-work-flow-editor\index.vue
  * @Description: 审批流演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -12,11 +12,10 @@
   <div class="workflow-demo-page">
     <!-- 页面头部 -->
     <header class="page-header">
+      <NH1>工作流设计器场景示例</NH1>
+      <p>拖拽构建审批流程，支持多种场景模板，实时预览工作流数据</p>
       <div class="header-content">
-        <div class="title-section">
-          <h1>🚀 工作流设计器演示</h1>
-          <p>拖拽构建审批流程，支持多种场景模板，实时预览工作流数据</p>
-        </div>
+        <div class="title-section"> </div>
         <div class="header-actions">
           <NButton
             type="primary"
@@ -390,22 +389,6 @@
                 size="small"
               >
                 <NTabPane
-                  name="json"
-                  tab="JSON 数据"
-                >
-                  <C_Code
-                    :code="workflowJsonData"
-                    language="json"
-                    title="工作流数据"
-                    :show-header="true"
-                    :show-line-numbers="true"
-                    :word-wrap="true"
-                    :show-fullscreen="true"
-                    :max-height="300"
-                    @copy="handleCodeCopy"
-                  />
-                </NTabPane>
-                <NTabPane
                   name="config"
                   tab="配置详情"
                 >
@@ -448,6 +431,22 @@
                       <span class="value">{{ currentScenarioData.name }}</span>
                     </div>
                   </div>
+                </NTabPane>
+                <NTabPane
+                  name="json"
+                  tab="JSON 数据"
+                >
+                  <C_Code
+                    :code="workflowJsonData"
+                    language="json"
+                    title="工作流数据"
+                    :show-header="true"
+                    :show-line-numbers="true"
+                    :word-wrap="true"
+                    :show-fullscreen="true"
+                    :max-height="300"
+                    @copy="handleCodeCopy"
+                  />
                 </NTabPane>
                 <NTabPane
                   name="validation"
