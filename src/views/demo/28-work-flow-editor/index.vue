@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-03 09:23:53
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-04 16:08:05
+ * @LastEditTime: 2025-07-04 16:48:11
  * @FilePath: \Robot_Admin\src\views\demo\28-work-flow-editor\index.vue
  * @Description: 审批流演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -10,12 +10,11 @@
 
 <template>
   <div class="workflow-demo-page">
-    <!-- 页面头部 -->
     <header class="page-header">
       <NH1>工作流设计器场景示例</NH1>
       <p>拖拽构建审批流程，支持多种场景模板，实时预览工作流数据</p>
       <div class="header-content">
-        <div class="title-section"> </div>
+        <div class="title-section"></div>
         <div class="header-actions">
           <NButton
             type="primary"
@@ -32,7 +31,6 @@
       </div>
     </header>
 
-    <!-- 场景选择标签 -->
     <section class="scenario-section">
       <div class="container">
         <NTabs
@@ -58,11 +56,9 @@
       </div>
     </section>
 
-    <!-- 主要内容区 -->
     <main class="main-content">
       <div class="container">
         <div class="content-layout">
-          <!-- 工作流设计器 -->
           <div class="workflow-designer">
             <div class="designer-header">
               <div class="designer-title">
@@ -109,9 +105,7 @@
             </div>
           </div>
 
-          <!-- 侧边面板 -->
           <aside class="sidebar">
-            <!-- 流程统计 -->
             <div class="sidebar-section stats-section">
               <div class="section-header">
                 <div class="i-mdi:chart-bar"></div>
@@ -141,7 +135,7 @@
               </div>
             </div>
 
-            <!-- 流程预览 - 优化版 -->
+            <!-- 修复后的流程预览 -->
             <div class="sidebar-section preview-section">
               <div class="section-header">
                 <div class="i-mdi:eye"></div>
@@ -200,7 +194,7 @@
                       </div>
                     </div>
 
-                    <!-- 选中节点的详细信息 -->
+                    <!-- 修复后的选中节点详细信息 -->
                     <div
                       v-if="selectedPreviewNode"
                       class="selected-node-info"
@@ -209,68 +203,56 @@
                         selectedPreviewNode.data?.title
                       }}</div>
                       <div class="node-details">
-                        <div
-                          v-if="selectedPreviewNode.data?.approvers?.length"
-                          class="detail-item"
+                        <!-- 统一处理所有用户字段 - 完全防御性编程 -->
+                        <template
+                          v-for="(label, field) in userFieldsMap"
+                          :key="field"
                         >
-                          <span class="detail-label"
-                            >审批人：{{
-                              getUserNames(selectedPreviewNode.data.approvers)
-                            }}</span
+                          <div
+                            v-if="
+                              selectedPreviewNode.data?.[field] &&
+                              Array.isArray(selectedPreviewNode.data[field]) &&
+                              selectedPreviewNode.data[field].length > 0
+                            "
+                            class="detail-item"
                           >
-                          <div class="user-list">
-                            <NAvatar
-                              v-for="user in selectedPreviewNode.data.approvers.slice(
-                                0,
-                                2
-                              )"
-                              :key="user.id"
-                              v-bind="createAvatarProps(user, 'tiny')"
-                            />
-                            <span
-                              v-if="
-                                selectedPreviewNode.data.approvers.length > 2
-                              "
-                              class="more-count"
+                            <span class="detail-label"
+                              >{{ label }}：{{
+                                getUserNames(selectedPreviewNode.data[field])
+                              }}</span
                             >
-                              +{{
-                                selectedPreviewNode.data.approvers.length - 2
-                              }}
-                            </span>
+                            <div class="user-list">
+                              <NAvatar
+                                v-for="user in safeSlice(
+                                  selectedPreviewNode.data[field],
+                                  0,
+                                  2
+                                )"
+                                :key="user?.id || 'unknown'"
+                                v-bind="createAvatarProps(user, 'tiny')"
+                              />
+                              <span
+                                v-if="
+                                  selectedPreviewNode.data[field].length > 2
+                                "
+                                class="more-count"
+                              >
+                                +{{
+                                  selectedPreviewNode.data[field].length - 2
+                                }}
+                              </span>
+                            </div>
                           </div>
-                        </div>
+                        </template>
+                        <!-- 条件分支显示 -->
                         <div
-                          v-if="selectedPreviewNode.data?.copyUsers?.length"
-                          class="detail-item"
-                        >
-                          <span class="detail-label"
-                            >抄送：{{
-                              getUserNames(selectedPreviewNode.data.copyUsers)
-                            }}</span
-                          >
-                          <div class="user-list">
-                            <NAvatar
-                              v-for="user in selectedPreviewNode.data.copyUsers.slice(
-                                0,
-                                2
-                              )"
-                              :key="user.id"
-                              v-bind="createAvatarProps(user, 'tiny')"
-                            />
-                            <span
-                              v-if="
-                                selectedPreviewNode.data.copyUsers.length > 2
-                              "
-                              class="more-count"
-                            >
-                              +{{
-                                selectedPreviewNode.data.copyUsers.length - 2
-                              }}
-                            </span>
-                          </div>
-                        </div>
-                        <div
-                          v-if="selectedPreviewNode.data?.conditions?.length"
+                          v-if="
+                            selectedPreviewNode.data?.conditions &&
+                            Array.isArray(
+                              selectedPreviewNode.data.conditions
+                            ) &&
+                            selectedPreviewNode.data.conditions.length > 0
+                          "
                           class="detail-item"
                         >
                           <span class="detail-label">条件:</span>
@@ -314,54 +296,50 @@
                           v-if="hasNodeContent(node)"
                           class="node-content"
                         >
-                          <div
-                            v-if="node.data?.approvers?.length"
-                            class="content-item"
+                          <!-- 统一处理所有用户字段 - 完全防御性编程 -->
+                          <template
+                            v-for="(label, field) in userFieldsMap"
+                            :key="field"
                           >
-                            <span class="content-label"
-                              >审批人：{{
-                                getUserNames(node.data.approvers)
-                              }}</span
+                            <div
+                              v-if="
+                                node.data?.[field] &&
+                                Array.isArray(node.data[field]) &&
+                                node.data[field].length > 0
+                              "
+                              class="content-item"
                             >
-                            <div class="user-avatars">
-                              <NAvatar
-                                v-for="user in node.data.approvers.slice(0, 3)"
-                                :key="user.id"
-                                v-bind="createAvatarProps(user, 'small')"
-                              />
-                              <span
-                                v-if="node.data.approvers.length > 3"
-                                class="more-users"
+                              <span class="content-label"
+                                >{{ label }}：{{
+                                  getUserNames(node.data[field])
+                                }}</span
                               >
-                                +{{ node.data.approvers.length - 3 }}
-                              </span>
+                              <div class="user-avatars">
+                                <NAvatar
+                                  v-for="user in safeSlice(
+                                    node.data[field],
+                                    0,
+                                    3
+                                  )"
+                                  :key="user?.id || 'unknown'"
+                                  v-bind="createAvatarProps(user, 'small')"
+                                />
+                                <span
+                                  v-if="node.data[field].length > 3"
+                                  class="more-users"
+                                >
+                                  +{{ node.data[field].length - 3 }}
+                                </span>
+                              </div>
                             </div>
-                          </div>
+                          </template>
+                          <!-- 条件分支显示 -->
                           <div
-                            v-if="node.data?.copyUsers?.length"
-                            class="content-item"
-                          >
-                            <span class="content-label"
-                              >抄送人：{{
-                                getUserNames(node.data.copyUsers)
-                              }}</span
-                            >
-                            <div class="user-avatars">
-                              <NAvatar
-                                v-for="user in node.data.copyUsers.slice(0, 3)"
-                                :key="user.id"
-                                v-bind="createAvatarProps(user, 'small')"
-                              />
-                              <span
-                                v-if="node.data.copyUsers.length > 3"
-                                class="more-users"
-                              >
-                                +{{ node.data.copyUsers.length - 3 }}
-                              </span>
-                            </div>
-                          </div>
-                          <div
-                            v-if="node.data?.conditions?.length"
+                            v-if="
+                              node.data?.conditions &&
+                              Array.isArray(node.data.conditions) &&
+                              node.data.conditions.length > 0
+                            "
                             class="content-item"
                           >
                             <span class="content-label">分支条件</span>
@@ -382,7 +360,7 @@
               </div>
             </div>
 
-            <!-- 数据详情 -->
+            <!-- 数据详情部分保持不变... -->
             <div class="sidebar-section data-section">
               <NTabs
                 type="line"
@@ -490,7 +468,6 @@
 </template>
 
 <script setup lang="ts">
-  // 从 data.ts 导入数据和类型
   import {
     type User,
     type ValidationError,
@@ -507,10 +484,15 @@
   const currentScenario = ref('default-designer')
   const workflowData = ref<any>(null)
   const validationResults = ref<ValidationError[]>([])
-
-  // 新增预览相关的状态
   const previewExpanded = ref(false)
   const selectedPreviewNode = ref<any>(null)
+
+  // 统一的用户字段映射
+  const userFieldsMap = {
+    initiators: '发起人',
+    approvers: '审批人',
+    copyUsers: '抄送人',
+  }
 
   // 计算属性
   const currentScenarioData = computed(() =>
@@ -540,7 +522,13 @@
     }
   })
 
-  // ============ 工具函数 ============
+  // ============ 工具函数 - 完全防御性编程 ============
+
+  // 安全的数组切片函数
+  const safeSlice = (arr: any[], start: number, end: number): any[] => {
+    if (!Array.isArray(arr)) return []
+    return arr.slice(start, end).filter(item => item != null)
+  }
 
   // 生成默认头像URL
   const generateDefaultAvatar = (name?: string): string => {
@@ -572,19 +560,25 @@
 
   // 获取完整用户信息
   const getFullUserInfo = (user: any): User => {
+    if (!user) return createDefaultUser(null)
     if (user?.avatar) return user
 
     const fullUser = findUserById(user?.id)
     return fullUser || createDefaultUser(user)
   }
 
-  // 获取用户名列表的辅助函数
+  // 获取用户名列表的辅助函数 - 完全防御性
   const getUserNames = (users: any[]): string => {
-    return users.map(user => getFullUserInfo(user).name).join('、')
+    if (!Array.isArray(users)) return ''
+    return users
+      .filter(user => user && user.name)
+      .map(user => getFullUserInfo(user).name)
+      .join('、')
   }
 
-  // 创建头像组件的辅助函数
+  // 创建头像组件的辅助函数 - 完全防御性
   const createAvatarProps = (user: any, size: 'tiny' | 'small' = 'small') => {
+    if (!user) return { size, src: '', title: '未知用户' }
     const fullUser = getFullUserInfo(user)
     return {
       size,
@@ -593,7 +587,7 @@
     }
   }
 
-  // 获取节点描述
+  // 获取节点描述 - 统一处理
   const getNodeDescription = (node: any): string => {
     const parts: string[] = []
 
@@ -612,7 +606,7 @@
   const getNodeIcon = (type: string): string =>
     NODE_MAPS.icon[type as keyof typeof NODE_MAPS.icon] || 'i-mdi:circle'
 
-  // 验证错误创建器
+  // 验证相关函数
   const createValidationError = (
     node: any,
     field: string,
@@ -625,29 +619,35 @@
     type: 'required' as const,
   })
 
-  // 验证单个节点
   const validateSingleNode = (node: any): ValidationError[] => {
     const rule = VALIDATION_RULES[node.type as keyof typeof VALIDATION_RULES]
     const errorMessage = rule?.(node)
-
     return errorMessage
       ? [createValidationError(node, node.type, errorMessage)]
       : []
   }
 
-  // 验证工作流
   const validateWorkflow = (): void => {
     const errors = workflowData.value?.nodes?.flatMap(validateSingleNode) || []
     validationResults.value = errors
   }
 
-  // 辅助函数：检查节点是否有内容
-  const hasNodeContent = (node: any): boolean =>
-    !!(
-      node.data?.approvers?.length ||
-      node.data?.copyUsers?.length ||
-      node.data?.conditions?.length
-    )
+  // 辅助函数：检查节点是否有内容 - 完全防御性
+  const hasNodeContent = (node: any): boolean => {
+    if (!node?.data) return false
+
+    // 检查所有用户字段
+    const hasUsers = Object.keys(userFieldsMap).some(field => {
+      const arr = node.data[field]
+      return Array.isArray(arr) && arr.length > 0
+    })
+
+    // 检查条件
+    const hasConditions =
+      Array.isArray(node.data.conditions) && node.data.conditions.length > 0
+
+    return hasUsers || hasConditions
+  }
 
   // ============ 预览相关方法 ============
   const togglePreviewExpanded = (): void => {
@@ -690,7 +690,11 @@
           id: 'start-1',
           type: 'start',
           position: { x: 150, y: 100 },
-          data: { title: '发起人', status: 'active' },
+          data: {
+            title: '发起人',
+            status: 'active',
+            initiators: [], // 确保初始化为空数组
+          },
         },
       ],
       edges: [],
@@ -703,8 +707,10 @@
     message.info('工作流已重置')
   }
 
+  // 修复的工作流变化处理 - 强制触发响应式更新
   const handleWorkflowChange = (data: any): void => {
-    workflowData.value = data
+    // 深拷贝数据，确保响应式更新
+    workflowData.value = JSON.parse(JSON.stringify(data))
     validateWorkflow()
 
     if (
@@ -713,6 +719,18 @@
     ) {
       selectedPreviewNode.value = null
     }
+
+    // 强制更新预览
+    nextTick(() => {
+      if (selectedPreviewNode.value) {
+        const updatedNode = data?.nodes?.find(
+          (n: any) => n.id === selectedPreviewNode.value.id
+        )
+        if (updatedNode) {
+          selectedPreviewNode.value = JSON.parse(JSON.stringify(updatedNode))
+        }
+      }
+    })
   }
 
   const handleNodeClick = (nodeData: any): void => {

@@ -52,7 +52,7 @@ export const workflowScenarios: WorkflowScenario[] = [
           id: 'start-1',
           type: 'start',
           position: { x: 150, y: 100 },
-          data: { title: '发起人', status: 'active' },
+          data: { title: '发起人', status: 'active', initiators: [] },
         },
       ],
       edges: [],
@@ -69,7 +69,7 @@ export const workflowScenarios: WorkflowScenario[] = [
           id: 'start-1',
           type: 'start',
           position: { x: 150, y: 100 },
-          data: { title: '发起人', status: 'active' },
+          data: { title: '发起人', status: 'active', initiators: [] },
         },
         {
           id: 'approval-1',
@@ -505,6 +505,7 @@ export const deptList: Department[] = [
 
 // 节点描述生成器
 export const NODE_DESCRIPTION_GENERATORS = {
+  initiators: (count: number) => `${count}个发起人`,
   approvers: (count: number) => `${count}个审批人`,
   copyUsers: (count: number) => `${count}个抄送人`,
   conditions: (count: number) => `${count}个条件`,

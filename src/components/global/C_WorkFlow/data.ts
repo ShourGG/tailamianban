@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-03 12:25:11
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-03 13:45:05
+ * @LastEditTime: 2025-07-04 16:44:21
  * @FilePath: \Robot_Admin\src\components\global\C_WorkFlow\data.ts
  * @Description:  工作（审批流）流组件 - 数据层
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -91,7 +91,7 @@ export const INITIAL_NODE: WorkflowNode = {
   id: 'start-1',
   type: 'start',
   position: { x: 150, y: 100 },
-  data: { title: '发起人', status: 'active' },
+  data: { title: '发起人', status: 'active', initiators: [] },
 }
 
 // 默认头像生成函数

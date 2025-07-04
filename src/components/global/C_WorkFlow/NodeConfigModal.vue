@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-03 09:13:12
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-03 18:51:33
+ * @LastEditTime: 2025-07-04 16:34:56
  * @FilePath: \Robot_Admin\src\components\global\C_WorkFlow\NodeConfigModal.vue
  * @Description: 节点配置弹窗组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -21,7 +21,7 @@
     @positive-click="saveNodeConfig"
     @negative-click="handleCancel"
   >
-    <!-- 发起人配置 -->
+    <!-- 发起人配置 - 统一为数组处理 -->
     <div
       v-if="currentNode?.type === 'start'"
       class="config-content"
@@ -47,7 +47,7 @@
             :checked-keys="selectedUsers"
             :selectable="false"
             checkable
-            :cascade="false"
+            cascade
             :virtual-scroll="true"
             style="max-height: 300px"
             @update:checked-keys="handleUserSelect"
@@ -55,17 +55,17 @@
         </div>
 
         <div
-          v-if="selectedUsers.length > 0"
+          v-if="selectedInitiators.length > 0"
           class="selected-users"
         >
-          <h5>已选择发起人</h5>
+          <h5>已选择发起人 ({{ selectedInitiators.length }})</h5>
           <div class="selected-user-tags">
             <NTag
               v-for="user in selectedInitiators"
               :key="user.id"
               closable
               type="primary"
-              @close="selectedUsers = []"
+              @close="removeInitiator(user.id)"
             >
               <div class="user-tag-content">
                 <NAvatar
@@ -412,15 +412,10 @@
     () => props.users?.filter(u => selectedUsers.value.includes(u.id)) || []
   )
 
-  // 方法定义
+  // 方法定义 - 统一处理，移除对开始节点的特殊处理
   const handleUserSelect = (keys: string[]) => {
     const userKeys = keys.filter(key => !key.startsWith('dept-'))
-    selectedUsers.value =
-      props.currentNode?.type === 'start'
-        ? userKeys.length > 0
-          ? [userKeys[userKeys.length - 1]]
-          : []
-        : userKeys
+    selectedUsers.value = userKeys
   }
 
   const handleCopyUserSelect = (keys: string[]) => {
@@ -437,13 +432,18 @@
     )
   }
 
+  // 新增：移除发起人方法
+  const removeInitiator = (userId: string) => {
+    selectedUsers.value = selectedUsers.value.filter(id => id !== userId)
+  }
+
   const addCondition = () => conditions.value.push(createDefaultCondition())
   const removeCondition = (index: number) => conditions.value.splice(index, 1)
 
-  // 节点配置初始化
+  // 节点配置初始化 - 修改发起人处理为数组
   const configureStartNode = (node: WorkflowNode) => {
-    const { initiator } = node.data as any
-    selectedUsers.value = initiator ? [initiator.id] : []
+    const { initiators } = node.data as any
+    selectedUsers.value = initiators ? initiators.map((u: User) => u.id) : []
   }
 
   const configureApprovalNode = (node: WorkflowNode) => {
@@ -461,20 +461,17 @@
     conditions.value = (node.data as any).conditions || []
   }
 
-  // 配置保存逻辑
+  // 配置保存逻辑 - 修改发起人保存为数组
   const saveStartNodeConfig = async (): Promise<boolean> => {
     if (selectedUsers.value.length === 0) {
       message.error('请选择发起人')
       return false
     }
 
-    const selectedUser = props.users?.find(u => u.id === selectedUsers.value[0])
-    if (selectedUser) {
-      emit('save', { initiator: selectedUser })
-      message.success(`已设置发起人：${selectedUser.name}`)
-      return true
-    }
-    return false
+    const selectedUserObjs = selectedInitiators.value
+    emit('save', { initiators: selectedUserObjs })
+    message.success(`已设置 ${selectedUserObjs.length} 个发起人`)
+    return true
   }
 
   const saveApprovalNodeConfig = async (): Promise<boolean> => {

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-03 09:13:12
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-03 18:27:14
+ * @LastEditTime: 2025-07-04 17:11:10
  * @FilePath: \Robot_Admin\src\components\global\C_WorkFlow\index.vue
  * @Description: 工作（审批流）流组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -480,8 +480,26 @@
   // 处理配置保存
   const handleConfigSave = (configData: any): void => {
     if (currentNode.value) {
-      // 更新节点数据
-      Object.assign(currentNode.value.data, configData)
+      const nodeIndex = nodes.value.findIndex(
+        n => n.id === currentNode.value!.id
+      )
+      if (nodeIndex !== -1) {
+        // 创建新的节点对象，确保响应式更新
+        const updatedNode = {
+          ...nodes.value[nodeIndex],
+          data: {
+            ...nodes.value[nodeIndex].data,
+            ...configData,
+          },
+        }
+
+        // 替换数组中的节点，触发响应式更新
+        nodes.value.splice(nodeIndex, 1, updatedNode)
+
+        // 更新当前节点引用
+        currentNode.value = updatedNode
+      }
+
       emitChange()
       showNodeConfig.value = false
       message?.success?.('节点配置已保存')

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-03 09:14:16
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-03 18:16:36
+ * @LastEditTime: 2025-07-04 16:42:18
  * @FilePath: \Robot_Admin\src\components\global\C_WorkFlow\nodes\StartNode.vue
  * @Description: 开始节点组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -16,9 +16,9 @@
       <div class="node-info">
         <div class="node-text">{{ data.title }}</div>
         <div
-          v-if="initiatorName"
+          v-if="initiatorNames"
           class="initiator-name"
-          >{{ initiatorName }}</div
+          >{{ initiatorNames }}</div
         >
         <div
           v-else
@@ -54,7 +54,7 @@
     data: {
       title: string
       status?: string
-      initiator?: Initiator
+      initiators?: Initiator[]
     }
   }
 
@@ -66,8 +66,12 @@
     | undefined
 
   // 计算发起人名称
-  const initiatorName = computed(() => {
-    return props.data.initiator?.name || ''
+  const initiatorNames = computed(() => {
+    const { initiators } = props.data
+    if (!initiators || !Array.isArray(initiators) || initiators.length === 0) {
+      return ''
+    }
+    return initiators.map(user => user?.name || '未知用户').join('、')
   })
 
   const showAddMenu = (event: MouseEvent) => {
