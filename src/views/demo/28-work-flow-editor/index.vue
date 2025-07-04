@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-03 09:23:53
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-04 16:48:11
+ * @LastEditTime: 2025-07-04 18:52:07
  * @FilePath: \Robot_Admin\src\views\demo\28-work-flow-editor\index.vue
  * @Description: 审批流演示页面
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -47,7 +47,11 @@
           >
             <template #tab>
               <div class="scenario-tab">
-                <div :class="scenario.icon"></div>
+                <C_Icon
+                  :name="scenario.icon"
+                  :title="scenario.name"
+                  class="align-middle mr-4px"
+                />
                 <span>{{ scenario.name }}</span>
               </div>
             </template>

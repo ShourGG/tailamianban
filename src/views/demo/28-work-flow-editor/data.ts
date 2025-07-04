@@ -45,7 +45,7 @@ export const workflowScenarios: WorkflowScenario[] = [
     id: 'default-designer',
     name: '默认设计器',
     description: '空白设计器，自由构建工作流',
-    icon: 'i-mdi:drawing',
+    icon: 'mdi:drawing',
     template: {
       nodes: [
         {
@@ -62,7 +62,7 @@ export const workflowScenarios: WorkflowScenario[] = [
     id: 'leave-approval',
     name: '请假审批',
     description: '员工请假申请的简单审批流程',
-    icon: 'i-mdi:calendar-remove',
+    icon: 'mdi:calendar-remove',
     template: {
       nodes: [
         {
@@ -100,7 +100,7 @@ export const workflowScenarios: WorkflowScenario[] = [
     id: 'purchase-approval',
     name: '采购申请',
     description: '物品采购的多级审批流程',
-    icon: 'i-mdi:cart',
+    icon: 'mdi:cart',
     template: {
       nodes: [
         {
@@ -177,7 +177,7 @@ export const workflowScenarios: WorkflowScenario[] = [
     id: 'expense-approval',
     name: '费用报销',
     description: '基于金额的条件分支审批流程',
-    icon: 'i-mdi:receipt',
+    icon: 'mdi:receipt',
     template: {
       nodes: [
         {
@@ -273,7 +273,7 @@ export const workflowScenarios: WorkflowScenario[] = [
     id: 'contract-approval',
     name: '合同审批',
     description: '合同签署的复杂多级审批流程',
-    icon: 'i-mdi:file-document-edit',
+    icon: 'mdi:file-document-edit',
     template: {
       nodes: [
         {
