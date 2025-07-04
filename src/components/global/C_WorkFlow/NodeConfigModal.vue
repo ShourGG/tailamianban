@@ -21,13 +21,15 @@
     @positive-click="saveNodeConfig"
     @negative-click="handleCancel"
   >
-    <!-- 发起人配置 - 统一为数组处理 -->
+    <!-- 发起人配置 -->
     <div
       v-if="currentNode?.type === 'start'"
-      class="config-content"
+      class="max-h-60vh overflow-y-auto"
     >
       <div class="config-section">
-        <h4 class="section-title">
+        <h4
+          class="flex items-center gap-2 mb-4 text-base font-semibold text-gray-800"
+        >
           <div class="i-mdi:account-star w-4 h-4"></div>
           选择发起人
         </h4>
@@ -36,7 +38,7 @@
           v-model:value="searchKeyword"
           placeholder="搜索用户姓名或部门"
           clearable
-          class="search-input"
+          class="mb-4"
         >
           <template #prefix><div class="i-mdi:magnify w-4 h-4"></div></template>
         </NInput>
@@ -58,8 +60,10 @@
           v-if="selectedInitiators.length > 0"
           class="selected-users"
         >
-          <h5>已选择发起人 ({{ selectedInitiators.length }})</h5>
-          <div class="selected-user-tags">
+          <h5 class="mb-2 text-gray-800 text-sm font-medium"
+            >已选择发起人 ({{ selectedInitiators.length }})</h5
+          >
+          <div class="flex flex-wrap gap-3">
             <NTag
               v-for="user in selectedInitiators"
               :key="user.id"
@@ -85,10 +89,12 @@
     <!-- 审批人配置 -->
     <div
       v-else-if="currentNode?.type === 'approval'"
-      class="config-content"
+      class="max-h-60vh overflow-y-auto"
     >
       <div class="config-section">
-        <h4 class="section-title">
+        <h4
+          class="flex items-center gap-2 mb-4 text-base font-semibold text-gray-800"
+        >
           <div class="i-mdi:account-check w-4 h-4"></div>
           选择审批人
         </h4>
@@ -97,7 +103,7 @@
           v-model:value="searchKeyword"
           placeholder="搜索用户姓名或部门"
           clearable
-          class="search-input"
+          class="mb-4"
         >
           <template #prefix><div class="i-mdi:magnify w-4 h-4"></div></template>
         </NInput>
@@ -119,8 +125,10 @@
           v-if="selectedApprovers.length > 0"
           class="selected-users"
         >
-          <h5>已选择审批人 ({{ selectedApprovers.length }})</h5>
-          <div class="selected-user-tags">
+          <h5 class="mb-2 text-gray-800 text-sm font-medium"
+            >已选择审批人 ({{ selectedApprovers.length }})</h5
+          >
+          <div class="flex flex-wrap gap-3">
             <NTag
               v-for="user in selectedApprovers"
               :key="user.id"
@@ -141,8 +149,8 @@
           </div>
         </div>
 
-        <div class="approval-mode-section">
-          <h5>审批模式</h5>
+        <div class="mt-4">
+          <h5 class="mb-3 text-sm font-medium text-gray-800">审批模式</h5>
           <NRadioGroup v-model:value="approvalMode">
             <NSpace vertical>
               <NRadio
@@ -150,9 +158,9 @@
                 :key="mode.value"
                 :value="mode.value"
               >
-                <div class="mode-option">
-                  <strong>{{ mode.label }}</strong>
-                  <span class="mode-desc">{{ mode.desc }}</span>
+                <div class="flex flex-col gap-1">
+                  <strong class="text-sm">{{ mode.label }}</strong>
+                  <span class="text-xs text-gray-500">{{ mode.desc }}</span>
                 </div>
               </NRadio>
             </NSpace>
@@ -164,10 +172,12 @@
     <!-- 抄送人配置 -->
     <div
       v-else-if="currentNode?.type === 'copy'"
-      class="config-content"
+      class="max-h-60vh overflow-y-auto"
     >
       <div class="config-section">
-        <h4 class="section-title">
+        <h4
+          class="flex items-center gap-2 mb-4 text-base font-semibold text-gray-800"
+        >
           <div class="i-mdi:email-outline w-4 h-4"></div>
           选择抄送人
         </h4>
@@ -176,7 +186,7 @@
           v-model:value="searchKeyword"
           placeholder="搜索用户姓名或部门"
           clearable
-          class="search-input"
+          class="mb-4"
         >
           <template #prefix><div class="i-mdi:magnify w-4 h-4"></div></template>
         </NInput>
@@ -198,8 +208,10 @@
           v-if="selectedCopyUserList.length > 0"
           class="selected-users"
         >
-          <h5>已选择抄送人 ({{ selectedCopyUserList.length }})</h5>
-          <div class="selected-user-tags">
+          <h5 class="mb-2 text-gray-800 text-sm font-medium"
+            >已选择抄送人 ({{ selectedCopyUserList.length }})</h5
+          >
+          <div class="flex flex-wrap gap-3">
             <NTag
               v-for="user in selectedCopyUserList"
               :key="user.id"
@@ -225,15 +237,17 @@
     <!-- 条件配置 -->
     <div
       v-else-if="currentNode?.type === 'condition'"
-      class="config-content"
+      class="max-h-60vh overflow-y-auto"
     >
       <div class="config-section">
-        <h4 class="section-title">
+        <h4
+          class="flex items-center gap-2 mb-4 text-base font-semibold text-gray-800"
+        >
           <div class="i-mdi:source-branch w-4 h-4"></div>
           条件分支设置
         </h4>
 
-        <div class="condition-builder">
+        <div class="space-y-3">
           <div
             v-for="(condition, index) in conditions"
             :key="condition.id"
@@ -241,11 +255,9 @@
           >
             <NCard
               size="small"
-              class="condition-card"
+              class="border border-gray-200 hover:border-gray-300 transition-colors"
             >
-              <div
-                class="condition-content flex items-center gap-3 flex-nowrap min-h-10 p-2"
-              >
+              <div class="flex items-center gap-3 flex-nowrap min-h-10 p-2">
                 <NInput
                   v-model:value="condition.name"
                   placeholder="分支名称"
@@ -290,6 +302,7 @@
             dashed
             block
             @click="addCondition"
+            class="w-full"
           >
             <template #icon><div class="i-mdi:plus w-4 h-4"></div></template>
             添加条件
@@ -301,7 +314,7 @@
 </template>
 
 <script setup lang="ts">
-  // 导入类型定义
+  // ... 保持原有的 script 部分不变
   import type {
     WorkflowNode,
     User,
@@ -309,7 +322,6 @@
     Condition,
   } from '@/types/work-flow'
 
-  // 导入数据常量
   import {
     APPROVAL_MODES,
     FIELD_OPTIONS,
@@ -319,7 +331,6 @@
     createDefaultCondition,
   } from './data'
 
-  // Props 定义
   interface Props {
     show: boolean
     currentNode: WorkflowNode | null
@@ -334,7 +345,6 @@
     departments: () => [],
   })
 
-  // Emits 定义
   interface Emits {
     (e: 'update:show', value: boolean): void
     (e: 'save', configData: any): void
@@ -343,7 +353,6 @@
 
   const emit = defineEmits<Emits>()
 
-  // 响应式数据
   const message = useMessage()
   const searchKeyword = ref('')
   const selectedUsers = ref<string[]>([])
@@ -352,7 +361,6 @@
   const configLoading = ref(false)
   const conditions = ref<Condition[]>([])
 
-  // 计算属性
   const visible = computed({
     get: () => props.show,
     set: (value: boolean) => emit('update:show', value),
@@ -419,7 +427,6 @@
     () => props.users?.filter(u => selectedUsers.value.includes(u.id)) || []
   )
 
-  // 方法定义 - 统一处理，移除对开始节点的特殊处理
   const handleUserSelect = (keys: string[]) => {
     const userKeys = keys.filter(key => !key.startsWith('dept-'))
     selectedUsers.value = userKeys
@@ -439,7 +446,6 @@
     )
   }
 
-  // 新增：移除发起人方法
   const removeInitiator = (userId: string) => {
     selectedUsers.value = selectedUsers.value.filter(id => id !== userId)
   }
@@ -447,7 +453,6 @@
   const addCondition = () => conditions.value.push(createDefaultCondition())
   const removeCondition = (index: number) => conditions.value.splice(index, 1)
 
-  // 节点配置初始化 - 修改发起人处理为数组
   const configureStartNode = (node: WorkflowNode) => {
     const { initiators } = node.data as any
     selectedUsers.value = initiators ? initiators.map((u: User) => u.id) : []
@@ -468,7 +473,6 @@
     conditions.value = (node.data as any).conditions || []
   }
 
-  // 配置保存逻辑 - 修改发起人保存为数组
   const saveStartNodeConfig = async (): Promise<boolean> => {
     if (selectedUsers.value.length === 0) {
       message.error('请选择发起人')
@@ -553,7 +557,6 @@
     emit('cancel')
   }
 
-  // 监听节点变化，重新初始化配置
   watch(
     () => props.currentNode,
     newNode => {
@@ -577,3 +580,46 @@
     { immediate: true }
   )
 </script>
+
+<style scoped>
+  /* 用户树容器样式 */
+  .user-tree-container {
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    background: #fafafa;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  /* 已选择用户区域样式 */
+  .selected-users {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #e9ecef;
+  }
+
+  /* 用户标签内容 - 关键的间距修复 */
+  .user-tag-content {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 这里是关键：头像、名称、部门之间的间距 */
+  }
+
+  .user-name {
+    font-weight: 500;
+    font-size: 13px;
+    color: #262626;
+  }
+
+  .user-dept {
+    font-size: 11px;
+    color: #8c8c8c;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+</style>

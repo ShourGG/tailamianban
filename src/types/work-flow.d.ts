@@ -66,6 +66,7 @@ export interface BaseNodeData {
   title: string
   status?: NodeStatus
   config?: Record<string, any>
+  initiators?: User[]
 }
 
 // 开始节点数据
