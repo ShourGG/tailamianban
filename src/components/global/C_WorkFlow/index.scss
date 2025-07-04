@@ -89,115 +89,18 @@
   font-weight: 500;
 }
 
-.config-content {
-  max-height: 60vh;
-  overflow-y: auto;
-}
-
-.config-section {
-  .section-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 16px 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #262626;
+@keyframes menuSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-
-  .search-input {
-    margin-bottom: 16px;
-  }
-
-  .user-tree-container {
-    border: 1px solid #e8e8e8;
-    border-radius: 6px;
-    padding: 8px;
-    margin-bottom: 16px;
-    background: #fafafa;
-  }
-
-  .selected-users {
-    background: #f8f9fa;
-    border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 16px;
-    border: 1px solid #e9ecef;
-
-    h5 {
-      margin: 0 0 8px 0;
-      color: #262626;
-      font-size: 14px;
-    }
-
-    .selected-user-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-
-      .user-tag-content {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        .user-name {
-          font-weight: 500;
-          margin-right: 8px !important;
-        }
-
-        .user-dept {
-          font-size: 12px;
-          color: #8c8c8c;
-          background: rgba(0, 0, 0, 0.05);
-          padding: 1px 4px;
-          border-radius: 2px;
-        }
-      }
-    }
-  }
-
-  .approval-mode-section {
-    h5 {
-      margin: 0 0 12px 0;
-      font-size: 14px;
-      color: #262626;
-    }
-
-    .mode-option {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      .mode-desc {
-        font-size: 12px;
-        color: #8c8c8c;
-      }
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.condition-builder {
-  .condition-item {
-    margin-bottom: 12px;
-
-    .condition-card {
-      border: 1px solid #e8e8e8;
-
-      &:hover {
-        border-color: #d9d9d9;
-      }
-    }
-
-    .condition-content {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-  }
-}
-
-// 验证结果样式
+// 保留“流程/数据校验结果”显示样式：
 .validation-success {
   text-align: center;
   padding: 40px 20px;
@@ -379,18 +282,7 @@
   justify-content: flex-end;
 }
 
-@keyframes menuSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// 边的样式
+// 边的样式（Vue Flow）
 :deep(.vue-flow__edge) {
   stroke: #1890ff;
   stroke-width: 2px;

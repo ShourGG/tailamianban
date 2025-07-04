@@ -1,13 +1,3 @@
-<!--
- * @Author: ChenYu ycyplus@gmail.com
- * @Date: 2025-07-03 09:13:12
- * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-04 17:41:44
- * @FilePath: \Robot_Admin\src\components\global\C_WorkFlow\NodeConfigModal.vue
- * @Description: 节点配置弹窗组件
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
--->
-
 <template>
   <NModal
     v-model:show="visible"
@@ -21,222 +11,104 @@
     @positive-click="saveNodeConfig"
     @negative-click="handleCancel"
   >
-    <!-- 发起人配置 -->
-    <div
-      v-if="currentNode?.type === 'start'"
-      class="max-h-60vh overflow-y-auto"
-    >
-      <div class="config-section">
-        <h4
-          class="flex items-center gap-2 mb-4 text-base font-semibold text-gray-800"
-        >
-          <div class="i-mdi:account-star w-4 h-4"></div>
-          选择发起人
-        </h4>
-
-        <NInput
-          v-model:value="searchKeyword"
-          placeholder="搜索用户姓名或部门"
-          clearable
-          class="mb-4"
-        >
-          <template #prefix><div class="i-mdi:magnify w-4 h-4"></div></template>
-        </NInput>
-
-        <div class="user-tree-container">
-          <NTree
-            :data="departmentUserTree"
-            :checked-keys="selectedUsers"
-            :selectable="false"
-            checkable
-            cascade
-            :virtual-scroll="true"
-            style="max-height: 300px"
-            @update:checked-keys="handleUserSelect"
-          />
-        </div>
-
-        <div
-          v-if="selectedInitiators.length > 0"
-          class="selected-users"
-        >
-          <h5 class="mb-2 text-gray-800 text-sm font-medium"
-            >已选择发起人 ({{ selectedInitiators.length }})</h5
+    <!-- 公共选择面板 -->
+    <template v-if="isUserSelectNode">
+      <div class="max-h-60vh overflow-y-auto">
+        <div class="config-section">
+          <h4
+            class="flex items-center gap-2 mb-4 text-base font-semibold text-gray-800"
           >
-          <div class="flex flex-wrap gap-3">
-            <NTag
-              v-for="user in selectedInitiators"
-              :key="user.id"
-              closable
-              type="primary"
-              @close="removeInitiator(user.id)"
-            >
-              <div class="user-tag-content">
-                <NAvatar
-                  :src="user.avatar"
-                  :fallback-src="getDefaultAvatar(user.name)"
-                  size="small"
-                />
-                <span class="user-name">{{ user.name }}</span>
-                <span class="user-dept">{{ user.department }}</span>
-              </div>
-            </NTag>
-          </div>
-        </div>
-      </div>
-    </div>
+            <div
+              :class="userSelectConfig.icon"
+              class="w-4 h-4"
+            ></div>
+            {{ userSelectConfig.title }}
+          </h4>
 
-    <!-- 审批人配置 -->
-    <div
-      v-else-if="currentNode?.type === 'approval'"
-      class="max-h-60vh overflow-y-auto"
-    >
-      <div class="config-section">
-        <h4
-          class="flex items-center gap-2 mb-4 text-base font-semibold text-gray-800"
-        >
-          <div class="i-mdi:account-check w-4 h-4"></div>
-          选择审批人
-        </h4>
-
-        <NInput
-          v-model:value="searchKeyword"
-          placeholder="搜索用户姓名或部门"
-          clearable
-          class="mb-4"
-        >
-          <template #prefix><div class="i-mdi:magnify w-4 h-4"></div></template>
-        </NInput>
-
-        <div class="user-tree-container">
-          <NTree
-            :data="departmentUserTree"
-            :checked-keys="selectedUsers"
-            :selectable="false"
-            checkable
-            cascade
-            :virtual-scroll="true"
-            style="max-height: 300px"
-            @update:checked-keys="handleUserSelect"
-          />
-        </div>
-
-        <div
-          v-if="selectedApprovers.length > 0"
-          class="selected-users"
-        >
-          <h5 class="mb-2 text-gray-800 text-sm font-medium"
-            >已选择审批人 ({{ selectedApprovers.length }})</h5
+          <NInput
+            v-model:value="searchKeyword"
+            placeholder="搜索用户姓名或部门"
+            clearable
+            class="mb-4"
           >
-          <div class="flex flex-wrap gap-3">
-            <NTag
-              v-for="user in selectedApprovers"
-              :key="user.id"
-              closable
-              type="info"
-              @close="removeApprover(user.id)"
-            >
-              <div class="user-tag-content">
-                <NAvatar
-                  :src="user.avatar"
-                  :fallback-src="getDefaultAvatar(user.name)"
-                  size="small"
-                />
-                <span class="user-name">{{ user.name }}</span>
-                <span class="user-dept">{{ user.department }}</span>
-              </div>
-            </NTag>
-          </div>
-        </div>
+            <template #prefix>
+              <div class="i-mdi:magnify w-4 h-4"></div>
+            </template>
+          </NInput>
 
-        <div class="mt-4">
-          <h5 class="mb-3 text-sm font-medium text-gray-800">审批模式</h5>
-          <NRadioGroup v-model:value="approvalMode">
-            <NSpace vertical>
-              <NRadio
-                v-for="mode in APPROVAL_MODES"
-                :key="mode.value"
-                :value="mode.value"
+          <div
+            class="border border-gray-200 rounded-lg p-3 mb-4 bg-gray-50 max-h-50 overflow-y-auto"
+          >
+            <NTree
+              :data="departmentUserTree"
+              :checked-keys="userSelectConfig.checkedKeys"
+              :selectable="false"
+              checkable
+              cascade
+              :virtual-scroll="true"
+              style="max-height: 300px"
+              @update:checked-keys="userSelectConfig.onSelect"
+            />
+          </div>
+
+          <div
+            v-if="userSelectConfig.selectedUsers.length > 0"
+            class="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200"
+          >
+            <h5 class="mb-2 text-gray-800 text-sm font-medium">
+              {{ userSelectConfig.selectedLabel }}
+              ({{ userSelectConfig.selectedUsers.length }})
+            </h5>
+            <div class="flex flex-wrap gap-3">
+              <NTag
+                v-for="user in userSelectConfig.selectedUsers"
+                :key="user.id"
+                closable
+                :type="userSelectConfig.tagType"
+                @close="userSelectConfig.onRemove(user.id)"
               >
-                <div class="flex flex-col gap-1">
-                  <strong class="text-sm">{{ mode.label }}</strong>
-                  <span class="text-xs text-gray-500">{{ mode.desc }}</span>
+                <div class="flex items-center gap-2">
+                  <NAvatar
+                    :src="user.avatar"
+                    :fallback-src="getDefaultAvatar(user.name)"
+                    size="small"
+                  />
+                  <span class="font-medium text-sm">{{ user.name }}</span>
+                  <span
+                    class="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded"
+                    >{{ user.department }}</span
+                  >
                 </div>
-              </NRadio>
-            </NSpace>
-          </NRadioGroup>
-        </div>
-      </div>
-    </div>
-
-    <!-- 抄送人配置 -->
-    <div
-      v-else-if="currentNode?.type === 'copy'"
-      class="max-h-60vh overflow-y-auto"
-    >
-      <div class="config-section">
-        <h4
-          class="flex items-center gap-2 mb-4 text-base font-semibold text-gray-800"
-        >
-          <div class="i-mdi:email-outline w-4 h-4"></div>
-          选择抄送人
-        </h4>
-
-        <NInput
-          v-model:value="searchKeyword"
-          placeholder="搜索用户姓名或部门"
-          clearable
-          class="mb-4"
-        >
-          <template #prefix><div class="i-mdi:magnify w-4 h-4"></div></template>
-        </NInput>
-
-        <div class="user-tree-container">
-          <NTree
-            :data="departmentUserTree"
-            :checked-keys="selectedCopyUsers"
-            :selectable="false"
-            checkable
-            cascade
-            :virtual-scroll="true"
-            style="max-height: 300px"
-            @update:checked-keys="handleCopyUserSelect"
-          />
-        </div>
-
-        <div
-          v-if="selectedCopyUserList.length > 0"
-          class="selected-users"
-        >
-          <h5 class="mb-2 text-gray-800 text-sm font-medium"
-            >已选择抄送人 ({{ selectedCopyUserList.length }})</h5
-          >
-          <div class="flex flex-wrap gap-3">
-            <NTag
-              v-for="user in selectedCopyUserList"
-              :key="user.id"
-              closable
-              type="success"
-              @close="removeCopyUser(user.id)"
-            >
-              <div class="user-tag-content">
-                <NAvatar
-                  :src="user.avatar"
-                  :fallback-src="getDefaultAvatar(user.name)"
-                  size="small"
-                />
-                <span class="user-name">{{ user.name }}</span>
-                <span class="user-dept">{{ user.department }}</span>
-              </div>
-            </NTag>
+              </NTag>
+            </div>
           </div>
         </div>
+        <!-- 审批节点时附带审批模式 -->
+        <template v-if="props.currentNode?.type === 'approval'">
+          <div class="mt-4">
+            <h5 class="mb-3 text-sm font-medium text-gray-800">审批模式</h5>
+            <NRadioGroup v-model:value="approvalMode">
+              <NSpace vertical>
+                <NRadio
+                  v-for="mode in APPROVAL_MODES"
+                  :key="mode.value"
+                  :value="mode.value"
+                >
+                  <div class="flex flex-col gap-1">
+                    <strong class="text-sm">{{ mode.label }}</strong>
+                    <span class="text-xs text-gray-500">{{ mode.desc }}</span>
+                  </div>
+                </NRadio>
+              </NSpace>
+            </NRadioGroup>
+          </div>
+        </template>
       </div>
-    </div>
+    </template>
 
-    <!-- 条件配置 -->
+    <!-- 条件节点配置 -->
     <div
-      v-else-if="currentNode?.type === 'condition'"
+      v-else-if="props.currentNode?.type === 'condition'"
       class="max-h-60vh overflow-y-auto"
     >
       <div class="config-section">
@@ -246,7 +118,6 @@
           <div class="i-mdi:source-branch w-4 h-4"></div>
           条件分支设置
         </h4>
-
         <div class="space-y-3">
           <div
             v-for="(condition, index) in conditions"
@@ -297,7 +168,6 @@
               </div>
             </NCard>
           </div>
-
           <NButton
             dashed
             block
@@ -314,14 +184,13 @@
 </template>
 
 <script setup lang="ts">
-  // ... 保持原有的 script 部分不变
+  import { ref, computed, watch } from 'vue'
   import type {
     WorkflowNode,
     User,
     Department,
     Condition,
   } from '@/types/work-flow'
-
   import {
     APPROVAL_MODES,
     FIELD_OPTIONS,
@@ -337,23 +206,15 @@
     users: User[]
     departments: Department[]
   }
-
   const props = withDefaults(defineProps<Props>(), {
     show: false,
     currentNode: null,
     users: () => [],
     departments: () => [],
   })
-
-  interface Emits {
-    (e: 'update:show', value: boolean): void
-    (e: 'save', configData: any): void
-    (e: 'cancel'): void
-  }
-
-  const emit = defineEmits<Emits>()
-
+  const emit = defineEmits(['update:show', 'save', 'cancel'])
   const message = useMessage()
+
   const searchKeyword = ref('')
   const selectedUsers = ref<string[]>([])
   const selectedCopyUsers = ref<string[]>([])
@@ -365,17 +226,16 @@
     get: () => props.show,
     set: (value: boolean) => emit('update:show', value),
   })
-
   const configTitle = computed(() => {
     if (props.currentNode?.type === 'start') return '发起人设置'
     const type = props.currentNode?.type as keyof typeof CONFIG_TITLES
     return CONFIG_TITLES[type] || '节点设置'
   })
 
+  // 用户树
   const departmentUserTree = computed(() => {
     const tree: any[] = []
     const deptMap = new Map()
-
     props.departments?.forEach(dept => {
       if (!deptMap.has(dept.id)) {
         deptMap.set(dept.id, {
@@ -387,7 +247,6 @@
         })
       }
     })
-
     const filteredUsers =
       props.users?.filter(
         user =>
@@ -401,7 +260,7 @@
       if (dept && deptMap.has(dept.id)) {
         deptMap.get(dept.id).children.push({
           key: user.id,
-          label: `${user.name} (${user.role})`,
+          label: `${user.name}${user.role ? `(${user.role})` : ''}`,
           isLeaf: true,
           user,
         })
@@ -428,24 +287,19 @@
   )
 
   const handleUserSelect = (keys: string[]) => {
-    const userKeys = keys.filter(key => !key.startsWith('dept-'))
-    selectedUsers.value = userKeys
+    selectedUsers.value = keys.filter(key => !key.startsWith('dept-'))
   }
-
   const handleCopyUserSelect = (keys: string[]) => {
     selectedCopyUsers.value = keys.filter(key => !key.startsWith('dept-'))
   }
-
   const removeApprover = (userId: string) => {
     selectedUsers.value = selectedUsers.value.filter(id => id !== userId)
   }
-
   const removeCopyUser = (userId: string) => {
     selectedCopyUsers.value = selectedCopyUsers.value.filter(
       id => id !== userId
     )
   }
-
   const removeInitiator = (userId: string) => {
     selectedUsers.value = selectedUsers.value.filter(id => id !== userId)
   }
@@ -457,18 +311,15 @@
     const { initiators } = node.data as any
     selectedUsers.value = initiators ? initiators.map((u: User) => u.id) : []
   }
-
   const configureApprovalNode = (node: WorkflowNode) => {
     const approvers = (node.data as any).approvers || []
     selectedUsers.value = approvers.map((u: User) => u.id)
     approvalMode.value = (node.data as any).approvalMode || 'any'
   }
-
   const configureCopyNode = (node: WorkflowNode) => {
     const copyUsers = (node.data as any).copyUsers || []
     selectedCopyUsers.value = copyUsers.map((u: User) => u.id)
   }
-
   const configureConditionNode = (node: WorkflowNode) => {
     conditions.value = (node.data as any).conditions || []
   }
@@ -478,19 +329,16 @@
       message.error('请选择发起人')
       return false
     }
-
     const selectedUserObjs = selectedInitiators.value
     emit('save', { initiators: selectedUserObjs })
     message.success(`已设置 ${selectedUserObjs.length} 个发起人`)
     return true
   }
-
   const saveApprovalNodeConfig = async (): Promise<boolean> => {
     if (selectedUsers.value.length === 0) {
       message.error('请至少选择一个审批人')
       return false
     }
-
     const selectedUserObjs = selectedApprovers.value
     emit('save', {
       approvers: selectedUserObjs,
@@ -499,20 +347,17 @@
     message.success(`已设置 ${selectedUserObjs.length} 个审批人`)
     return true
   }
-
   const saveCopyNodeConfig = async (): Promise<boolean> => {
     const selectedUserObjs = selectedCopyUserList.value
     emit('save', { copyUsers: selectedUserObjs })
     message.success(`已设置 ${selectedUserObjs.length} 个抄送人`)
     return true
   }
-
   const saveConditionNodeConfig = async (): Promise<boolean> => {
     if (conditions.value.length === 0) {
       message.error('请至少添加一个条件分支')
       return false
     }
-
     const validConditions = conditions.value.filter(
       c => c.name && c.field && c.operator && c.value
     )
@@ -520,17 +365,13 @@
       message.error('请完善条件配置')
       return false
     }
-
     emit('save', { conditions: validConditions })
     message.success(`已设置 ${validConditions.length} 个条件分支`)
     return true
   }
-
   const saveNodeConfig = async (): Promise<boolean> => {
     if (!props.currentNode) return false
-
     configLoading.value = true
-
     try {
       const nodeSavers = {
         start: saveStartNodeConfig,
@@ -538,11 +379,9 @@
         copy: saveCopyNodeConfig,
         condition: saveConditionNodeConfig,
       }
-
       const saver =
         nodeSavers[props.currentNode.type as keyof typeof nodeSavers]
       const success = saver ? await saver() : false
-
       return success
     } catch (error) {
       message.error('保存配置失败')
@@ -552,24 +391,20 @@
       configLoading.value = false
     }
   }
-
   const handleCancel = () => {
     emit('cancel')
   }
-
   watch(
     () => props.currentNode,
     newNode => {
       if (newNode) {
         searchKeyword.value = ''
-
         const nodeConfigurators = {
           start: configureStartNode,
           approval: configureApprovalNode,
           copy: configureCopyNode,
           condition: configureConditionNode,
         }
-
         const configurator =
           nodeConfigurators[newNode.type as keyof typeof nodeConfigurators]
         if (configurator) {
@@ -579,47 +414,57 @@
     },
     { immediate: true }
   )
+
+  const isUserSelectNode = computed(() =>
+    ['start', 'approval', 'copy'].includes(props.currentNode?.type || '')
+  )
+
+  const userSelectConfig = computed(() => {
+    const type = props.currentNode?.type
+    if (type === 'start') {
+      return {
+        icon: 'i-mdi:account-star',
+        title: '选择发起人',
+        checkedKeys: selectedUsers.value,
+        onSelect: handleUserSelect,
+        selectedUsers: selectedInitiators.value,
+        selectedLabel: '已选择发起人',
+        tagType: 'primary',
+        onRemove: removeInitiator,
+      }
+    } else if (type === 'approval') {
+      return {
+        icon: 'i-mdi:account-check',
+        title: '选择审批人',
+        checkedKeys: selectedUsers.value,
+        onSelect: handleUserSelect,
+        selectedUsers: selectedApprovers.value,
+        selectedLabel: '已选择审批人',
+        tagType: 'info',
+        onRemove: removeApprover,
+      }
+    } else if (type === 'copy') {
+      return {
+        icon: 'i-mdi:email-outline',
+        title: '选择抄送人',
+        checkedKeys: selectedCopyUsers.value,
+        onSelect: handleCopyUserSelect,
+        selectedUsers: selectedCopyUserList.value,
+        selectedLabel: '已选择抄送人',
+        tagType: 'success',
+        onRemove: removeCopyUser,
+      }
+    }
+    // 安全兜底
+    return {
+      icon: '',
+      title: '',
+      checkedKeys: [],
+      onSelect: () => {},
+      selectedUsers: [],
+      selectedLabel: '',
+      tagType: 'default',
+      onRemove: () => {},
+    }
+  })
 </script>
-
-<style scoped>
-  /* 用户树容器样式 */
-  .user-tree-container {
-    border: 1px solid #e8e8e8;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 16px;
-    background: #fafafa;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-  /* 已选择用户区域样式 */
-  .selected-users {
-    background: #f8f9fa;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
-    border: 1px solid #e9ecef;
-  }
-
-  /* 用户标签内容 - 关键的间距修复 */
-  .user-tag-content {
-    display: flex;
-    align-items: center;
-    gap: 8px; /* 这里是关键：头像、名称、部门之间的间距 */
-  }
-
-  .user-name {
-    font-weight: 500;
-    font-size: 13px;
-    color: #262626;
-  }
-
-  .user-dept {
-    font-size: 11px;
-    color: #8c8c8c;
-    background: rgba(0, 0, 0, 0.05);
-    padding: 2px 6px;
-    border-radius: 4px;
-  }
-</style>
