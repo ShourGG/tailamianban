@@ -378,7 +378,7 @@
           "name": "work-flow",
           "component": "/demo/28-work-flow-editor/index",
           "meta": {
-            "icon": "mdi:text-shadow",
+            "icon": "streamline-freehand:business-workflow-merge-2",
             "title": "工作流编辑器",
             "hidden": false,
             "full": false,

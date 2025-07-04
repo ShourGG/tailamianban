@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-03 09:13:12
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-04 16:34:56
+ * @LastEditTime: 2025-07-04 17:41:44
  * @FilePath: \Robot_Admin\src\components\global\C_WorkFlow\NodeConfigModal.vue
  * @Description: 节点配置弹窗组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
@@ -243,37 +243,44 @@
               size="small"
               class="condition-card"
             >
-              <div class="condition-content">
+              <div
+                class="condition-content flex items-center gap-3 flex-nowrap min-h-10 p-2"
+              >
                 <NInput
                   v-model:value="condition.name"
                   placeholder="分支名称"
                   style="width: 150px"
+                  class="flex-shrink-0"
                 />
                 <NSelect
                   v-model:value="condition.field"
                   placeholder="选择字段"
                   :options="FIELD_OPTIONS"
                   style="width: 120px"
+                  class="flex-shrink-0"
                 />
                 <NSelect
                   v-model:value="condition.operator"
                   placeholder="操作符"
                   :options="OPERATOR_OPTIONS"
                   style="width: 100px"
+                  class="flex-shrink-0"
                 />
                 <NInput
                   v-model:value="condition.value"
                   placeholder="值"
                   style="width: 120px"
+                  class="flex-shrink-0"
                 />
                 <NButton
                   quaternary
                   type="error"
                   @click="removeCondition(index)"
+                  class="flex-shrink-0 ml-auto"
                 >
-                  <template #icon
-                    ><div class="i-mdi:delete w-4 h-4"></div
-                  ></template>
+                  <template #icon>
+                    <div class="i-mdi:delete w-4 h-4"></div>
+                  </template>
                 </NButton>
               </div>
             </NCard>
