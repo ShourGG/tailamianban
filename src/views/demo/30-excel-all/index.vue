@@ -434,9 +434,8 @@
     type SelectOption,
   } from 'naive-ui/es'
   import { useExcel, type ExcelTemplate } from '@/hooks/useExcel'
-
-  // 常量
-  const PREVIEW_ROWS = 10
+  import { PREVIEW_ROWS, sampleData, historyColumns } from './data'
+  import './index.scss'
 
   // Hooks
   const {
@@ -533,29 +532,6 @@
         ellipsis: true,
       }))
   })
-
-  /**
-   * * @description 操作历史列配置
-   */
-  const historyColumns: DataTableColumns = [
-    { title: '时间', key: 'time', width: 160 },
-    { title: '操作', key: 'operation', width: 120 },
-    { title: '描述', key: 'description', ellipsis: true },
-    {
-      title: '状态',
-      key: 'status',
-      width: 80,
-      render: row => {
-        return h(
-          NTag,
-          {
-            type: row.status === 'success' ? 'success' : 'error',
-          },
-          { default: () => (row.status === 'success' ? '成功' : '失败') }
-        )
-      },
-    },
-  ]
 
   /**
    * * @description 添加操作历史
@@ -688,30 +664,6 @@
    * * @description 导出示例数据
    */
   const handleExportSample = async () => {
-    const sampleData = [
-      {
-        姓名: '张三',
-        部门: '技术部',
-        职位: '前端工程师',
-        薪资: 12000,
-        入职日期: '2023-01-15',
-      },
-      {
-        姓名: '李四',
-        部门: '产品部',
-        职位: '产品经理',
-        薪资: 15000,
-        入职日期: '2022-05-20',
-      },
-      {
-        姓名: '王五',
-        部门: '设计部',
-        职位: 'UI设计师',
-        薪资: 10000,
-        入职日期: '2023-03-10',
-      },
-    ]
-
     try {
       await exportToExcel(sampleData, {
         fileName: '员工信息示例.xlsx',
@@ -843,140 +795,3 @@
     }
   })
 </script>
-
-<style lang="scss" scoped>
-  .excel-demo {
-    padding: 1.5rem;
-  }
-
-  .demo-title {
-    font-size: 1.875rem;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-  }
-
-  .demo-content {
-    > * + * {
-      margin-top: 1.5rem;
-    }
-  }
-
-  .demo-section {
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  }
-
-  .upload-area {
-    .upload-dragger {
-      width: 100%;
-    }
-
-    .upload-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 0;
-    }
-
-    .upload-text {
-      font-size: 1.125rem;
-      font-weight: 500;
-    }
-
-    .upload-hint {
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
-    }
-  }
-
-  .sheet-selector {
-    display: flex;
-    align-items: center;
-  }
-
-  .preview-table {
-    border-radius: 0.5rem;
-    overflow: hidden;
-  }
-
-  .export-grid {
-    display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 1rem;
-
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .export-card {
-    height: 100%;
-
-    .export-card-content {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      min-height: 11rem;
-
-      .export-form {
-        flex: 1;
-        margin-bottom: 1rem;
-      }
-
-      .export-button {
-        margin-top: auto;
-      }
-    }
-  }
-
-  .checkbox-grid {
-    display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 0.5rem;
-  }
-
-  .template-grid {
-    display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 1rem;
-
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    @media (min-width: 1024px) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .template-card {
-    height: 100%;
-  }
-
-  .data-process-controls {
-    margin-bottom: 1rem;
-  }
-
-  .processed-data {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 0.375rem;
-  }
-
-  .data-summary {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: #eff6ff;
-    border-radius: 0.375rem;
-  }
-
-  .history-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-</style>
