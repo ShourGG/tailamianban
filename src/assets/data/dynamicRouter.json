@@ -455,12 +455,12 @@
           }
         },
         {
-          "path": "excel-import",
-          "name": "sys-excel-import",
-          "component": "/demo/import/index",
+          "path": "excel-all",
+          "name": "excel-all",
+          "component": "/demo/30-excel-all/index",
           "meta": {
             "icon": "mdi:microsoft-excel",
-            "title": "Excel导入",
+            "title": "Excel All",
             "hidden": false,
             "full": false,
             "affix": false,
