@@ -11,8 +11,10 @@
 <template>
   <div class="workflow-demo-page">
     <header class="page-header">
-      <NH1>工作流设计器场景示例</NH1>
-      <p>拖拽构建审批流程，支持多种场景模板，实时预览工作流数据</p>
+      <NH1 class="p4px">工作流设计器场景示例</NH1>
+      <p class="pl-4px"
+        >拖拽构建审批流程，支持多种场景模板，实时预览工作流数据</p
+      >
       <div class="header-content">
         <div class="title-section"></div>
         <div class="header-actions">

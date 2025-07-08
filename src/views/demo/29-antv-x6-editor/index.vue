@@ -1,15 +1,27 @@
 <template>
   <div class="diagram-demo">
+    <NH1 class="p4px">图编辑引擎示例</NH1>
     <NCard>
       <template #header>
-        <NSpace justify="space-between">
-          <span>AntV X6 图表演示</span>
-          <NSelect
-            v-model:value="currentType"
-            :options="typeOptions"
-            style="width: 120px"
+        <NTabs
+          v-model:value="currentType"
+          type="line"
+          size="medium"
+          :bar-width="28"
+        >
+          <NTab
+            name="er"
+            tab="ER图"
           />
-        </NSpace>
+          <NTab
+            name="bpmn"
+            tab="BPMN图"
+          />
+          <NTab
+            name="uml"
+            tab="UML类图"
+          />
+        </NTabs>
       </template>
 
       <!-- 关键：给容器明确的高度 -->
@@ -33,9 +45,16 @@
       title="数据预览"
       style="margin-top: 16px"
     >
-      <pre class="bg-gray-50 p-4 rounded text-sm overflow-auto">{{
-        JSON.stringify(currentData, null, 2)
-      }}</pre>
+      <C_Code
+        :code="JSON.stringify(currentData, null, 2)"
+        language="json"
+        title="当前图表数据"
+        :show-header="true"
+        :show-line-numbers="true"
+        :word-wrap="false"
+        :show-fullscreen="true"
+        max-height="400px"
+      />
     </NCard>
   </div>
 </template>
@@ -46,12 +65,6 @@
   const currentType = ref<DiagramType>('bpmn') // 直接显示BPMN
   const diagramRef = ref()
   const graphData = ref<DiagramData>()
-
-  const typeOptions = [
-    { label: 'ER图', value: 'er' },
-    { label: 'BPMN图', value: 'bpmn' },
-    { label: 'UML类图', value: 'uml' },
-  ]
 
   // 根据类型提供初始数据 - 精简修复：只改返回类型和default
   const currentData = computed((): DiagramData | undefined => {
