@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    C_AntV: typeof import('./../components/global/C_AntV/index.vue')['default']
     C_Breadcrumb: typeof import('./../components/global/C_Breadcrumb/index.vue')['default']
     C_Cascade: typeof import('./../components/global/C_Cascade/index.vue')['default']
     C_City: typeof import('./../components/global/C_City/index.vue')['default']
@@ -45,6 +46,7 @@ declare module 'vue' {
     C_Tree: typeof import('./../components/global/C_Tree/index.vue')['default']
     C_WorkFlow: typeof import('./../components/global/C_WorkFlow/index.vue')['default']
     Icon: typeof import('@iconify/vue')['Icon']
+    IconLayout: typeof import('~icons/la/yout')['default']
     IconMdiAbTesting: typeof import('~icons/mdi/ab-testing')['default']
     NAlert: typeof import('naive-ui')['NAlert']
     NAvatar: typeof import('naive-ui')['NAvatar']

@@ -385,6 +385,19 @@
             "affix": false,
             "keepAlive": false
           }
+        },
+        {
+          "path": "antv-x6-editor",
+          "name": "antv-x6",
+          "component": "/demo/29-antv-x6-editor/index",
+          "meta": {
+            "icon": "simple-icons:antv",
+            "title": "图编辑引擎",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
         }
       ]
     },
