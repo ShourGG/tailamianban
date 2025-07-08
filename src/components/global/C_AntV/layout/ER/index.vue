@@ -213,13 +213,14 @@
 <script setup lang="ts">
   import { Node, Graph, Cell, Edge } from '@antv/x6'
   import { useGraphBase } from '@/composables/AntV/useGraphBase'
-  import { exportJSON } from '../utils/exportUtils'
+  import { exportJSON } from '../../utils/exportUtils'
   import type {
     ERTable,
     ERField,
     ERDiagramData,
     ERRelation,
   } from '@/types/antv'
+  import { fieldTypes, exportOptions } from './data'
 
   interface Props {
     data?: ERDiagramData
@@ -245,34 +246,6 @@
   const showEditor = ref(false)
   const editingTable = ref<ERTable>()
   const deleteMode = ref(false)
-
-  const fieldTypes = [
-    { label: 'BIGINT', value: 'BIGINT' },
-    { label: 'INT', value: 'INT' },
-    { label: 'SMALLINT', value: 'SMALLINT' },
-    { label: 'TINYINT', value: 'TINYINT' },
-    { label: 'VARCHAR(50)', value: 'VARCHAR(50)' },
-    { label: 'VARCHAR(100)', value: 'VARCHAR(100)' },
-    { label: 'VARCHAR(255)', value: 'VARCHAR(255)' },
-    { label: 'CHAR(10)', value: 'CHAR(10)' },
-    { label: 'TEXT', value: 'TEXT' },
-    { label: 'LONGTEXT', value: 'LONGTEXT' },
-    { label: 'DATETIME', value: 'DATETIME' },
-    { label: 'TIMESTAMP', value: 'TIMESTAMP' },
-    { label: 'DATE', value: 'DATE' },
-    { label: 'TIME', value: 'TIME' },
-    { label: 'DECIMAL(10,2)', value: 'DECIMAL(10,2)' },
-    { label: 'FLOAT', value: 'FLOAT' },
-    { label: 'DOUBLE', value: 'DOUBLE' },
-    { label: 'BOOLEAN', value: 'BOOLEAN' },
-    { label: 'JSON', value: 'JSON' },
-  ]
-
-  const exportOptions = [
-    { label: '导出PNG', key: 'png' },
-    { label: '导出SVG', key: 'svg' },
-    { label: '导出JSON', key: 'json' },
-  ]
 
   // 切换删除模式
   const toggleDeleteMode = () => {
@@ -732,102 +705,6 @@
   })
 </script>
 
-<style scoped>
-  .er-layout {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    min-height: 400px;
-  }
-
-  .toolbar {
-    padding: 12px;
-    background: #fafafa;
-    border-bottom: 1px solid #d9d9d9;
-    flex-shrink: 0;
-  }
-
-  .graph-container {
-    flex: 1;
-    position: relative;
-    min-height: 300px;
-    width: 100%;
-    border: 1px solid #e8e8e8;
-    overflow: hidden;
-  }
-
-  .graph-container :deep(.x6-graph) {
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  .graph-container :deep(.x6-graph-svg) {
-    width: 100% !important;
-    height: 100% !important;
-    display: block;
-  }
-
-  .graph-container :deep(.x6-graph-svg-stage) {
-    outline: none;
-  }
-
-  .table-editor {
-    height: 100%;
-    overflow-y: auto;
-    padding: 0 4px;
-  }
-
-  .fields-container {
-    max-height: calc(100vh - 400px);
-    overflow-y: auto;
-  }
-
-  .field-card {
-    margin-bottom: 16px;
-  }
-
-  .field-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    font-weight: 500;
-  }
-
-  /* 优化下拉框显示 */
-  .fields-container :deep(.n-select) {
-    min-width: 140px;
-  }
-
-  .fields-container :deep(.n-select-menu) {
-    max-height: 200px;
-    z-index: 9999;
-  }
-
-  /* 优化表单布局 */
-  .fields-container :deep(.n-form-item) {
-    margin-bottom: 8px;
-  }
-
-  .fields-container :deep(.n-form-item-label) {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 4px;
-    white-space: nowrap;
-  }
-
-  /* 确保输入框不会太窄 */
-  .fields-container :deep(.n-input) {
-    min-width: 100px;
-  }
-
-  /* 优化卡片内边距 */
-  .field-card :deep(.n-card-header) {
-    padding: 10px 16px 8px;
-  }
-
-  .field-card :deep(.n-card__content) {
-    padding: 12px 16px 16px;
-  }
+<style lang="scss" scoped>
+  @use './index.scss';
 </style>

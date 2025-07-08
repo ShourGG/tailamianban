@@ -11,10 +11,9 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, watch } from 'vue'
-  import ERLayout from './layout/ERLayout.vue'
-  import BPMNLayout from './layout/BPMNLayout.vue'
-  import UMLLayout from './layout/UMLLayout.vue'
+  import ERLayout from './layout/ER/index.vue'
+  import BPMNLayout from './layout/BPMN/index.vue'
+  import UMLLayout from './layout/UML/index.vue'
   import type { DiagramConfig, DiagramData } from '@/types/antv'
 
   interface Props extends DiagramConfig {
