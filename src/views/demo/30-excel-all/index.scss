@@ -11,6 +11,7 @@
   align-items: center;
 }
 
+//  "对于.demo-content下的所有直接子元素，从第二个子元素开始（即前面有兄弟元素的元素），都添加1.5rem的上边距"
 .demo-content {
   > * + * {
     margin-top: 1.5rem;
