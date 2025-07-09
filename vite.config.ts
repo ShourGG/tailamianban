@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-17 17:10:15
+ * @LastEditTime: 2025-07-09 17:09:12
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -39,4 +39,18 @@ export default defineConfig({
     include: ['vue', 'naive-ui'],
   },
   server: serverConfig,
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vue-vendor': ['vue', 'vue-router', 'pinia'],
+          'ui-vendor': ['naive-ui', '@iconify/vue'],
+          'chart-vendor': ['echarts', '@antv/x6'],
+          'editor-vendor': ['@kangc/v-md-editor', 'wangeditor'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+    reportCompressedSize: false,
+  },
 })

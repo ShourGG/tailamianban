@@ -289,9 +289,7 @@
                             size="tiny"
                             type="info"
                           >
-                            {{
-                              getFilteredChildPermissions(permission).length
-                            }}
+                            {{ getFilteredChildPermissions(permission).length }}
                             个子权限
                           </NTag>
                         </div>
@@ -803,5 +801,5 @@
 </script>
 
 <style lang="scss" scoped>
-  @import './index.scss';
+  @use './index.scss';
 </style>
