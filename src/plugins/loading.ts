@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-12 22:07:55
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-23 17:53:24
+ * @LastEditTime: 2025-07-09 20:19:02
  * @FilePath: \Robot_Admin\src\plugins\loading.ts
  * @Description: 项目启动时的加载动画
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -53,7 +53,7 @@ export function setupLoading() {
           justify-content: center;
           margin-bottom: 40px;
         ">
-          <img src="/src/assets/images/机器人.gif"
+        <img src="/robot.gif"
                class="${CLASS.logo}"
                style="width: 280px; height: 280px;"
                alt="Loading" />
