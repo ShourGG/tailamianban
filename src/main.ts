@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-03 09:21:40
+ * @LastEditTime: 2025-07-09 15:02:26
  * @FilePath: \Robot_Admin\src\main.ts
  * @Description: 根入口文件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -26,6 +26,7 @@ import {
   setupHighlight,
   setupMarkdown,
   setupDirectives,
+  setupAnalytics,
 } from '@/plugins'
 
 /**
@@ -54,6 +55,7 @@ async function bootstrap() {
   setupHighlight(app)
   setupMarkdown(app)
   setupDirectives(app)
+  setupAnalytics(app)
 
   // 第四阶段：异步插件
   await router.isReady()
