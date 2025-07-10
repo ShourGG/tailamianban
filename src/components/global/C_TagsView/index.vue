@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-26 13:38:13
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-01 22:31:55
+ * @LastEditTime: 2025-07-10 09:57:23
  * @FilePath: \Robot_Admin\src\components\global\C_TagsView\index.vue
  * @Description: 标签页组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -102,14 +102,15 @@
 
   // 添加滚轮处理
   const handleWheel = (e: WheelEvent) => {
-    // 完全阻止所有滚轮事件的默认行为和冒泡
-    e.preventDefault()
-    e.stopPropagation()
-
     const container = tagsContainer.value
     if (container) {
-      // 只进行水平滚动，速度适中
+      // 直接进行水平滚动，不阻止默认行为
       container.scrollLeft += e.deltaY * 0.3
+      // 如果想要更平滑的滚动效果
+      container.scrollTo({
+        left: container.scrollLeft + e.deltaY * 0.3,
+        behavior: 'smooth',
+      })
     }
   }
   /**
