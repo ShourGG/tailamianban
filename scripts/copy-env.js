@@ -108,6 +108,9 @@ function detectEnvironment() {
   if (fs.existsSync(path.join(rootDir, 'bun.lockb'))) {
     packageManager = 'bun'
     lockFileExists = true
+  } else if (fs.existsSync(path.join(rootDir, 'bun.lock'))) {
+    packageManager = 'bun'
+    lockFileExists = true
   } else if (fs.existsSync(path.join(rootDir, 'package-lock.json'))) {
     packageManager = 'npm'
     lockFileExists = true
@@ -129,7 +132,7 @@ function detectEnvironment() {
       projectName = packageJson.name || 'unknown'
       hasScripts =
         packageJson.scripts && Object.keys(packageJson.scripts).length > 0
-    } catch {
+    } catch  {
       // ignore
     }
   }
@@ -158,12 +161,19 @@ function checkSystemEnvironment() {
     detail: `${envInfo.runtime} ${envInfo.version}`,
   })
 
-  // 检查包管理器
-  checks.push({
-    name: '包管理器',
-    status: envInfo.lockFileExists,
-    detail: `${envInfo.packageManager}${envInfo.lockFileExists ? ' (检测到锁文件)' : ' (未检测到锁文件)'}`,
-  })
+  // 检查包管理器 (警告但不阻止构建)
+  if (envInfo.lockFileExists) {
+    checks.push({
+      name: '包管理器',
+      status: true,
+      detail: `${envInfo.packageManager} (检测到锁文件)`,
+    })
+  } else {
+    // 包管理器检测失败时只警告，不阻止构建
+    console.log(
+      `${colors.yellow}⚠️  包管理器检测: ${envInfo.packageManager} (未检测到锁文件，但继续构建)${colors.reset}`
+    )
+  }
 
   // 检查项目信息
   checks.push({
