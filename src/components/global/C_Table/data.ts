@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-14 22:06:22
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-01 15:27:09
+ * @LastEditTime: 2025-07-10 12:30:40
  * @FilePath: \Robot_Admin\src\components\global\C_Table\data.ts
  * @Description: 表格数据处理模块
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -14,6 +14,7 @@ import type {
   TableProps,
   EditType,
   DataRecord,
+  PaginationConfig,
 } from '@/types/modules/table'
 import type { FormOption, ComponentType } from '@/types/modules/form'
 import type { FieldRule } from '@/utils/v_verify'
@@ -27,6 +28,7 @@ export interface TablePresetConfig<T extends DataRecord = DataRecord> {
   expandable?: ExpandableConfig<T> | boolean
   selection?: SelectionConfig<T> | boolean
   edit?: EditConfig | boolean
+  pagination?: PaginationConfig | boolean
 }
 
 export interface ExpandableConfig<T extends DataRecord = DataRecord> {
@@ -137,6 +139,43 @@ const buildDynamicConfig = (preset: any, props: any) => {
 }
 
 /**
+ * * @description 构建分页配置
+ * ? @param preset - 预设配置对象
+ * ? @param props - 组件属性对象
+ * ! @return 处理后的分页配置对象
+ */
+const buildPaginationConfig = (preset: any, props: any) => {
+  const defaultPagination = {
+    enabled: true,
+    page: 1,
+    pageSize: 10,
+    showSizePicker: true,
+    showQuickJumper: true,
+    pageSizes: [10, 20, 50, 100],
+    simple: false,
+    size: 'medium' as const,
+  }
+
+  // 如果明确设置为 false，则禁用分页
+  if (props.pagination === false) {
+    return { pagination: { enabled: false } }
+  }
+
+  // 如果设置为 true 或未设置，使用默认配置
+  if (props.pagination === true || !props.pagination) {
+    return { pagination: defaultPagination }
+  }
+
+  // 如果是对象，则合并配置
+  return {
+    pagination: {
+      ...defaultPagination,
+      ...props.pagination,
+    },
+  }
+}
+
+/**
  * * @description 展开配置构建器
  */
 const buildExpandConfig = createConfigBuilder({
@@ -211,6 +250,8 @@ export function createUnifiedConfig(props: any) {
       enableParentChildLink: ['link.enabled', 'enableParentChildLink'],
       parentChildLinkMode: ['link.mode', 'parentChildLinkMode'],
     }),
+    // 新增分页配置
+    ...buildPaginationConfig(preset, props),
   }
 }
 

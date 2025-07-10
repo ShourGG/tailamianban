@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-01 15:55:35
+ * @LastEditTime: 2025-07-10 12:31:06
  * @FilePath: \Robot_Admin\src\views\demo\10-table\index.vue
  * @Description: 表格组件演示
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -47,6 +47,20 @@
               </template>
               添加新行
             </NButton>
+
+            <NDivider vertical />
+
+            <!-- 分页状态信息 -->
+            <NSpace class="mt-4px">
+              <span>分页状态：</span>
+              <NSwitch
+                v-model:value="paginationEnabled"
+                @update:value="handlePaginationToggle"
+              >
+                <template #checked> 开启 </template>
+                <template #unchecked> 关闭 </template>
+              </NSwitch>
+            </NSpace>
           </NSpace>
         </NCard>
 
@@ -56,6 +70,12 @@
           :title="currentModeConfig.title"
         >
           {{ currentModeConfig.description }}
+          <template v-if="paginationEnabled">
+            <br />
+            <strong>分页功能已启用</strong> - 当前显示第
+            {{ currentPage }} 页，每页 {{ defaultPageSize }} 条，总共
+            {{ tableData.length }} 条记录
+          </template>
         </NAlert>
 
         <!-- 表格组件 -->
@@ -69,8 +89,10 @@
           modal-title="编辑员工信息"
           :modal-width="700"
           :actions="tableActions"
+          :pagination="paginationConfig"
           @save="handleSave"
           @cancel="handleCancel"
+          @pagination-change="handlePaginationChange"
         />
       </NSpace>
     </NCard>
@@ -78,11 +100,15 @@
 </template>
 
 <script setup lang="ts">
-  import type { EditMode, DataRecord } from '@/types/modules/table'
+  import type {
+    EditMode,
+    DataRecord,
+    PaginationConfig,
+  } from '@/types/modules/table'
   import {
     EDIT_MODES,
     MODE_CONFIG,
-    initialTableData,
+    extendedTableData,
     getTableColumns,
     createNewEmployee,
     type Employee,
@@ -96,11 +122,34 @@
   const loading = ref(false)
   const tableRef = ref()
   const editMode = ref<EditMode>('modal')
-  const tableData = ref<Employee[]>([...initialTableData])
+  const tableData = ref<Employee[]>([...extendedTableData])
+
+  // 分页相关状态
+  const paginationEnabled = ref(true)
+  const defaultPageSize = ref(10)
+  const currentPage = ref(1)
 
   // ================= 计算属性 =================
   const currentModeConfig = computed(() => MODE_CONFIG[editMode.value])
   const tableColumns = computed(() => getTableColumns())
+
+  // 分页配置
+  const paginationConfig = computed((): PaginationConfig | boolean => {
+    if (!paginationEnabled.value) {
+      return false
+    }
+
+    return {
+      enabled: true,
+      page: currentPage.value,
+      pageSize: defaultPageSize.value,
+      showSizePicker: true,
+      showQuickJumper: true,
+      pageSizes: [10, 20, 50, 100],
+      simple: false,
+      size: 'medium',
+    }
+  })
 
   // 🎯 表格操作配置 - 使用新的内置操作方式
   const tableActions = computed(() => ({
@@ -123,6 +172,52 @@
     ],
   }))
 
+  // ================= 分页事件处理 =================
+
+  /**
+   * @description 处理分页开关切换
+   */
+  const handlePaginationToggle = (enabled: boolean) => {
+    console.log('分页功能:', enabled ? '已开启' : '已关闭')
+    if (enabled) {
+      message.info(`分页功能已开启，每页显示 ${defaultPageSize.value} 条记录`)
+    } else {
+      message.info('分页功能已关闭，显示全部记录')
+    }
+  }
+
+  /**
+   * @description 处理分页大小变化
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handlePageSizeChange = (pageSize: number) => {
+    console.log('分页大小变更为:', pageSize)
+    defaultPageSize.value = pageSize
+    currentPage.value = 1 // 重置到第一页
+    message.info(`分页大小已调整为每页 ${pageSize} 条记录`)
+  }
+
+  /**
+   * @description 处理分页变化事件
+   */
+  const handlePaginationChange = (page: number, pageSize: number) => {
+    console.log('分页变化:', { page, pageSize, total: tableData.value.length })
+    currentPage.value = page
+
+    // 只有当页面大小真的变化时才更新
+    if (pageSize !== defaultPageSize.value) {
+      defaultPageSize.value = pageSize
+    }
+
+    const total = tableData.value.length
+    const start = (page - 1) * pageSize + 1
+    const end = Math.min(page * pageSize, total)
+
+    message.info(
+      `已切换到第 ${page} 页，显示第 ${start}-${end} 条记录，共 ${total} 条`
+    )
+  }
+
   // ================= 业务逻辑 =================
 
   /**
@@ -131,6 +226,12 @@
   const addNewRow = () => {
     const newRow = createNewEmployee()
     tableData.value.unshift(newRow)
+
+    // 如果启用分页且不在第一页，则跳转到第一页
+    if (paginationEnabled.value && currentPage.value !== 1) {
+      currentPage.value = 1
+      message.info('新数据已添加到第一页')
+    }
 
     // 根据编辑模式自动开始编辑
     setTimeout(() => {
@@ -152,7 +253,13 @@
       id: Date.now(),
       name: `${employeeRow.name}_副本`,
     }
-    tableData.value.splice(index + 1, 0, newRow)
+
+    // 计算在完整数据中的实际索引
+    const actualIndex = paginationEnabled.value
+      ? (currentPage.value - 1) * defaultPageSize.value + index + 1
+      : index + 1
+
+    tableData.value.splice(actualIndex, 0, newRow)
     message.success('复制成功')
   }
 
@@ -191,8 +298,13 @@
       // 模拟异步保存
       await new Promise(resolve => setTimeout(resolve, 500))
 
+      // 计算在完整数据中的实际索引
+      const actualIndex = paginationEnabled.value
+        ? (currentPage.value - 1) * defaultPageSize.value + rowIndex
+        : rowIndex
+
       // 更新数据
-      tableData.value[rowIndex] = { ...rowData } as Employee
+      tableData.value[actualIndex] = { ...rowData } as Employee
 
       const columnTitle = tableColumns.value.find(
         (c: any) => c.key === columnKey

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-01 15:26:05
+ * @LastEditTime: 2025-07-10 11:52:03
  * @FilePath: \Robot_Admin\src\types\modules\table.d.ts
  * @Description: 表格类型系统
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -32,6 +32,19 @@ export type ButtonType =
   | 'warning'
   | 'error'
 export type ParentChildLinkMode = 'strict' | 'loose'
+
+// ================= 分页相关类型 =================
+export interface PaginationConfig {
+  enabled?: boolean
+  page?: number
+  pageSize?: number
+  total?: number
+  showSizePicker?: boolean
+  showQuickJumper?: boolean
+  pageSizes?: number[]
+  simple?: boolean
+  size?: 'small' | 'medium' | 'large'
+}
 
 // ================= 工具类型 =================
 export type ValueOf<T> = T[keyof T]
@@ -198,7 +211,10 @@ export interface TableProps<T extends DataRecord = DataRecord>
     TableDisplayProps,
     TableEditProps<T>,
     TableExpandProps<T>,
-    TableSelectionProps<T> {}
+    TableSelectionProps<T> {
+  // 新增分页配置
+  pagination?: PaginationConfig | boolean
+}
 
 // ================= 事件系统 =================
 export interface TableExpandEvents<T extends DataRecord = DataRecord> {
@@ -235,7 +251,10 @@ export interface TableEditEvents<T extends DataRecord = DataRecord> {
 export interface TableEmits<T extends DataRecord = DataRecord>
   extends TableExpandEvents<T>,
     TableSelectionEvents<T>,
-    TableEditEvents<T> {}
+    TableEditEvents<T> {
+  // 新增分页事件
+  'pagination-change': [page: number, pageSize: number]
+}
 
 // ================= 实例方法系统 =================
 export interface TableEditMethods<T extends DataRecord = DataRecord> {
@@ -366,37 +385,4 @@ export interface DemoConfig {
   enableSelection: boolean
   enableChildSelection: boolean
   parentChildLinkMode: ParentChildLinkMode
-}
-
-// ================= 向后兼容性保证 =================
-
-// 原有的接口继续导出，确保向后兼容
-export {
-  type DataRecord,
-  type EditMode,
-  type EditType,
-  type ButtonType,
-  type ParentChildLinkMode,
-  type SelectOption,
-  type DataMapping,
-  type CommonMappings,
-  type EditProps,
-  type TableColumn,
-  type RowAction,
-  type ChildSelectionState,
-  type ExpandConfig,
-  type SelectionConfig,
-  type TableProps,
-  type TableEmits,
-  type TableInstance,
-  type UseTableExpandOptions,
-  type UseTableExpandReturn,
-  type TestRecord,
-  type ChildData,
-  type SelectedChildGroup,
-  type DemoConfig,
-  type ValueOf,
-  type OptionalKeys,
-  type RequiredKeys,
-  type SafeRecord,
 }
