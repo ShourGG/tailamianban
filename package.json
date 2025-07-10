@@ -1,6 +1,6 @@
 {
   "name": "robot-admin",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Robot 中后台管理系统团队架构模板 - 基于 Vue3 + Vite 的企业级中后台解决方案",
   "author": {
@@ -12,17 +12,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build-prod": "vite build --mode production",
     "build:test": "vite build --mode test --emptyOutDir",
     "build:staging": "vite build --mode staging --profile",
     "preview": "bun run build-prod && vite preview",
     "test:unit": "vitest",
-    "build-only": "bun run type-build && bun run build-prod",
-    "type-check": "vue-tsc --noEmit --watch",
+    "build:check": "bun run type-build && bun run build",
+    "type-watch": "vue-tsc --noEmit --watch",
     "type-build": "vue-tsc --build tsconfig.app.json --force",
-    "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
-    "lint:eslint": "eslint . --fix",
-    "lint": "bun x oxlint . --fix && bun x eslint . --fix",
+    "lint": "oxlint . --fix -D correctness --ignore-path .gitignore && eslint . --fix",
     "format": "prettier --write src/",
     "prepare": "husky install",
     "commit": "bunx cz",
