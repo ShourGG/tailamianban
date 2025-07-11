@@ -703,14 +703,14 @@ bun run build         # 生产环境构建
 <tr>
 <td width="50%" align="center" style="padding: 10px;">
 
-![login](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot-adminlogin.png)
+![login](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot_admin/login.png)
 <br><strong>登录页面</strong>
 
 </td>
 <td width="50%" align="center" style="padding: 10px;">
 
-![table](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot-admintable.png)
-<br><strong>表格管理</strong>
+![home](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot_admin/home.png)
+<br><strong>首页</strong>
 
 </td>
 </tr>

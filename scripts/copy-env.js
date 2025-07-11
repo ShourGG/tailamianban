@@ -6,8 +6,15 @@ import os from 'os'
 import { fileURLToPath } from 'url'
 
 /**
- * Robot Admin 环境文件自动复制脚本 (Bun 优先 + npm 兼容版本)
- * 基于项目实际的启动命令和环境文件配置
+ * Robot Admin 环境文件自动复制脚本 (Bun 优先 + npm 兼容版本 + 文件合并)
+ * 基于项目实际的启动命令和环境文件配置，支持配置文件合并
+ *
+ * 功能特性:
+ * - 自动合并 envs/.env (通用配置) + envs/.env.xxx (环境配置) → .env
+ * - Bun + Node.js 双兼容
+ * - 自动检测运行环境和包管理器
+ * - 系统环境检查和文件格式验证
+ * - 自动备份恢复
  *
  * 使用方法：
  * - bun run env:dev        (开发环境 - 对应 bun run dev)
@@ -41,6 +48,7 @@ const colors = {
   magenta: '\x1b[35m',
   cyan: '\x1b[36m',
   white: '\x1b[37m',
+  gray: '\x1b[90m',
 }
 
 const log = {
@@ -50,6 +58,7 @@ const log = {
   info: msg => console.log(`${colors.blue}ℹ️  ${msg}${colors.reset}`),
   step: msg => console.log(`${colors.cyan}🔧 ${msg}${colors.reset}`),
   runtime: msg => console.log(`${colors.magenta}🚀 ${msg}${colors.reset}`),
+  merge: msg => console.log(`${colors.cyan}🔀 ${msg}${colors.reset}`),
 }
 
 // 获取命令行参数
@@ -228,35 +237,17 @@ function checkSystemEnvironment() {
 }
 
 /**
- * 扫描可用的环境文件
+ * 读取环境文件内容
  */
-function scanAvailableEnvFiles() {
-  if (!fs.existsSync(envsDir)) {
-    log.error(`envs 目录不存在: ${envsDir}`)
-    return []
-  }
-
+function readEnvFile(filePath) {
   try {
-    const files = fs
-      .readdirSync(envsDir)
-      .filter(file => file.startsWith('.env'))
-      .sort()
-
-    return files.map(file => {
-      const filePath = path.join(envsDir, file)
-      const stats = fs.statSync(filePath)
-
-      return {
-        name: file,
-        path: filePath,
-        size: stats.size,
-        modified: stats.mtime.toLocaleString('zh-CN'),
-        readable: fs.constants.R_OK,
-      }
-    })
+    if (!fs.existsSync(filePath)) {
+      return { content: '', exists: false }
+    }
+    const content = fs.readFileSync(filePath, 'utf8')
+    return { content, exists: true }
   } catch (error) {
-    log.error(`扫描 envs 目录失败: ${error.message}`)
-    return []
+    return { content: '', exists: false, error: error.message }
   }
 }
 
@@ -322,6 +313,70 @@ function validateEnvFile(filePath) {
 }
 
 /**
+ * 合并环境文件
+ */
+function mergeEnvFiles(baseContent, envContent, envType) {
+  const mergedLines = []
+  const processedKeys = new Set()
+  
+  // 添加文件头注释
+  mergedLines.push('# 自动生成的环境配置文件')
+  mergedLines.push(`# 由 scripts/copy-env.js 生成 (${envType} 环境)`)
+  mergedLines.push('# 请勿手动编辑此文件')
+  mergedLines.push('')
+  
+  // 先处理环境特定配置（优先级更高）
+  if (envContent.trim()) {
+    mergedLines.push('# ========== 环境特定配置 ==========')
+    const envLines = envContent.split('\n')
+    
+    envLines.forEach(line => {
+      const trimmed = line.trim()
+      if (!trimmed || trimmed.startsWith('#')) {
+        mergedLines.push(line)
+        return
+      }
+      
+      if (trimmed.includes('=')) {
+        const [key] = trimmed.split('=')
+        processedKeys.add(key.trim())
+        mergedLines.push(line)
+      }
+    })
+    
+    mergedLines.push('')
+  }
+  
+  // 再处理通用配置（跳过已经在环境特定配置中定义的）
+  if (baseContent.trim()) {
+    mergedLines.push('# ========== 通用配置 ==========')
+    const baseLines = baseContent.split('\n')
+    
+    baseLines.forEach(line => {
+      const trimmed = line.trim()
+      if (!trimmed || trimmed.startsWith('#')) {
+        mergedLines.push(line)
+        return
+      }
+      
+      if (trimmed.includes('=')) {
+        const [key] = trimmed.split('=')
+        const cleanKey = key.trim()
+        
+        // 如果环境特定配置中已经有这个键，就跳过
+        if (!processedKeys.has(cleanKey)) {
+          mergedLines.push(line)
+        } else {
+          mergedLines.push(`# ${line} # (被环境特定配置覆盖)`)
+        }
+      }
+    })
+  }
+  
+  return mergedLines.join('\n')
+}
+
+/**
  * 创建备份文件
  */
 function createBackup(sourceFile) {
@@ -341,9 +396,57 @@ function createBackup(sourceFile) {
 }
 
 /**
- * 复制环境文件
+ * 扫描可用的环境文件
  */
-async function copyEnvFile(envType) {
+function scanAvailableEnvFiles() {
+  if (!fs.existsSync(envsDir)) {
+    log.error(`envs 目录不存在: ${envsDir}`)
+    return []
+  }
+
+  try {
+    const files = fs
+      .readdirSync(envsDir)
+      .filter(file => file.startsWith('.env'))
+      .sort()
+
+    return files.map(file => {
+      const filePath = path.join(envsDir, file)
+      const stats = fs.statSync(filePath)
+
+      return {
+        name: file,
+        path: filePath,
+        size: stats.size,
+        modified: stats.mtime.toLocaleString('zh-CN'),
+        readable: fs.constants.R_OK,
+      }
+    })
+  } catch (error) {
+    log.error(`扫描 envs 目录失败: ${error.message}`)
+    return []
+  }
+}
+
+/**
+ * 掩码敏感信息
+ */
+function maskSensitiveValue(value) {
+  if (value.length <= 8) {
+    return '*'.repeat(value.length)
+  }
+
+  const start = value.substring(0, 3)
+  const end = value.substring(value.length - 3)
+  const middle = '*'.repeat(Math.max(0, value.length - 6))
+
+  return start + middle + end
+}
+
+/**
+ * 复制和合并环境文件
+ */
+async function copyAndMergeEnvFiles(envType) {
   const buildCommands = getBuildCommands()
 
   log.step(`开始处理 ${envType} 环境...`)
@@ -368,8 +471,8 @@ async function copyEnvFile(envType) {
   }
 
   // 2. 环境类型验证
-  const sourceFileName = envMap[envType]
-  if (!sourceFileName) {
+  const envFileName = envMap[envType]
+  if (!envFileName) {
     log.error(`不支持的环境类型: ${envType}`)
     log.info('支持的环境类型:')
     Object.keys(envMap).forEach(key => {
@@ -402,29 +505,78 @@ async function copyEnvFile(envType) {
     )
   })
 
-  // 4. 源文件检查
-  const sourceFile = path.join(envsDir, sourceFileName)
-  if (!fs.existsSync(sourceFile)) {
-    log.error(`源文件不存在: ${sourceFile}`)
-    log.info('可用的文件:')
+  // 4. 读取通用配置文件
+  const baseEnvFile = path.join(envsDir, '.env')
+  const baseEnv = readEnvFile(baseEnvFile)
+  
+  if (baseEnv.error) {
+    log.error(`读取通用配置失败: ${baseEnv.error}`)
+    process.exit(1)
+  }
+  
+  if (!baseEnv.exists) {
+    log.warning(`通用配置文件不存在: ${baseEnvFile}`)
+    log.info('将只使用环境特定配置')
+  } else {
+    log.success(`通用配置读取成功: ${baseEnvFile}`)
+  }
+
+  // 5. 读取环境特定配置文件
+  const envSpecificFile = path.join(envsDir, envFileName)
+  const envSpecific = readEnvFile(envSpecificFile)
+  
+  if (envSpecific.error) {
+    log.error(`读取环境配置失败: ${envSpecific.error}`)
+    process.exit(1)
+  }
+  
+  if (!envSpecific.exists) {
+    log.error(`环境配置文件不存在: ${envSpecificFile}`)
+    
+    // 列出可用文件
+    log.info('可用的环境文件:')
     availableFiles.forEach(file => console.log(`  • ${file.name}`))
     process.exit(1)
+  } else {
+    log.success(`环境配置读取成功: ${envSpecificFile}`)
   }
 
-  // 5. 验证源文件内容
-  log.step('验证环境文件内容...')
-  const validation = validateEnvFile(sourceFile)
-  if (!validation.valid) {
-    log.error(`环境文件格式错误 (${sourceFile}):`)
-    validation.errors.forEach(error => console.log(`  • ${error}`))
+  // 6. 验证文件内容
+  if (baseEnv.exists) {
+    log.step('验证通用配置文件...')
+    const baseValidation = validateEnvFile(baseEnvFile)
+    if (!baseValidation.valid) {
+      log.error(`通用配置文件格式错误 (${baseEnvFile}):`)
+      baseValidation.errors.forEach(error => console.log(`  • ${error}`))
+      process.exit(1)
+    }
+    log.success(`通用配置验证通过: ${baseValidation.variableCount} 个变量`)
+  }
+
+  log.step('验证环境配置文件...')
+  const envValidation = validateEnvFile(envSpecificFile)
+  if (!envValidation.valid) {
+    log.error(`环境配置文件格式错误 (${envSpecificFile}):`)
+    envValidation.errors.forEach(error => console.log(`  • ${error}`))
     process.exit(1)
   }
+  log.success(`环境配置验证通过: ${envValidation.variableCount} 个变量`)
 
-  log.success(
-    `环境文件验证通过: ${validation.variableCount} 个变量，${validation.lineCount} 行`
-  )
+  // 7. 合并配置
+  log.merge('合并配置文件...')
+  const mergedContent = mergeEnvFiles(baseEnv.content, envSpecific.content, envType)
+  
+  // 显示合并信息
+  const baseVarCount = baseEnv.exists ? (baseEnv.content.match(/^[^#\s].*=/gm) || []).length : 0
+  const envVarCount = (envSpecific.content.match(/^[^#\s].*=/gm) || []).length
+  const mergedVarCount = (mergedContent.match(/^[^#\s].*=/gm) || []).length
+  
+  log.info(`配置合并完成:`)
+  log.info(`  通用配置变量: ${baseVarCount} 个`)
+  log.info(`  环境特定变量: ${envVarCount} 个`)
+  log.info(`  合并后变量: ${mergedVarCount} 个`)
 
-  // 6. 创建备份
+  // 8. 创建备份
   let backupFile = null
   if (fs.existsSync(targetEnvFile)) {
     try {
@@ -437,15 +589,15 @@ async function copyEnvFile(envType) {
     }
   }
 
-  // 7. 执行复制
+  // 9. 写入合并后的配置
   try {
-    log.step('复制环境文件...')
-    fs.copyFileSync(sourceFile, targetEnvFile)
+    log.step('写入环境文件...')
+    fs.writeFileSync(targetEnvFile, mergedContent, 'utf8')
 
-    // 验证复制结果
+    // 验证写入结果
     const targetValidation = validateEnvFile(targetEnvFile)
     if (!targetValidation.valid) {
-      log.error('复制后的文件验证失败!')
+      log.error('写入后的文件验证失败!')
       if (backupFile) {
         fs.copyFileSync(backupFile, targetEnvFile)
         log.info('已恢复备份文件')
@@ -454,12 +606,12 @@ async function copyEnvFile(envType) {
     }
 
     log.success(`成功切换到 ${envType} 环境`)
-    log.info(`复制: ${sourceFileName} → .env`)
+    log.info(`合并: .env + ${envFileName} → .env`)
 
-    // 8. 显示环境信息
-    showEnvironmentInfo(envType, targetValidation, envInfo)
+    // 10. 显示环境信息
+    showEnvironmentInfo(envType, targetValidation, envInfo, buildCommands)
   } catch (error) {
-    log.error(`复制失败: ${error.message}`)
+    log.error(`写入失败: ${error.message}`)
     if (backupFile) {
       try {
         fs.copyFileSync(backupFile, targetEnvFile)
@@ -475,9 +627,7 @@ async function copyEnvFile(envType) {
 /**
  * 显示环境信息
  */
-function showEnvironmentInfo(envType, validation, envInfo) {
-  const buildCommands = getBuildCommands()
-
+function showEnvironmentInfo(envType, validation, envInfo, buildCommands) {
   console.log('\n' + '='.repeat(60))
   console.log(`🎯 ${envType.toUpperCase()} 环境已激活 (${envInfo.runtime})`)
   console.log('='.repeat(60))
@@ -490,9 +640,9 @@ function showEnvironmentInfo(envType, validation, envInfo) {
 
   // 显示运行时特定的建议
   if (isBun) {
-    log.info(`Bun 特性: 快速启动、TypeScript 原生支持`)
+    log.info(`Bun 特性: 快速启动、TypeScript 原生支持、配置合并`)
   } else {
-    log.info(`Node.js 环境: 稳定可靠、生态丰富`)
+    log.info(`Node.js 环境: 稳定可靠、生态丰富、配置合并`)
   }
 
   // 显示关键环境变量（隐藏敏感信息）
@@ -505,7 +655,8 @@ function showEnvironmentInfo(envType, validation, envInfo) {
         v.key.includes('MODE') ||
         v.key.includes('ENV') ||
         v.key.includes('BASE') ||
-        v.key.includes('PORT')
+        v.key.includes('PORT') ||
+        v.key.includes('TITLE')
     )
     .slice(0, 8)
 
@@ -528,21 +679,6 @@ function showEnvironmentInfo(envType, validation, envInfo) {
 }
 
 /**
- * 掩码敏感信息
- */
-function maskSensitiveValue(value) {
-  if (value.length <= 8) {
-    return '*'.repeat(value.length)
-  }
-
-  const start = value.substring(0, 3)
-  const end = value.substring(value.length - 3)
-  const middle = '*'.repeat(Math.max(0, value.length - 6))
-
-  return start + middle + end
-}
-
-/**
  * 显示帮助信息
  */
 function showHelp() {
@@ -552,7 +688,11 @@ function showHelp() {
   const packageManager = envInfo.packageManager === 'bun' ? 'bun' : 'npm'
 
   console.log(`
-🤖 Robot Admin 环境管理工具 (${runtime} 运行时)
+🤖 Robot Admin 环境管理工具 (${runtime} 运行时 + 配置合并)
+
+${colors.cyan}功能说明:${colors.reset}
+  自动合并 envs/.env (通用配置) + envs/.env.xxx (环境配置) → .env
+  支持 Bun + Node.js 双运行时环境，自动检测并适配
 
 ${colors.cyan}当前环境:${colors.reset}
   运行时: ${envInfo.runtime} ${envInfo.version}
@@ -569,9 +709,12 @@ ${colors.cyan}支持的环境:${colors.reset}
   stage, staging     → 预发布环境   (${buildCommands.stage})
   prod, production   → 生产环境     (${buildCommands.prod})
 
+${colors.cyan}文件优先级:${colors.reset}
+  环境特定配置 > 通用配置 (相同变量时，环境配置会覆盖通用配置)
+
 ${colors.cyan}示例:${colors.reset}
-  ${packageManager === 'bun' ? 'bun' : 'node'} scripts/copy-env.js dev
-  ${packageManager === 'bun' ? 'bun' : 'node'} scripts/copy-env.js production
+  ${packageManager === 'bun' ? 'bun' : 'node'} scripts/copy-env.js dev      # 开发环境 (合并 .env + .env.development)
+  ${packageManager === 'bun' ? 'bun' : 'node'} scripts/copy-env.js production  # 生产环境 (合并 .env + .env.production)
 
 ${colors.cyan}推荐的 ${packageManager} scripts (添加到 package.json):${colors.reset}
   "env:dev": "${packageManager === 'bun' ? 'bun' : 'node'} scripts/copy-env.js dev",
@@ -586,10 +729,16 @@ ${colors.cyan}自动化工作流:${colors.reset}
 
 ${colors.cyan}功能特性:${colors.reset}
   ✅ Bun + Node.js 双兼容  ✅ 自动检测运行环境
-  ✅ 系统环境检查         ✅ 文件格式验证
-  ✅ 自动备份恢复         ✅ 详细错误提示
-  ✅ 敏感信息保护         ✅ 多环境支持
-  ✅ ES6 Module 语法      ✅ 现代化代码风格
+  ✅ 配置文件合并         ✅ 系统环境检查
+  ✅ 文件格式验证         ✅ 自动备份恢复
+  ✅ 详细错误提示         ✅ 敏感信息保护
+  ✅ 多环境支持           ✅ ES6 Module 语法
+
+${colors.cyan}注意事项:${colors.reset}
+  1. .env 文件会自动生成，请勿手动编辑
+  2. .env 文件应该在 .gitignore 中，不要提交到 git
+  3. 只提交 envs/ 目录中的配置模板文件
+  4. 环境特定配置会覆盖通用配置中的同名变量
 `)
 }
 
@@ -607,6 +756,7 @@ function scanEnvironmentFiles() {
     log.warning('未找到任何环境文件')
     log.info('请在 envs/ 目录中创建环境文件:')
     console.log('  mkdir -p envs')
+    console.log('  echo "# 通用配置" > envs/.env')
     console.log('  echo "NODE_ENV=development" > envs/.env.development')
     console.log('  echo "NODE_ENV=test" > envs/.env.test')
     console.log('  echo "NODE_ENV=production" > envs/.env.production')
@@ -627,7 +777,8 @@ function scanEnvironmentFiles() {
             v =>
               v.key.includes('NODE_ENV') ||
               v.key.includes('API') ||
-              v.key.includes('URL')
+              v.key.includes('URL') ||
+              v.key.includes('TITLE')
           )
           .slice(0, 3)
 
@@ -664,8 +815,8 @@ async function main() {
     process.exit(0)
   }
 
-  // 执行环境切换
-  await copyEnvFile(env)
+  // 执行环境切换和配置合并
+  await copyAndMergeEnvFiles(env)
 }
 
 // 启动主程序

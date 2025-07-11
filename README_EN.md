@@ -701,13 +701,13 @@ bun run build         # Production environment build
 <tr>
 <td width="50%" align="center" style="padding: 10px;">
 
-![login](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot-adminlogin.png)
+![login](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot_admin/login.png)
 <br><strong>Login Page</strong>
 
 </td>
 <td width="50%" align="center" style="padding: 10px;">
 
-![table](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot-admintable.png)
+![home](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot_admin/home.png)
 <br><strong>Table Management</strong>
 
 </td>
