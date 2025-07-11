@@ -1,11 +1,15 @@
-
 <div align="center">
   <a href="https://robotadmin.cn">
     <picture>
       <source srcset="https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/robot-left.png" media="(prefers-color-scheme: dark)">
-      <img src="https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/robot-left.png" />
+      <img src="https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/img/robot-left.png" height="120" />
     </picture>
   </a>
+  
+  <h1>
+    <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=32&duration=3000&pause=1000&color=4FC08D&background=FFFFFF00&center=true&vCenter=true&multiline=true&width=600&height=100&lines=🤖+Robot+Admin;重新定义企业级中后台开发体验" alt="Robot Admin" />
+  </h1>
+  
   <p><strong>Robot Admin</strong></p>
   <p>
     <a href="https://github.com/ChenyCHENYU/fearless/actions"><img src="https://img.shields.io/github/actions/workflow/status/ChenyCHENYU/fearless/main.yml" alt="Build Status"></a>
@@ -29,55 +33,81 @@
     <img src="https://img.shields.io/github/forks/ChenyCHENYU/robot-admin?style=social" alt="GitHub forks">
     <img src="https://img.shields.io/github/watchers/ChenyCHENYU/robot-admin?style=social" alt="GitHub watchers">
   </p>
+
+  <!-- 快速导航 -->
+  <p>
+    <a href="https://www.robotadmin.cn">
+      <img src="https://img.shields.io/badge/🚀-在线体验-00D8FF?style=for-the-badge&logo=vercel" alt="Live Demo">
+    </a>
+    <a href="https://www.tzagileteam.com">
+      <img src="https://img.shields.io/badge/📖-完整文档-FF6B6B?style=for-the-badge&logo=gitbook" alt="Documentation">
+    </a>
+    <a href="#-快速开始真的很快">
+      <img src="https://img.shields.io/badge/⚡-快速开始-4ECDC4?style=for-the-badge&logo=rocket" alt="Quick Start">
+    </a>
+    <a href="./README_EN.md">
+      <img src="https://img.shields.io/badge/🌍-English-95E1D3?style=for-the-badge&logo=googletranslate" alt="English Version">
+    </a>
+  </p>
 </div>
-
-## 🚀 重新定义企业级中后台开发体验
-
-> **🎯 一个敏捷的，为开发者体验而生的企业级中后台解决方案**  
-> *在这里，当 `Bun` 的极致性能遇上 `Vue3` 的组合式 API，当 `TypeScript` 的类型安全拥抱 `UnoCSS` 的原子化样式...*
 
 
 ---
 
-## 🌟 项目成长图
+## 🚀 重新定义企业级中后台开发体验
+
+> **🎯 一个敏捷的，为开发者体验而生的企业级中后台解决方案**  
+
+*在这里，当 `Bun` 的极致性能遇上 `Vue3` 的组合式 API，当 `TypeScript` 的类型安全拥抱 `UnoCSS` 的原子化样式...*
+
+### 📊 项目成长图
+
+<div align="center">
 
 [![Star History Chart](https://api.star-history.com/svg?repos=ChenyCHENYU/robot_admin&type=Date)](https://star-history.com/#ChenyCHENYU/robot_admin&Date)
 
-**📊 项目成长数据**
+</div>
+
+**📈 项目数据概览**
+
 - 🌟 **GitHub Stars**: 0+ (期待持续增长，前排太空舱，坐坐呗啊哒)
-- 🍴 **Forks**: 9+ (AHH)
+- 🍴 **Forks**: 0+ (AHH)
 - 👀 **Watchers**: 活跃关注者
 - 📦 **Bundle Size**: < 2MB (生产环境)
 - ⚡ **Performance**: A+ 级性能评分
 - 🧪 **Test Coverage**: 85%+ 测试覆盖率
-
-**💻 社区建设**
 - 🔧 **Contributors**: 欢迎更多贡献者加入
 - 📈 **Weekly Downloads**: 新生儿，逐步统计中
 - 🌍 **Global Usage**: 和平和尊敬，全球开发者友好
 
-## ⚡ 为什么选择 Robot Admin？(肤白貌美大长腿)
+---
 
-### **🔥 性能怪兽级别的开发体验**
+## ⚡ 为什么选择 Robot Admin？<sub>(肤白貌美大长腿)</sub>
+
+### 🔥 性能怪兽级别的开发体验
 - **毫秒级热更新** - Bun + Vite6 化学反应，告别等待
 - **智能类型提示** - TypeScript5.8 + 30+ 自定义组件，IDE 智能感知体验拉满
 - **零配置开箱即用** - 一条命令启动，30 秒内搭建完整后台系统
 
-具体数据见性能基准测试。
-
-### **🎨 不只是一个管理系统，更是一个作品**
+### 🎨 不只是一个管理系统，更是一个作品
 - **30+ 精心打磨的演示页面（陆续追加）** - 每一个都是可直接用于生产的业务组件
 - **7 种自定义指令** - 防抖、节流、长按、拖拽、权限...让开发更优雅
 - **主题系统** - 深色/浅色模式/跟随系统 + 支持自定义扩展，随心所欲
 
-### **🛠️ 企业级架构，个人项目也能享受**
+### 🛠️ 企业级架构，个人项目也能享受
 - **RBAC 权限体系** - 菜单级、按钮级、接口级，权限控制细致入微
 - **渐进式微前端** - 架构设计支持从单体到微前端的平滑演进
 - **生产级工程化** - ESLint + Prettier + Husky，代码质量无忧
 
+---
+
 ## 🚀 快速开始（真的很快！）
 
-> 🎉 **推荐使用 Bun** - 体验前所未有的安装速度
+<table width="100%">
+<tr>
+<td width="45%" valign="top">
+
+> <sub>🎉 **推荐使用 Bun** - 体验前所未有的安装速度</sub>
 
 ```bash
 # 1. 克隆项目
@@ -93,100 +123,133 @@ bun install
 bun dev
 ```
 
-**🔥 首次启动只需 2 秒不到，后续热更新不到 100ms！**
+<sub>**🔥 首次启动只需 2 秒不到，后续热更新不到 100ms！**</sub>
 
-如果你还没有 Bun：
+<sub>如果你还没有 Bun：</sub>
 ```bash
 npm install -g bun
 ```
 
-### 其他有用的命令
+</td>
+<td width="55%" valign="top">
 
+<table width="100%">
+<tr>
+<td width="50%">
+
+<sub>**🔧 开发相关**</sub>
 ```bash
-# 🔧 开发相关
 bun dev                # 开发环境启动
 bun run build          # 生产环境构建
 bun run build:test     # 测试环境构建
 bun run build:staging  # 预发布构建
 bun run preview        # 本地预览构建结果
+```
 
-# 📋 代码质量
+<sub>**📋 代码质量**</sub>
+```bash
 bun run lint           # 代码检查和修复
 bun run format         # 代码格式化
 bun test:unit          # 单元测试
+```
 
-# 🎯 类型检查
+</td>
+<td width="50%">
+
+<sub>**🎯 类型检查**</sub>
+```bash
 bun run type-watch     # 监听模式类型检查
 bun run type:check     # 智能类型分析
+```
 
-# 📦 提交代码
+<sub>**📦 提交代码**</sub>
+```bash
 bun run commit         # 规范化提交（git cz）
 ```
 
-# 📚 其他更多...
+<sub>**⚡ 其他命令**</sub>
+```bash
+bun outdated           # 检查依赖更新
+bun clean              # 清理缓存
+```
+
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+---
 
 ## ✨ 核心亮点
 
-### **🏗️ 技术栈（高富帅阵容）**
+### 🏗️ 技术栈（高富帅阵容）
 
 **🎭 前端核心**
-```
-Vue 3.5.13      # 🔥 最新稳定版，Composition API 丝滑体验
-TypeScript 5.8  # 🛡️ 类型安全，智能提示
-Naive UI 2.41   # 🎨 颜值与性能并存的组件库
-UnoCSS 66.0     # ⚡ 原子化CSS，按需生成，体积极小
-```
+
+![Vue](https://img.shields.io/badge/Vue-3.5.13-4FC08D?style=for-the-badge&logo=vue.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8.0-blue?style=for-the-badge&logo=typescript)
+![Naive UI](https://img.shields.io/badge/Naive_UI-2.41-green?style=for-the-badge)
+![UnoCSS](https://img.shields.io/badge/UnoCSS-66.0-yellow?style=for-the-badge)
+
+- **Vue 3.5.13** - 🔥 最新稳定版，Composition API 丝滑体验
+- **TypeScript 5.8** - 🛡️ 类型安全，智能提示
+- **Naive UI 2.41** - 🎨 颜值与性能并存的组件库
+- **UnoCSS 66.0** - ⚡ 原子化CSS，按需生成，体积极小
 
 **⚙️ 构建工具**
-```
-Bun 1.x         # 🚀 性能怪兽，安装速度提升10倍
-Vite 6.2.1      # ⚡ 下一代构建工具，热更新极速
-Sass 1.87       # 🎨 成熟的CSS预处理器
-```
+
+![Bun](https://img.shields.io/badge/Bun-1.x-ff1e56?style=for-the-badge&logo=bun)
+![Vite](https://img.shields.io/badge/Vite-6.2.1-646CFF?style=for-the-badge&logo=vite)
+![Sass](https://img.shields.io/badge/Sass-1.87-CC6699?style=for-the-badge&logo=sass)
+
+- **Bun 1.x** - 🚀 性能怪兽，安装速度提升10倍
+- **Vite 6.2.1** - ⚡ 下一代构建工具，热更新极速
+- **Sass 1.87** - 🎨 成熟的CSS预处理器
 
 **🔧 开发工具**
-```
-ESLint 9.21     # 📏 代码质量守护者
-Prettier 3.5    # ✨ 代码格式化
-Oxlint 0.15     # 🦀 Rust编写的超快Linter
-Vitest 3.0      # 🧪 现代化测试框架
-```
 
-更多内容可以参考项目个人页面，技术栈详情清单
+![ESLint](https://img.shields.io/badge/ESLint-9.21-4B32C3?style=for-the-badge&logo=eslint)
+![Prettier](https://img.shields.io/badge/Prettier-3.5-F7B93E?style=for-the-badge&logo=prettier)
+![Vitest](https://img.shields.io/badge/Vitest-3.0-6E9F18?style=for-the-badge&logo=vitest)
 
-### **🎯 功能矩阵（30+ 实用功能）**
+- **ESLint 9.21** - 📏 代码质量守护者
+- **Prettier 3.5** - ✨ 代码格式化
+- **Oxlint 0.15** - 🦀 Rust编写的超快Linter
+- **Vitest 3.0** - 🧪 现代化测试框架
 
-#### **权限管理** 🔐
+### 🎯 功能矩阵（30+ 实用功能）
+
+#### 🔐 权限管理
 - **RBAC权限体系** - 用户-角色-权限，灵活分配
 - **动态路由** - 根据权限实时生成菜单
 - **按钮级权限** - 精确到每一个操作按钮
 - **接口级权限** - API调用权限控制
 
-#### **数据可视化** 📊
+#### 📊 数据可视化
 - **ECharts 5.6** - 企业级图表库
 - **实时Dashboard** - 数据大屏展示
 - **FullCalendar** - 完整的日程管理
 - **AntV X6** - 专业流程图引擎
 
-#### **编辑器生态** ✏️
+#### ✏️ 编辑器生态
 - **WangEditor** - 富文本编辑器
 - **Markdown编辑器** - 实时预览，语法高亮
 - **代码编辑器** - 支持多语言语法高亮
 - **JSON编辑器** - 结构化数据编辑
 
-#### **文件处理** 📁
+#### 📁 文件处理
 - **Excel导入导出** - 支持复杂表格结构
 - **ZIP批量下载** - 文件打包压缩
 - **图片截图** - Html2canvas 网页截图
 - **文件上传** - 多格式文件支持
 
-#### **交互增强** 🎮
-- **拖拽排序** - 列表、表格自由拖拽
-- **3D展示** - Spline 3D场景
-- **动画系统** - 流畅的页面转场
-- **用户引导** - 新手引导系统
+#### 🎮 交互增强
+**拖拽排序** - 列表、表格自由拖拽 | **3D展示** - Spline 3D场景 | **动画系统** - 流畅的页面转场 | **用户引导** - 新手引导系统
 
-### **🧩 组件库（开箱即用）**
+### 🧩 组件库（开箱即用）
 
 **核心组件**
 - `C_Form` - 动态表单引擎，支持8种布局
@@ -204,47 +267,86 @@ Vitest 3.0      # 🧪 现代化测试框架
 
 **等等等等...不一一赘述**
 
-### **🎪 演示页面（手摸手私秘级的学习保姆）**
+### 🎪 演示页面（手摸手私秘级的学习保姆）
 
 > **30+ 精心制作的演示页面，每一个都赤诚奔赴最佳实践**
 
-**基础组件展示**
-- 🎨 图标组件 - 完整的图标系统使用指南
-- 🏙️ 地区联动 - 省市区三级联动实现
-- 📊 进度条 - 多种样式进度展示
-- ⏰ 时间组件 - 时间选择和格式化
-- 📅 日期选择 - 日期范围选择器
-- 🌆 城市选择 - 城市选择器组件
+<details>
+<summary><strong>🎨 基础组件展示</strong></summary>
 
-**表单与表格**
-- 📝 表单布局 - 8种表单布局模式
-- 🔍 表单搜索 - 高级搜索功能
-- 📋 超级表格 - 表格的各种高级用法
+- 🎨 **图标组件** - 完整的图标系统使用指南
+- 🏙️ **地区联动** - 省市区三级联动实现
+- 📊 **进度条** - 多种样式进度展示
+- ⏰ **时间组件** - 时间选择和格式化
+- 📅 **日期选择** - 日期范围选择器
+- 🌆 **城市选择** - 城市选择器组件
 
-**编辑器展示**
-- 📆 日历组件 - FullCalendar完整功能
-- 💻 代码编辑器 - 多语言语法高亮
-- 📖 Markdown编辑器 - 实时预览编辑
-- ✏️ 富文本编辑 - WangEditor完整功能
+</details>
 
-**实用功能**
-- 📦 导出ZIP - 批量文件打包下载
-- 📋 复制功能 - 文本复制到剪贴板
-- ⬇️ 批量下载 - 文件批量下载处理
-- 🔄 拖拽排序 - 列表项拖拽排序
+<details>
+<summary><strong>📝 表单与表格</strong></summary>
 
-**自定义指令**
-- 📄 v-copy - 复制指令
-- 💧 v-watermark - 水印指令  
-- 👆 v-draggable - 拖拽指令
-- ⏱️ v-debounce - 防抖指令
-- 🚦 v-throttle - 节流指令
-- 👆 v-longpress - 长按指令
-- 🔐 v-permission - 权限指令
+- 📝 **表单布局** - 8种表单布局模式
+- 🔍 **表单搜索** - 高级搜索功能
+- 📋 **超级表格** - 表格的各种高级用法
+
+</details>
+
+<details>
+<summary><strong>✏️ 编辑器展示</strong></summary>
+
+- 📆 **日历组件** - FullCalendar完整功能
+- 💻 **代码编辑器** - 多语言语法高亮
+- 📖 **Markdown编辑器** - 实时预览编辑
+- ✏️ **富文本编辑** - WangEditor完整功能
+
+</details>
+
+<details>
+<summary><strong>🛠️ 实用功能</strong></summary>
+
+- 📦 **导出ZIP** - 批量文件打包下载
+- 📋 **复制功能** - 文本复制到剪贴板
+- ⬇️ **批量下载** - 文件批量下载处理
+- 🔄 **拖拽排序** - 列表项拖拽排序
+
+</details>
+
+<details>
+<summary><strong>🎯 自定义指令</strong></summary>
+
+<div align="center">
+
+![v-copy](https://img.shields.io/badge/v--copy-复制指令-blue)
+![v-watermark](https://img.shields.io/badge/v--watermark-水印指令-green)
+![v-draggable](https://img.shields.io/badge/v--draggable-拖拽指令-purple)
+![v-debounce](https://img.shields.io/badge/v--debounce-防抖指令-orange)
+
+![v-throttle](https://img.shields.io/badge/v--throttle-节流指令-red)
+![v-longpress](https://img.shields.io/badge/v--longpress-长按指令-yellow)
+![v-permission](https://img.shields.io/badge/v--permission-权限指令-pink)
+
+</div>
+
+- 📄 **v-copy** - 复制指令
+- 💧 **v-watermark** - 水印指令
+- 👆 **v-draggable** - 拖拽指令
+- ⏱️ **v-debounce** - 防抖指令
+- 🚦 **v-throttle** - 节流指令
+- 👆 **v-longpress** - 长按指令
+- 🔐 **v-permission** - 权限指令
+
+</details>
+
+---
 
 ## 🏗️ 项目架构
 
-### **📁 目录结构（清晰明了）**
+### 📁 目录结构（清晰明了）
+
+<table width="100%">
+<tr>
+<td width="50%">
 
 ```
 Robot_Admin/
@@ -262,6 +364,12 @@ Robot_Admin/
 │   ├── 📁 stores/                   # Pinia状态管理
 │   ├── 📁 composables/              # 组合式API
 │   ├── 📁 hooks/                    # 自定义Hooks
+```
+
+</td>
+<td width="50%">
+
+```
 │   ├── 📁 router/                   # 路由配置
 │   ├── 📁 utils/                    # 工具函数
 │   ├── 📁 types/                    # TypeScript类型定义
@@ -278,7 +386,11 @@ Robot_Admin/
 └── 📖 README.md                     # 项目说明
 ```
 
-### **🔄 架构演进路线**
+</td>
+</tr>
+</table>
+
+### 🔄 架构演进路线
 
 ```mermaid
 graph LR
@@ -292,127 +404,133 @@ graph LR
     D -.->|愿景| H[🌟 PC/移动/桌面3端完整解决方案的大逼兜大满贯yy]
 ```
 
+---
+
 ## 📱 响应式设计
 
 > **尽量适配所有设备，无论是桌面、平板还是手机**
 
-- **桌面端** - 1200px+ 完整功能体验
-- **平板端** - 768px-1200px 适配优化
-- **手机端** - <768px 移动端友好
+- **🖥️ 桌面端** - 1200px+ 完整功能体验
+- **📱 平板端** - 768px-1200px 适配优化  
+- **📱 手机端** - <768px 移动端友好
+
+---
 
 ## 🛠️ 开发者工具推荐
 
-### **🎯 VSCode 插件生态**
+### 📋 关于部分 vscode 插件使用
 
-> **提升开发效率的神器组合**（如果你懒，直接用我的插件集...若君不弃，妾不负君...嘤咛）
+<table width="100%">
+<tr>
+<td width="50%">
 
-## 关于部分 vscode 插件使用
+> <sub>1.  **Vscode Samge Translate 插件**</sub>
+<sub>- `desc：` 用于快速中英文翻译切换，并生成变量命名方式</sub>
+<sub>- `cc` Ctrl+Shift+P， 选择 Samge 进行对应功能使用</sub>
+<sub>- `key：` `Alt+x` 翻译成中文， `Alt+z` 翻译成英文</sub>
 
-> 1.  Vscode Samge Translate 插件
+> <sub>2. **any-rule 插件**</sub>
+<sub>- `desc：` 用于快速生成正则</sub>
+<sub>- `use：` 右键 => 正则大全</sub>
+<sub>- `key：` `@zz` 弹出正则选项,根据生成的选项,可以图解正则</sub>
 
-- `desc：` 用于快速中英文翻译切换，并生成变量命名方式
-- `cc` Ctrl+Shift+P， 选择 Samge 进行对应功能使用
-- `key：` `Alt+x` 翻译成中文， `Alt+z` 翻译成英文
+> <sub>3. **Better Comments 插件**</sub>
+<sub>- `desc：` 在js文件中,通过颜色标记区分注释评论描述</sub>
+<sub>- `use：` //\* 绿色 //! 红色 //? 蓝色</sub>
+<sub>- `key：` 注释修饰[* ! ? ]</sub>
 
-> 2. any-rule 插件
+> <sub>4. **code settings sync 插件**</sub>
+<sub>- `desc：` 用于快速团队同步 vscode 插件及配置</sub>
+<sub>- `use：` [地址](https://marketplace.visualstudio.com/items?itemName=Alex-Chen.gitee-code-settings-sync)</sub>
 
-- `desc：` 用于快速生成正则
-- `use：` 右键 => 正则大全
-- `key：` `@zz` 弹出正则选项,根据生成的选项,可以图解正则
+> <sub>5. **Code Spell Checker 插件**</sub>
+<sub>- `desc：` 用于快速检查代码和文档拼写是否正确</sub>
+<sub>- `use：` 将一些典型词，非语法错误的单词，报波浪提示后添加cspell.json，或通过灯泡添加</sub>
+<sub>- `key：` 拼写后单词上方提示的黄色小灯泡💡</sub>
 
-> 3. Better Comments 插件
+</td>
+<td width="50%">
 
-- `desc：` 在js文件中,通过颜色标记区分注释评论描述
-- `use：` //\* 绿色 //! 红色 //? 蓝色
-- `key：` 注释修饰[* ! ? ]
+> <sub>6. **CodeSnap 插件**</sub>
+<sub>- `desc：` 用于快速生成代码截图</sub>
+<sub>- `use：` 右键 => 底部选项 CodeSnap</sub>
 
-> 4. code settings sync 插件
+> <sub>7. **EmoJi 插件**</sub>
+<sub>- `desc：` 用于快速选择表情符号</sub>
+<sub>- `use：` 输入 `Ctrl+Shift+P` => 输入 `emo` 行对应表情</sub>
+<sub>- `key：` `F1 => emo`</sub>
 
-- `desc：` 用于快速团队同步 vscode 插件及配置
-- `use：` [地址](https://marketplace.visualstudio.com/items?itemName=Alex-Chen.gitee-code-settings-sync)
+> <sub>8. **JSON to JS 插件**</sub>
+<sub>- `desc：` 用于快速将json格式转换为js格式</sub>
+<sub>- `use：` 从剪切板，选择转换，可选引号 3种 方式进行转换</sub>
+<sub>- `key：` `Shift + Ctrl + Alt + V | S` 或 `F1 => Clipboard`</sub>
 
-> 5. Code Spell Checker 插件
+> <sub>9. **koroFileHeader 插件**</sub>
+<sub>- `desc：` 用于添加头部注释，函数注释</sub>
+<sub>- `use：` 在文件头部使用快捷键，或自动识别生成，函数注释勾选使用快捷键生成</sub>
+<sub>- `key：` `ctrl+win+i` 头部注释 `ctrl+win+t` 函数注释</sub>
 
-- `desc：` 用于快速检查代码和文档拼写是否正确
-- `use：` 将一些典型词，非语法错误的单词，报波浪提示后添加cspell.json，或通过灯泡添加
-- `key：` 拼写后单词上方提示的黄色小灯泡💡
+> <sub>10. **TODO Tree 插件**</sub>
+<sub>- `desc：` 用于快速高亮代码中的 TODO 等标记性注释</sub>
+<sub>- `use：` 通过注释关键词的方式，高亮显示</sub>
+<sub>- `key：` TODO: 待完成 | BUG: 问题 | TAG: 标签 | FIXME: 待修复 | HACK: 自定义 | MARK: 标记</sub>
 
-> 6. CodeSnap 插件
+> <sub>11. **Turbo Console Log 插件**</sub>
+<sub>- `desc：` 用于快速生成 console 打印信息</sub>
+<sub>- `use：` 通过选中变量，按下快捷键，生成打印句柄</sub>
+<sub>- `key：` `ctrl+alt+l` 生成 `alt+shift+c` 注释所有 **+u** 启用所有 **+d** 删除所有</sub>
 
-- `desc：` 用于快速生成代码截图
-- `use：` 右键 => 底部选项 CodeSnap
+</td>
+</tr>
+</table>
 
-> 7. EmoJi 插件
-
-- `desc：` 用于快速选择表情符号
-- `use：` 输入 `Ctrl+Shift+P` => 输入 `emo` 行对应表情
-- `key：` `F1 => emo`
-
-> 8. JSON to JS 插件
-
-- `desc：` 用于快速将json格式转换为js格式
-- `use：` 从剪切板，选择转换，可选引号 3种 方式进行转换
-- `key：` `Shift + Ctrl + Alt + V | S` 或 `F1 => Clipboard`
-
-> 9. koroFileHeader 插件
-
-- `desc：` 用于添加头部注释，函数注释
-- `use：` 在文件头部使用快捷键，或自动识别生成，函数注释勾选使用快捷键生成
-- `key：` `ctrl+win+i` 头部注释 `ctrl+win+t` 函数注释
-
-> 10. TODO Tree 插件
-
-- `desc：` 用于快速高亮代码中的 TODO 等标记性注释
-- `use：` 通过注释关键词的方式，高亮显示
-- `key：` TODO: 待完成 | BUG: 问题 | TAG: 标签 | FIXME: 待修复 | HACK: 自定义 | MARK: 标记
-
-> 11. Turbo Console Log 插件
-
-- `desc：` 用于快速生成 console 打印信息
-- `use：` 通过选中变量，按下快捷键，生成打印句柄
-- `key：` `ctrl+alt+l` 生成 `alt+shift+c` 注释所有 **+u** 启用所有 **+d** 删除所有
+---
 
 ## 🎨 主题定制
 
 > **让你的后台系统拥有独特的视觉风格**
 
-### **🌙 深色/浅色模式**
+### 🌙 深色/浅色模式
 - 一键切换，白嫖不懂爷的黑
 - 自动跟随系统主题
 - 自定义主题色彩（后续扩展）
 
+---
+
 ## 🔒 安全与权限
 
-### **🛡️ 多层次权限控制**
+### 🛡️ 多层次权限控制
 - **页面级权限** - 路由访问控制
 - **菜单级权限** - 导航菜单显示控制
 - **按钮级权限** - 操作按钮权限控制
 - **接口级权限** - API调用权限验证
 
-### **🔐 身份认证**
+### 🔐 身份认证
 - `JWT Token` 认证
 - 刷新Token自动续期（马上替换模拟的真实接口，给俺点时间）
 - 多终端登录管理（这个后续计划就整到位，做成开关配置的）
 - 密码强度验证
 
+---
+
 ## 📊 性能优化
 
-### **⚡ 构建优化**
+### ⚡ 构建优化
 - **Tree Shaking** - 无用代码自动移除（考虑未来服务于中大型项目，也添加了相关配置，后面做一个插件）
 - **代码分割** - 按需加载，减少首屏时间
 - **资源压缩** - CSS/JS/图片智能压缩
 - **CDN加速** - 静态资源CDN部署
 
-### **🚀 运行时优化**
+### 🚀 运行时优化
 - **虚拟滚动** - 大数据表格流畅渲染
 - **组件懒加载** - 路由级别懒加载
 - **图片懒加载** - 视口内图片按需加载
 - **防抖节流** - 高频操作性能优化
 
-### **⚡ 性能基准测试**
+### ⚡ 性能基准测试
 
 | 指标 | Robot Admin | 传统方案 | 提升幅度 |
-|------|-------------|----------|----------|
+|:---:|:---:|:---:|:---:|
 | 🚀 首屏加载 | < 800ms | ~2.5s | **70%+** |
 | ⚡ 热更新速度 | < 100ms | ~1.5s | **90%+** |
 | 📦 构建速度 | < 30s | ~2min | **75%+** |
@@ -421,99 +539,109 @@ graph LR
 
 **测试验证**: HP 幽灵360, 16GB RAM, Node.js 20+
 
+---
 
 ## 🚀 部署方案
 
-### **☁️ 多环境支持**
+### ☁️ 多环境支持
 - **开发环境** - 本地开发调试
 - **测试环境** - 功能测试验证
 - **预发布环境** - 生产前最后验证
 - **生产环境** - 线上正式环境
 
-### **📦 部署选项**
+### 📦 部署选项
 - **Vercel** - 零配置部署
 - **GitHub Pages** - 静态部署
 - **Docker** - 容器化部署
 - **传统服务器** - Nginx部署
 
+---
+
 ## 💻 系统要求
 
-### **🔧 开发环境**
+### 🔧 开发环境
 - **`Node.js`**: >= 18.0.0 (推荐 20+)
 - **`Bun`**: >= 1.0.0 (推荐最新版)
 - **内存**: >= 8GB RAM
 - **存储**: >= 1GB 可用空间
 - **系统**: 不小于 Windows 10+, macOS 12+, Ubuntu 20.04+
 
-### **🌐 浏览器要求**
-- **Chrome**: >= 90
-- **Firefox**: >= 88
-- **Safari**: >= 14
-- **Edge**: >= 90
-
-### **⚙️ 可选工具**
+### ⚙️ 可选工具
 - **VS Code**: 推荐编辑器
 - **Git**: >= 2.20.0
 - **Docker**: >= 20.0 (容器部署)
 
-## 🆚 对比其他解决方案（社区还有很多优秀的项目，这只是选样对比，仅供参考）
+### 🌐 浏览器要求
+- **Chrome**: >= 90 | **Firefox**: >= 88  
+- **Safari**: >= 14 | **Edge**: >= 90
 
-| 特性 | Robot Admin | Ant xxx Pro | Vue xxx Admin | 其他框架 |
-|------|-------------|----------------|-------------------|----------|
-| **🚀 启动速度** | Bun < 100ms | npm ~2s | yarn ~1.5s | 较慢 |
-| **📦 构建工具** | Vite 6.x | Webpack/Vite | Webpack | 多样 |
-| **🎨 UI库** | Naive UI | Ant Design | Element Plus | 多样 |
-| **💪 TypeScript** | ✅ 完整支持 | ✅ | ✅ | 部分 |
-| **🔧 自定义指令** | 7个实用指令 | 少量 | 基础 | 有限 |
-| **📊 演示页面** | 30+ 页面 | 有限 | 有限 | 基础 |
-| **🎯 学习成本** | 中等 | 较高 | 中等 | 不一 |
-| **📈 维护状态** | 🔥 活跃 | 活跃 | 活跃 | 不一 |
-| **🌟 社区生态** | 成长中 | 成熟 | 成熟 | 不一 |
+---
+
+## 🆚 对比其他解决方案
+
+> 社区有很多优秀的项目，这只是选样对比，仅供参考
+
+| 特性对比 | Robot Admin | Ant Design Pro | Vue Element Admin | 其他框架 |
+|:---:|:---:|:---:|:---:|:---:|
+| 🚀 启动速度 | **Bun < 100ms** | npm ~2s | yarn ~1.5s | 普遍较慢 |
+| ⚡ 热更新速度 | **< 100ms 极速** | ~1.5s 等待 | ~1s 等待 | 普遍较慢 |
+| 📦 构建工具 | **Vite 6.x 最新** | Webpack/Vite | Webpack 4/5 | 工具多样 |
+| 🎨 UI 组件库 | **Naive UI 轻量** | Ant Design | Element Plus | 选择多样 |
+| 💪 TypeScript | **完整类型支持** | 基础支持 | 基础支持 | 支持程度不一 |
+| 🔧 自定义指令 | **7个实用指令** | 少量指令 | 基础指令 | 功能有限 |
+| 📊 演示页面 | **30+ 完整示例** | 有限示例 | 有限示例 | 基础示例 |
+| 🎯 学习成本 | **中等友好** | 较高门槛 | 中等门槛 | 差异较大 |
+| 📈 维护状态 | **🔥 积极维护** | 持续维护 | 持续维护 | 状态不一 |
 
 **🎯 选择 Robot Admin 的理由**:
 - 🚀 **性能优先**: Bun + Vite 双引擎，开发体验极致
-- 🧩 **组件丰富**: 30+ 业务组件，开箱即用
+- 🧩 **组件丰富**: 30+ 业务组件，开箱即用  
 - 🎨 **设计现代**: Naive UI + UnoCSS，颜值与性能并存
 - 📚 **学习友好**: 30+ 演示页面，每个都是裸奔最佳实践
 
+---
+
 ## 📈 路线图
 
-### **🎯 短期目标 (Q1 2025)**
+### 🎯 短期目标 (Q1 2025)
 - [ ] 🎨 主题系统完善
 - [ ] 📱 移动端适配优化
 - [ ] 🔧 UnoCSS配置优化
 - [ ] 📊 性能监控集成
 
-### **🚀 中期规划 (Q2-Q3 2025)**
+### 🚀 中期规划 (Q2-Q3 2025)
 - [ ] 🏢 多租户系统支持
 - [ ] 🔗 微前端架构支持
 - [ ] 📚 组件库独立发布
 - [ ] 🎨 可视化页面模板
 
-### **🌟 长期愿景 (Q4 2025+)**
+### 🌟 长期愿景 (Q4 2025+)
 - [ ] 🏗️ NestJS后端服务
 - [ ] 🛠️ 低代码平台集成
 - [ ] ☁️ 云原生部署方案
 - [ ] 🔌 完整插件生态
 
+---
+
 ## 📝 贡献指南
 
 > **来啊，快活啊，一起打造更好的开源项目！**
 
-### **🤝 参与方式**
+### 🤝 参与方式
 - 🐛 **Bug反馈** - 发现问题及时反馈
 - 💡 **功能建议** - 提出改进想法
 - 📖 **文档完善** - 帮助改进文档
 - 🔧 **代码贡献** - 提交PR参与开发
 
-### **📋 提交流程**
+### 📋 提交流程
 ```bash
 # 1. Fork项目到你的账号
 # 2. 创建功能分支
 git checkout -b feat/awesome-feature
 
 # 3. 提交你的改动
-git commit -m 'feat: add awesome feature' （建议你最好用规范的方式提交）
+git commit -m 'feat: add awesome feature' 
+# （建议你最好用规范的方式提交）
 
 # 4. 推送到分支
 git push origin feat/awesome-feature
@@ -521,7 +649,8 @@ git push origin feat/awesome-feature
 # 5. 创建Pull Request
 ```
 
-### **📏 代码规范**
+### 📏 代码规范
+
 我们使用严格的代码规范确保代码质量：
 - **ESLint** - JavaScript/TypeScript代码检查
 - **Prettier** - 代码格式化
@@ -539,9 +668,11 @@ test: 测试相关
 chore: 构建工具/依赖更新
 ```
 
+---
+
 ## 🌍 环境配置
 
-### **⚙️ 环境变量**
+### ⚙️ 环境变量
 ```
 .env                # 基础配置
 .env.development    # 开发环境
@@ -550,7 +681,7 @@ chore: 构建工具/依赖更新
 .env.production     # 生产环境
 ```
 
-### **🔧 构建命令**
+### 🔧 构建命令
 ```bash
 bun dev               # 开发环境
 bun run build:test    # 测试环境构建
@@ -558,26 +689,65 @@ bun run build:staging # 预发布构建
 bun run build         # 生产环境构建
 ```
 
+---
+
 ## 🖼️ 项目预览
 
+<table width="100%">
+<tr>
+<td width="50%" align="center" style="padding: 10px;">
+
 ![login](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot-adminlogin.png)
+<br><strong>登录页面</strong>
+
+</td>
+<td width="50%" align="center" style="padding: 10px;">
 
 ![table](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot-admintable.png)
+<br><strong>表格管理</strong>
+
+</td>
+</tr>
+</table>
 
 > **🎯 [在线预览](https://www.robotadmin.cn/)** | **📖 [项目文档](https://www.tzagileteam.com)**
+
+---
 
 ## 🖥️ 浏览器支持
 
 **现代浏览器，拒绝IE**
 
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Safari |
-| :-: | :-: | :-: | :-: |
-| Latest 2 versions | Latest 2 versions | Latest 2 versions | Latest 2 versions |
+<table width="100%">
+<tr>
+<td width="25%" align="center">
 
+[<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>**Edge**<br/><sub>Latest 2 versions</sub>
+
+</td>
+<td width="25%" align="center">
+
+[<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>**Firefox**<br/><sub>Latest 2 versions</sub>
+
+</td>
+<td width="25%" align="center">
+
+[<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>**Chrome**<br/><sub>Latest 2 versions</sub>
+
+</td>
+<td width="25%" align="center">
+
+[<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>**Safari**<br/><sub>Latest 2 versions</sub>
+
+</td>
+</tr>
+</table>
+
+---
 
 ## 🔄 迁移指南
 
-### **从 Vue Element Admin 迁移**
+### 从 Vue Element Admin 迁移
 ```bash
 # 1. 安装依赖
 bun install
@@ -595,7 +765,7 @@ bun install
 # 更简洁的API，性能更好
 ```
 
-### **从 Ant Design Pro 迁移**
+### 从 Ant Design Pro 迁移
 ```bash
 # 1. 调整构建工具
 # Webpack -> Vite
@@ -609,12 +779,11 @@ bun install
 # 已有完整配置，开箱即用
 ```
 
+---
+
 ## 🛠️ 故障排除
 
-### **常见问题解决**
-
-<details>
-<summary><strong>❌ Bun 安装失败</strong></summary>
+### ❌ Bun 安装失败
 
 **解决方案:**
 ```bash
@@ -627,10 +796,8 @@ brew install oven-sh/bun/bun
 # 或使用 npm 安装
 npm install -g bun
 ```
-</details>
 
-<details>
-<summary><strong>⚠️ 端口占用问题</strong></summary>
+### ⚠️ 端口占用问题
 
 **解决方案:**
 ```bash
@@ -643,10 +810,8 @@ server: {
 # 或启动时指定端口
 bun dev --port 3001
 ```
-</details>
 
-<details>
-<summary><strong>🔧 TypeScript 类型错误</strong></summary>
+### 🔧 TypeScript 类型错误
 
 **解决方案:**
 ```bash
@@ -657,10 +822,8 @@ bun run type:check
 rm -rf node_modules/.cache
 bun install
 ```
-</details>
 
-<details>
-<summary><strong>📦 构建失败</strong></summary>
+### 📦 构建失败
 
 **解决方案:**
 ```bash
@@ -674,38 +837,41 @@ bun install
 # 强制类型检查
 bun run type-build
 ```
-</details>
 
+---
 
 ## 🌟 生态系统
 
-### **🔗 相关项目**
+### 🔗 相关项目
 - **[Robot UI](https://github.com/ChenyCHENYU/robot-ui)** - 独立的组件库 (以后根据公司业务发展看吧)
 - **[Robot CLI](https://github.com/ChenyCHENYU/robot-cli)** - 脚手架工具 (这个正在搞，给点时间，开发中)
 - **[Robot Mobile](https://github.com/ChenyCHENYU/robot-mobile)** - 移动端解决方案 (规划中)
 - **[Robot Backend](https://github.com/ChenyCHENYU/robot-backend)** - NestJS 后端服务 (规划中)
 
-### **🧩 插件生态**
+### 🧩 插件生态
 - **robot-plugin-charts** - 图表插件扩展
 - **robot-plugin-editor** - 编辑器插件合集  
 - **robot-plugin-auth** - 权限插件增强
 - **robot-plugin-deploy** - 部署工具插件
 
-### **📖 学习资源**
+### 📖 学习资源
 - **[官方文档](https://www.tzagileteam.com)** - 完整的使用指南（马上出，正在规划大纲）
 - **[视频教程](https://space.bilibili.com/robot-admin)** - B站教学视频 (看使用情况吧，看时间)
 - **[在线课程](https://www.robotadmin.cn/course)** - 系统性学习课程 (规划中)
 - **[最佳实践](https://www.robotadmin.cn/best-practices)** - 实战经验分享，计划后面让团队伙伴基于业务场景做分享视频
 
+---
+
 ## 👥 社区
 
-### **💬 讨论与交流**
+### 💬 讨论与交流
 - **[GitHub Discussions](https://github.com/ChenyCHENYU/robot-admin/discussions)** - 项目讨论区
 - **[QQ群](https://qm.qq.com/robot-admin)** - 即时交流群 (申请中)
 - **[微信群](https://weixin.qq.com/robot-admin)** - 微信技术群 (规划中)
 - **[Discord](https://discord.gg/robot-admin)** - 国际化社区 (以后再说...)
 
-### **🤝 贡献者**
+### 🤝 贡献者
+
 感谢所有为项目做出贡献的开发者：
 
 <a href="https://github.com/ChenyCHENYU/robot-admin/graphs/contributors">
@@ -713,23 +879,20 @@ bun run type-build
 </a>
 
 **成为贡献者:**
-- 🐛 报告 Bug
-- 💡 提出功能建议  
-- 📝 改进文档
-- 🔧 提交代码
-- 🌍 翻译文档
-- 📢 推广项目
+- 🐛 报告 Bug | 💡 提出功能建议 | 📝 改进文档 | 🔧 提交代码 | 🌍 翻译文档 | 📢 推广项目
 
-### **🏆 特别鸣谢**
+### 🏆 特别鸣谢
 - **Vue.js 团队** - 提供强大的框架基础
 - **Naive UI 团队** - 提供优秀的组件库
 - **Vite 团队** - 提供极速的构建工具
 - **Bun 团队** - 提供革命性的运行时
 - **所有 Star 和 Fork 的开发者** - 给予项目支持与信任
 
+---
+
 ## 🔒 安全政策
 
-### **🛡️ 安全漏洞报告**
+### 🛡️ 安全漏洞报告
 如果您发现安全漏洞，请通过以下方式报告：
 
 - **加密邮箱**: [ycyplus@gmail.com](mailto:ycyplus@gmail.com) (PGP公钥)
@@ -737,45 +900,49 @@ bun run type-build
 
 **⚠️ 请勿在公开场所披露安全漏洞**
 
-### **🔐 安全最佳实践**
+### 🔐 安全最佳实践
 - 定期更新依赖包版本
 - 使用 HTTPS 进行数据传输
 - 实施内容安全策略 (CSP)
 - 启用跨站请求伪造 (CSRF) 保护
 - 使用安全的 JWT Token 配置
 
+---
+
 ## 💰 赞助支持
 
 如果这个项目对您有帮助，欢迎赞助支持项目持续发展：
 
-### **☕ 请作者喝咖啡**
-- **支付宝**: [扫码支付](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/alipay-qr.png)
+### ☕ 请作者喝咖啡
+<!-- - **支付宝**: [扫码支付](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/alipay-qr.png)
 - **微信支付**: [扫码支付](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/wechat-qr.png)
-- **GitHub Sponsors**: [月度赞助](https://github.com/sponsors/ChenyCHENYU)
+- **GitHub Sponsors**: [月度赞助](https://github.com/sponsors/ChenyCHENYU) -->
 
-### **🏢 企业赞助**
+### 🏢 企业赞助
 企业用户如需技术支持、定制开发、培训服务，请联系：
-- **邮箱**: [ycyplus@gmial.com](mailto:business@robotadmin.cn)
+- **邮箱**: [ycyplus@gmail.com](mailto:ycyplus@gmail.com)
 
-**赞助者权益:**
+<!-- **赞助者权益:**
 - 🎯 优先技术支持
 - 📞 专属答疑服务
 - 🔧 定制功能开发
 - 📚 内训服务支持
-- 🏷️ 项目展示推广
+- 🏷️ 项目展示推广 -->
+
+---
 
 ## 📋 行为准则
 
 我们致力于创建一个开放、包容、友好的社区环境。参与项目的所有人员都应遵守以下准则：
 
-### **✅ 我们鼓励**
+### ✅ 我们鼓励
 - 🤝 友善和耐心的交流
 - 🌍 尊重不同观点和经验
 - 💡 建设性的反馈和批评
 - 🔄 关注对社区最有利的事情
 - ❤️ 对其他社区成员表现出同理心
 
-### **❌ 不被接受的行为**
+### ❌ 不被接受的行为
 - 🚫 使用性别化语言或图像
 - 🚫 恶意评论或人身攻击
 - 🚫 公开或私下的骚扰行为
@@ -784,9 +951,11 @@ bun run type-build
 
 **违规处理**: 项目维护者有权移除、编辑或拒绝不符合行为准则的评论、提交、代码等。
 
+---
+
 ## 📄 更新日志
 
-### **🎉 v1.0.0** (2025-07-10)
+### 🎉 v1.0.0 (2025-07-10)
 - ✨ 首个正式版本发布
 - 🎨 30+ 核心组件完整实现
 - 📊 30+ 演示页面全部完成
@@ -795,73 +964,73 @@ bun run type-build
 - 📱 响应式设计全面适配
 - 🧪 测试覆盖率达到 85%+
 
-### **📋 完整更新日志**
+### 📋 完整更新日志
 查看 [CHANGELOG.md](./CHANGELOG.md) 了解详细的版本历史。
+
+---
 
 ## ❓ 常见问题
 
-<details>
-<summary><strong>🔧 为什么推荐使用Bun？</strong></summary>
+#### 🔧 为什么推荐使用Bun？
 
 Bun是新一代JavaScript运行时，相比npm/yarn：
 - 安装速度提升10倍+
 - 内存占用更低
 - 内置打包器、测试运行器
 - 完全兼容Node.js生态
-</details>
 
-<details>
-<summary><strong>🎨 如何自定义主题？</strong></summary>
+#### 🎨 如何自定义主题？
 
 1. 修改 `src/assets/css/theme.scss` 中的CSS变量
 2. 使用 `C_Theme` 组件进行动态切换
 3. 支持深色/浅色模式自动切换
-</details>
 
-<details>
-<summary><strong>🔐 权限系统如何使用？</strong></summary>
+#### 🔐 权限系统如何使用？
 
 系统支持4级权限控制：
 - 页面级：路由守卫控制
 - 菜单级：动态菜单生成
 - 按钮级：v-permission指令
 - 接口级：axios拦截器
-</details>
 
-<details>
-<summary><strong>📱 是否支持移动端？</strong></summary>
+#### 📱 是否支持移动端？
 
 完全支持！项目采用响应式设计：
 - 桌面端：完整功能
 - 平板端：适配优化
 - 手机端：核心功能
-</details>
+
+---
 
 ## 🌍 国际化支持
 
 Robot Admin 是可以支持多语言的，让全球开发者都能便捷使用，但需要给我点时间完善：
 
-### **🗣️ 支持语言**
+### 🗣️ 支持语言
 - 🇨🇳 **中文简体** - 默认语言
 - 🇺🇸 **English** - 计划支持
 - Others **其他** - 看使用情况吧
 
+---
 
 ## 📚 API 文档
 
-### **🔗 文档链接**
+### 🔗 文档链接
 - **[完整API文档](https://www.robotadmin.cn/api)** - 详细的接口说明
 - **[组件文档](https://www.robotadmin.cn/components)** - 组件使用指南
 - **[工具函数](https://www.robotadmin.cn/utils)** - 实用工具函数
 - **[类型定义](https://www.robotadmin.cn/types)** - TypeScript 类型
 
+---
 
 ## 📊 示例项目
 
 基于 Robot Admin 构建的真实项目案例：
 
-### **🏢 企业项目**
+### 🏢 企业项目
 - **[某某系统(老版本)](https://demo-crm.robotadmin.cn)** - 其实蛮多的，涉敏不便公开
+
+---
 
 ## 📞 联系我们
 
@@ -876,9 +1045,12 @@ Robot Admin 是可以支持多语言的，让全球开发者都能便捷使用�
 - **项目文档：** [https://www.tzagileteam.com](https://www.tzagileteam.com)
 - **GitHub仓库：** [Robot Admin](https://github.com/ChenyCHENYU/robot-admin)
 
+---
+
 ## 🙏 致谢
 
-### **🌟 开源项目致谢**
+### 🌟 开源项目致谢
+
 感谢以下优秀的开源项目，为 Robot Admin 提供了强大的技术支撑：
 
 **🚀 核心技术**
@@ -904,14 +1076,14 @@ Robot Admin 是可以支持多语言的，让全球开发者都能便捷使用�
 - [WangEditor](https://www.wangeditor.com/) - 富文本编辑器
 - [Highlight.js](https://highlightjs.org/) - 语法高亮库
 
-### **👨‍💻 特别感谢**
+### 👨‍💻 特别感谢
 - **Vue.js 团队** - 为现代前端开发奠定基础
 - **Anthony Fu (@antfu)** - UnoCSS、unplugin等优秀工具的创作者
 - **尤雨溪 (Evan You)** - Vue.js 的创造者和领导者
 - **Naive UI 团队** - 提供优雅的Vue 3组件库
 - **所有开源贡献者** - 让开源世界更美好
 
-### **🌟 社区支持**
+### 🌟 社区支持
 - **所有 Star 的开发者** - 给予项目信心和动力
 - **提出 Issue 的用户** - 帮助项目发现和改进问题  
 - **贡献 PR 的开发者** - 让项目变得更好
@@ -920,13 +1092,16 @@ Robot Admin 是可以支持多语言的，让全球开发者都能便捷使用�
 
 > *"一个人可以走得很快，但一群人可以走得更远。感谢每一位支持 Robot Admin 的朋友！"*
 
-### **🎯 持续改进**
+### 🎯 持续改进
+
 Robot Admin 将持续改进和完善，我们承诺：
 - 📈 **定期更新** - 跟进最新技术趋势
 - 🐛 **快速修复** - 及时处理发现的问题
 - 📚 **文档完善** - 持续改进使用文档
 - 🤝 **社区建设** - 构建活跃的开发者社区
 - 🌍 **生态扩展** - 丰富项目生态系统
+
+---
 
 ## 📜 开源许可
 
@@ -985,25 +1160,23 @@ copies or substantial portions of the Software.
 
 ### 🎯 下一步行动
 
-<table>
-<tr>
-<td align="center" width="33%">
-  <h4>🔥 立即使用</h4>
+<p>
+  🔥 <strong>立即使用</strong><br>
   <code>git clone https://github.com/ChenyCHENYU/robot_admin.git</code><br>
   <em>30秒启动你的项目</em>
-</td>
-<td align="center" width="33%">
-  <h4>📚 学习文档</h4>
+</p>
+
+<p>
+  📚 <strong>学习文档</strong><br>
   <a href="https://www.tzagileteam.com">查看完整文档</a><br>
   <em>从入门到精通</em>
-</td>
-<td align="center" width="33%">
-  <h4>💬 加入讨论</h4>
+</p>
+
+<p>
+  💬 <strong>加入讨论</strong><br>
   <a href="https://github.com/ChenyCHENYU/robot-admin/discussions">GitHub讨论区</a><br>
   <em>与开发者交流</em>
-</td>
-</tr>
-</table>
+</p>
 
 <br>
 
