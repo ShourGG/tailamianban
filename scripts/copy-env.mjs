@@ -377,25 +377,6 @@ function mergeEnvFiles(baseContent, envContent, envType) {
 }
 
 /**
- * 创建备份文件
- */
-function createBackup(sourceFile) {
-  if (!fs.existsSync(sourceFile)) {
-    return null
-  }
-
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-  const backupFile = `${sourceFile}.backup.${timestamp}`
-
-  try {
-    fs.copyFileSync(sourceFile, backupFile)
-    return backupFile
-  } catch (error) {
-    throw new Error(`创建备份失败: ${error.message}`)
-  }
-}
-
-/**
  * 扫描可用的环境文件
  */
 function scanAvailableEnvFiles() {
@@ -576,20 +557,7 @@ async function copyAndMergeEnvFiles(envType) {
   log.info(`  环境特定变量: ${envVarCount} 个`)
   log.info(`  合并后变量: ${mergedVarCount} 个`)
 
-  // 8. 创建备份
-  let backupFile = null
-  if (fs.existsSync(targetEnvFile)) {
-    try {
-      log.step('备份现有环境文件...')
-      backupFile = createBackup(targetEnvFile)
-      log.success(`备份创建成功: ${path.basename(backupFile)}`)
-    } catch (error) {
-      log.error(error.message)
-      process.exit(1)
-    }
-  }
-
-  // 9. 写入合并后的配置
+  // 8. 写入合并后的配置
   try {
     log.step('写入环境文件...')
     fs.writeFileSync(targetEnvFile, mergedContent, 'utf8')
@@ -598,28 +566,18 @@ async function copyAndMergeEnvFiles(envType) {
     const targetValidation = validateEnvFile(targetEnvFile)
     if (!targetValidation.valid) {
       log.error('写入后的文件验证失败!')
-      if (backupFile) {
-        fs.copyFileSync(backupFile, targetEnvFile)
-        log.info('已恢复备份文件')
-      }
+      log.error('请检查源文件格式，然后重新运行脚本')
       process.exit(1)
     }
 
     log.success(`成功切换到 ${envType} 环境`)
     log.info(`合并: .env + ${envFileName} → .env`)
 
-    // 10. 显示环境信息
+    // 9. 显示环境信息
     showEnvironmentInfo(envType, targetValidation, envInfo, buildCommands)
   } catch (error) {
     log.error(`写入失败: ${error.message}`)
-    if (backupFile) {
-      try {
-        fs.copyFileSync(backupFile, targetEnvFile)
-        log.info('已恢复备份文件')
-      } catch (restoreError) {
-        log.error(`恢复备份也失败了: ${restoreError.message}`)
-      }
-    }
+    log.info('如需恢复，请重新运行脚本')
     process.exit(1)
   }
 }
@@ -627,23 +585,10 @@ async function copyAndMergeEnvFiles(envType) {
 /**
  * 显示环境信息
  */
-function showEnvironmentInfo(envType, validation, envInfo, buildCommands) {
+function showEnvironmentInfo(envType, validation, envInfo) {
   console.log('\n' + '='.repeat(60))
   console.log(`🎯 ${envType.toUpperCase()} 环境已激活 (${envInfo.runtime})`)
   console.log('='.repeat(60))
-
-  // 显示构建命令
-  const buildCommand = buildCommands[envType]
-  if (buildCommand) {
-    log.info(`推荐命令: ${buildCommand}`)
-  }
-
-  // 显示运行时特定的建议
-  if (isBun) {
-    log.info(`Bun 特性: 快速启动、TypeScript 原生支持、配置合并`)
-  } else {
-    log.info(`Node.js 环境: 稳定可靠、生态丰富、配置合并`)
-  }
 
   // 显示关键环境变量（隐藏敏感信息）
   console.log('\n📋 关键环境变量:')
