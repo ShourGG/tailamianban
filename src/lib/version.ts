@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-07-10 08:49:00
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-10 09:37:24
+ * @LastEditTime: 2025-07-11 23:26:10
  * @FilePath: \Robot_Admin\src\lib\version.ts
  * @Description: 版本信息管理工具(配合release-please)
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -10,7 +10,7 @@
 
 // x-release-please-start-version
 export const VERSION = '1.0.0'
-// x-release-please-end
+// x-release-please-end-version
 
 export const BUILD_TIME = new Date().toISOString()
 

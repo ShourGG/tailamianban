@@ -23,7 +23,7 @@
     "format": "prettier --write src/",
     "prepare": "husky install",
     "commit": "bunx cz",
-    "check-branch": "node scripts/check-branch.js",
+    "check-branch": "node scripts/check-branch.mjs",
     "type:analyze": "node scripts/smart-type-manager.js",
     "type:validate": "node scripts/smart-type-validator.js",
     "type:check": "bun run type:analyze && bun run type:validate"
