@@ -708,7 +708,7 @@ bun run build         # Production environment build
 <td width="50%" align="center" style="padding: 10px;">
 
 ![home](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot_admin/home.png)
-<br><strong>Table Management</strong>
+<br><strong>Home Page</strong>
 
 </td>
 </tr>

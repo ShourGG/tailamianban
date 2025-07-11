@@ -710,7 +710,7 @@ bun run build         # 生产环境构建
 <td width="50%" align="center" style="padding: 10px;">
 
 ![home](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot_admin/home.png)
-<br><strong>首页</strong>
+<br><strong>首页页面</strong>
 
 </td>
 </tr>
