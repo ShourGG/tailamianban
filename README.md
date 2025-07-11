@@ -54,6 +54,12 @@
 
 ---
 
+<div align="center">
+  <p>
+    <strong>中文</strong> | <a href="./README_EN.md">English</a>
+  </p>
+</div>
+
 ## 🚀 重新定义企业级中后台开发体验
 
 > **🎯 一个敏捷的，为开发者体验而生的企业级中后台解决方案**  
