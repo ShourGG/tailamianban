@@ -715,6 +715,7 @@ bun run build         # Production environment build
 </table>
 
 > **🎯 [Live Preview](https://www.robotadmin.cn/)** | **📖 [Project Documentation](https://www.tzagileteam.com)**
+Note: If you are unable to access, please turn off the scientific Internet access method. Some ip addresses have restrictions, or access directly [Backup address](https://robot-admin-new.vercel.app/)
 
 ---
 
