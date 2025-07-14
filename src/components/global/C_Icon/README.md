@@ -453,7 +453,7 @@ preloadIcons(['mdi:home', 'mdi:user', 'mdi:settings'])
 
 ## 📄 许可证
 
-Copyright (c) 2023 by ChenYu, All Rights Reserved.
+Copyright (c) 2025 by ChenYu, All Rights Reserved.
 
 ---
 
