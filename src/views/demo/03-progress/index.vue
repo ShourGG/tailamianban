@@ -144,8 +144,8 @@
   const multipleCirclePercentages = ref([30, 60])
 
   // 定时器引用，用于清理动画
-  let raceTimer: number | null = null
-  let doubleTimer: number | null = null
+  let raceTimer: ReturnType<typeof setInterval> | null = null
+  let doubleTimer: ReturnType<typeof setInterval> | null = null
 
   /**
    * 更新圈圈赛跑的进度百分比
