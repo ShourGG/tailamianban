@@ -2,10 +2,10 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-10 10:24:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-10 17:21:51
+ * @LastEditTime: 2025-07-17 16:01:55
  * @FilePath: \Robot_Admin\src\components\global\C_FormSearch\index.vue
  * @Description: 表单搜索组件
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
@@ -82,7 +82,7 @@
             :placeholder="item.placeholder || '请选择'"
             clearable
             :options="
-              item.list?.map(opt => ({
+              item.list?.map((opt: any) => ({
                 label: opt.label || opt.labelDefault,
                 value:
                   opt.value !== undefined
@@ -216,7 +216,7 @@
 
   // ================= 计算属性 =================
   const disposeFormItemList = computed(() =>
-    formItemList.value.filter(item => item.show !== false)
+    formItemList.value.filter((item: { show: boolean }) => item.show !== false)
   )
 
   const hasExpandButton = computed(() => formItemList.value.length > 7)
@@ -248,7 +248,7 @@
 
   // 工具函数：根据prop查找字段项
   const findFieldByProp = (itemProp: string) =>
-    formItemList.value.find(item => item.prop === itemProp)
+    formItemList.value.find((item: any) => item.prop === itemProp)
 
   // 工具函数：更新本地存储
   const updateStorage = () => {
@@ -308,7 +308,7 @@
     }
 
     // 关闭其他字段焦点
-    formItemList.value.forEach(item => {
+    formItemList.value.forEach((item: { prop: string; isFocus: boolean }) => {
       if (item.prop !== itemProp) item.isFocus = false
     })
   }
@@ -369,7 +369,7 @@
   const changeFoldState = () => {
     flag.value = !flag.value
 
-    formItemList.value.forEach((item, index) => {
+    formItemList.value.forEach((item: { show: boolean }, index: number) => {
       if (index > 6) item.show = !item.show
     })
 
@@ -378,22 +378,33 @@
 
   // ================= 初始化 =================
   const initialize = () => {
-    formItemList.value.forEach((item, index) => {
-      item.isFocus = false
+    formItemList.value.forEach(
+      (
+        item: {
+          isFocus: boolean
+          show: boolean | undefined
+          type: string
+          placeholder: string
+          prop: string | number
+        },
+        index: number
+      ) => {
+        item.isFocus = false
 
-      // 前7个默认显示，第8个开始默认隐藏
-      if (index > 6 && item.show === undefined) {
-        item.show = false
-      }
+        // 前7个默认显示，第8个开始默认隐藏
+        if (index > 6 && item.show === undefined) {
+          item.show = false
+        }
 
-      // 处理select字段
-      if (item.type === 'select') {
-        if (!item.placeholder) item.placeholder = '请选择'
-        if (formParams.value[item.prop] === undefined) {
-          formParams.value[item.prop] = null
+        // 处理select字段
+        if (item.type === 'select') {
+          if (!item.placeholder) item.placeholder = '请选择'
+          if (formParams.value[item.prop] === undefined) {
+            formParams.value[item.prop] = null
+          }
         }
       }
-    })
+    )
   }
 
   // ================= 生命周期 =================

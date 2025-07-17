@@ -2,10 +2,10 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-10 10:57:55
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-10 16:58:19
+ * @LastEditTime: 2025-07-17 08:36:59
  * @FilePath: \Robot_Admin\src\views\demo\09-form-search\index.vue
  * @Description: 表单搜索组件 - 演示页面
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
@@ -62,7 +62,6 @@
 </template>
 
 <script setup lang="ts">
-  import { reactive, ref } from 'vue'
   import {
     basicFormConfig,
     advancedFormConfig,
@@ -93,11 +92,11 @@
    * ! @return {void} 无返回值，直接修改目标对象
    */
   function resetFormParams<T extends Record<string, unknown>>(
-    target: T,
+    target: { [K in keyof T]: T[K] }, // 修改为可写类型
     source: T
   ): void {
     Object.keys(target).forEach(key => {
-      target[key] = source[key]
+      target[key as keyof T] = source[key as keyof T]
     })
   }
 

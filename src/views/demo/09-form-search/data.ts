@@ -1,11 +1,13 @@
-// 基础类型定义
-export interface OptionItem {
+import type { SearchFormItem, SearchOptionItem } from '@/types/modules/form'
+
+// 基础类型定义 - 使用兼容性类型
+export interface OptionItem extends SearchOptionItem {
   labelDefault: string
   value?: string | number
   disabled?: boolean
 }
 
-export interface FormItem {
+export interface FormItem extends SearchFormItem {
   type: 'input' | 'select' | 'date-range'
   prop: string
   placeholder?: string
@@ -19,6 +21,7 @@ export interface FormItem {
 export interface BaseFormParams {
   pageNum: number
   pageSize: number
+  [key: string]: any // 添加索引签名解决泛型约束问题
 }
 
 export interface BasicFormParams extends BaseFormParams {
@@ -66,10 +69,10 @@ export interface MegaFormParams extends BaseFormParams {
 // 联合类型
 export type FormParams = BasicFormParams | AdvancedFormParams | MegaFormParams
 
-// 配置类型
-export interface FormConfig<T extends FormParams> {
+// 配置类型 - 使用兼容性类型
+export interface FormConfig<T extends BaseFormParams> {
   params: T
-  items: FormItem[]
+  items: SearchFormItem[] // 使用 SearchFormItem 而不是 FormItem
   historyKey: string
 }
 
@@ -249,9 +252,9 @@ function createMegaFormConfig(fieldCount = 16): FormConfig<MegaFormParams> {
   /**
    * * @description: 创建表单项配置数组
    * ? @param {number} count 字段数量
-   * ! @return {FormItem[]} 表单项配置数组
+   * ! @return {SearchFormItem[]} 表单项配置数组
    */
-  const createFormItems = (count: number): FormItem[] => {
+  const createFormItems = (count: number): SearchFormItem[] => {
     return Array.from({ length: count }, (_, index) => ({
       type: 'input' as const,
       prop: `field${index + 1}`,
@@ -373,15 +376,15 @@ export function formatParamsForLog(params: FormParams, type: string): string {
 
 /**
  * * @description: 重置表单参数到初始状态
- * ? @param {Record<string, unknown>} target 目标表单参数对象
- * ? @param {Record<string, unknown>} source 源初始参数对象
+ * ? @param {T} target 目标表单参数对象
+ * ? @param {T} source 源初始参数对象
  * ! @return {void} 无返回值，直接修改目标对象
  */
-export function resetFormParams(
-  target: Record<string, unknown>,
-  source: Record<string, unknown>
+export function resetFormParams<T extends Record<string, any>>(
+  target: { [K in keyof T]: T[K] }, // 修改为可写类型
+  source: T
 ): void {
   Object.keys(target).forEach(key => {
-    target[key] = source[key]
+    target[key as keyof T] = source[key as keyof T]
   })
 }
