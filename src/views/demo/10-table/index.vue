@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-10 12:31:06
+ * @LastEditTime: 2025-07-18 15:43:20
  * @FilePath: \Robot_Admin\src\views\demo\10-table\index.vue
  * @Description: 表格组件演示
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -200,11 +200,11 @@
   /**
    * @description 处理分页变化事件
    */
-  const handlePaginationChange = (page: number, pageSize: number) => {
+  const handlePaginationChange = (...args: unknown[]) => {
+    const [page, pageSize] = args as [number, number]
     console.log('分页变化:', { page, pageSize, total: tableData.value.length })
     currentPage.value = page
 
-    // 只有当页面大小真的变化时才更新
     if (pageSize !== defaultPageSize.value) {
       defaultPageSize.value = pageSize
     }
