@@ -35,7 +35,7 @@
     "esModuleInterop": true, // 启用 ES 模块与 CommonJS 模块的互操作性
 
     // ==================== 路径映射配置 ====================
-    "baseUrl": "..", // 基础路径为项目根目录
+    "baseUrl": "../", // 基础路径为项目根目录
     "paths": {
       "@/*": ["src/*"], // @ 符号映射到 src 目录
       "_views/*": ["src/views/*"] // _views 映射到 src/views 目录

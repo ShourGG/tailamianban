@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 14:22:31
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-18 14:14:17
+ * @LastEditTime: 2025-07-18 14:26:26
  * @FilePath: \Robot_Admin\src\components\global\C_Layout\index.vue
  * @Description: 布局组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -13,7 +13,7 @@
     :class="['layout-container', isDarkMode ? 'dark-mode' : 'light-mode']"
   >
     <NLayout has-sider>
-      <NLayoutSidera
+      <NLayoutSider
         ref="siderRef"
         bordered
         collapse-mode="width"
@@ -40,7 +40,7 @@
             :inverted="isDarkMode"
           />
         </div>
-      </NLayoutSidera>
+      </NLayoutSider>
 
       <NLayout>
         <C_Header :isLightTheme="!isDarkMode" />
