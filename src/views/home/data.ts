@@ -12,9 +12,24 @@ export const projectStats = [
 
 // 操作按钮
 export const actionButtons = [
-  { text: 'GitHub 仓库', icon: '🐙', type: 'primary', strong: true },
-  { text: '在线演示', icon: '▶️', secondary: true },
-  { text: '查看文档', icon: '📄', tertiary: true },
+  {
+    text: '在线演示',
+    icon: '▶️',
+    secondary: true,
+    strong: true,
+    type: 'primary',
+  },
+  {
+    text: 'GitHub 仓库',
+    icon: '🐙',
+    url: 'https://github.com/ChenyCHENYU/Robot_Admin',
+  },
+  {
+    text: '查看文档',
+    icon: '📄',
+    tertiary: true,
+    url: 'https://www.tzagileteam.com/robot/components/preface.html',
+  },
 ]
 
 // 作者统计

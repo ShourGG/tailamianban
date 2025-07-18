@@ -75,6 +75,9 @@
               :tertiary="action.tertiary"
               size="large"
               :strong="action.strong"
+              tag="a"
+              target="_blank"
+              :href="action.url"
             >
               <template #icon>
                 <div class="btn-icon">{{ action.icon }}</div>
@@ -391,7 +394,6 @@
 
 <script setup lang="ts">
   import { useThemeVars } from 'naive-ui/es'
-  import { defineComponent, h, type PropType, type VNode } from 'vue'
   import {
     projectStats,
     actionButtons,
@@ -440,7 +442,7 @@
     /**
      * * @description: 递归渲染文件树节点
      */
-    setup(props) {
+    setup(props: { node: TreeNodeType }) {
       const renderNode = (node: TreeNodeType): VNode => {
         return h('div', {}, [
           // 当前节点
