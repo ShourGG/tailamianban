@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 14:22:31
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-02 22:42:38
+ * @LastEditTime: 2025-07-18 14:14:17
  * @FilePath: \Robot_Admin\src\components\global\C_Layout\index.vue
  * @Description: 布局组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -10,10 +10,10 @@
 <template>
   <div
     v-if="isReady"
-    :class="['layout-container', `${themeStore.mode}-mode`]"
+    :class="['layout-container', isDarkMode ? 'dark-mode' : 'light-mode']"
   >
     <NLayout has-sider>
-      <NLayoutSider
+      <NLayoutSidera
         ref="siderRef"
         bordered
         collapse-mode="width"
@@ -25,7 +25,7 @@
         :class="[
           'layout-sider',
           'no-horizontal-scroll',
-          isLightTheme ? 'light-theme' : 'dark-theme',
+          isDarkMode ? 'dark-theme' : 'light-theme',
         ]"
       >
         <C_MenuTop id="guide-menu-top" />
@@ -37,21 +37,21 @@
             :data="menuData"
             mode="vertical"
             :collapsed="isCollapsed"
-            :inverted="!isLightTheme"
+            :inverted="isDarkMode"
           />
         </div>
-      </NLayoutSider>
+      </NLayoutSidera>
 
       <NLayout>
-        <C_Header :isLightTheme="isLightTheme" />
+        <C_Header :isLightTheme="!isDarkMode" />
 
         <NLayoutContent
           class="content-with-header p16px"
-          :style="{ backgroundColor: isLightTheme ? '#ffffff' : '#1c1c1c' }"
+          :style="{ backgroundColor: isDarkMode ? '#1c1c1c' : '#ffffff' }"
         >
           <RouterView class="main-content" />
         </NLayoutContent>
-        <C_Footer :isLightTheme="isLightTheme" />
+        <C_Footer :isLightTheme="!isDarkMode" />
       </NLayout>
     </NLayout>
   </div>
@@ -65,18 +65,17 @@
   const themeStore = useThemeStore()
 
   const isReady = ref(false) // 控制布局组件是否准备好显示，避免主题闪烁
-  const theme = computed(() => themeStore.mode)
-  const isLightTheme = computed(() => theme.value === 'light')
+
+  // 关键修改：使用 themeStore.isDark 来统一判断主题
+  const isDarkMode = computed(() => themeStore.isDark)
 
   /**
    * * @description: 创建预渲染样式，确保黑色主题下页面初始加载不会出现白闪
    * ! @return {*} void
    */
   const _disposeThemeEffect = () => {
-    if (
-      themeStore.mode === 'dark' ||
-      (themeStore.mode === 'system' && themeStore.systemIsDark)
-    ) {
+    // 使用 isDarkMode 判断
+    if (isDarkMode.value) {
       const style = document.createElement('style')
       style.textContent = `
         body, #app {
@@ -97,6 +96,7 @@
       isReady.value = true
     }
   }
+
   // 获取菜单数据
   const menuData = permissionStore.showMenuListGet
 
@@ -113,10 +113,11 @@
     isCollapsed.value = collapsed
   }
 
+  // 监听实际的暗色模式状态，而不是 mode
   watch(
-    theme,
-    newTheme => {
-      if (newTheme === 'dark') {
+    isDarkMode,
+    (isDark: boolean) => {
+      if (isDark) {
         document.documentElement.classList.add('dark')
       } else {
         document.documentElement.classList.remove('dark')
