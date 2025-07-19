@@ -5,7 +5,7 @@
  * @LastEditTime: 2025-06-25 11:22:09
  * @FilePath: \Robot_Admin\src\components\global\C_FullCalendar\index.vue
  * @Description: 全局日历组件 - 内置事件管理功能
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <!--

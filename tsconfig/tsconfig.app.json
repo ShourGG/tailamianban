@@ -38,7 +38,8 @@
     "baseUrl": "../", // 基础路径为项目根目录
     "paths": {
       "@/*": ["src/*"], // @ 符号映射到 src 目录
-      "_views/*": ["src/views/*"] // _views 映射到 src/views 目录
+      "_views/*": ["src/views/*"], // _views 映射到 src/views 目录
+      "@vue-flow/*": ["node_modules/@vue-flow/*"]
     },
 
     // ==================== Vue 框架配置 ====================
