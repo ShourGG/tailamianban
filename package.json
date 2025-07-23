@@ -23,8 +23,8 @@
     "format": "prettier --write src/",
     "prepare": "husky install",
     "commit": "bunx cz",
-    "check-branch": "bun scripts/check-branch.mjs",
-    "check-type": "bunx ts-type-cleaner check --format"
+    "check-branch": "gbd",
+    "check-type": "ttc check --format"
   },
   "dependencies": {
     "@antv/x6": "^2.18.1",
@@ -90,6 +90,7 @@
     "eslint-plugin-jsdoc": "^50.6.11",
     "eslint-plugin-oxlint": "^0.15.13",
     "eslint-plugin-vue": "~10.0.0",
+    "git-branch-check-diff-commits": "^1.0.1",
     "jiti": "^2.4.2",
     "jsdom": "^26.0.0",
     "lint-staged": "^15.5.0",
