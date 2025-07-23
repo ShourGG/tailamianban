@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     C_AntV: typeof import('./../components/global/C_AntV/index.vue')['default']
     C_Breadcrumb: typeof import('./../components/global/C_Breadcrumb/index.vue')['default']
+    C_Captcha: typeof import('./../components/global/C_Captcha/index.vue')['default']
     C_Cascade: typeof import('./../components/global/C_Cascade/index.vue')['default']
     C_City: typeof import('./../components/global/C_City/index.vue')['default']
     C_Code: typeof import('./../components/global/C_Code/index.vue')['default']

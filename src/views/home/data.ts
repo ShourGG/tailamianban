@@ -34,8 +34,8 @@ export const actionButtons = [
 
 // 作者统计
 export const authorStats = [
-  { number: '9+', label: '⭐Star' },
-  { number: '11+', label: '🍴Forks' },
+  { number: '12K+', label: '⭐Star' },
+  { number: '212+', label: '🍴Forks' },
   { number: '1K+', label: '👁️Views' },
 ]
 

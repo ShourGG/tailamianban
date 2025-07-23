@@ -47,7 +47,7 @@ export const OPTIONS: FormField[] = [
     prop: 'password',
     rules: [required('密码'), length('密码', 6, 15)],
     attrs: {
-      type: 'password', // 关键属性！必须添加
+      type: 'password',
       showPasswordOn: 'mousedown',
       clearable: true,
     },

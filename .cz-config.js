@@ -8,11 +8,9 @@
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 module.exports = {
-
   scopes: [],
   allowEmptyScopes: false,
   allowCustomScopes: true,
-
 
   //MARK: 可选类型
   types: [
@@ -20,7 +18,10 @@ module.exports = {
     { value: 'feat', name: 'feat:     🎯 新功能' },
     { value: 'fix', name: 'fix:      🐛 bug修复' },
     { value: 'docs', name: 'docs:     📤 文档变更' },
-    { value: 'style', name: 'style:    💄 代码格式|样式(不影响代码运行的变动)' },
+    {
+      value: 'style',
+      name: 'style:    💄 代码格式|样式(不影响代码运行的变动)',
+    },
     {
       value: 'refactor',
       name: 'refactor: ☠️  重构(既不是增加feature，也不是修复bug)',
@@ -45,8 +46,8 @@ module.exports = {
   //MARK: 跳过问题
   skipQuestions: ['body', 'footer'],
 
-  //MARK: subject文字长度默认是72
-  subjectLimit: 72,
+  //MARK: subject文字长度默认是88
+  subjectLimit: 88,
 }
 
 
