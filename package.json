@@ -10,10 +10,10 @@
   },
   "license": "MIT",
   "scripts": {
-    "dev": "node scripts/copy-env.mjs dev && vite",
-    "build": "node scripts/copy-env.mjs prod && vite build",
-    "build:test": "node scripts/copy-env.mjs test && vite build --mode test --emptyOutDir",
-    "build:staging": "node scripts/copy-env.mjs staging && vite build --mode staging --profile",
+    "dev": "env-manager dev && vite && vite",
+    "build": "env-manager prod && vite build",
+    "build:test": "env-manager test && vite build --mode test --emptyOutDir",
+    "build:staging": "env-manager staging && vite build --mode staging --profile",
     "preview": "bun run build && vite preview",
     "test:unit": "vitest",
     "type-watch": "vue-tsc --noEmit --watch",
@@ -23,10 +23,8 @@
     "format": "prettier --write src/",
     "prepare": "husky install",
     "commit": "bunx cz",
-    "check-branch": "node scripts/check-branch.mjs",
-    "type:analyze": "node scripts/smart-type-manager.js",
-    "type:validate": "node scripts/smart-type-validator.js",
-    "type:check": "bun run type:analyze && bun run type:validate"
+    "check-branch": "bun scripts/check-branch.mjs",
+    "check-type": "bunx ts-type-cleaner check --format"
   },
   "dependencies": {
     "@antv/x6": "^2.18.1",
@@ -58,6 +56,8 @@
     "pinia": "^3.0.1",
     "pinia-plugin-persistedstate": "^4.3.0",
     "print-js": "^1.6.0",
+    "robot-admin-env-manager": "^1.0.1",
+    "ts-type-cleaner": "^1.1.3",
     "vue": "^3.5.13",
     "vue-draggable-plus": "^0.6.0",
     "vue-router": "^4.5.0",
