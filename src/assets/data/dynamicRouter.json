@@ -130,6 +130,19 @@
           }
         },
         {
+          "path": "steps",
+          "name": "demo-steps",
+          "component": "/demo/31-steps/index",
+          "meta": {
+            "icon": "streamline-sharp:steps-number",
+            "title": "步骤条",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
+        },
+        {
           "path": "time",
           "name": "demo-time",
           "component": "/demo/04-time/index",
