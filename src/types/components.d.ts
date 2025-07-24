@@ -21,6 +21,7 @@ declare module 'vue' {
     C_Form: typeof import('./../components/global/C_Form/index.vue')['default']
     C_FormSearch: typeof import('./../components/global/C_FormSearch/index.vue')['default']
     C_FullCalendar: typeof import('./../components/global/C_FullCalendar/index.vue')['default']
+    C_GlobalSearch: typeof import('./../components/global/C_GlobalSearch/index.vue')['default']
     C_Guide: typeof import('./../components/global/C_Guide/index.vue')['default']
     C_Header: typeof import('./../components/global/C_Header/index.vue')['default']
     C_Icon: typeof import('./../components/global/C_Icon/index.vue')['default']

@@ -2,33 +2,40 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2022-04-10 23:20:30
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-26 19:45:24
+ * @LastEditTime: 2025-07-24 11:44:49
  * @FilePath: \Robot_Admin\src\stores\app\index.ts
  * @Description: 应用相关存储
  * Copyright (c) ${2022} by ChenYu/天智AgileTeam, All Rights Reserved.
  */
 
+import type { MenuTag } from '@/types/modules/menu'
+
 export const s_appStore = defineStore('app', {
   state: () => ({
-    tagsViewList: [] as Tag[],
+    tagsViewList: [] as MenuTag[],
     activeTag: '',
   }),
 
   actions: {
-    initTags(tags?: Tag[]) {
+    initTags(tags?: MenuTag[]) {
       if (tags) {
         this.tagsViewList = tags
         this.ensureCurrentRouteTag()
       } else {
         this.tagsViewList = [
-          ...new Map(this.tagsViewList.map(tag => [tag.path, tag])).values(),
+          ...new Map(
+            this.tagsViewList.map((tag: MenuTag) => [tag.path, tag])
+          ).values(),
         ]
       }
     },
 
     ensureCurrentRouteTag() {
       const route = useRoute()
-      if (route.path && !this.tagsViewList.some(t => t.path === route.path)) {
+      if (
+        route.path &&
+        !this.tagsViewList.some((t: MenuTag) => t.path === route.path)
+      ) {
         this.addTag({
           path: route.path,
           title: (route.meta.title as string) || 'Unnamed Page',
@@ -42,8 +49,8 @@ export const s_appStore = defineStore('app', {
       this.activeTag = path
     },
 
-    addTag(tag: Tag) {
-      if (!this.tagsViewList.some(item => item.path === tag.path)) {
+    addTag(tag: MenuTag) {
+      if (!this.tagsViewList.some((item: MenuTag) => item.path === tag.path)) {
         this.tagsViewList.push(tag)
         this.setActiveTag(tag.path)
       }
@@ -79,7 +86,9 @@ export const s_appStore = defineStore('app', {
     },
 
     removeAllTags() {
-      this.tagsViewList = this.tagsViewList.filter(tag => tag.meta?.affix)
+      this.tagsViewList = this.tagsViewList.filter(
+        (tag: MenuTag) => tag.meta?.affix
+      )
     },
   },
 

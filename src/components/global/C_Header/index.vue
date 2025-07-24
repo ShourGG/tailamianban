@@ -41,10 +41,12 @@
         <!-- 中间：面包屑导航 -->
         <C_Breadcrumb />
 
+        <C_GlobalSearch />
+
         <!-- 右侧：操作区 -->
         <div
           id="guide-actions"
-          class="w-350px flex items-center justify-end gap-4 mr16px"
+          class="w-220px flex items-center justify-end gap-4 mr16px"
         >
           <template
             v-for="(item, index) in headerActions"
@@ -126,13 +128,6 @@
     {
       type: 'component',
       componentName: 'C_Notice',
-    },
-    {
-      icon: 'i-mdi:search',
-      tooltip: '搜索',
-      action: () => {
-        // 搜索相关逻辑
-      },
     },
     {
       icon: 'i-mdi:fullscreen',
