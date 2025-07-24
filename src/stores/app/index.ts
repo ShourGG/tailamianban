@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2022-04-10 23:20:30
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-24 11:44:49
+ * @LastEditTime: 2025-07-24 15:50:04
  * @FilePath: \Robot_Admin\src\stores\app\index.ts
  * @Description: 应用相关存储
  * Copyright (c) ${2022} by ChenYu/天智AgileTeam, All Rights Reserved.
