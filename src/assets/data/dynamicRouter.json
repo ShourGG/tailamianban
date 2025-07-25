@@ -330,6 +330,19 @@
             "affix": false,
             "keepAlive": false
           }
+        },
+        {
+          "path": "file-preview",
+          "name": "file-preview",
+          "component": "/demo/32-file-preview/index",
+          "meta": {
+            "icon": "material-symbols-light:preview-outline-sharp",
+            "title": "文件预览",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
         }
       ]
     },
