@@ -213,11 +213,12 @@
   }
 
   // 监听路由变化，更新展开的菜单项，但不折叠现有展开的菜单
+
   watch(
     () => route.path,
-    () => {
+    newPath => {
       // 获取当前路径需要展开的菜单项
-      const paths = route.path.split('/').filter(Boolean)
+      const paths = newPath.split('/').filter(Boolean)
       const currentPathKeys = new Set<string>()
       let currentPath = ''
 
@@ -237,8 +238,16 @@
       })
 
       // 添加所有父级菜单的key
-      const parentKeys = findParentKeys(props.data, route.path)
+      const parentKeys = findParentKeys(props.data, newPath)
       parentKeys.forEach(key => currentPathKeys.add(key))
+
+      // 如果上面的菜单匹配没找到足够的展开项，用路径层级作为兜底
+      const pathSegments = newPath.split('/').filter(Boolean)
+      let fallbackPath = ''
+      pathSegments.forEach(segment => {
+        fallbackPath += `/${segment}`
+        currentPathKeys.add(fallbackPath) // 直接按路径层级添加
+      })
 
       // 合并现有展开的菜单和新路径需要的菜单
       const newKeys = new Set([
@@ -246,6 +255,12 @@
         ...Array.from(currentPathKeys),
       ])
       expandedKeys.value = Array.from(newKeys)
+
+      nextTick(() => {
+        if (menuRef.value) {
+          menuRef.value.showOption(newPath)
+        }
+      })
     },
     { immediate: true }
   )
