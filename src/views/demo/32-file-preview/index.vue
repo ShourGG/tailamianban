@@ -1,873 +1,538 @@
-<!--
- * @Description: 文件预览组件演示页面 - 支持弹窗预览版本
- * @Author: Your Name
- * @Date: 2025-01-25
--->
+<!-- 文件预览组件使用示例 - 精简版 -->
 <template>
   <div class="file-preview-demo">
     <div class="demo-header">
-      <h1>
-        <span style="font-size: 32px;">👁️</span>
-        文件预览组件演示
-      </h1>
-      <p>基于 vue-files-preview 封装的通用文件预览组件，支持内联和弹窗预览</p>
+      <NH1>文件预览组件场景示例</NH1>
     </div>
 
     <div class="demo-content">
-      <!-- 内联预览模式 -->
-      <NCard title="内联预览模式" class="demo-section">
-        <template #header-extra>
-          <NTag type="info">直接在页面预览</NTag>
-        </template>
-
-        <C_FilePreview
-          preview-mode="inline"
-          :height="400"
-          @file-select="handleFileSelect"
-          @preview-success="handlePreviewSuccess"
-          @preview-error="handlePreviewError"
-        />
-
-        <template #footer>
-          <div class="demo-info">
-            <div class="info-item">
-              <span class="label">预览模式：</span>
-              <span class="value">内联预览 - 直接在页面中显示预览内容</span>
-            </div>
-          </div>
-        </template>
-      </NCard>
-
-      <!-- 弹窗预览模式 -->
-      <NCard title="弹窗预览模式" class="demo-section">
-        <template #header-extra>
-          <NTag type="success">点击预览 + 全屏支持</NTag>
-        </template>
-
-        <C_FilePreview
-          preview-mode="modal"
-          @file-select="handleModalFileSelect"
-          @modal-open="handleModalOpen"
-          @modal-close="handleModalClose"
-          @preview-success="handlePreviewSuccess"
-          @preview-error="handlePreviewError"
-        />
-
-        <template #footer>
-          <div class="demo-info">
-            <div class="info-item">
-              <span class="label">预览模式：</span>
-              <span class="value">弹窗预览 - 点击预览按钮打开弹窗查看</span>
-            </div>
-            <div class="info-item">
-              <span class="label">全屏功能：</span>
-              <span class="value">支持全屏预览，提供更大的查看区域</span>
-            </div>
-            <div class="info-item">
-              <span class="label">快捷键：</span>
-              <span class="value">ESC键退出全屏/关闭弹窗，F11或Ctrl+F切换全屏</span>
-            </div>
-            <div class="info-item">
-              <span class="label">优势：</span>
-              <span class="value">节省页面空间，支持全屏查看，更好的用户体验</span>
-            </div>
-          </div>
-        </template>
-      </NCard>
-
-      <!-- 网络文件预览 -->
-      <NCard title="网络文件预览" class="demo-section">
-        <template #header-extra>
-          <NTag type="warning">URL预览</NTag>
-        </template>
-
-        <div class="network-preview">
-          <div class="url-input">
-            <NInput
-              :value="networkUrl"
-              placeholder="🔗 请输入文件URL地址"
-              clearable
-              @update:value="updateNetworkUrl"
-            />
-            <NButton
-              type="primary"
-              :disabled="!networkUrl.trim()"
-              :loading="networkLoading"
-              @click="loadNetworkFile"
-            >
-              🌐 加载预览
-            </NButton>
-          </div>
-
-          <div class="preview-mode-tabs">
-            <NTabs v-model:value="networkPreviewMode" type="segment">
-              <NTabPane name="inline" tab="内联预览">
-                <C_FilePreview
-                  :file="networkFile"
-                  :show-upload="false"
-                  preview-mode="inline"
-                  :height="350"
-                  @preview-success="handleNetworkPreviewSuccess"
-                  @preview-error="handleNetworkPreviewError"
-                />
-              </NTabPane>
-              <NTabPane name="modal" tab="弹窗预览">
-                <C_FilePreview
-                  :file="networkFile"
-                  :show-upload="false"
-                  preview-mode="modal"
-                  @modal-open="handleModalOpen"
-                  @modal-close="handleModalClose"
-                  @preview-success="handleNetworkPreviewSuccess"
-                  @preview-error="handleNetworkPreviewError"
-                />
-              </NTabPane>
-            </NTabs>
-          </div>
-
-          <div class="demo-urls">
-            <h4>示例文件：</h4>
-            <div class="url-list">
-              <NButton
-                v-for="demo in demoFiles"
-                :key="demo.url"
-                size="small"
-                type="tertiary"
-                @click="selectDemoFile(demo)"
-              >
-                {{ demo.name }}
-              </NButton>
-            </div>
-          </div>
-        </div>
-      </NCard>
-
-      <!-- 配置选项 -->
-      <NCard title="配置选项" class="demo-section">
-        <template #header-extra>
-          <NTag type="primary">可定制</NTag>
-        </template>
-
-        <div class="config-demo">
-          <div class="config-panel">
-            <NForm
-              :model="config"
-              label-placement="left"
-              label-width="120"
-              size="small"
-            >
-              <NFormItem label="预览模式">
-                <NRadioGroup v-model:value="config.previewMode">
-                  <NRadio value="inline">内联预览</NRadio>
-                  <NRadio value="modal">弹窗预览</NRadio>
-                </NRadioGroup>
-              </NFormItem>
-
-              <NFormItem label="预览高度" v-if="config.previewMode === 'inline'">
-                <NInputNumber
-                  v-model:value="config.height"
-                  :min="200"
-                  :max="800"
-                  :step="50"
-                  suffix="px"
-                />
-              </NFormItem>
-
-              <NFormItem label="最大文件大小">
-                <NInputNumber
-                  v-model:value="config.maxSize"
-                  :min="1"
-                  :max="100"
-                  suffix="MB"
-                />
-              </NFormItem>
-
-              <NFormItem label="支持的格式">
-                <NSelect
-                  v-model:value="config.accept"
-                  multiple
-                  :options="acceptOptions"
-                  placeholder="选择支持的文件格式"
-                />
-              </NFormItem>
-
-              <NFormItem label="显示上传区域">
-                <NSwitch v-model:value="config.showUpload" />
-              </NFormItem>
-            </NForm>
-          </div>
-
-          <div class="config-preview">
-            <C_FilePreview
-              ref="configPreviewRef"
-              :preview-mode="config.previewMode"
-              :height="config.height"
-              :max-size="config.maxSize"
-              :accept="configAcceptString"
-              :show-upload="config.showUpload"
-              :file="configFile"
-              @file-select="handleConfigFileSelect"
-              @modal-open="handleModalOpen"
-              @modal-close="handleModalClose"
-            />
-          </div>
-        </div>
-      </NCard>
-
-      <!-- 批量文件管理 -->
-      <NCard title="批量文件管理" class="demo-section">
-        <template #header-extra>
-          <NTag type="info">文件列表</NTag>
-        </template>
-
-        <div class="multi-file-demo">
-          <div class="file-manager">
-            <div class="file-upload">
-              <input
-                ref="multiFileInputRef"
-                type="file"
-                multiple
-                class="hidden"
-                @change="handleMultiFileSelect"
+      <!-- 场景选择卡片 -->
+      <div class="scenario-cards">
+        <NCard
+          v-for="scenario in scenarios"
+          :key="scenario.id"
+          :class="{ 'active-card': activeScenario === scenario.id }"
+          hoverable
+          @click="switchScenario(scenario.id)"
+          class="scenario-card"
+        >
+          <template #header>
+            <div class="flex items-center gap-2">
+              <C_Icon
+                :name="scenario.icon"
+                :size="18"
               />
-              <NButton type="dashed" block @click="triggerMultiFileInput">
-                ➕ 添加文件
+              {{ scenario.title }}
+            </div>
+          </template>
+          <p class="text-sm text-gray-600">{{ scenario.description }}</p>
+        </NCard>
+      </div>
+
+      <!-- 演示区域 -->
+      <div class="demo-section">
+        <!-- 场景1: 文件上传预览 -->
+        <div
+          v-if="activeScenario === 'upload'"
+          class="upload-demo"
+        >
+          <div class="upload-area">
+            <NUpload
+              ref="uploadRef"
+              :file-list="fileList"
+              :max="1"
+              @change="handleUploadChange"
+              @remove="handleUploadRemove"
+              accept=".pdf,.doc,.docx,.xls,.xlsx"
+              :show-file-list="false"
+            >
+              <NUploadDragger>
+                <div class="upload-content">
+                  <C_Icon
+                    name="ic:outline-cloud-upload"
+                    :size="36"
+                    color="#3b82f6"
+                    class="mb-2"
+                  />
+                  <NText class="text-lg">点击或拖拽文件到此区域上传</NText>
+                  <NText
+                    depth="3"
+                    class="text-sm"
+                  >
+                    支持 PDF、Word (.doc/.docx)、Excel (.xls/.xlsx) 格式
+                  </NText>
+                </div>
+              </NUploadDragger>
+            </NUpload>
+          </div>
+
+          <div
+            v-if="uploadedFile"
+            class="preview-section"
+          >
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold">文件预览</h3>
+              <NButton
+                size="small"
+                @click="clearUpload"
+              >
+                <template #icon>
+                  <C_Icon name="ic:outline-clear" />
+                </template>
+                清除
+              </NButton>
+            </div>
+            <div class="preview-container">
+              <C_FilePreview :file="uploadedFile" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 场景2: URL预览 -->
+        <div
+          v-if="activeScenario === 'url'"
+          class="url-demo"
+        >
+          <div class="url-input-section">
+            <h3 class="text-lg font-semibold mb-4">URL 文件预览</h3>
+            <div class="flex gap-3 mb-4">
+              <NInput
+                v-model:value="fileUrl"
+                placeholder="请输入文件URL (支持 PDF、Word、Excel)"
+                class="flex-1"
+              />
+              <NButton
+                type="primary"
+                @click="loadUrlFile"
+                :loading="urlLoading"
+              >
+                <template #icon>
+                  <C_Icon name="ic:outline-preview" />
+                </template>
+                预览
               </NButton>
             </div>
 
-            <div class="file-list">
-              <div
-                v-for="(file, index) in uploadedFiles"
-                :key="index"
-                class="file-item"
-                :class="{ active: currentFileIndex === index }"
-                @click="selectFile(index)"
+            <!-- 预设URL示例 -->
+            <div class="preset-urls">
+              <p class="text-sm text-gray-600 mb-2"
+                >快速示例：(需要将示例文件放在 public/demo-files/ 目录下)</p
               >
-                <div class="file-info">
-                  <span class="file-icon" :style="{ fontSize: '16px' }">
-                    {{ getFileTypeEmoji(file.name) }}
-                  </span>
-                  <div class="file-details">
-                    <div class="file-name">{{ file.name }}</div>
-                    <div class="file-size">{{ formatFileSize(file.size) }}</div>
-                  </div>
-                </div>
-                <div class="file-actions">
-                  <NButton
-                    size="tiny"
-                    type="primary"
-                    text
-                    @click.stop="previewFile(index)"
-                  >
-                    👁️
-                  </NButton>
-                  <NButton
-                    size="tiny"
-                    type="error"
-                    text
-                    @click.stop="removeFile(index)"
-                  >
-                    ✖️
-                  </NButton>
-                </div>
+              <div class="flex flex-wrap gap-2">
+                <NTag
+                  v-for="preset in presetUrls"
+                  :key="preset.name"
+                  :type="preset.type"
+                  clickable
+                  @click="selectPresetUrl(preset)"
+                  class="cursor-pointer"
+                >
+                  <template #icon>
+                    <C_Icon :name="preset.icon" />
+                  </template>
+                  {{ preset.name }}
+                </NTag>
               </div>
             </div>
           </div>
 
-          <div class="file-preview">
-            <C_FilePreview
-              v-if="uploadedFiles.length > 0 && currentFileIndex >= 0"
-              :file="uploadedFiles[currentFileIndex]"
-              :show-upload="false"
-              :preview-mode="batchPreviewMode"
-              :height="400"
-              @modal-open="handleModalOpen"
-              @modal-close="handleModalClose"
-            />
-            <div v-else class="empty-placeholder">
-              <div class="empty-icon" style="font-size: 48px;">📁</div>
-              <p>请选择文件进行预览</p>
-            </div>
-
-            <div class="preview-mode-switcher">
-              <NRadioGroup v-model:value="batchPreviewMode" size="small">
-                <NRadio value="inline">内联预览</NRadio>
-                <NRadio value="modal">弹窗预览</NRadio>
-              </NRadioGroup>
-            </div>
-          </div>
-        </div>
-      </NCard>
-
-      <!-- 事件日志 -->
-      <NCard title="事件日志" class="demo-section">
-        <template #header-extra>
-          <NButton size="small" @click="clearLogs">清空日志</NButton>
-        </template>
-
-        <div class="event-logs">
           <div
-            v-for="(log, index) in eventLogs"
-            :key="index"
-            class="log-item"
-            :class="log.type"
+            v-if="currentUrlFile"
+            class="preview-section"
           >
-            <span class="log-time">{{ log.time }}</span>
-            <span class="log-event">{{ log.event }}</span>
-            <span class="log-data">{{ log.data }}</span>
-          </div>
-          <div v-if="eventLogs.length === 0" class="empty-logs">
-            暂无事件日志
+            <div class="preview-container">
+              <C_FilePreview
+                :url="currentUrlFile.url"
+                :fileName="currentUrlFile.name"
+              />
+            </div>
           </div>
         </div>
+
+        <!-- 场景3: 批量预览 -->
+        <div
+          v-if="activeScenario === 'batch'"
+          class="batch-demo"
+        >
+          <div class="batch-upload-section">
+            <h3 class="text-lg font-semibold mb-4">批量文件预览</h3>
+            <NUpload
+              multiple
+              :file-list="batchFileList"
+              @change="handleBatchUploadChange"
+              accept=".pdf,.doc,.docx,.xls,.xlsx"
+              :show-file-list="false"
+            >
+              <NButton>
+                <template #icon>
+                  <C_Icon name="ic:outline-add" />
+                </template>
+                添加文件
+              </NButton>
+            </NUpload>
+          </div>
+
+          <div
+            v-if="batchFileList.length > 0"
+            class="batch-list"
+          >
+            <div class="flex justify-between items-center mb-4">
+              <NTabs
+                v-model:value="activeFileIndex"
+                type="card"
+                class="flex-1"
+              >
+                <NTabPane
+                  v-for="(file, index) in batchFileList"
+                  :key="index"
+                  :name="index"
+                  :tab="file.name"
+                />
+              </NTabs>
+              <NButton
+                size="small"
+                @click="clearBatchFiles"
+                class="ml-4"
+              >
+                <template #icon>
+                  <C_Icon name="ic:outline-clear-all" />
+                </template>
+                清空全部
+              </NButton>
+            </div>
+
+            <div class="preview-container">
+              <C_FilePreview
+                v-if="currentBatchFile"
+                :file="currentBatchFile.file as File"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- 场景4: 配置选项演示 -->
+        <div
+          v-if="activeScenario === 'config'"
+          class="config-demo"
+        >
+          <h3 class="text-lg font-semibold mb-4">配置选项演示</h3>
+
+          <div class="config-options mb-4">
+            <NCard
+              title="预览配置"
+              size="small"
+            >
+              <div class="config-grid">
+                <div class="config-item">
+                  <NCheckbox v-model:checked="showHeader"
+                    >显示头部信息</NCheckbox
+                  >
+                </div>
+                <div class="config-item">
+                  <NCheckbox v-model:checked="showToolbar"
+                    >显示工具栏</NCheckbox
+                  >
+                </div>
+                <div class="config-item">
+                  <NCheckbox v-model:checked="allowDownload"
+                    >允许下载</NCheckbox
+                  >
+                </div>
+              </div>
+            </NCard>
+          </div>
+
+          <div class="config-preview">
+            <div class="config-file-selector mb-4">
+              <NSelect
+                v-model:value="selectedConfigFile"
+                :options="configFileOptions"
+                placeholder="选择演示文件"
+              />
+            </div>
+
+            <div
+              v-if="selectedConfigFile"
+              class="preview-container"
+            >
+              <C_FilePreview
+                :url="selectedConfigFile.url"
+                :fileName="selectedConfigFile.name"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 使用说明 -->
+    <div class="usage-info">
+      <NCard
+        title="使用说明"
+        size="small"
+      >
+        <NText depth="3">
+          这是一个功能完善的文件预览组件，支持 PDF、Word、Excel 文件预览。
+          <br />
+          • PDF: 支持缩放、翻页、内置浏览器预览
+          <br />
+          • Word: 支持目录导航、缩放、格式化显示
+          <br />
+          • Excel: 支持多工作表、分页、数据类型识别、合并单元格显示
+          <br />
+          <strong>推荐使用文件上传功能进行测试</strong>
+        </NText>
       </NCard>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  NCard,
-  NTag,
-  NInput,
-  NButton,
-  NForm,
-  NFormItem,
-  NInputNumber,
-  NSelect,
-  NSwitch,
-  NRadioGroup,
-  NRadio,
-  NTabs,
-  NTabPane
-} from 'naive-ui'
+  import type { UploadFileInfo } from 'naive-ui/es'
 
-// 响应式数据
-const networkUrl = ref('')
-const networkFile = ref<string | null>(null)
-const networkLoading = ref(false)
-const networkPreviewMode = ref<'inline' | 'modal'>('inline')
-const configFile = ref<File | null>(null)
-const uploadedFiles = ref<File[]>([])
-const currentFileIndex = ref(-1)
-const batchPreviewMode = ref<'inline' | 'modal'>('inline')
-const configPreviewRef = ref()
-const multiFileInputRef = ref<HTMLInputElement>()
+  const message = useMessage()
 
-// 配置选项
-const config = ref({
-  previewMode: 'inline' as 'inline' | 'modal',
-  height: 400,
-  maxSize: 50,
-  accept: ['.pdf', '.docx', '.xlsx'],
-  showUpload: true
-})
+  // 当前激活的场景
+  const activeScenario = ref('upload')
 
-const acceptOptions = [
-  { label: 'PDF (.pdf)', value: '.pdf' },
-  { label: 'Word (.docx, .doc)', value: '.docx,.doc' },
-  { label: 'Excel (.xlsx, .xls)', value: '.xlsx,.xls' },
-  { label: '图片 (.jpg, .png, .gif)', value: '.jpg,.jpeg,.png,.gif' },
-  { label: '视频 (.mp4)', value: '.mp4' },
-  { label: '音频 (.mp3)', value: '.mp3' },
-  { label: '文本 (.txt)', value: '.txt' },
-  { label: 'Markdown (.md)', value: '.md' }
-]
+  // 场景配置
+  const scenarios = [
+    {
+      id: 'upload',
+      title: '文件上传预览',
+      description: '上传本地文件进行预览',
+      icon: 'ic:outline-cloud-upload',
+    },
+    {
+      id: 'url',
+      title: 'URL文件预览',
+      description: '通过URL加载远程文件',
+      icon: 'ic:outline-link',
+    },
+    {
+      id: 'batch',
+      title: '批量文件预览',
+      description: '同时预览多个文件',
+      icon: 'ic:outline-folder-open',
+    },
+    {
+      id: 'config',
+      title: '配置选项',
+      description: '自定义预览组件配置',
+      icon: 'ic:outline-settings',
+    },
+  ]
 
-const configAcceptString = computed(() => config.value.accept.join(','))
+  // 场景1: 文件上传
+  const uploadRef = ref()
+  const fileList = ref<UploadFileInfo[]>([])
+  const uploadedFile = ref<File | null>(null)
 
-// 示例文件
-const demoFiles = [
-  {
-    name: '📄 PDF示例',
-    url: 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf',
-    icon: 'i-mdi:file-pdf-box text-red-500'
-  },
-  {
-    name: '🖼️ 图片示例',
-    url: 'https://picsum.photos/800/600',
-    icon: 'i-mdi:file-image-box text-orange-500'
-  }
-]
+  // 场景2: URL预览
+  const fileUrl = ref('')
+  const urlLoading = ref(false)
+  const currentUrlFile = ref<{ url: string; name: string } | null>(null)
 
-// 事件日志
-interface EventLog {
-  time: string
-  event: string
-  data: string
-  type: 'info' | 'success' | 'error'
-}
+  const presetUrls = [
+    {
+      name: '本地PDF示例',
+      url: '/demo-files/sample.pdf',
+      type: 'error' as const,
+      icon: 'ic:outline-picture-as-pdf',
+    },
+    {
+      name: '本地Excel示例',
+      url: '/demo-files/sample.xlsx',
+      type: 'success' as const,
+      icon: 'ic:outline-grid-on',
+    },
+    {
+      name: '本地Word示例',
+      url: '/demo-files/sample.docx',
+      type: 'info' as const,
+      icon: 'ic:outline-description',
+    },
+  ]
 
-const eventLogs = ref<EventLog[]>([])
+  // 场景3: 批量预览
+  const batchFileList = ref<UploadFileInfo[]>([])
+  const activeFileIndex = ref(0)
 
-// 方法
-const addLog = (event: string, data: string = '', type: 'info' | 'success' | 'error' = 'info') => {
-  const time = new Date().toLocaleTimeString()
-  eventLogs.value.unshift({ time, event, data, type })
-  if (eventLogs.value.length > 50) {
-    eventLogs.value = eventLogs.value.slice(0, 50)
-  }
-}
+  // 场景4: 配置选项
+  const showHeader = ref(true)
+  const showToolbar = ref(true)
+  const allowDownload = ref(true)
+  const selectedConfigFile = ref<{ url: string; name: string } | null>(null)
 
-const getFileTypeEmoji = (fileName: string): string => {
-  const ext = fileName.split('.').pop()?.toLowerCase() || ''
-  const emojiMap: Record<string, string> = {
-    pdf: '📄',
-    docx: '📝',
-    doc: '📝',
-    xlsx: '📊',
-    xls: '📊',
-    txt: '📄',
-    md: '📝',
-    jpg: '🖼️',
-    jpeg: '🖼️',
-    png: '🖼️',
-    gif: '🖼️',
-    mp4: '🎬',
-    mp3: '🎵'
-  }
-  return emojiMap[ext] || '📎'
-}
+  const configFileOptions = [
+    {
+      label: 'PDF文档',
+      value: { url: '/demo-files/sample.pdf', name: 'sample.pdf' },
+      url: '/demo-files/sample.pdf',
+      name: 'sample.pdf',
+    },
+    {
+      label: 'Excel表格',
+      value: { url: '/demo-files/sample.xlsx', name: 'sample.xlsx' },
+      url: '/demo-files/sample.xlsx',
+      name: 'sample.xlsx',
+    },
+  ]
 
-const getFileIconName = (fileName: string): string => {
-  const ext = fileName.split('.').pop()?.toLowerCase() || ''
-  const iconMap: Record<string, string> = {
-    pdf: 'i-mdi:file-pdf-box text-red-500',
-    docx: 'i-mdi:file-word-box text-blue-500',
-    doc: 'i-mdi:file-word-box text-blue-500',
-    xlsx: 'i-mdi:file-excel-box text-green-500',
-    xls: 'i-mdi:file-excel-box text-green-500',
-    txt: 'i-mdi:file-document-outline text-gray-500',
-    md: 'i-mdi:language-markdown text-purple-500',
-    jpg: 'i-mdi:file-image-box text-orange-500',
-    jpeg: 'i-mdi:file-image-box text-orange-500',
-    png: 'i-mdi:file-image-box text-orange-500',
-    gif: 'i-mdi:file-image-box text-orange-500',
-    mp4: 'i-mdi:file-video-box text-pink-500',
-    mp3: 'i-mdi:file-music-box text-cyan-500'
-  }
-  return iconMap[ext] || 'i-mdi:file-outline text-gray-400'
-}
+  // 计算属性
+  const currentBatchFile = computed(() => {
+    return batchFileList.value[activeFileIndex.value] || null
+  })
 
-const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
-}
-
-const updateNetworkUrl = (value: string) => {
-  networkUrl.value = value
-}
-
-const selectDemoFile = (demo: typeof demoFiles[0]) => {
-  networkUrl.value = demo.url
-}
-
-const loadNetworkFile = async () => {
-  if (!networkUrl.value.trim()) return
-
-  networkLoading.value = true
-  try {
-    // 验证URL格式
-    new URL(networkUrl.value.trim())
-
-    networkFile.value = networkUrl.value.trim()
-    addLog('加载网络文件', networkUrl.value, 'info')
-  } catch (error) {
-    addLog('网络文件URL无效', networkUrl.value, 'error')
-  } finally {
-    networkLoading.value = false
-  }
-}
-
-const handleFileSelect = (file: File) => {
-  addLog('内联预览文件选择', `${file.name} (${formatFileSize(file.size)})`, 'info')
-}
-
-const handleModalFileSelect = (file: File) => {
-  addLog('弹窗预览文件选择', `${file.name} (${formatFileSize(file.size)})`, 'info')
-}
-
-const handlePreviewSuccess = () => {
-  addLog('预览成功', '', 'success')
-}
-
-const handlePreviewError = (error: string) => {
-  addLog('预览失败', error, 'error')
-}
-
-const handleNetworkPreviewSuccess = () => {
-  addLog('网络文件预览成功', '', 'success')
-  networkLoading.value = false
-}
-
-const handleNetworkPreviewError = (error: string) => {
-  addLog('网络文件预览失败', error, 'error')
-  networkLoading.value = false
-}
-
-const handleModalOpen = () => {
-  addLog('预览弹窗打开', '', 'info')
-}
-
-const handleModalClose = () => {
-  addLog('预览弹窗关闭', '', 'info')
-}
-
-const handleConfigFileSelect = (file: File) => {
-  configFile.value = file
-  addLog('配置演示文件选择', `${file.name}`, 'info')
-}
-
-const triggerMultiFileInput = () => {
-  multiFileInputRef.value?.click()
-}
-
-const handleMultiFileSelect = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const files = Array.from(target.files || [])
-  uploadedFiles.value.push(...files)
-  addLog('批量文件添加', `添加了 ${files.length} 个文件`, 'info')
-
-  // 选中第一个新添加的文件
-  if (currentFileIndex.value < 0 && files.length > 0) {
-    currentFileIndex.value = uploadedFiles.value.length - files.length
+  // 方法
+  const switchScenario = (scenarioId: string) => {
+    activeScenario.value = scenarioId
   }
 
-  // 重置input
-  target.value = ''
-}
-
-const selectFile = (index: number) => {
-  currentFileIndex.value = index
-  addLog('切换预览文件', uploadedFiles.value[index].name, 'info')
-}
-
-const previewFile = (index: number) => {
-  currentFileIndex.value = index
-  if (batchPreviewMode.value === 'modal') {
-    addLog('点击弹窗预览', uploadedFiles.value[index].name, 'info')
+  // 场景1方法
+  const handleUploadChange = (options: { file: UploadFileInfo }) => {
+    const { file } = options
+    if (file.file) {
+      uploadedFile.value = file.file
+      fileList.value = [file]
+      message.success(`已上传文件: ${file.name}`)
+    }
   }
-}
 
-const removeFile = (index: number) => {
-  const file = uploadedFiles.value[index]
-  uploadedFiles.value.splice(index, 1)
-  addLog('文件移除', file.name, 'info')
-
-  // 调整当前选中索引
-  if (currentFileIndex.value >= uploadedFiles.value.length) {
-    currentFileIndex.value = Math.max(-1, uploadedFiles.value.length - 1)
-  } else if (currentFileIndex.value === index) {
-    currentFileIndex.value = uploadedFiles.value.length > 0 ? 0 : -1
-  } else if (currentFileIndex.value > index) {
-    currentFileIndex.value--
+  const handleUploadRemove = () => {
+    uploadedFile.value = null
+    fileList.value = []
   }
-}
 
-const clearLogs = () => {
-  eventLogs.value = []
-}
+  const clearUpload = () => {
+    uploadedFile.value = null
+    fileList.value = []
+    if (uploadRef.value) {
+      uploadRef.value.clear()
+    }
+  }
 
-// 初始化日志
-onMounted(() => {
-  addLog('组件初始化', '文件预览组件演示页面已加载', 'success')
-})
+  // 场景2方法
+  const loadUrlFile = () => {
+    if (!fileUrl.value) {
+      message.warning('请输入文件URL')
+      return
+    }
+
+    urlLoading.value = true
+    currentUrlFile.value = {
+      url: fileUrl.value,
+      name: fileUrl.value.split('/').pop() || 'document',
+    }
+
+    setTimeout(() => {
+      urlLoading.value = false
+      message.success('文件加载成功')
+    }, 1000)
+  }
+
+  const selectPresetUrl = (preset: (typeof presetUrls)[0]) => {
+    fileUrl.value = preset.url
+    loadUrlFile()
+  }
+
+  // 场景3方法
+  const handleBatchUploadChange = (options: { fileList: UploadFileInfo[] }) => {
+    batchFileList.value = options.fileList.filter(file => file.file)
+    if (batchFileList.value.length > 0) {
+      activeFileIndex.value = batchFileList.value.length - 1
+      message.success(`已添加 ${batchFileList.value.length} 个文件`)
+    }
+  }
+
+  const clearBatchFiles = () => {
+    batchFileList.value = []
+    activeFileIndex.value = 0
+  }
 </script>
 
 <style lang="scss" scoped>
-.file-preview-demo {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-
-  .demo-header {
-    text-align: center;
-    margin-bottom: 32px;
-
-    h1 {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      font-size: 32px;
-      color: var(--text-color-1);
-      margin: 0 0 8px 0;
-    }
-
-    p {
-      font-size: 16px;
-      color: var(--text-color-3);
-      margin: 0;
-    }
-  }
-
-  .demo-content {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .demo-section {
-    .demo-info {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 14px;
-
-      .info-item {
-        display: flex;
-        gap: 8px;
-
-        .label {
-          color: var(--text-color-3);
-          min-width: 80px;
-        }
-
-        .value {
-          color: var(--text-color-1);
-        }
-      }
-    }
-  }
-
-  .network-preview {
-    .url-input {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-      align-items: flex-start;
-    }
-
-    .preview-mode-tabs {
-      margin-bottom: 16px;
-    }
-
-    .demo-urls {
-      margin-bottom: 16px;
-
-      h4 {
-        margin: 0 0 8px 0;
-        font-size: 14px;
-        color: var(--text-color-2);
-      }
-
-      .url-list {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-    }
-  }
-
-  .config-demo {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 24px;
-
-    .config-panel {
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 16px;
-      height: fit-content;
-    }
-
-    .config-preview {
-      min-height: 400px;
-    }
-  }
-
-  .multi-file-demo {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 24px;
-
-    .file-manager {
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      overflow: hidden;
-      height: fit-content;
-
-      .file-upload {
-        padding: 16px;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .file-list {
-        max-height: 300px;
-        overflow-y: auto;
-
-        .file-item {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 12px 16px;
-          border-bottom: 1px solid var(--border-color);
-          cursor: pointer;
-          transition: background-color 0.2s;
-
-          &:hover {
-            background-color: var(--hover-color);
-          }
-
-          &.active {
-            background-color: var(--primary-color-hover);
-            border-left: 3px solid var(--primary-color);
-          }
-
-          &:last-child {
-            border-bottom: none;
-          }
-
-          .file-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-            min-width: 0;
-
-            .file-icon {
-              flex-shrink: 0;
-              line-height: 1;
-            }
-
-            .file-details {
-              .file-name {
-                font-weight: 500;
-                color: var(--text-color-1);
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 150px;
-              }
-
-              .file-size {
-                font-size: 12px;
-                color: var(--text-color-3);
-              }
-            }
-          }
-
-          .file-actions {
-            display: flex;
-            gap: 4px;
-          }
-        }
-      }
-    }
-
-    .file-preview {
-      position: relative;
-
-      .empty-placeholder {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 400px;
-        color: var(--text-color-3);
-        border: 1px dashed var(--border-color);
-        border-radius: 6px;
-
-        .empty-icon {
-          line-height: 1;
-          margin-bottom: 12px;
-        }
-
-        p {
-          margin: 12px 0 0 0;
-        }
-      }
-
-      .preview-mode-switcher {
-        margin-top: 12px;
-        text-align: center;
-      }
-    }
-  }
-
-  .event-logs {
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-
-    .log-item {
-      display: grid;
-      grid-template-columns: 80px 120px 1fr;
-      gap: 12px;
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--border-color);
-      font-size: 13px;
-      font-family: 'Monaco', 'Consolas', monospace;
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      .log-time {
-        color: var(--text-color-3);
-      }
-
-      .log-event {
-        font-weight: 500;
-      }
-
-      .log-data {
-        color: var(--text-color-2);
-        word-break: break-all;
-      }
-
-      &.success {
-        background-color: var(--success-color-hover);
-
-        .log-event {
-          color: var(--success-color);
-        }
-      }
-
-      &.error {
-        background-color: var(--error-color-hover);
-
-        .log-event {
-          color: var(--error-color);
-        }
-      }
-
-      &.info {
-        .log-event {
-          color: var(--info-color);
-        }
-      }
-    }
-
-    .empty-logs {
-      padding: 24px;
-      text-align: center;
-      color: var(--text-color-3);
-    }
-  }
-
-  .hidden {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
   .file-preview-demo {
-    padding: 16px;
+    padding: 24px;
+    margin: 0 auto;
 
-    .config-demo,
-    .multi-file-demo {
-      grid-template-columns: 1fr;
+    .demo-header {
+      margin-bottom: 32px;
+    }
 
-      .config-panel,
-      .file-manager {
-        order: 2;
+    .scenario-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+
+      .scenario-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        &.active-card {
+          border: 2px solid #18a058;
+          box-shadow: 0 4px 12px rgba(24, 160, 88, 0.2);
+        }
       }
     }
+
+    .demo-section {
+      min-height: 600px;
+
+      .upload-demo {
+        .upload-area {
+          margin-bottom: 24px;
+
+          .upload-content {
+            text-align: center;
+            padding: 40px;
+          }
+        }
+      }
+
+      .url-demo {
+        .preset-urls {
+          margin-top: 16px;
+        }
+      }
+
+      .batch-demo {
+        .batch-list {
+          .flex {
+            margin-bottom: 16px;
+          }
+        }
+      }
+
+      .config-demo {
+        .config-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+        }
+      }
+
+      .preview-section {
+        margin-top: 24px;
+      }
+
+      .preview-container {
+        height: 600px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+    }
+
+    .usage-info {
+      margin-top: 32px;
+      text-align: center;
+    }
   }
-}
 </style>
