@@ -40,6 +40,7 @@ declare module 'vue' {
     C_Theme: typeof import('./../components/global/C_Theme/index.vue')['default']
     C_Time: typeof import('./../components/global/C_Time/index.vue')['default']
     C_Tree: typeof import('./../components/global/C_Tree/index.vue')['default']
+    C_VtableGantt: typeof import('./../components/global/C_VtableGantt/index.vue')['default']
     C_WorkFlow: typeof import('./../components/global/C_WorkFlow/index.vue')['default']
     Icon: typeof import('@iconify/vue')['Icon']
     NAlert: typeof import('naive-ui')['NAlert']

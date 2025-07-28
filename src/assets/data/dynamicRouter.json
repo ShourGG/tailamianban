@@ -343,6 +343,19 @@
             "affix": false,
             "keepAlive": false
           }
+        },
+        {
+          "path": "v-table-gantt",
+          "name": "v-table-gantt",
+          "component": "/demo/33-v-table-gantt/index",
+          "meta": {
+            "icon": "fluent:gantt-chart-24-regular",
+            "title": "甘特图",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
         }
       ]
     },
