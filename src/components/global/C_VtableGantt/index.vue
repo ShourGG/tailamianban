@@ -182,72 +182,82 @@
     return props.height
   })
 
-  // 预设配置 - 简化重复配置
-  const getBaseTheme = () => ({
-    headerStyle: {
-      borderColor: '#e1e4e8',
-      borderLineWidth: 1,
-      fontSize: 14,
-      fontWeight: 'bold',
-      bgColor: '#EEF1F5',
+  // 通用配置生成器 - 减少重复代码
+  const createCommonConfig = () => ({
+    theme: {
+      headerStyle: {
+        borderColor: '#e1e4e8',
+        borderLineWidth: 1,
+        fontSize: 14,
+        fontWeight: 'bold',
+        bgColor: '#EEF1F5',
+      },
+      bodyStyle: {
+        borderColor: '#e1e4e8',
+        borderLineWidth: [1, 0, 1, 0],
+        fontSize: 13,
+        bgColor: '#FFF',
+      },
     },
-    bodyStyle: {
-      borderColor: '#e1e4e8',
-      borderLineWidth: [1, 0, 1, 0],
-      fontSize: 13,
-      bgColor: '#FFF',
+    frame: {
+      outerFrameStyle: {
+        borderLineWidth: 1,
+        borderColor: '#e1e4e8',
+        cornerRadius: 6,
+      },
+      verticalSplitLineMoveable: true,
+      verticalSplitLine: {
+        lineColor: '#e1e4e8',
+        lineWidth: 2,
+      },
     },
-  })
-
-  const getBaseFrame = () => ({
-    outerFrameStyle: {
-      borderLineWidth: 1,
-      borderColor: '#e1e4e8',
-      cornerRadius: 6,
+    grid: {
+      weekendBackgroundColor: '#f8f8f8',
+      verticalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
+      horizontalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
     },
-    verticalSplitLineMoveable: true,
-    verticalSplitLine: {
-      lineColor: '#e1e4e8',
-      lineWidth: 2,
+    timelineHeader: {
+      backgroundColor: '#EEF1F5',
+      colWidth: 60,
+      horizontalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
+      verticalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
     },
-  })
-
-  const getBaseGrid = () => ({
-    weekendBackgroundColor: '#f8f8f8',
-    verticalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
-    horizontalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
-  })
-
-  const getBaseTimelineHeader = () => ({
-    backgroundColor: '#EEF1F5',
-    colWidth: 50,
-    horizontalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
-    verticalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
+    scrollStyle: {
+      scrollRailColor: 'rgba(246,246,246,0.5)',
+      visible: 'scrolling',
+      width: 6,
+      scrollSliderCornerRadius: 2,
+      scrollSliderColor: '#1890ff',
+    },
   })
 
   const getPresetOptions = (preset: GanttPreset): GanttOptions => {
-    const baseConfigs = {
+    const common = createCommonConfig()
+
+    const configs = {
       basic: {
         overscrollBehavior: 'none',
         headerRowHeight: 40,
         rowHeight: 40,
         taskListTable: {
           columns: [
-            { field: 'title', title: '任务名称', width: 200, tree: true },
+            { field: 'title', title: '任务名称', width: 220, tree: true },
             { field: 'start', title: '开始时间', width: 120 },
             { field: 'end', title: '结束时间', width: 120 },
             { field: 'progress', title: '进度', width: 80 },
           ],
-          tableWidth: 350,
-          theme: getBaseTheme(),
+          tableWidth: 420,
+          minTableWidth: 300,
+          theme: common.theme,
         },
-        frame: getBaseFrame(),
-        grid: getBaseGrid(),
+        frame: common.frame,
+        grid: common.grid,
         taskBar: {
           startDateField: 'start',
           endDateField: 'end',
           progressField: 'progress',
-          moveable: false,
+          moveable: true,
+          resizable: true,
           labelText: '{title}',
           labelTextStyle: { fontSize: 12, textAlign: 'left' },
           barStyle: {
@@ -266,7 +276,7 @@
           },
         },
         timelineHeader: {
-          ...getBaseTimelineHeader(),
+          ...common.timelineHeader,
           scales: [
             {
               unit: 'week' as const,
@@ -282,13 +292,7 @@
             },
           ],
         },
-        scrollStyle: {
-          scrollRailColor: 'rgba(246,246,246,0.5)',
-          visible: 'scrolling',
-          width: 6,
-          scrollSliderCornerRadius: 2,
-          scrollSliderColor: '#1890ff',
-        },
+        scrollStyle: common.scrollStyle,
       },
 
       project: {
@@ -300,43 +304,43 @@
             {
               field: 'title',
               title: '任务名称',
-              width: 'auto',
+              width: 200,
               tree: true,
               editor: 'input',
             },
             {
               field: 'start',
               title: '开始时间',
-              width: 'auto',
+              width: 120,
               editor: 'date-input',
             },
             {
               field: 'end',
               title: '结束时间',
-              width: 'auto',
+              width: 120,
               editor: 'date-input',
             },
             {
               field: 'priority',
               title: '优先级',
-              width: 'auto',
+              width: 80,
               editor: 'input',
             },
             {
               field: 'progress',
               title: '进度%',
-              width: 'auto',
+              width: 80,
               editor: 'input',
             },
           ],
-          tableWidth: 400,
-          minTableWidth: 200,
+          tableWidth: 480,
+          minTableWidth: 350,
           maxTableWidth: 800,
-          theme: getBaseTheme(),
-          hierarchyExpandLevel: 2, // 默认展开2层
+          theme: common.theme,
+          hierarchyExpandLevel: 2,
         },
         frame: {
-          ...getBaseFrame(),
+          ...common.frame,
           outerFrameStyle: {
             borderLineWidth: 2,
             borderColor: '#e1e4e8',
@@ -344,7 +348,7 @@
           },
           verticalSplitLine: { lineColor: '#e1e4e8', lineWidth: 3 },
         },
-        grid: getBaseGrid(),
+        grid: common.grid,
         taskBar: {
           startDateField: 'start',
           endDateField: 'end',
@@ -368,7 +372,7 @@
           },
         },
         timelineHeader: {
-          ...getBaseTimelineHeader(),
+          ...common.timelineHeader,
           scales: [
             {
               unit: 'week' as const,
@@ -391,6 +395,7 @@
           headerStyle: { bgColor: '#EEF1F5', borderColor: '#e1e4e8' },
           style: { borderColor: '#e1e4e8' },
         },
+        scrollStyle: common.scrollStyle,
       },
 
       timeline: {
@@ -403,9 +408,10 @@
             { field: 'start', title: '时间', width: 150 },
           ],
           tableWidth: 400,
+          minTableWidth: 300,
           theme: {
-            headerStyle: { ...getBaseTheme().headerStyle, bgColor: '#f0f2f5' },
-            bodyStyle: getBaseTheme().bodyStyle,
+            headerStyle: { ...common.theme.headerStyle, bgColor: '#f0f2f5' },
+            bodyStyle: common.theme.bodyStyle,
           },
         },
         frame: {
@@ -414,6 +420,7 @@
             borderColor: '#d9d9d9',
             cornerRadius: 4,
           },
+          verticalSplitLineMoveable: true,
         },
         grid: {
           verticalLine: { lineWidth: 1, lineColor: '#f0f0f0' },
@@ -423,6 +430,8 @@
           startDateField: 'start',
           endDateField: 'end',
           progressField: 'progress',
+          moveable: true,
+          resizable: true,
           labelText: '{title}',
           labelTextStyle: { fontSize: 12, textAlign: 'left' },
           barStyle: {
@@ -450,6 +459,7 @@
             },
           ],
         },
+        scrollStyle: common.scrollStyle,
       },
 
       milestone: {
@@ -462,14 +472,15 @@
             { field: 'start', title: '目标日期', width: 120 },
             { field: 'priority', title: '重要性', width: 100 },
           ],
-          tableWidth: 350,
+          tableWidth: 400,
+          minTableWidth: 300,
           theme: {
             headerStyle: {
-              ...getBaseTheme().headerStyle,
+              ...common.theme.headerStyle,
               borderColor: '#ffa940',
               bgColor: '#fff7e6',
             },
-            bodyStyle: { ...getBaseTheme().bodyStyle, borderColor: '#ffa940' },
+            bodyStyle: { ...common.theme.bodyStyle, borderColor: '#ffa940' },
           },
         },
         frame: {
@@ -478,6 +489,7 @@
             borderColor: '#ffa940',
             cornerRadius: 6,
           },
+          verticalSplitLineMoveable: true,
         },
         grid: {
           verticalLine: { lineWidth: 1, lineColor: '#ffe7ba' },
@@ -514,6 +526,7 @@
             },
           ],
         },
+        scrollStyle: common.scrollStyle,
       },
 
       official: {
@@ -525,7 +538,7 @@
             {
               field: 'title',
               title: 'title',
-              width: 'auto',
+              width: 180,
               sort: true,
               tree: true,
               editor: 'input',
@@ -533,48 +546,48 @@
             {
               field: 'start',
               title: 'start',
-              width: 'auto',
+              width: 120,
               sort: true,
               editor: 'date-input',
             },
             {
               field: 'end',
               title: 'end',
-              width: 'auto',
+              width: 120,
               sort: true,
               editor: 'date-input',
             },
             {
               field: 'priority',
               title: 'priority',
-              width: 'auto',
+              width: 80,
               sort: true,
               editor: 'input',
             },
             {
               field: 'progress',
               title: 'progress',
-              width: 'auto',
+              width: 80,
               sort: true,
               editor: 'input',
             },
           ],
-          tableWidth: 250,
-          minTableWidth: 100,
-          maxTableWidth: 600,
+          tableWidth: 460,
+          minTableWidth: 350,
+          maxTableWidth: 800,
           theme: {
             headerStyle: {
-              ...getBaseTheme().headerStyle,
+              ...common.theme.headerStyle,
               fontSize: 18,
               color: 'red',
             },
             bodyStyle: {
-              ...getBaseTheme().bodyStyle,
+              ...common.theme.bodyStyle,
               fontSize: 16,
               color: '#4D4D4D',
             },
           },
-          hierarchyExpandLevel: 2, // 默认展开2层
+          hierarchyExpandLevel: 2,
         },
         frame: {
           outerFrameStyle: {
@@ -586,12 +599,13 @@
           verticalSplitLine: { lineColor: '#e1e4e8', lineWidth: 3 },
           horizontalSplitLine: { lineColor: '#e1e4e8', lineWidth: 3 },
         },
-        grid: getBaseGrid(),
+        grid: common.grid,
         taskBar: {
           startDateField: 'start',
           endDateField: 'end',
           progressField: 'progress',
           moveable: true,
+          resizable: true,
           hoverBarStyle: { barOverlayColor: 'rgba(99, 144, 0, 0.4)' },
           labelText: '{title} {progress}%',
           labelTextStyle: {
@@ -615,7 +629,7 @@
           },
         },
         timelineHeader: {
-          ...getBaseTimelineHeader(),
+          ...common.timelineHeader,
           scales: [
             {
               unit: 'week' as const,
@@ -663,12 +677,13 @@
           headerStyle: { bgColor: '#EEF1F5', borderColor: '#e1e4e8' },
           style: { borderColor: '#e1e4e8' },
         },
+        scrollStyle: common.scrollStyle,
       },
 
       custom: {},
     }
 
-    return baseConfigs[preset] || baseConfigs.basic
+    return configs[preset] || configs.basic
   }
 
   // 深度合并配置
@@ -751,22 +766,19 @@
     }
   }
 
-  // 全屏切换 - 使用浏览器的Fullscreen API
+  // 全屏切换
   const toggleFullscreen = async () => {
     if (!ganttContainerRef.value) return
 
     try {
       if (!document.fullscreenElement) {
-        // 进入全屏
         await ganttContainerRef.value.requestFullscreen()
         isFullscreen.value = true
       } else {
-        // 退出全屏
         await document.exitFullscreen()
         isFullscreen.value = false
       }
 
-      // 延迟调整大小，确保全屏状态已生效
       setTimeout(() => {
         if (ganttInstance.value && ganttInstance.value.resize) {
           try {
@@ -778,7 +790,6 @@
       }, 100)
     } catch (error) {
       console.warn('全屏切换失败:', error)
-      // 降级处理：如果浏览器不支持fullscreen，使用样式方式
       isFullscreen.value = !isFullscreen.value
       nextTick(() => {
         if (ganttInstance.value && ganttInstance.value.resize) {
@@ -791,8 +802,6 @@
   // 监听全屏状态变化
   const handleFullscreenChange = () => {
     isFullscreen.value = !!document.fullscreenElement
-
-    // 全屏状态改变时调整甘特图大小
     nextTick(() => {
       if (ganttInstance.value && ganttInstance.value.resize) {
         try {
@@ -863,9 +872,7 @@
 
   // 生命周期
   onMounted(() => {
-    // 监听全屏状态变化
     document.addEventListener('fullscreenchange', handleFullscreenChange)
-
     nextTick(() => {
       setTimeout(() => {
         initGantt()
@@ -874,7 +881,6 @@
   })
 
   onUnmounted(() => {
-    // 移除全屏监听
     document.removeEventListener('fullscreenchange', handleFullscreenChange)
     destroyGantt()
   })
@@ -930,6 +936,6 @@
     flex: 1;
     position: relative;
     min-height: 400px;
-    padding: 20px 20px 32px 20px; /* 增加底部边距 */
+    padding: 8px;
   }
 </style>
