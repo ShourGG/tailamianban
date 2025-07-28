@@ -5,7 +5,7 @@
  * @LastEditTime: 2025-07-27 22:37:33
  * @FilePath: \Robot_Admin\src\components\global\C_FilePreview\index.vue
  * @Description: 文件预览组件
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>

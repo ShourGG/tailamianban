@@ -52,7 +52,7 @@
                     name="ic:outline-cloud-upload"
                     :size="36"
                     color="#3b82f6"
-                    class="mb-2"
+                    class="mb-2 mr-10px align-middle"
                   />
                   <NText class="text-lg">点击或拖拽文件到此区域上传</NText>
                   <NText
