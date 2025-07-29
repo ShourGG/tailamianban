@@ -364,23 +364,43 @@ else
     print_info "非交互模式，保留功能分支 $FEATURE_BRANCH"
 fi
 
-# 10. 切换到dev分支，为下次开发做准备
+# 10. 智能分支切换策略
 echo ""
-print_step "切换到dev分支，准备下次开发..."
-git checkout dev
-print_success "已切换到dev分支"
+if [ "$BRANCH_DELETED" = true ]; then
+    # 如果删除了功能分支，说明功能已完结，切换到dev开始新开发
+    print_step "功能分支已删除，切换到dev分支准备下次开发..."
+    git checkout dev
+    print_success "已切换到dev分支，可以开始新功能开发"
+    
+    echo ""
+    echo -e "${GREEN}🌟 开始新功能开发:${NC}"
+    echo "  - 当前在dev分支，基于最新代码开发"
+    echo -e "  - 创建功能分支: ${BLUE}git checkout -b feat_0129${NC} ${CYAN}# 功能+日期${NC}"
+    echo -e "  - 创建模块分支: ${BLUE}git checkout -b feat_userLogin${NC} ${CYAN}# 功能+模块名${NC}"
+    echo -e "  - 创建修复分支: ${BLUE}git checkout -b fix_loginBug${NC} ${CYAN}# 修复+问题${NC}"
+    echo -e "  - 创建热修分支: ${BLUE}git checkout -b hotfix_critical${NC} ${CYAN}# 紧急修复${NC}"
+else
+    # 如果保留了功能分支，可能还需要继续在该分支上工作，切换回功能分支
+    print_step "功能分支已保留，切换回功能分支继续开发..."
+    git checkout "$FEATURE_BRANCH"
+    print_success "已切换回功能分支 $FEATURE_BRANCH"
+    
+    echo ""
+    echo -e "${YELLOW}🔧 继续功能开发:${NC}"
+    echo "  - 当前在功能分支 $FEATURE_BRANCH，可继续完善功能"
+    echo -e "  - 提交更改: ${BLUE}git add . && git cz || [commit] -m \"补充功能\"${NC}"
+    echo -e "  - 推送更新: ${BLUE}git push origin $FEATURE_BRANCH${NC}"
+    echo -e "  - 完成后再次发布: ${BLUE}bun run deploy${NC}"
+    echo ""
+    echo -e "  - 或开始新功能: ${BLUE}git checkout dev && git checkout -b feat_newFeature${NC}"
+fi
 
 # 11. 后续操作建议
 echo ""
 echo -e "${YELLOW}💡 后续操作建议:${NC}"
 echo "  1. 通知团队成员拉取最新的dev和main分支"
-echo "  2. 检查GitHub和Gitee的分支状态"
+echo "  2. 检查GitHub和Gitee的分支状态"  
 echo "  3. 验证部署和功能是否正常"
-echo ""
-echo -e "${GREEN}🌟 准备下次开发:${NC}"
-echo "  4. 当前已在dev分支，可以开始新功能开发"
-echo "  5. 创建新功能分支: ${BLUE}git checkout -b feature/新功能名${NC}"
-echo "  6. 或者使用命名规范: ${BLUE}git checkout -b feature/YYYY-MM-DD-功能描述${NC}"
 
 if [ "$BRANCH_DELETED" = true ]; then
     echo ""
@@ -388,16 +408,28 @@ if [ "$BRANCH_DELETED" = true ]; then
     echo "  - ✅ 功能分支 $FEATURE_BRANCH 已合并并删除"
     echo "  - ✅ 代码已同步到dev和main分支"
     echo "  - ✅ 远程仓库已更新"
+    echo "  - ✅ 已切换到dev分支，可开始新功能开发"
+else
+    echo ""
+    echo -e "${CYAN}📋 功能分支保留:${NC}"
+    echo "  - ✅ 功能分支 $FEATURE_BRANCH 已合并到dev和main"
+    echo "  - ✅ 代码已同步到远程仓库"
+    echo "  - ✅ 已切换回功能分支，可继续完善功能"
 fi
 
 # 检查整体结果
+CURRENT_BRANCH=$(git branch --show-current)
 if [ $DEV_PUSH_RESULT -eq 0 ] && [ $MAIN_PUSH_RESULT -eq 0 ]; then
-    print_success "🎉 所有操作成功完成！已准备好下次开发"
+    if [ "$BRANCH_DELETED" = true ]; then
+        print_success "🎉 发布完成并已清理！准备开始新功能开发 (当前在$CURRENT_BRANCH分支)"
+    else
+        print_success "🎉 发布完成！可继续完善当前功能 (当前在$CURRENT_BRANCH分支)"
+    fi
     exit 0
 elif [ $DEV_PUSH_RESULT -lt 2 ] && [ $MAIN_PUSH_RESULT -lt 2 ]; then
-    print_warning "部分推送失败，但核心流程完成。已切换到dev分支"
+    print_warning "部分推送失败，但核心流程完成 (当前在$CURRENT_BRANCH分支)"
     exit 0
 else
-    print_error "存在推送失败，请检查网络连接和权限。当前在dev分支"
+    print_error "存在推送失败，请检查网络连接和权限 (当前在$CURRENT_BRANCH分支)"
     exit 1
 fi
