@@ -328,13 +328,35 @@ echo "  - 最新提交: $(git log --oneline -1)"
 
 # 9. 询问是否删除功能分支
 echo ""
+BRANCH_DELETED=false
 if [ -t 0 ] && [ -t 1 ]; then  # 检查是否在交互式终端中
-    read -p "是否删除功能分支 $FEATURE_BRANCH？(y/N): " -n 1 -r
+    read -p "是否删除本地功能分支 $FEATURE_BRANCH？(y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        print_step "删除功能分支 $FEATURE_BRANCH..."
+        print_step "删除本地功能分支 $FEATURE_BRANCH..."
         git branch -d $FEATURE_BRANCH
-        print_success "功能分支 $FEATURE_BRANCH 已删除"
+        print_success "本地功能分支 $FEATURE_BRANCH 已删除"
+        BRANCH_DELETED=true
+        
+        # 检查是否存在远程分支
+        if check_remote "origin"; then
+            if git ls-remote --exit-code --heads origin $FEATURE_BRANCH > /dev/null 2>&1; then
+                read -p "是否同时删除远程功能分支 origin/$FEATURE_BRANCH？(y/N): " -n 1 -r
+                echo
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    print_step "删除远程功能分支 origin/$FEATURE_BRANCH..."
+                    if git push origin --delete $FEATURE_BRANCH; then
+                        print_success "远程功能分支 origin/$FEATURE_BRANCH 已删除"
+                    else
+                        print_warning "删除远程分支失败，可能权限不足或分支被保护"
+                    fi
+                else
+                    print_info "保留远程功能分支 origin/$FEATURE_BRANCH"
+                fi
+            else
+                print_info "远程分支 origin/$FEATURE_BRANCH 不存在或已删除"
+            fi
+        fi
     else
         print_info "保留功能分支 $FEATURE_BRANCH"
     fi
@@ -342,22 +364,40 @@ else
     print_info "非交互模式，保留功能分支 $FEATURE_BRANCH"
 fi
 
-# 10. 后续操作建议
+# 10. 切换到dev分支，为下次开发做准备
+echo ""
+print_step "切换到dev分支，准备下次开发..."
+git checkout dev
+print_success "已切换到dev分支"
+
+# 11. 后续操作建议
 echo ""
 echo -e "${YELLOW}💡 后续操作建议:${NC}"
 echo "  1. 通知团队成员拉取最新的dev和main分支"
 echo "  2. 检查GitHub和Gitee的分支状态"
 echo "  3. 验证部署和功能是否正常"
-echo "  4. 开始下一个功能的开发"
+echo ""
+echo -e "${GREEN}🌟 准备下次开发:${NC}"
+echo "  4. 当前已在dev分支，可以开始新功能开发"
+echo "  5. 创建新功能分支: ${BLUE}git checkout -b feature/新功能名${NC}"
+echo "  6. 或者使用命名规范: ${BLUE}git checkout -b feature/YYYY-MM-DD-功能描述${NC}"
+
+if [ "$BRANCH_DELETED" = true ]; then
+    echo ""
+    echo -e "${CYAN}📋 分支清理完成:${NC}"
+    echo "  - ✅ 功能分支 $FEATURE_BRANCH 已合并并删除"
+    echo "  - ✅ 代码已同步到dev和main分支"
+    echo "  - ✅ 远程仓库已更新"
+fi
 
 # 检查整体结果
 if [ $DEV_PUSH_RESULT -eq 0 ] && [ $MAIN_PUSH_RESULT -eq 0 ]; then
-    print_success "🎉 所有操作成功完成！"
+    print_success "🎉 所有操作成功完成！已准备好下次开发"
     exit 0
 elif [ $DEV_PUSH_RESULT -lt 2 ] && [ $MAIN_PUSH_RESULT -lt 2 ]; then
-    print_warning "部分推送失败，但核心流程完成"
+    print_warning "部分推送失败，但核心流程完成。已切换到dev分支"
     exit 0
 else
-    print_error "存在推送失败，请检查网络连接和权限"
+    print_error "存在推送失败，请检查网络连接和权限。当前在dev分支"
     exit 1
 fi
