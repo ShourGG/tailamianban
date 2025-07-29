@@ -24,7 +24,8 @@
     "prepare": "husky install",
     "commit": "bunx cz",
     "check-branch": "gbd",
-    "check-type": "ttc check --format"
+    "check-type": "ttc check --format",
+    "sync-dev-branch": "bash ./scripts/sync-dev.sh"
   },
   "dependencies": {
     "@antv/x6": "^2.18.1",
