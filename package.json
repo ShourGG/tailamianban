@@ -25,7 +25,8 @@
     "commit": "bunx cz",
     "check-branch": "gbd",
     "check-type": "ttc check --format",
-    "sync-dev-branch": "bash ./scripts/sync-dev.sh"
+    "deploy": "bash ./scripts/merge-and-deploy.sh",
+    "sync-deploy-branch": "bash ./scripts/sync-dev.sh"
   },
   "dependencies": {
     "@antv/x6": "^2.18.1",
