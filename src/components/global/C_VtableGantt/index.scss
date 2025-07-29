@@ -1,0 +1,39 @@
+// 甘特图组件样式
+
+.c-vtable-gantt-wrapper {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color, #e1e4e8);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  .gantt-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color, #e1e4e8);
+    min-height: 48px;
+
+    .toolbar-left {
+      .gantt-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+    }
+
+    .toolbar-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+  }
+
+  .gantt-container {
+    flex: 1;
+    position: relative;
+    min-height: 400px;
+    padding: 8px;
+  }
+}

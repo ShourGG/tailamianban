@@ -76,6 +76,7 @@
     "mozfullscreenchange",
     "msword",
     "navpanes",
+    "niao",
     "njsproj",
     "nomal",
     "Nord",
@@ -132,7 +133,8 @@
     "vuex",
     "wangeditor",
     "wechat",
-    "wordprocessingml"
+    "wordprocessingml",
+    "xiong"
   ],
   "ignorePaths": [
     "README.md"
