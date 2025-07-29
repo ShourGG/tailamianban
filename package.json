@@ -24,7 +24,9 @@
     "prepare": "husky install",
     "commit": "bunx cz",
     "check-branch": "gbd",
-    "check-type": "ttc check --format"
+    "check-type": "ttc check --format",
+    "deploy": "bash ./scripts/merge-and-deploy.sh",
+    "sync-deploy-branch": "bash ./scripts/sync-dev.sh"
   },
   "dependencies": {
     "@antv/x6": "^2.18.1",
