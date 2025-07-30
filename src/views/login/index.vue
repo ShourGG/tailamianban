@@ -2,18 +2,31 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:07:28
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-23 16:42:39
+ * @LastEditTime: 2025-07-30 14:21:28
  * @FilePath: \Robot_Admin\src\views\login\index.vue
  * @Description: 登录页
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 <template>
   <div class="login-container bg-[#181818]">
+    <!-- 打字机组件 -->
+    <Typewriter
+      v-if="showTypewriter"
+      text="Hey！伙计，欢迎来到我的世界。"
+      :duration="2000"
+      :delay="300"
+      :pause-after="1000"
+      @complete="handleTypewriterComplete"
+      @hidden="handleTypewriterHidden"
+    />
+
+    <!-- 原有的登录界面 -->
     <div class="spline-background">
       <Spline
         scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
       />
     </div>
+
     <div class="login-wrapper">
       <h3 class="login-title">{{ 'Robot Admin 管理系统' }}</h3>
       <C_Form
@@ -58,16 +71,31 @@
   import './index.scss'
   import Spline from './components/Spline.vue'
   import C_Captcha from '@/components/global/C_Captcha/index.vue'
+  import Typewriter from './components/Typewriter.vue'
 
   const router = useRouter()
   const userStore = s_userStore()
   const message = useMessage()
   const { loading, createSubmit } = useFormSubmit<LoginResponse>()
 
+  // 打字机控制
+  const showTypewriter = ref(true)
+
   // 验证码相关状态
   const captchaRef = ref()
   const captchaValid = ref(false)
   const captchaData = ref<{ token: string; timestamp: number } | null>(null)
+
+  // 打字机完成事件
+  const handleTypewriterComplete = () => {
+    console.log('打字机效果完成')
+  }
+
+  // 打字机隐藏事件
+  const handleTypewriterHidden = () => {
+    showTypewriter.value = false
+    console.log('打字机组件已隐藏，登录界面显示')
+  }
 
   // 验证码成功处理
   const handleCaptchaSuccess = (data: { token: string; timestamp: number }) => {
