@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-23 15:09:59
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-02 22:40:12
+ * @LastEditTime: 2025-07-30 16:29:36
  * @FilePath: \Robot_Admin\src\stores\user\index.ts
  * @Description: 用户状态管理 - 统一管理用户登录状态、信息和相关操作
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -73,7 +73,6 @@ export const s_userStore = defineStore('user', {
 
     handleLoginSuccess(token: string) {
       this.setToken(token)
-      router.replace('/home')
       d_setTimeStamp()
     },
 

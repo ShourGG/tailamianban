@@ -69,12 +69,12 @@
         clearInterval(typeInterval!)
         typeInterval = null
         emit('complete')
-        console.log('打字完成，准备隐藏组件')
+        // console.log('打字完成，准备隐藏组件')
 
         // 自动隐藏
         if (props.autoHide) {
           setTimeout(() => {
-            console.log('开始隐藏打字机组件')
+            // console.log('开始隐藏打字机组件')
             visible.value = false
           }, props.pauseAfter)
         }

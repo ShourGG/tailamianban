@@ -12,6 +12,7 @@ import DynamicRouter from '@/assets/data/dynamicRouter.json'
 // import type { DynamicRoute } from '@/router/dynamicRouter'
 
 export interface LoginResponse {
+  data: any
   code: '0' | '1' // 根据实际业务码调整
   token: string
   message?: string

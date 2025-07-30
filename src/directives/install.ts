@@ -23,7 +23,7 @@ const directiveModules = import.meta.glob('./modules/*.ts', { eager: true })
  * @param app Vue 应用实例
  */
 export function setupDirectives(app: App): void {
-  console.log('🚀 开始安装指令插件...')
+  // console.log('🚀 开始安装指令插件...')
 
   let registeredCount = 0
 
@@ -36,7 +36,7 @@ export function setupDirectives(app: App): void {
         // 注册指令，添加 v- 前缀
         app.directive(directiveName, directiveModule.default)
         registeredCount++
-        console.log(`📌 指令注册成功: v-${directiveName}`)
+        // console.log(`📌 指令注册成功: v-${directiveName}`)
       } catch (error) {
         console.error(`❌ 指令注册失败: v-${directiveName}`, error)
       }

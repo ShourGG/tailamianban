@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-11 01:02:12
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-02 22:40:45
+ * @LastEditTime: 2025-07-30 16:40:45
  * @FilePath: \Robot_Admin\src\router\permission.ts
  * @Description: 路由权限控制
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -20,6 +20,9 @@ const nprogress = setupNProgress()
 const WHITE_LIST = ['/login', '/404', '/401']
 const LOGIN_PATH = '/login'
 const DEFAULT_TITLE = 'Robot Admin'
+
+// 防止重复初始化
+let isInitializing = false
 
 // 扩展 RouteMeta 类型
 interface ExtendedRouteMeta {
@@ -41,10 +44,20 @@ const setPageTitle = (title?: string): void => {
   document.title = title ? `${title} | ${DEFAULT_TITLE}` : DEFAULT_TITLE
 }
 
-// 初始化动态路由
+// 初始化动态路由 - 简化版本
 const handleDynamicRouterInit = async (fullPath: string): Promise<string> => {
+  // 防止重复初始化
+  if (isInitializing) {
+    console.log('⏳ 动态路由正在初始化，跳过重复请求')
+    return fullPath
+  }
+
+  isInitializing = true
+
   try {
+    console.log('🚀 开始初始化动态路由...')
     const success = await initDynamicRouter()
+
     if (!success) {
       throw new Error('动态路由初始化失败')
     }
@@ -55,15 +68,22 @@ const handleDynamicRouterInit = async (fullPath: string): Promise<string> => {
       throw new Error('菜单数据为空')
     }
 
+    console.log('✅ 动态路由初始化成功')
     return fullPath
   } catch (error) {
     return handleRouteError(error, '动态路由加载失败')
+  } finally {
+    isInitializing = false
   }
 }
 
-// 核心路由守卫
+// 核心路由守卫 - 简化版本
 router.beforeEach(
-  async (to: RouteLocationNormalized): Promise<string | boolean> => {
+  async (
+    to: RouteLocationNormalized,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    from: RouteLocationNormalized
+  ): Promise<string | boolean> => {
     nprogress.start()
 
     try {
@@ -72,24 +92,35 @@ router.beforeEach(
       const { authMenuList } = s_permissionStore()
       const meta = to.meta as ExtendedRouteMeta
 
+      // console.log(`🚦 路由导航: ${from.path} -> ${to.path}`)
+
       // 1. 未登录处理
       if (!token) {
-        // 如果访问的是白名单页面，直接允许访问
         if (WHITE_LIST.includes(to.path)) {
+          setPageTitle(meta.title)
           return true
         }
-        // 否则重定向到登录页
         return LOGIN_PATH
       }
 
-      // 2. 已登录但访问登录页
+      // 2. 已登录但访问登录页 - 关键修复点
       if (to.path === LOGIN_PATH) {
-        return '/'
+        console.log('✅ 已登录用户访问登录页，跳转首页')
+        return '/home'
       }
 
-      // 3. 动态路由初始化
-      if (!authMenuList.length) {
-        return await handleDynamicRouterInit(to.fullPath)
+      // 3. 动态路由初始化 - 简化逻辑
+      if (!authMenuList.length && !isInitializing) {
+        console.log('🔄 需要初始化动态路由')
+        const result = await handleDynamicRouterInit(to.fullPath)
+
+        // 如果返回的是错误路径，直接重定向
+        if (result !== to.fullPath) {
+          return result
+        }
+
+        // 初始化成功，重新访问当前路径
+        return to.fullPath
       }
 
       // 4. 正常访问
@@ -103,8 +134,26 @@ router.beforeEach(
   }
 )
 
-// 全局错误处理
+// 简化的错误处理
 router.onError((error: Error) => {
   nprogress.done()
-  handleRouteError(error, '路由加载失败')
+  console.error('🔥 路由错误:', error)
+
+  // 只处理关键的 chunk 加载错误
+  if (error.message.includes('Loading chunk')) {
+    console.log('🔄 检测到 chunk 加载失败，刷新页面')
+    window.location.reload()
+    return
+  }
+
+  message.error('页面加载失败，请刷新重试')
+})
+
+// 后置钩子 - 只记录日志
+router.afterEach((to, from, failure) => {
+  if (failure) {
+    console.error('❌ 路由跳转失败:', failure.message)
+  } else {
+    // console.log(`✅ 路由跳转成功: ${from.path} -> ${to.path}`)
+  }
 })

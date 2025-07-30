@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-01 22:46:09
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-06 15:43:56
+ * @LastEditTime: 2025-07-30 15:43:56
  * @FilePath: \Robot_Admin\src\hooks\useFormSubmit\index.ts
  * @Description:  表单提交封装
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -16,25 +16,24 @@ interface ApiResponse<T = any> {
   data?: T
   // 你可以在这里添加更多的属性
 }
+
 export interface SubmitOptions<T extends ApiResponse = ApiResponse> {
   successCode?: string
   successMsg?: string
+  meta?: string | ((data: T) => string) // 直接使用官方的 meta 属性
   errorMsg?: string
   onSuccess?: (data: T) => Promise<void> | void
-  globalErrorHandler?: (error: any) => void // 新增的全局错误处理函数
-  debounce?: number | false // 新增防抖配置（单位：毫秒）
+  globalErrorHandler?: (error: any) => void
+  debounce?: number | false
 }
 
 // 定义默认的全局错误处理函数
 const defaultGlobalErrorHandler = (error: any) => {
   console.error('默认全局错误处理:', error)
-  // 在这里添加默认的错误处理逻辑，例如显示通知
-  // notification.error({ content: '默认错误: ' + error.message, duration: 5000 })
 }
 
 export const useFormSubmit = <T extends ApiResponse = ApiResponse>() => {
   const loading = ref(false)
-  // const notification = useNotification()
 
   /**
    * 处理表单未准备好的情况
@@ -57,8 +56,20 @@ export const useFormSubmit = <T extends ApiResponse = ApiResponse>() => {
   const handleResponse = (data: T, options: SubmitOptions<T>) => {
     if (data.code === (options.successCode || '0')) {
       options.onSuccess?.(data)
+
+      // 处理成功提示信息
+      const displayMessage = options.successMsg || '提交成功'
+      let metaContent: string | undefined
+
+      // 如果有 meta 属性，则生成个性化信息
+      if (options.meta) {
+        metaContent =
+          typeof options.meta === 'function' ? options.meta(data) : options.meta
+      }
+
       notification.success({
-        content: options.successMsg || '提交成功',
+        content: displayMessage,
+        meta: metaContent, // 直接使用官方的 meta 属性
         duration: 3000,
       })
       return true
@@ -100,10 +111,9 @@ export const useFormSubmit = <T extends ApiResponse = ApiResponse>() => {
 
       try {
         console.info('[表单验证] 开始验证...')
-        // 直接验证
         await validateForm(formScope)
         loading.value = true
-        const data = await finalApiFn(formScope.model) // 修改防抖包装调用方式
+        const data = await finalApiFn(formScope.model)
 
         // 处理成功逻辑
         if (handleResponse(data, options)) {
@@ -124,22 +134,40 @@ export const useFormSubmit = <T extends ApiResponse = ApiResponse>() => {
 }
 
 // TAG: 使用示例
+
+// 示例1: 简单的个性化信息
 // const login = createSubmit(loginApi, {
 //   successMsg: '登录成功',
+//   meta: '欢迎你，CHENY！', // 静态个性化信息
 //   errorMsg: '账号或密码错误',
 //   onSuccess: async ({ token }) => {
 //     userStore.handleLoginSuccess(token)
 //     await initDynamicRouter()
 //     router.push('/home')
-//   },
-//? 如果需要额外的全局错误处理逻辑，可以在这里提供, 增加下面的代码调用
-// globalErrorHandler: (error) => {
-//   console.error('全局错误处理:', error)
-//   // 在这里添加额外的错误处理逻辑
-// }
+//   }
 // })
 
-//? 防抖自定义示例
+// 示例2: 动态个性化信息（根据API响应数据生成）
+// const login = createSubmit(loginApi, {
+//   successMsg: '登录成功',
+//   meta: (data) => {
+//     const username = data.data?.username || data.data?.name || 'CHENY'
+//     const time = new Date().getHours()
+//     let greeting = '早上好'
+//     if (time >= 12 && time < 18) greeting = '下午好'
+//     else if (time >= 18) greeting = '晚上好'
+//     return `${greeting}，${username}！欢迎回来～`
+//   },
+//   errorMsg: '账号或密码错误',
+//   onSuccess: async ({ token }) => {
+//     userStore.handleLoginSuccess(token)
+//     await initDynamicRouter()
+//     router.push('/home')
+//   }
+// })
+
+// 示例3: 防抖自定义示例
 // const createUser = createSubmit(userApi, {
-//   debounce: 1000 // 1秒防抖  ||   debounce: false // 紧急情况立即提交
+//   debounce: 1000, // 1秒防抖
+//   meta: (data) => `用户 ${data.data?.name} 创建成功！`
 // })
