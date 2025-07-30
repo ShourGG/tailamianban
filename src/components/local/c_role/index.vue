@@ -1,3 +1,13 @@
+<!--
+ * @Author: ChenYu ycyplus@gmail.com
+ * @Date: 2025-07-10 14:20:39
+ * @LastEditors: ChenYu ycyplus@gmail.com
+ * @LastEditTime: 2025-07-30 15:07:57
+ * @FilePath: \Robot_Admin\src\components\local\c_role\index.vue
+ * @Description: 角色权限设置组件
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+-->
+
 <template>
   <NDrawer
     v-model:show="showDrawer"
