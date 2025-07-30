@@ -12,8 +12,8 @@
   
   <p><strong>Robot Admin</strong></p>
   <p>
-    <a href="https://github.com/ChenyCHENYU/fearless/actions"><img src="https://img.shields.io/github/actions/workflow/status/ChenyCHENYU/fearless/main.yml" alt="Build Status"></a>
-    <a href="https://github.com/ChenyCHENYU/fearless/blob/master/LICENSE"><img src="https://img.shields.io/github/license/ChenyCHENYU/fearless" alt="License"></a>
+    <a href="https://github.com/ChenyCHENYU/robot_admin/actions"><img src="https://img.shields.io/github/actions/workflow/status/ChenyCHENYU/robot_admin/main.yml" alt="Build Status"></a>
+    <a href="https://github.com/ChenyCHENYU/robot_admin/blob/master/LICENSE"><img src="https://img.shields.io/github/license/ChenyCHENYU/robot_admin" alt="License"></a>
     <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-brightgreen" alt="Code Style"></a>
     <img src="https://img.shields.io/badge/bun-%E2%89%A51.x-ff1e56?style=flat&logo=bun" alt="Bun Version">
     <img src="https://img.shields.io/badge/vue-3.5.13-4FC08D?style=flat&logo=vue.js" alt="Vue Version">
@@ -29,9 +29,9 @@
     <img src="https://img.shields.io/badge/performance-A+-brightgreen?style=flat" alt="Performance">
   </p>
   <p>
-    <img src="https://img.shields.io/github/stars/ChenyCHENYU/robot-admin?style=social" alt="GitHub stars">
-    <img src="https://img.shields.io/github/forks/ChenyCHENYU/robot-admin?style=social" alt="GitHub forks">
-    <img src="https://img.shields.io/github/watchers/ChenyCHENYU/robot-admin?style=social" alt="GitHub watchers">
+    <img src="https://img.shields.io/github/stars/ChenyCHENYU/robot_admin?style=social" alt="GitHub stars">
+    <img src="https://img.shields.io/github/forks/ChenyCHENYU/robot_admin?style=social" alt="GitHub forks">
+    <img src="https://img.shields.io/github/watchers/ChenyCHENYU/robot_admin?style=social" alt="GitHub watchers">
   </p>
 
   <!-- 快速导航 -->
@@ -44,6 +44,9 @@
     </a>
     <a href="#-快速开始真的很快">
       <img src="https://img.shields.io/badge/⚡-快速开始-4ECDC4?style=for-the-badge&logo=rocket" alt="Quick Start">
+    </a>
+    <a href="./CONTRIBUTING.md">
+      <img src="https://img.shields.io/badge/🤝-参与贡献-FFA726?style=for-the-badge&logo=github" alt="Contributing">
     </a>
     <a href="./README_EN.md">
       <img src="https://img.shields.io/badge/🌍-English-95E1D3?style=for-the-badge&logo=googletranslate" alt="English Version">
@@ -76,15 +79,83 @@
 
 **📈 项目数据概览**
 
-- 🌟 **GitHub Stars**: 0+ (期待持续增长，前排太空舱，坐坐呗啊哒)
-- 🍴 **Forks**: 0+ (AHH)
-- 👀 **Watchers**: 活跃关注者
-- 📦 **Bundle Size**: < 2MB (生产环境)
-- ⚡ **Performance**: A+ 级性能评分
-- 🧪 **Test Coverage**: 85%+ 测试覆盖率
-- 🔧 **Contributors**: 欢迎更多贡献者加入
-- 📈 **Weekly Downloads**: 新生儿，逐步统计中
-- 🌍 **Global Usage**: 和平和尊敬，全球开发者友好
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="https://img.shields.io/github/stars/ChenyCHENYU/robot_admin?style=for-the-badge&logo=github&color=yellow" alt="GitHub Stars">
+        <br>
+        <strong>⭐ Stars</strong>
+        <br>
+        <sub>给个星标呗 🌟</sub>
+      </td>
+      <td align="center">
+        <img src="https://img.shields.io/github/forks/ChenyCHENYU/robot_admin?style=for-the-badge&logo=github&color=blue" alt="GitHub Forks">
+        <br>
+        <strong>🍴 Forks</strong>
+        <br>
+        <sub>一起来开发</sub>
+      </td>
+      <td align="center">
+        <img src="https://img.shields.io/github/watchers/ChenyCHENYU/robot_admin?style=for-the-badge&logo=github&color=green" alt="GitHub Watchers">
+        <br>
+        <strong>👀 Watchers</strong>
+        <br>
+        <sub>关注项目动态</sub>
+      </td>
+      <td align="center">
+        <img src="https://img.shields.io/github/issues/ChenyCHENYU/robot_admin?style=for-the-badge&logo=github&color=red" alt="GitHub Issues">
+        <br>
+        <strong>🐛 Issues</strong>
+        <br>
+        <sub>问题反馈</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://img.shields.io/github/contributors/ChenyCHENYU/robot_admin?style=for-the-badge&logo=github&color=orange" alt="Contributors">
+        <br>
+        <strong>🧑‍💻 Contributors</strong>
+        <br>
+        <sub>欢迎加入团队</sub>
+      </td>
+      <td align="center">
+        <img src="https://img.shields.io/github/last-commit/ChenyCHENYU/robot_admin?style=for-the-badge&logo=github&color=purple" alt="Last Commit">
+        <br>
+        <strong>🕐 Last Commit</strong>
+        <br>
+        <sub>保持活跃更新</sub>
+      </td>
+      <td align="center">
+        <img src="https://img.shields.io/github/repo-size/ChenyCHENYU/robot_admin?style=for-the-badge&logo=github&color=lightblue" alt="Repo Size">
+        <br>
+        <strong>📦 Repo Size</strong>
+        <br>
+        <sub>轻量级项目</sub>
+      </td>
+      <td align="center">
+        <img src="https://img.shields.io/github/license/ChenyCHENYU/robot_admin?style=for-the-badge&logo=github&color=pink" alt="License">
+        <br>
+        <strong>📄 License</strong>
+        <br>
+        <sub>MIT 开源协议</sub>
+      </td>
+    </tr>
+  </table>
+</div>
+
+### 🚀 想让这些数据更好看？一起来搞！
+
+<div align="center">
+  <a href="./CONTRIBUTING.md">
+    <img src="https://img.shields.io/badge/🤝-加入开发团队-orange?style=for-the-badge&logo=github" alt="Join Us">
+  </a>
+  <a href="https://github.com/ChenyCHENYU/robot_admin/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22">
+    <img src="https://img.shields.io/badge/🎯-新手任务-green?style=for-the-badge&logo=target" alt="Good First Issues">
+  </a>
+</div>
+
+<sub>**💡 贡献不分大小，每个 PR 都让项目更好！** 文档错字、代码注释、新功能都欢迎！</sub>
 
 ---
 
@@ -117,7 +188,7 @@
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/ChenyCHENYU/Robot_Admin.git
+git clone https://github.com/ChenyCHENYU/robot_admin.git
 
 # 2. 进入目录
 cd robot_admin
@@ -412,6 +483,206 @@ graph LR
 
 ---
 
+## 🤝 加入 Robot Admin 开发大军
+
+> **来啊，快活啊！一起搞事情啊！** 🎉
+
+### 🚀 30秒快速上手贡献
+
+<table width="100%">
+<tr>
+<td width="50%" valign="top">
+
+**📝 简单贡献（新手友好）**
+```bash
+# 1. Fork + Clone
+git clone https://github.com/你的用户名/robot_admin.git
+
+# 2. 安装依赖
+bun install
+
+# 3. 启动项目
+bun dev
+
+# 4. 改代码，提交PR
+```
+
+**适合做什么？**
+- 🐛 修复文档错别字
+- 📝 添加代码注释
+- 🎨 优化界面样式
+- 📊 新增演示页面
+
+</td>
+<td width="50%" valign="top">
+
+**🔥 高级贡献（老司机专用）**
+```bash
+# 1. 讨论新功能
+# 在 Issues/Discussions 里聊聊
+
+# 2. 开发新功能
+git checkout -b feat/awesome-feature
+
+# 3. 测试 + 提交
+bun test && git commit -m "feat: 牛逼功能"
+
+# 4. 创建 PR
+```
+
+**可以搞什么？**
+- ⚡ 性能优化
+- 🧩 新组件开发
+- 🛠️ 工具函数
+- 🎪 自定义指令
+
+</td>
+</tr>
+</table>
+
+### 💡 贡献方向指南
+
+<div align="center">
+
+![演示页面](https://img.shields.io/badge/📊-演示页面-blue?style=for-the-badge)
+![组件开发](https://img.shields.io/badge/🧩-组件开发-green?style=for-the-badge)
+![工具函数](https://img.shields.io/badge/🛠️-工具函数-orange?style=for-the-badge)
+![文档完善](https://img.shields.io/badge/📚-文档完善-purple?style=for-the-badge)
+
+</div>
+
+<details>
+<summary><strong>🎨 UI/演示页面贡献</strong> - 最容易上手，最有成就感</summary>
+
+**什么是演示页面？**
+- 展示某个功能的完整使用案例
+- 现在有 30+ 页面，目标是 50+ 
+
+**怎么贡献？**
+- 在 `src/views/demo/` 下新建页面
+- 展示一个完整的业务场景
+- 代码要有注释，能复制粘贴直接用
+
+**举个例子：**
+- 新的图表类型展示页
+- 表单验证最佳实践
+- 文件上传处理流程
+- 权限控制使用案例
+
+</details>
+
+<details>
+<summary><strong>🧩 组件开发贡献</strong> - 核心功能，影响力大</summary>
+
+**全局组件标准：**
+- 放在 `src/components/global/`
+- 组件名以 `C_` 开头
+- 必须有 TypeScript 类型定义
+- 要有完整的使用文档
+
+**当前急需：**
+- 更多的表单组件
+- 数据展示组件
+- 交互增强组件
+
+</details>
+
+<details>
+<summary><strong>🛠️ 工具函数贡献</strong> - 小而美，实用性强</summary>
+
+**放哪里？**
+- `src/utils/` 目录下
+- 按功能分类建文件
+
+**写什么？**
+- 日期时间处理
+- 数据格式化
+- 文件处理
+- 网络请求封装
+
+**要求：**
+- 要有单元测试
+- 要有 JSDoc 注释
+- 要考虑边界情况
+
+</details>
+
+### 🏆 贡献者激励
+
+<table width="100%">
+<tr>
+<td width="25%" align="center">
+
+**🌟 新手村**
+<br>
+第1个PR
+<br>
+<sub>修复文档、优化样式</sub>
+
+</td>
+<td width="25%" align="center">
+
+**🚀 开发者**
+<br>
+5个PR+
+<br>
+<sub>新增功能、组件开发</sub>
+
+</td>
+<td width="25%" align="center">
+
+**🧠 架构师**
+<br>
+10个PR+
+<br>
+<sub>核心功能、性能优化</sub>
+
+</td>
+<td width="25%" align="center">
+
+**👑 核心团队**
+<br>
+长期贡献
+<br>
+<sub>项目决策、技术指导</sub>
+
+</td>
+</tr>
+</table>
+
+**🎁 贡献者福利：**
+- 📛 **GitHub 展示** - README 贡献者墙
+- 💼 **简历亮点** - 开源项目经验
+- 🎓 **技术成长** - 实战中学习最新技术
+- 🤝 **人脉拓展** - 认识更多优秀开发者
+
+### 📞 贡献支持
+
+**遇到问题？**
+- 📖 [详细贡献指南](./CONTRIBUTING.md) - 手把手教学
+- 💬 [GitHub Discussions](https://github.com/ChenyCHENYU/robot_admin/discussions) - 讨论交流
+- 📧 [邮件联系](mailto:ycyplus@gmail.com) - 直接沟通
+
+**想要贡献但不知道做什么？**
+
+<div align="center">
+
+[![Good First Issues](https://img.shields.io/github/issues/ChenyCHENYU/robot_admin/good%20first%20issue?color=7057ff&label=Good%20First%20Issues&style=for-the-badge)](https://github.com/ChenyCHENYU/robot_admin/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+
+</div>
+
+---
+
+**💪 现在就开始你的第一个贡献吧！**
+
+<div align="center">
+  <a href="./CONTRIBUTING.md">
+    <img src="https://img.shields.io/badge/🚀-查看完整贡献指南-brightgreen?style=for-the-badge" alt="Contributing Guide">
+  </a>
+</div>
+
+---
+
 ## 📱 响应式设计
 
 > **尽量适配所有设备，无论是桌面、平板还是手机**
@@ -626,53 +897,6 @@ graph LR
 - [ ] 🛠️ 低代码平台集成
 - [ ] ☁️ 云原生部署方案
 - [ ] 🔌 完整插件生态
-
----
-
-## 📝 贡献指南
-
-> **来啊，快活啊，一起打造更好的开源项目！**
-
-### 🤝 参与方式
-- 🐛 **Bug反馈** - 发现问题及时反馈
-- 💡 **功能建议** - 提出改进想法
-- 📖 **文档完善** - 帮助改进文档
-- 🔧 **代码贡献** - 提交PR参与开发
-
-### 📋 提交流程
-```bash
-# 1. Fork项目到你的账号
-# 2. 创建功能分支
-git checkout -b feat/awesome-feature
-
-# 3. 提交你的改动
-git commit -m 'feat: add awesome feature' 
-# （建议你最好用规范的方式提交）
-
-# 4. 推送到分支
-git push origin feat/awesome-feature
-
-# 5. 创建Pull Request
-```
-
-### 📏 代码规范
-
-我们使用严格的代码规范确保代码质量：
-- **ESLint** - JavaScript/TypeScript代码检查
-- **Prettier** - 代码格式化
-- **Commitizen** - 提交信息规范
-- **Husky** - Git钩子自动化
-
-**提交规范：**
-```
-feat: 新功能
-fix: 修复bug
-docs: 文档更新
-style: 代码风格调整
-refactor: 代码重构
-test: 测试相关
-chore: 构建工具/依赖更新
-```
 
 ---
 
