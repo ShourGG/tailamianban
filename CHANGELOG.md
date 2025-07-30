@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.1](https://github.com/ChenyCHENYU/Robot_Admin/compare/v1.0.0...v1.0.1) (2025-07-30)
+
+
+### Bug Fixes
+
+* **login/menu-top:** fix login route.push blank and optimiza func ([4366a07](https://github.com/ChenyCHENYU/Robot_Admin/commit/4366a07e9b7fbea44be039dbd4d88320442fb00b))
+
+
+### Performance Improvements
+
+* **login:** add Loading transition ([8adac6d](https://github.com/ChenyCHENYU/Robot_Admin/commit/8adac6d03ebbf26b4ecb0e270b834eb6ca76be62))
+
 ## 1.0.0 (2025-07-29)
 
 
