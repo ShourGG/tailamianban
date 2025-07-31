@@ -18,7 +18,7 @@
     <img src="https://img.shields.io/badge/bun-%E2%89%A51.x-ff1e56?style=flat&logo=bun" alt="Bun Version">
     <img src="https://img.shields.io/badge/vue-3.5.13-4FC08D?style=flat&logo=vue.js" alt="Vue Version">
     <img src="https://img.shields.io/badge/typescript-5.8.0-blue?style=flat&logo=typescript" alt="TypeScript Version">
-    <img src="https://img.shields.io/badge/vite-6.2.1-646CFF?style=flat&logo=vite" alt="Vite Version">
+    <img src="https://img.shields.io/badge/vite-7.0.6-646CFF?style=flat&logo=vite" alt="Vite Version">
   </p>
   <p>
     <img src="https://img.shields.io/badge/components-30+-success?style=flat" alt="Components">
@@ -90,7 +90,7 @@
 ## ⚡ Why Choose Robot Admin? <sub>(Best in class)</sub>
 
 ### 🔥 Monster-level Development Experience
-- **Millisecond Hot Reload** - Bun + Vite6 chemistry, goodbye waiting
+- **Millisecond Hot Reload** - Bun + Vite7 chemistry, goodbye waiting
 - **Smart Type Hints** - TypeScript5.8 + 30+ custom components, IDE experience maxed out
 - **Zero Config Out-of-box** - One command to start, complete backend system in 30 seconds
 
@@ -207,11 +207,11 @@ bun clean              # Clean cache
 **⚙️ Build Tools**
 
 ![Bun](https://img.shields.io/badge/Bun-1.x-ff1e56?style=for-the-badge&logo=bun)
-![Vite](https://img.shields.io/badge/Vite-6.2.1-646CFF?style=for-the-badge&logo=vite)
+![Vite](https://img.shields.io/badge/Vite-7.0.6-646CFF?style=for-the-badge&logo=vite)
 ![Sass](https://img.shields.io/badge/Sass-1.87-CC6699?style=for-the-badge&logo=sass)
 
 - **Bun 1.x** - 🚀 Performance monster, 10x faster installation
-- **Vite 6.2.1** - ⚡ Next generation build tool, extremely fast hot updates
+- **Vite 7.0.6** - ⚡ Next generation build tool, extremely fast hot updates
 - **Sass 1.87** - 🎨 Mature CSS preprocessor
 
 **🔧 Development Tools**
@@ -541,7 +541,7 @@ graph LR
 | 💾 Bundle Size | < 2MB | ~5MB | **60%+** |
 | 🔄 Page Switch | < 50ms | ~300ms | **85%+** |
 
-**Test Environment**: HP Pavilion 360, 16GB RAM, Node.js 20+
+**Test Environment**: HP Pavilion 360, 16GB RAM, Node.js 22+
 
 ---
 
@@ -564,8 +564,8 @@ graph LR
 ## 💻 System Requirements
 
 ### 🔧 Development Environment
-- **`Node.js`**: >= 18.0.0 (Recommended 20+)
-- **`Bun`**: >= 1.0.0 (Recommended latest)
+- **`Node.js`**: >= 20.19.0 (Recommended 22.12+)
+- **`Bun`**: >= 1.2.19 (Recommended latest)
 - **Memory**: >= 8GB RAM
 - **Storage**: >= 1GB available space
 - **System**: Windows 10+, macOS 12+, Ubuntu 20.04+
@@ -589,7 +589,7 @@ graph LR
 |:---:|:---:|:---:|:---:|:---:|
 | 🚀 Startup Speed | **Bun < 100ms** | npm ~2s | yarn ~1.5s | Generally slower |
 | ⚡ Hot Reload Speed | **< 100ms ultra-fast** | ~1.5s wait | ~1s wait | Generally slower |
-| 📦 Build Tool | **Vite 6.x latest** | Webpack/Vite | Webpack 4/5 | Various tools |
+| 📦 Build Tool | **Vite 7.x latest** | Webpack/Vite | Webpack 4/5 | Various tools |
 | 🎨 UI Component Library | **Naive UI lightweight** | Ant Design | Element Plus | Various choices |
 | 💪 TypeScript | **Complete type support** | Basic support | Basic support | Varying degrees |
 | 🔧 Custom Directives | **7 practical directives** | Few directives | Basic directives | Limited functionality |
@@ -598,7 +598,7 @@ graph LR
 | 📈 Maintenance Status | **🔥 Actively maintained** | Continuously maintained | Continuously maintained | Varies |
 
 **🎯 Reasons to Choose Robot Admin**:
-- 🚀 **Performance First**: Bun + Vite dual engine, ultimate development experience
+- 🚀 **Performance First**: Bun + Vite7 dual engine, ultimate development experience
 - 🧩 **Rich Components**: 30+ business components, ready to use  
 - 🎨 **Modern Design**: Naive UI + UnoCSS, beauty and performance coexist
 - 📚 **Learning Friendly**: 30+ demo pages, each one is a best practice

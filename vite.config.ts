@@ -2,13 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-31 08:38:21
+ * @LastEditTime: 2025-07-31 10:02:20
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-import { defineConfig } from 'vite'
+import { defineConfig, PluginOption } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -35,14 +35,14 @@ export default defineConfig({
     Icons({ autoInstall: true }),
     viteAutoImportPlugin,
     viteComponentsPlugin,
-    // 修复类型错误：使用条件语句
+    // 可视化分析 vite 打包结果
     ...(process.env.ANALYZE
       ? [
           visualizer({
             filename: 'dist/report.html',
             open: true,
             gzipSize: true,
-          }),
+          }) as PluginOption,
         ]
       : []),
   ],

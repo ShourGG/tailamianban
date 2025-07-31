@@ -60,19 +60,6 @@
             "affix": false,
             "keepAlive": false
           }
-        },
-        {
-          "path": "profile",
-          "name": "dashboard-profile",
-          "component": "/dashboard/profile/index",
-          "meta": {
-            "icon": "mdi:face-man-profile",
-            "title": "个人中心",
-            "hidden": false,
-            "full": false,
-            "affix": false,
-            "keepAlive": false
-          }
         }
       ]
     },
@@ -779,6 +766,25 @@
             "full": false,
             "affix": false,
             "keepAlive": false
+          }
+        }
+      ]
+    },
+    {
+      "component": "layout",
+      "redirect": "/about",
+      "children": [
+        {
+          "path": "about",
+          "name": "about",
+          "component": "/about/index",
+          "meta": {
+            "icon": "ix:about-filled",
+            "title": "关于",
+            "hidden": false,
+            "affix": true,
+            "keepAlive": false,
+            "full": false
           }
         }
       ]
