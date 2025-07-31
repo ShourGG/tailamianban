@@ -22,7 +22,7 @@ const buildConfig: BuildOptions = {
         ],
 
         // UI 组件库分包
-        'ui-vendor': ['naive-ui', '@iconify/vue'],
+        'ui-vendor': ['naive-ui'],
 
         // 其他大型库分包
         'editor-vendor': ['@kangc/v-md-editor', 'wangeditor', 'highlight.js'],

@@ -62,7 +62,7 @@
               <div class="card-footer">
                 <div
                   :class="
-                    card.trend > 0 ? 'i-uil:arrow-up' : 'i-uil:arrow-down'
+                    card.trend > 0 ? 'i-mdi:arrow-up' : 'i-mdi:arrow-down'
                   "
                 ></div>
                 <span :class="card.trend > 0 ? 'text-success' : 'text-danger'"
@@ -191,7 +191,7 @@
             <h4 class="text-muted">TOP SELLING PRODUCTS</h4>
             <div class="btn-link">
               <span>Export</span>
-              <div class="i-uil:download-alt ml-1"></div>
+              <div class="i-mdi:download ml-1"></div>
             </div>
           </div>
           <NDataTable
@@ -270,7 +270,7 @@
                 >
                   more
                   <template #icon
-                    ><div class="i-uil:angle-right-b ml-1"></div
+                    ><div class="i-mdi:chevron-right ml-1"></div
                   ></template>
                 </NButton>
               </div>

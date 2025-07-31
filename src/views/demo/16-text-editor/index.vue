@@ -65,7 +65,7 @@
           <!-- 状态控制 -->
           <div class="control-section">
             <h3 class="section-title">
-              <i class="i-carbon-settings-adjust mr-1"></i>
+              <i class="i-mdi:arrow-decision-outline mr-1"></i>
               状态控制
             </h3>
             <div class="switch-group">
@@ -94,7 +94,7 @@
           class="status-card"
         >
           <template #header-extra>
-            <i class="i-carbon-information text-lg"></i>
+            <i class="i-mdi-information text-lg"></i>
           </template>
 
           <div class="status-item">
@@ -103,7 +103,9 @@
               <template #icon>
                 <i
                   :class="
-                    isEditorReady ? 'i-carbon-checkmark' : 'i-carbon-time'
+                    isEditorReady
+                      ? 'mdi:check'
+                      : 'i-mdi:clock-time-four-outline'
                   "
                 ></i>
               </template>
@@ -133,7 +135,7 @@
           class="editor-card"
         >
           <template #header-extra>
-            <i class="i-carbon-edit text-lg"></i>
+            <i class="i-mdi:edit-outline text-lg"></i>
           </template>
 
           <C_Editor

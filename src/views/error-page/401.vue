@@ -107,7 +107,7 @@
 
     <!-- 锁链装饰 -->
     <div class="absolute top-32 right-32 opacity-10">
-      <div class="i-mdi:chain text-4xl text-red-400 animate-pulse"></div>
+      <div class="i-mdi:key-chain text-4xl text-red-400 animate-pulse"></div>
     </div>
     <div class="absolute bottom-32 left-32 opacity-10">
       <div class="i-mdi:lock text-4xl text-orange-400 animate-pulse"></div>
@@ -121,7 +121,7 @@
   })
   const router = useRouter()
   const countdown = ref(5)
-  let timer: number | null = null
+  let timer: ReturnType<typeof setTimeout> | null = null
 
   const startCountdown = () => {
     timer = setInterval(() => {

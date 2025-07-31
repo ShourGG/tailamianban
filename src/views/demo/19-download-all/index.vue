@@ -9,7 +9,7 @@
         class="demo-card demo-section"
       >
         <template #header-extra>
-          <span class="i-carbon:flash text-yellow-500"></span>
+          <span class="i-mdi:flash-outline text-yellow-500"></span>
         </template>
 
         <div class="button-grid">
@@ -94,7 +94,7 @@
         class="demo-card demo-section"
       >
         <template #header-extra>
-          <span class="i-carbon:folder-details text-green-500"></span>
+          <span class="i-mdi:folder text-green-500"></span>
         </template>
 
         <div class="batch-controls">
@@ -147,7 +147,7 @@
         class="demo-card demo-section"
       >
         <template #header-extra>
-          <span class="i-carbon:time text-indigo-500"></span>
+          <span class="i-mdi:clock-time-four-outline text-indigo-500"></span>
         </template>
 
         <NDataTable
