@@ -126,18 +126,10 @@
 </template>
 
 <script setup lang="ts">
+  import { type StepItem } from '@/components/global/C_Steps/index.vue'
+
   // 定义步骤类型
   type StepStatus = 'wait' | 'process' | 'finish' | 'error'
-
-  interface StepItem {
-    title: string
-    description?: string
-    time?: string
-    icon?: string
-    status?: StepStatus
-    disabled?: boolean
-    detail?: string
-  }
 
   const message = useMessage()
 

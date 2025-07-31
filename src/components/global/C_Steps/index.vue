@@ -58,13 +58,14 @@
 </template>
 
 <script setup lang="ts">
-  interface StepItem {
+  export interface StepItem {
     title: string
     description?: string
     time?: string
     icon?: string
     status?: 'wait' | 'process' | 'finish' | 'error'
     disabled?: boolean
+    detail?: string
   }
 
   const props = withDefaults(

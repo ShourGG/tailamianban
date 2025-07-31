@@ -2,10 +2,10 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-27 23:29:15
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-28 17:11:42
+ * @LastEditTime: 2025-07-31 14:23:24
  * @FilePath: \Robot_Admin\src\components\global\C_Tree\index.vue
  * @Description: 树型组件
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
@@ -97,107 +97,18 @@
 
 <script setup lang="ts">
   import C_Icon from '@/components/global/C_Icon/index.vue'
-
-  // 预设模式类型
-  type TreeMode = 'menu' | 'file' | 'org' | 'custom'
-
-  // 树节点状态类型
-  type StatusType = 'success' | 'warning' | 'error' | 'info'
-
-  // 按钮类型
-  type ButtonType = 'primary' | 'info' | 'warning' | 'error' | 'default'
-
-  // 基础树选项类型
-  interface TreeOption {
-    [key: string]: any
-    id?: string | number
-    key?: string | number
-    label?: string
-    children?: TreeOption[]
-  }
-
-  // 拖拽信息类型
-  interface DropInfo {
-    node: TreeOption
-    dragNode: TreeOption
-    dropPosition: 'before' | 'inside' | 'after'
-    event: DragEvent
-  }
-
-  // 基础树节点数据类型
-  interface TreeNodeData {
-    [key: string]: any
-    id: string | number
-    name: string
-    type?: string
-    children?: TreeNodeData[]
-  }
-
-  // 状态配置类型
-  interface StatusConfig {
-    field: string
-    values: Record<
-      string | number,
-      {
-        text: string
-        type: StatusType
-      }
-    >
-  }
-
-  // 操作按钮配置
-  interface ActionConfig {
-    key: string
-    text: string
-    icon: string
-    type?: ButtonType
-    show?: (node: TreeNodeData) => boolean
-    confirm?: string
-  }
-
-  // 图标配置类型
-  interface IconConfig {
-    default?: string
-    typeMap?: Record<string, string>
-    colorMap?: Record<string, string>
-  }
-
-  // Props定义
-  interface Props {
-    // 数据相关
-    data: TreeNodeData[]
-    mode?: TreeMode
-    keyField?: string
-    labelField?: string
-    childrenField?: string
-
-    // 搜索相关
-    searchPattern?: string
-    searchable?: boolean
-    searchPlaceholder?: string
-
-    // 功能开关
-    draggable?: boolean
-    showLine?: boolean
-    showToolbar?: boolean
-    addable?: boolean
-    addText?: string
-    refreshable?: boolean
-
-    // 自定义配置
-    iconField?: string
-    iconConfig?: IconConfig
-    statusConfigs?: StatusConfig[]
-    actions?: ActionConfig[]
-
-    // 默认状态
-    defaultExpandAll?: boolean
-    defaultExpandedKeys?: (string | number)[]
-    defaultSelectedKeys?: (string | number)[]
-  }
+  import type {
+    TreeMode,
+    TreeOption,
+    TreeNodeData,
+    TreeProps,
+    TreeEmits,
+    TreeExpose,
+    DropInfo,
+  } from '@/types/modules/tree'
 
   // 预设配置 - 只包含图标映射，颜色由外部传入
-  const presetConfigs: Record<TreeMode, Partial<Props>> = {
+  const presetConfigs: Record<TreeMode, Partial<TreeProps>> = {
     menu: {
       draggable: true,
       showLine: true,
@@ -292,7 +203,7 @@
     custom: {},
   }
 
-  const props = withDefaults(defineProps<Props>(), {
+  const props = withDefaults(defineProps<TreeProps>(), {
     mode: 'custom',
     keyField: 'id',
     labelField: 'name',
@@ -320,16 +231,7 @@
   })
 
   // Emits定义
-  const emit = defineEmits<{
-    'node-select': [
-      node: TreeNodeData | null,
-      selectedKeys: (string | number)[],
-    ]
-    'node-action': [action: string, node: TreeNodeData]
-    'node-drop': [info: DropInfo]
-    add: [parentNode?: TreeNodeData]
-    refresh: []
-  }>()
+  const emit = defineEmits<TreeEmits>()
 
   // 响应式数据
   const internalSearchPattern = ref('')
@@ -598,7 +500,7 @@
   }
 
   // 暴露方法
-  defineExpose({
+  defineExpose<TreeExpose>({
     expandAll: () => {
       expandedKeys.value = getAllKeys(props.data)
       isAllExpanded.value = true

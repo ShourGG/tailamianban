@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-28 11:41:36
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-28 14:57:40
+ * @LastEditTime: 2025-07-31 14:13:48
  * @FilePath: \Robot_Admin\src\components\global\C_Cascade\index.vue
  * @Description: 级联选择组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -26,7 +26,7 @@
 
 <script lang="ts" setup>
   // 类型定义
-  interface CascadeItem {
+  export interface CascadeItem {
     label: string
     value: string | number
     children?: CascadeItem[]

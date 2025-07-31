@@ -608,12 +608,7 @@
     deleteButtonPermissionApi,
   } from './data'
 
-  interface DropInfo {
-    node: any
-    dragNode: any
-    dropPosition: 'before' | 'inside' | 'after'
-    event: DragEvent
-  }
+  import { type DropInfo } from '@/types/modules/tree'
 
   const message = useMessage()
 

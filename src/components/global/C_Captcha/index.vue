@@ -5,7 +5,7 @@
  * @LastEditTime: 2025-07-23 17:02:50
  * @FilePath: \Robot_Admin\src\components\global\C_Captcha\index.vue
  * @Description: 基于 vue3-puzzle-vcode 封装的验证器组件
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
@@ -73,16 +73,6 @@
 
 <script setup lang="ts">
   import PuzzleVcode from 'vue3-puzzle-vcode'
-
-  // 声明全局类型
-  declare global {
-    interface Window {
-      VcodeSetting?: {
-        accuracy?: number
-        [key: string]: any
-      }
-    }
-  }
 
   interface CaptchaProps {
     triggerText?: string

@@ -37,7 +37,7 @@
         "pinia-plugin-persistedstate": "^4.3.0",
         "print-js": "^1.6.0",
         "robot-admin-env-manager": "^1.0.1",
-        "ts-type-cleaner": "^1.1.3",
+        "ts-type-cleaner": "^2.0.0",
         "vue": "^3.5.13",
         "vue-command-palette": "^0.2.3",
         "vue-draggable-plus": "^0.6.0",
@@ -2142,7 +2142,7 @@
 
     "ts-dedent": ["ts-dedent@2.2.0", "", {}, "sha512-q5W7tVM71e2xjHZTlgfTDoPF/SmqKG5hddq9SzR49CH2hayqRKJtQ4mtRlSxKaJlR/+9rEM+mnBHf7I2/BQcpQ=="],
 
-    "ts-type-cleaner": ["ts-type-cleaner@1.1.3", "", { "dependencies": { "chalk": "^5.3.0", "commander": "^11.0.0", "enquirer": "^2.4.1", "ora": "^7.0.1" }, "bin": { "ts-type-cleaner": "bin/ts-type-cleaner.js", "ttc": "bin/ttc.js" } }, "sha512-wM8IQxxHTr5WfK4vHe9ql0NkKOhC7043VeRGiatSwD4TZOlVmwG833qmr153ZxotuvPhf5AMj6okGIJ5XswpdQ=="],
+    "ts-type-cleaner": ["ts-type-cleaner@2.0.0", "", { "dependencies": { "chalk": "^5.3.0", "commander": "^11.0.0", "enquirer": "^2.4.1", "ora": "^7.0.1" }, "bin": { "ts-type-cleaner": "bin/ts-type-cleaner.js", "ttc": "bin/ttc.js" } }, "sha512-yL2gGxhbx6kDkyyvQ8bn2gZgTqY+BnWmfsPYXqo50r6Ax9jFoahDp7CgOi1ORDzoduyzdH58DRBEg9wFOsUBDQ=="],
 
     "tslib": ["tslib@2.3.0", "https://registry.npmmirror.com/tslib/-/tslib-2.3.0.tgz", {}, "sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg=="],
 

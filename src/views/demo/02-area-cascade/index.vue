@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-28 11:26:23
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-29 10:35:20
+ * @LastEditTime: 2025-07-31 14:13:24
  * @FilePath: \Robot_Admin\src\views\demo\02-area-cascade\index.vue
  * @Description: 级联选择器示例
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -112,6 +112,7 @@
 
 <script setup lang="ts">
   import pcaCode from '@/assets/data/pca-code.json'
+  import { type CascadeItem } from '@/components/global/C_Cascade/index.vue'
 
   // 定义级联选择器选中值的接口
   interface CascadeOption {
@@ -124,13 +125,6 @@
     primary?: CascadeOption | null // 第一级选项
     secondary?: CascadeOption | null // 第二级选项
     tertiary?: CascadeOption | null // 第三级选项
-  }
-
-  // 定义级联数据项接口
-  interface CascadeItem {
-    label: string
-    value: string | number
-    children?: CascadeItem[]
   }
 
   // 定义级联选择器配置接口
