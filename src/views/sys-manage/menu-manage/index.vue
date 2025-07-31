@@ -608,7 +608,7 @@
     deleteButtonPermissionApi,
   } from './data'
 
-  import { type DropInfo } from '@/types/modules/tree'
+  import type { DropInfo } from '@/types/modules/tree'
 
   const message = useMessage()
 
