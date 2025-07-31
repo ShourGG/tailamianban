@@ -18,7 +18,7 @@
     <img src="https://img.shields.io/badge/bun-%E2%89%A51.x-ff1e56?style=flat&logo=bun" alt="Bun Version">
     <img src="https://img.shields.io/badge/vue-3.5.13-4FC08D?style=flat&logo=vue.js" alt="Vue Version">
     <img src="https://img.shields.io/badge/typescript-5.8.0-blue?style=flat&logo=typescript" alt="TypeScript Version">
-    <img src="https://img.shields.io/badge/vite-6.2.1-646CFF?style=flat&logo=vite" alt="Vite Version">
+    <img src="https://img.shields.io/badge/vite-7.0.6-646CFF?style=flat&logo=vite" alt="Vite Version">
   </p>
   <p>
     <img src="https://img.shields.io/badge/components-30+-success?style=flat" alt="Components">
@@ -162,7 +162,7 @@
 ## ⚡ 为什么选择 Robot Admin？<sub>(肤白貌美大长腿)</sub>
 
 ### 🔥 性能怪兽级别的开发体验
-- **毫秒级热更新** - Bun + Vite6 化学反应，告别等待
+- **毫秒级热更新** - Bun + Vite7 化学反应，告别等待
 - **智能类型提示** - TypeScript5.8 + 30+ 自定义组件，IDE 智能感知体验拉满
 - **零配置开箱即用** - 一条命令启动，30 秒内搭建完整后台系统
 
@@ -279,11 +279,11 @@ bun clean              # 清理缓存
 **⚙️ 构建工具**
 
 ![Bun](https://img.shields.io/badge/Bun-1.x-ff1e56?style=for-the-badge&logo=bun)
-![Vite](https://img.shields.io/badge/Vite-6.2.1-646CFF?style=for-the-badge&logo=vite)
+![Vite](https://img.shields.io/badge/Vite-7.0.6-646CFF?style=for-the-badge&logo=vite)
 ![Sass](https://img.shields.io/badge/Sass-1.87-CC6699?style=for-the-badge&logo=sass)
 
 - **Bun 1.x** - 🚀 性能怪兽，安装速度提升10倍
-- **Vite 6.2.1** - ⚡ 下一代构建工具，热更新极速
+- **Vite 7.0.6** - ⚡ 下一代构建工具，热更新极速
 - **Sass 1.87** - 🎨 成熟的CSS预处理器
 
 **🔧 开发工具**
@@ -814,7 +814,7 @@ bun test && git commit -m "feat: 牛逼功能"
 | 💾 Bundle大小 | < 2MB | ~5MB | **60%+** |
 | 🔄 页面切换 | < 50ms | ~300ms | **85%+** |
 
-**测试验证**: HP 幽灵360, 16GB RAM, Node.js 20+
+**测试验证**: HP 幽灵360, 16GB RAM, Node.js 22+
 
 ---
 
@@ -837,8 +837,8 @@ bun test && git commit -m "feat: 牛逼功能"
 ## 💻 系统要求
 
 ### 🔧 开发环境
-- **`Node.js`**: >= 18.0.0 (推荐 20+)
-- **`Bun`**: >= 1.0.0 (推荐最新版)
+- **`Node.js`**: >= 20.19.0 (推荐 22.12+)
+- **`Bun`**: >= 1.2.19 (推荐最新版)
 - **内存**: >= 8GB RAM
 - **存储**: >= 1GB 可用空间
 - **系统**: 不小于 Windows 10+, macOS 12+, Ubuntu 20.04+
@@ -862,7 +862,7 @@ bun test && git commit -m "feat: 牛逼功能"
 |:---:|:---:|:---:|:---:|:---:|
 | 🚀 启动速度 | **Bun < 100ms** | npm ~2s | yarn ~1.5s | 普遍较慢 |
 | ⚡ 热更新速度 | **< 100ms 极速** | ~1.5s 等待 | ~1s 等待 | 普遍较慢 |
-| 📦 构建工具 | **Vite 6.x 最新** | Webpack/Vite | Webpack 4/5 | 工具多样 |
+| 📦 构建工具 | **Vite 7.x 最新** | Webpack/Vite | Webpack 4/5 | 工具多样 |
 | 🎨 UI 组件库 | **Naive UI 轻量** | Ant Design | Element Plus | 选择多样 |
 | 💪 TypeScript | **完整类型支持** | 基础支持 | 基础支持 | 支持程度不一 |
 | 🔧 自定义指令 | **7个实用指令** | 少量指令 | 基础指令 | 功能有限 |
@@ -871,7 +871,7 @@ bun test && git commit -m "feat: 牛逼功能"
 | 📈 维护状态 | **🔥 积极维护** | 持续维护 | 持续维护 | 状态不一 |
 
 **🎯 选择 Robot Admin 的理由**:
-- 🚀 **性能优先**: Bun + Vite 双引擎，开发体验极致
+- 🚀 **性能优先**: Bun + Vite7 双引擎，开发体验极致
 - 🧩 **组件丰富**: 30+ 业务组件，开箱即用  
 - 🎨 **设计现代**: Naive UI + UnoCSS，颜值与性能并存
 - 📚 **学习友好**: 30+ 演示页面，每个都是裸奔最佳实践

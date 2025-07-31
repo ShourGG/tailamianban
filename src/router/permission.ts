@@ -44,7 +44,7 @@ const setPageTitle = (title?: string): void => {
   document.title = title ? `${title} | ${DEFAULT_TITLE}` : DEFAULT_TITLE
 }
 
-// 初始化动态路由 - 简化版本
+// 初始化动态路由
 const handleDynamicRouterInit = async (fullPath: string): Promise<string> => {
   // 防止重复初始化
   if (isInitializing) {
@@ -55,7 +55,7 @@ const handleDynamicRouterInit = async (fullPath: string): Promise<string> => {
   isInitializing = true
 
   try {
-    console.log('🚀 开始初始化动态路由...')
+    // console.log('🚀 开始初始化动态路由...')
     const success = await initDynamicRouter()
 
     if (!success) {
@@ -105,13 +105,13 @@ router.beforeEach(
 
       // 2. 已登录但访问登录页 - 关键修复点
       if (to.path === LOGIN_PATH) {
-        console.log('✅ 已登录用户访问登录页，跳转首页')
+        // console.log('✅ 已登录用户访问登录页，跳转首页')
         return '/home'
       }
 
       // 3. 动态路由初始化 - 简化逻辑
       if (!authMenuList.length && !isInitializing) {
-        console.log('🔄 需要初始化动态路由')
+        // console.log('🔄 需要初始化动态路由')
         const result = await handleDynamicRouterInit(to.fullPath)
 
         // 如果返回的是错误路径，直接重定向
