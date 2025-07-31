@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-31 08:10:49
+ * @LastEditTime: 2025-07-31 08:38:21
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -14,6 +14,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import Unocss from 'unocss/vite'
 import Icons from 'unplugin-icons/vite'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 import {
   viteConsolePlugin,
@@ -34,6 +35,16 @@ export default defineConfig({
     Icons({ autoInstall: true }),
     viteAutoImportPlugin,
     viteComponentsPlugin,
+    // 修复类型错误：使用条件语句
+    ...(process.env.ANALYZE
+      ? [
+          visualizer({
+            filename: 'dist/report.html',
+            open: true,
+            gzipSize: true,
+          }),
+        ]
+      : []),
   ],
   resolve: resolveConfig,
   optimizeDeps: {

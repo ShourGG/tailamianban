@@ -1,21 +1,19 @@
-// src/config/vite/viteBuildConfig.ts
 import type { BuildOptions } from 'vite'
 
 const buildConfig: BuildOptions = {
-  // 生产环境移除console
-  minify: 'terser' as const,
-  terserOptions: {
-    compress: {
-      drop_console: true,
-      drop_debugger: true,
-    },
-  },
+  // 关闭构建报告压缩大小计算，提升构建速度（默认 true）
+  reportCompressedSize: false,
 
   rollupOptions: {
     output: {
-      // 根据你实际使用的库进行分包
       manualChunks: {
-        // Vue 核心生态
+        // 将 3.28MB 的 chart-vendor 拆分为独立包
+        echarts: ['echarts'], // ~200KB，你已按需引入
+        'antv-x6': ['@antv/x6'], // ~1MB，只在图编辑页面加载
+        'vtable-gantt': ['@visactor/vtable-gantt'], // ~800KB，只在甘特图页面加载
+        'vue-flow': ['@vue-flow/core'], // ~500KB，只在流程图页面加载
+
+        // Vue 生态分包
         'vue-vendor': [
           'vue',
           'vue-router',
@@ -23,24 +21,12 @@ const buildConfig: BuildOptions = {
           'pinia-plugin-persistedstate',
         ],
 
-        // UI组件库 (你用的是naive-ui)
+        // UI 组件库分包
         'ui-vendor': ['naive-ui', '@iconify/vue'],
 
-        // 图表相关库群 (你有很多图表库)
-        'chart-vendor': [
-          'echarts',
-          '@antv/x6',
-          '@visactor/vtable-gantt',
-          '@vue-flow/core',
-        ],
-
-        // 编辑器相关
+        // 其他大型库分包
         'editor-vendor': ['@kangc/v-md-editor', 'wangeditor', 'highlight.js'],
-
-        // 3D渲染库
         'spline-vendor': ['@splinetool/runtime'],
-
-        // 文档处理相关
         'office-vendor': [
           'xlsx',
           '@tato30/vue-pdf',
@@ -49,8 +35,6 @@ const buildConfig: BuildOptions = {
           'jszip',
           'jszip-utils',
         ],
-
-        // 日历相关
         'calendar-vendor': [
           '@fullcalendar/core',
           '@fullcalendar/daygrid',
@@ -58,8 +42,6 @@ const buildConfig: BuildOptions = {
           '@fullcalendar/list',
           '@fullcalendar/vue3',
         ],
-
-        // 交互增强库
         'interaction-vendor': [
           'vue-draggable-plus',
           'vue-command-palette',
@@ -67,8 +49,6 @@ const buildConfig: BuildOptions = {
           'motion-v',
           'driver.js',
         ],
-
-        // 工具库
         'utils-vendor': [
           '@vueuse/core',
           'axios',
@@ -78,17 +58,8 @@ const buildConfig: BuildOptions = {
           '@vercel/analytics',
         ],
       },
-
-      // 优化文件命名
-      chunkFileNames: 'assets/js/[name]-[hash].js',
-      entryFileNames: 'assets/js/[name]-[hash].js',
-      assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
     },
   },
-
-  // 严格控制包大小
-  chunkSizeWarningLimit: 200,
-  reportCompressedSize: false,
 } as const
 
 export default buildConfig
