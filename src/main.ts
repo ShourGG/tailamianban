@@ -28,7 +28,6 @@ import {
   setupDirectives,
   setupAnalytics,
 } from '@/plugins'
-import './lib/version'
 
 /**
  * @description: 应用启动入口
