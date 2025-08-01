@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-19 12:30:00
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-19 14:52:36
+ * @LastEditTime: 2025-08-01 08:58:40
  * @FilePath: \Robot_Admin\src\plugins\highlight.ts
  * @Description: highlight.js 插件 - 代码高亮支持
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -211,11 +211,5 @@ export const defaultHighlightOptions: HighlightPluginOptions = {
 declare global {
   interface Window {
     hljs: HLJSApi
-  }
-}
-
-declare module '@vue/runtime-core' {
-  interface ComponentCustomProperties {
-    $highlight: ReturnType<typeof useHighlight>
   }
 }
