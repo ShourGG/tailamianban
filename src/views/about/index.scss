@@ -3,7 +3,6 @@ $primary-color: #4a90e2;
 $primary-color-hover: #357abd;
 
 // 明亮主题色彩系统
-$text-primary: rgba(0, 0, 0, 0.87);
 $text-secondary: rgba(182, 178, 178, 0.6);
 $text-tertiary: rgba(131, 131, 131, 0.38);
 
@@ -22,7 +21,6 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
 
 .tech-profile-page {
   min-height: 100vh;
-  color: $text-primary;
   transition: all 0.3s ease;
 }
 
@@ -51,7 +49,7 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
           font-size: 21px;
           font-weight: 600;
           margin: 0;
-          color: $text-primary;
+
           transition: color 0.3s ease;
         }
       }
@@ -74,7 +72,7 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
 
   .profile-version {
     .version-text {
-      color: $text-primary;
+
       font-size: 14px;
       font-weight: 600;
       padding: 8px 16px;
@@ -92,7 +90,7 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
   padding: 24px;
 
   .section-title {
-    color: $text-primary;
+
     font-size: 17px;
     font-weight: 500;
     transition: color 0.3s ease;
@@ -152,7 +150,7 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
       min-width: 0;
 
       .title {
-        color: $text-primary;
+
         font-size: 15px;
         font-weight: 600;
         transition: color 0.3s ease;
@@ -195,7 +193,7 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
 
     .table-title {
       background: $hover-overlay;
-      color: $text-primary;
+
       font-size: 15px;
       font-weight: 600;
       padding: 13px 18px;
@@ -212,7 +210,7 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
 
     :deep(.n-data-table-td) {
       font-size: 13px;
-      color: $text-primary;
+
       transition: color 0.3s ease;
     }
 
@@ -270,7 +268,7 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
       .modal-title {
         font-size: 18px;
         font-weight: 600;
-        color: $text-primary;
+
         transition: color 0.3s ease;
       }
     }
@@ -290,7 +288,7 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
       }
 
       .text {
-        color: $text-primary;
+
         font-size: 14px;
         transition: color 0.3s ease;
         word-break: break-all;
@@ -299,7 +297,7 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
           color: $primary-color;
           text-decoration: none;
           transition: color 0.3s ease;
-          
+
           &:hover {
             color: $primary-color-hover;
           }
@@ -336,7 +334,7 @@ $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
 
     .cards-grid .card {
       background: var(--surface-overlay);
-      border-color: var(--border-light);
+      border: 1px solid rgb(157 146 146 / 15%);
 
       .info {
         .title { color: var(--text-primary); }
