@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-08-06 12:41:25
+ * @LastEditTime: 2025-08-06 15:06:07
  * @FilePath: \Robot_Admin\vite.config.ts
- * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
+ * @Description: 基于 Vite 7 实际特性的优化配置，移除负优化，保留有效优化
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
@@ -42,7 +42,7 @@ export default defineConfig({
             filename: 'dist/report.html',
             open: true,
             gzipSize: true,
-            brotliSize: true, //  brotli 分析
+            brotliSize: true,
           }) as PluginOption,
         ]
       : []),
@@ -50,23 +50,15 @@ export default defineConfig({
 
   resolve: resolveConfig,
 
-  // 与 manualChunks 保持一致
+  // 简化的依赖优化
   optimizeDeps: {
+    // 只包含确实需要强制预构建的核心依赖
     include: [
-      // 必须与 buildConfig 中的 manualChunks 保持一致
-      'vue',
-      'vue-router',
-      'pinia',
-      'naive-ui',
-      'wangeditor',
+      'naive-ui', // UI 框架通常需要预构建
     ],
+    // 只排除真正有问题的包
     exclude: [
       'pinia-plugin-persistedstate', // 有特殊加载逻辑
-      // 排除大型库，让它们按需加载
-      'echarts',
-      '@antv/x6',
-      '@visactor/vtable-gantt',
-      '@fullcalendar/core',
     ],
   },
 
