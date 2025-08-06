@@ -39,3 +39,5 @@ project_path.txt
 .temp-tsconfig.json
 
 type-reports
+
+src/types/auto-imports.d.ts
