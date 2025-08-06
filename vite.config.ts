@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-31 14:56:39
+ * @LastEditTime: 2025-08-06 12:41:25
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: vite 配置文件，团队协作中莫要乱改乱动，修改前记得通知维护者。
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -42,20 +42,38 @@ export default defineConfig({
             filename: 'dist/report.html',
             open: true,
             gzipSize: true,
+            brotliSize: true, //  brotli 分析
           }) as PluginOption,
         ]
       : []),
   ],
+
   resolve: resolveConfig,
+
+  // 与 manualChunks 保持一致
   optimizeDeps: {
-    include: ['vue', 'naive-ui'],
-    exclude: ['pinia-plugin-persistedstate'],
+    include: [
+      // 必须与 buildConfig 中的 manualChunks 保持一致
+      'vue',
+      'vue-router',
+      'pinia',
+      'naive-ui',
+      'wangeditor',
+    ],
+    exclude: [
+      'pinia-plugin-persistedstate', // 有特殊加载逻辑
+      // 排除大型库，让它们按需加载
+      'echarts',
+      '@antv/x6',
+      '@visactor/vtable-gantt',
+      '@fullcalendar/core',
+    ],
   },
+
   server: serverConfig,
   build: buildConfig,
-  // 开发环境优化
+
   esbuild: {
-    // 生产环境移除调试代码
     drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
   },
 })

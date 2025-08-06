@@ -1,33 +1,31 @@
 import type { BuildOptions } from 'vite'
 
 const buildConfig: BuildOptions = {
-  // 关闭构建报告压缩大小计算，提升构建速度（默认 true）
-  reportCompressedSize: false,
-
   rollupOptions: {
     output: {
       manualChunks: {
-        // 将 3.28MB 的 chart-vendor 拆分为独立包
-        echarts: ['echarts'], // ~200KB，你已按需引入
-        'antv-x6': ['@antv/x6'], // ~1MB，只在图编辑页面加载
-        'vtable-gantt': ['@visactor/vtable-gantt'], // ~800KB，只在甘特图页面加载
-        'vue-flow': ['@vue-flow/core'], // ~500KB，只在流程图页面加载
-
-        // Vue 生态分包
-        'vue-vendor': [
+        // 拆分真正需要的大型库
+        'vue-core': [
           'vue',
           'vue-router',
           'pinia',
           'pinia-plugin-persistedstate',
         ],
+        'ui-lib': ['naive-ui'],
 
-        // UI 组件库分包
-        'ui-vendor': ['naive-ui'],
+        // 重型图表库
+        charts: [
+          'echarts',
+          '@antv/x6',
+          '@vue-flow/core',
+          '@visactor/vtable-gantt',
+        ],
 
-        // 其他大型库分包
-        'editor-vendor': ['@kangc/v-md-editor', 'wangeditor', 'highlight.js'],
-        'spline-vendor': ['@splinetool/runtime'],
-        'office-vendor': [
+        // 编辑器 - 低频大型库
+        editors: ['@kangc/v-md-editor', 'wangeditor', 'highlight.js'],
+
+        // 办公套件
+        office: [
           'xlsx',
           '@tato30/vue-pdf',
           'mammoth',
@@ -35,28 +33,18 @@ const buildConfig: BuildOptions = {
           'jszip',
           'jszip-utils',
         ],
-        'calendar-vendor': [
+
+        // 日历组件
+        calendar: [
           '@fullcalendar/core',
           '@fullcalendar/daygrid',
           '@fullcalendar/interaction',
           '@fullcalendar/list',
           '@fullcalendar/vue3',
         ],
-        'interaction-vendor': [
-          'vue-draggable-plus',
-          'vue-command-palette',
-          'vue3-puzzle-vcode',
-          'motion-v',
-          'driver.js',
-        ],
-        'utils-vendor': [
-          '@vueuse/core',
-          'axios',
-          'html2canvas',
-          'print-js',
-          'nprogress',
-          '@vercel/analytics',
-        ],
+
+        // 3D 渲染 - 特殊大型库
+        spline: ['@splinetool/runtime'],
       },
     },
   },
