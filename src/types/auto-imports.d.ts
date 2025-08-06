@@ -287,9 +287,6 @@ declare module 'vue' {
     readonly useNotification: UnwrapRef<
       (typeof import('naive-ui'))['useNotification']
     >
-    readonly usePreloader: UnwrapRef<
-      (typeof import('../composables/usePreloader'))['usePreloader']
-    >
     readonly useRoute: UnwrapRef<(typeof import('vue-router'))['useRoute']>
     readonly useRouter: UnwrapRef<(typeof import('vue-router'))['useRouter']>
     readonly useSlots: UnwrapRef<(typeof import('vue'))['useSlots']>

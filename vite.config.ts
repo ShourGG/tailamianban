@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-03-30 17:45:29
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-08-06 15:06:07
+ * @LastEditTime: 2025-08-06 22:40:02
  * @FilePath: \Robot_Admin\vite.config.ts
  * @Description: 基于 Vite 7 实际特性的优化配置，移除负优化，保留有效优化
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -15,6 +15,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import Unocss from 'unocss/vite'
 import Icons from 'unplugin-icons/vite'
 import { visualizer } from 'rollup-plugin-visualizer'
+import preloader from 'vite-plugin-preloader'
 
 import {
   viteConsolePlugin,
@@ -35,6 +36,16 @@ export default defineConfig({
     Icons({ autoInstall: true }),
     viteAutoImportPlugin,
     viteComponentsPlugin,
+    preloader({
+      routes: [
+        '/demo/13-calendar',
+        '/demo/29-antv-x6-editor',
+        '/demo/16-text-editor',
+        '/demo/33-v-table-gantt',
+        '/demo/20-dragable',
+        // 后续还觉得哪些页面初次切换等待时间长，添加到预加载里面来耍
+      ],
+    }),
     // 可视化分析 vite 打包结果
     ...(process.env.ANALYZE
       ? [

@@ -20,7 +20,7 @@ export const coreProjects: ProjectItem[] = [
     bagName: 'vue',
     desc: '渐进式 JavaScript 框架，用于构建用户界面',
     version: '^3.5.13',
-    icon: 'https://vuejs.org/logo.svg',
+    icon: 'https://router.vuejs.org/logo.svg',
     url: 'https://vuejs.org/',
   },
   {

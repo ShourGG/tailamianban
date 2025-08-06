@@ -37,6 +37,7 @@
         "pinia-plugin-persistedstate": "^4.3.0",
         "print-js": "^1.6.0",
         "robot-admin-env-manager": "^1.0.4",
+        "vite-plugin-preloader": "^1.1.3",
         "vue": "^3.5.13",
         "vue-command-palette": "^0.2.3",
         "vue-draggable-plus": "^0.6.0",
@@ -2233,6 +2234,8 @@
     "vite-node": ["vite-node@3.0.9", "https://registry.npmmirror.com/vite-node/-/vite-node-3.0.9.tgz", { "dependencies": { "cac": "^6.7.14", "debug": "^4.4.0", "es-module-lexer": "^1.6.0", "pathe": "^2.0.3", "vite": "^5.0.0 || ^6.0.0" }, "bin": { "vite-node": "vite-node.mjs" } }, "sha512-w3Gdx7jDcuT9cNn9jExXgOyKmf5UOTb6WMHz8LGAm54eS1Elf5OuBhCxl6zJxGhEeIkgsE1WbHuoL0mj/UXqXg=="],
 
     "vite-plugin-inspect": ["vite-plugin-inspect@0.8.9", "https://registry.npmmirror.com/vite-plugin-inspect/-/vite-plugin-inspect-0.8.9.tgz", { "dependencies": { "@antfu/utils": "^0.7.10", "@rollup/pluginutils": "^5.1.3", "debug": "^4.3.7", "error-stack-parser-es": "^0.1.5", "fs-extra": "^11.2.0", "open": "^10.1.0", "perfect-debounce": "^1.0.0", "picocolors": "^1.1.1", "sirv": "^3.0.0" }, "peerDependencies": { "vite": "^3.1.0 || ^4.0.0 || ^5.0.0-0 || ^6.0.1" } }, "sha512-22/8qn+LYonzibb1VeFZmISdVao5kC22jmEKm24vfFE8siEn47EpVcCLYMv6iKOYMJfjSvSJfueOwcFCkUnV3A=="],
+
+    "vite-plugin-preloader": ["vite-plugin-preloader@1.1.3", "", { "peerDependencies": { "vite": "^7.0.0 || ^6.0.0 || ^5.0.0", "vue": "^3.5.0" } }, "sha512-DHgLX6d85eVr5hwULEFFGqrLeJet8/lHVVXXqK07SZjnM4C9R3JNB+ifrR95X67H9l4ktOifIr3UyeJw5dj3AQ=="],
 
     "vite-plugin-vue-devtools": ["vite-plugin-vue-devtools@7.7.2", "https://registry.npmmirror.com/vite-plugin-vue-devtools/-/vite-plugin-vue-devtools-7.7.2.tgz", { "dependencies": { "@vue/devtools-core": "^7.7.2", "@vue/devtools-kit": "^7.7.2", "@vue/devtools-shared": "^7.7.2", "execa": "^9.5.1", "sirv": "^3.0.0", "vite-plugin-inspect": "0.8.9", "vite-plugin-vue-inspector": "^5.3.1" }, "peerDependencies": { "vite": "^3.1.0 || ^4.0.0-0 || ^5.0.0-0 || ^6.0.0-0" } }, "sha512-5V0UijQWiSBj32blkyPEqIbzc6HO9c1bwnBhx+ay2dzU0FakH+qMdNUT8nF9BvDE+i6I1U8CqCuJiO20vKEdQw=="],
 

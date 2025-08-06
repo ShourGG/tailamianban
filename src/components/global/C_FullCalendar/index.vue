@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-19 08:26:47
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-25 11:22:09
+ * @LastEditTime: 2025-08-06 23:43:44
  * @FilePath: \Robot_Admin\src\components\global\C_FullCalendar\index.vue
  * @Description: 全局日历组件 - 内置事件管理功能
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
