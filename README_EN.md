@@ -7,13 +7,12 @@
   </a>
   
   <h1>
-    <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=32&duration=3000&pause=1000&color=4FC08D&background=FFFFFF00&center=true&vCenter=true&multiline=true&width=600&height=100&lines=🤖+Robot+Admin;Redefining+Enterprise+Admin+Development" alt="Robot Admin" />
+    <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=32&duration=3000&pause=1000&color=4FC08D&background=FFFFFF00&center=true&vCenter=true&multiline=true&width=700&height=100&lines=🤖+Robot+Admin;Redefining+Enterprise+Admin+Development" alt="Robot Admin" />
   </h1>
   
   <p><strong>Robot Admin</strong></p>
   <p>
-    <a href="https://github.com/ChenyCHENYU/fearless/actions"><img src="https://img.shields.io/github/actions/workflow/status/ChenyCHENYU/fearless/main.yml" alt="Build Status"></a>
-    <a href="https://github.com/ChenyCHENYU/fearless/blob/master/LICENSE"><img src="https://img.shields.io/github/license/ChenyCHENYU/fearless" alt="License"></a>
+    <a href="https://github.com/ChenyCHENYU/robot_admin/actions"><img src="https://img.shields.io/github/actions/workflow/status/ChenyCHENYU/robot_admin/main.yml" alt="Build Status"></a>
     <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-brightgreen" alt="Code Style"></a>
     <img src="https://img.shields.io/badge/bun-%E2%89%A51.x-ff1e56?style=flat&logo=bun" alt="Bun Version">
     <img src="https://img.shields.io/badge/vue-3.5.13-4FC08D?style=flat&logo=vue.js" alt="Vue Version">
@@ -25,28 +24,29 @@
     <img src="https://img.shields.io/badge/demos-30+-orange?style=flat" alt="Demo Pages">
     <img src="https://img.shields.io/badge/directives-7-purple?style=flat" alt="Custom Directives">
     <img src="https://img.shields.io/badge/test_coverage-85%25-brightgreen?style=flat" alt="Test Coverage">
-    <img src="https://img.shields.io/badge/bundle_size-<2MB-green?style=flat" alt="Bundle Size">
-    <img src="https://img.shields.io/badge/performance-A+-brightgreen?style=flat" alt="Performance">
   </p>
   <p>
-    <img src="https://img.shields.io/github/stars/ChenyCHENYU/robot-admin?style=social" alt="GitHub stars">
-    <img src="https://img.shields.io/github/forks/ChenyCHENYU/robot-admin?style=social" alt="GitHub forks">
-    <img src="https://img.shields.io/github/watchers/ChenyCHENYU/robot-admin?style=social" alt="GitHub watchers">
+    <img src="https://img.shields.io/github/stars/ChenyCHENYU/robot_admin?style=social" alt="GitHub stars">
+    <img src="https://img.shields.io/github/forks/ChenyCHENYU/robot_admin?style=social" alt="GitHub forks">
+    <img src="https://img.shields.io/github/watchers/ChenyCHENYU/robot_admin?style=social" alt="GitHub watchers">
   </p>
 
   <!-- Quick Navigation -->
   <p>
     <a href="https://www.robotadmin.cn">
-      <img src="https://img.shields.io/badge/🚀-Live%20Demo-00D8FF?style=for-the-badge&logo=vercel" alt="Live Demo">
+      <img src="https://img.shields.io/badge/🚀-Live Demo-00D8FF?style=for-the-badge&logo=vercel" alt="Live Demo">
     </a>
     <a href="https://www.tzagileteam.com">
       <img src="https://img.shields.io/badge/📖-Documentation-FF6B6B?style=for-the-badge&logo=gitbook" alt="Documentation">
     </a>
-    <a href="#-quick-start">
-      <img src="https://img.shields.io/badge/⚡-Quick%20Start-4ECDC4?style=for-the-badge&logo=rocket" alt="Quick Start">
+    <a href="#-quick-start-lightning-fast">
+      <img src="https://img.shields.io/badge/⚡-Quick Start-4ECDC4?style=for-the-badge&logo=rocket" alt="Quick Start">
+    </a>
+    <a href="./CONTRIBUTING.md">
+      <img src="https://img.shields.io/badge/🤝-Contributing-FFA726?style=for-the-badge&logo=github" alt="Contributing">
     </a>
     <a href="./README.md">
-      <img src="https://img.shields.io/badge/🌍-中文-95E1D3?style=for-the-badge&logo=googletranslate" alt="Chinese Version">
+      <img src="https://img.shields.io/badge/🌍-中文版-95E1D3?style=for-the-badge&logo=googletranslate" alt="Chinese Version">
     </a>
   </p>
 </div>
@@ -61,200 +61,124 @@
 
 ## 🚀 Redefining Enterprise Admin Development Experience
 
-> **🎯 An agile enterprise-level admin solution built for developer experience**  
+> **🎯 An agile, developer-experience-first enterprise admin solution**  
 
-*Where `Bun`'s extreme performance meets `Vue3`'s Composition API, where `TypeScript`'s type safety embraces `UnoCSS`'s atomic styling...*
-
-### 📊 Project Growth Chart
-
-<div align="center">
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ChenyCHENYU/robot_admin&type=Date)](https://star-history.com/#ChenyCHENYU/robot_admin&Date)
-
-</div>
-
-**📈 Project Overview**
-
-- 🌟 **GitHub Stars**: 0+ (Looking forward to continuous growth!)
-- 🍴 **Forks**: 0+ (Join us!)
-- 👀 **Watchers**: Active followers
-- 📦 **Bundle Size**: < 2MB (Production)
-- ⚡ **Performance**: A+ grade performance
-- 🧪 **Test Coverage**: 85%+ test coverage
-- 🔧 **Contributors**: Welcome more contributors
-- 📈 **Weekly Downloads**: Growing steadily
-- 🌍 **Global Usage**: Developer-friendly worldwide
+*Here, when `Bun's` ultimate performance meets `Vue3's` Composition API, when `TypeScript's` type safety embraces `UnoCSS's` atomic styling...*
 
 ---
 
-## ⚡ Why Choose Robot Admin? <sub>(Best in class)</sub>
+## ⚡ Why Choose Robot Admin?
 
-### 🔥 Monster-level Development Experience
-- **Millisecond Hot Reload** - Bun + Vite7 chemistry, goodbye waiting
-- **Smart Type Hints** - TypeScript5.8 + 30+ custom components, IDE experience maxed out
-- **Zero Config Out-of-box** - One command to start, complete backend system in 30 seconds
+### 🔥 Monster-Level Performance Development Experience
+- **Millisecond Hot Updates** - Bun + Vite7 chemical reaction, say goodbye to waiting
+- **Intelligent Type Hints** - TypeScript5.8 + 30+ custom components, IDE intelligence maxed out
+- **Zero Config Out-of-Box** - One command to start, complete admin system in 30 seconds
 
-### 🎨 Not Just an Admin System, It's a Masterpiece
-- **30+ Carefully Crafted Demo Pages (More coming)** - Each one is production-ready business component
-- **7 Custom Directives** - Debounce, throttle, long press, drag, permissions... making development elegant
-- **Theme System** - Dark/Light mode/System follow + Custom theme extension support
+### 🎨 Not Just a Management System, But a Masterpiece
+- **30+ Carefully Crafted Demo Pages** - Each one is production-ready business component
+- **7 Custom Directives** - Debounce, throttle, long press, drag, permission... Make development elegant
+- **Theme System** - Dark/Light mode/Follow system + Custom extension support
 
-### 🛠️ Enterprise Architecture for Personal Projects Too
+### 🛠️ Enterprise Architecture, Personal Projects Can Also Enjoy
 - **RBAC Permission System** - Menu-level, button-level, API-level, fine-grained permission control
-- **Progressive Micro-frontend** - Architecture supports smooth evolution from monolith to micro-frontend
-- **Production-grade Engineering** - ESLint + Prettier + Husky, code quality assured
+- **Progressive Micro-frontend** - Architecture design supports smooth evolution from monolith to micro-frontend
+- **Production-Grade Engineering** - ESLint + Prettier + Husky, code quality assured
 
 ---
 
-## 🚀 Quick Start (Really Fast!)
+## 🚀 Quick Start (Lightning Fast!)
 
-<table width="100%">
-<tr>
-<td width="45%" valign="top">
-
-> <sub>🎉 **Recommended: Use Bun** - Experience unprecedented installation speed</sub>
+> 🎉 **Recommended using Bun** - Experience unprecedented installation speed
 
 ```bash
-# 1. Clone the project
-git clone https://github.com/ChenyCHENYU/Robot_Admin.git
+# 1. Clone project
+git clone https://github.com/ChenyCHENYU/robot_admin.git
 
 # 2. Enter directory
 cd robot_admin
 
-# 3. Install dependencies (Lightning fast)
-bun install
+# 3. Install dependencies (lightning fast)
+bun install    # Recommended! 10x speed boost
+# or use npm install / yarn install / pnpm install
 
-# 4. Start project (Millisecond startup)
+# 4. Start project (millisecond startup)
 bun dev
 ```
 
-<sub>**🔥 First startup takes less than 2 seconds, subsequent hot updates under 100ms!**</sub>
+**🔥 First startup takes less than 2 seconds, subsequent hot updates under 100ms!**
 
-<sub>If you don't have Bun yet:</sub>
+<details>
+<summary><b>📦 More Commands</b></summary>
+
 ```bash
-npm install -g bun
-```
-
-</td>
-<td width="55%" valign="top">
-
-<table width="100%">
-<tr>
-<td width="50%">
-
-<sub>**🔧 Development**</sub>
-```bash
-bun dev                # Development server
+# Development
+bun dev                # Start development environment
 bun run build          # Production build
 bun run build:test     # Test environment build
 bun run build:staging  # Staging build
 bun run preview        # Preview build locally
-```
 
-<sub>**📋 Code Quality**</sub>
-```bash
+# Code Quality
 bun run lint           # Code check and fix
 bun run format         # Code formatting
 bun test:unit          # Unit testing
-```
 
-</td>
-<td width="50%">
-
-<sub>**🎯 Type Checking**</sub>
-```bash
+# Type Checking
 bun run type-watch     # Watch mode type checking
 bun run type:check     # Smart type analysis
-```
 
-<sub>**📦 Code Commit**</sub>
-```bash
-bun run commit         # Conventional commits (git cz)
-```
-
-<sub>**⚡ Other Commands**</sub>
-```bash
+# Others
+bun run commit         # Standardized commit (git cz)
 bun outdated           # Check dependency updates
 bun clean              # Clean cache
 ```
-
-</td>
-</tr>
-</table>
-
-</td>
-</tr>
-</table>
+</details>
 
 ---
 
 ## ✨ Core Highlights
 
-### 🏗️ Tech Stack (Premium Stack)
+### 🏗️ Tech Stack (Premium Arsenal)
+
+<details>
+<summary><b>View Complete Tech Stack</b></summary>
 
 **🎭 Frontend Core**
-
-![Vue](https://img.shields.io/badge/Vue-3.5.13-4FC08D?style=for-the-badge&logo=vue.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8.0-blue?style=for-the-badge&logo=typescript)
-![Naive UI](https://img.shields.io/badge/Naive_UI-2.41-green?style=for-the-badge)
-![UnoCSS](https://img.shields.io/badge/UnoCSS-66.0-yellow?style=for-the-badge)
-
-- **Vue 3.5.13** - 🔥 Latest stable version, Composition API silky experience
-- **TypeScript 5.8** - 🛡️ Type safety, smart hints
-- **Naive UI 2.41** - 🎨 Beauty and performance coexist component library
-- **UnoCSS 66.0** - ⚡ Atomic CSS, on-demand generation, extremely small size
+- **Vue 3.5.13** - 🔥 Latest stable version, silky Composition API experience
+- **TypeScript 5.8** - 🛡️ Type safety, intelligent hints
+- **Naive UI 2.41** - 🎨 Component library with both beauty and performance
+- **UnoCSS 66.0** - ⚡ Atomic CSS, on-demand generation, minimal size
 
 **⚙️ Build Tools**
-
-![Bun](https://img.shields.io/badge/Bun-1.x-ff1e56?style=for-the-badge&logo=bun)
-![Vite](https://img.shields.io/badge/Vite-7.0.6-646CFF?style=for-the-badge&logo=vite)
-![Sass](https://img.shields.io/badge/Sass-1.87-CC6699?style=for-the-badge&logo=sass)
-
-- **Bun 1.x** - 🚀 Performance monster, 10x faster installation
-- **Vite 7.0.6** - ⚡ Next generation build tool, extremely fast hot updates
+- **Bun 1.x** - 🚀 Performance monster, 10x installation speed
+- **Vite 7.0.6** - ⚡ Next-generation build tool, lightning hot updates
 - **Sass 1.87** - 🎨 Mature CSS preprocessor
 
 **🔧 Development Tools**
-
-![ESLint](https://img.shields.io/badge/ESLint-9.21-4B32C3?style=for-the-badge&logo=eslint)
-![Prettier](https://img.shields.io/badge/Prettier-3.5-F7B93E?style=for-the-badge&logo=prettier)
-![Vitest](https://img.shields.io/badge/Vitest-3.0-6E9F18?style=for-the-badge&logo=vitest)
-
 - **ESLint 9.21** - 📏 Code quality guardian
 - **Prettier 3.5** - ✨ Code formatting
-- **Oxlint 0.15** - 🦀 Super fast linter written in Rust
+- **Oxlint 0.15** - 🦀 Ultra-fast Linter written in Rust
 - **Vitest 3.0** - 🧪 Modern testing framework
 
-### 🎯 Feature Matrix (30+ Practical Features)
+**📊 Functional Components**
+- **ECharts 5.6** - Enterprise-grade chart library
+- **AntV X6** - Professional flowchart engine
+- **FullCalendar** - Complete calendar management
+- **WangEditor** - Rich text editor
+</details>
+
+### 🎯 Feature Matrix
 
 #### 🔐 Permission Management
 - **RBAC Permission System** - User-Role-Permission, flexible assignment
 - **Dynamic Routing** - Real-time menu generation based on permissions
-- **Button-level Permissions** - Precise control over every operation button
-- **API-level Permissions** - API call permission control
+- **Button-Level Permissions** - Precise control down to every action button
+- **API-Level Permissions** - API call permission control
 
-#### 📊 Data Visualization
-- **ECharts 5.6** - Enterprise-grade chart library
-- **Real-time Dashboard** - Data screen display
-- **FullCalendar** - Complete schedule management
-- **AntV X6** - Professional flowchart engine
+#### 🧩 Component Library (30+ Ready-to-Use)
 
-#### ✏️ Editor Ecosystem
-- **WangEditor** - Rich text editor
-- **Markdown Editor** - Real-time preview, syntax highlighting
-- **Code Editor** - Multi-language syntax highlighting support
-- **JSON Editor** - Structured data editing
-
-#### 📁 File Processing
-- **Excel Import/Export** - Support for complex table structures
-- **ZIP Batch Download** - File packaging and compression
-- **Image Screenshot** - Html2canvas web screenshot
-- **File Upload** - Multi-format file support
-
-#### 🎮 Interactive Enhancement
-**Drag & Drop Sorting** - Free dragging of lists and tables | **3D Display** - Spline 3D scenes | **Animation System** - Smooth page transitions | **User Guide** - Onboarding system
-
-### 🧩 Component Library (Ready to Use)
+<details>
+<summary><b>View All Components</b></summary>
 
 **Core Components**
 - `C_Form` - Dynamic form engine, supports 8 layouts
@@ -269,89 +193,68 @@ bun clean              # Clean cache
 - `C_Markdown` - Markdown editor
 - `C_Time` - Time processing component
 - `C_Progress` - Progress display component
+- `C_Chart` - Chart component wrapper
+- `C_Upload` - File upload component
 
-**And many more...**
+**Editor Ecosystem**
+- **WangEditor** - Rich text editor
+- **Markdown Editor** - Real-time preview, syntax highlighting
+- **Code Editor** - Multi-language syntax highlighting support
+- **JSON Editor** - Structured data editing
 
-### 🎪 Demo Pages (Hands-on Learning Paradise)
-
-> **30+ carefully crafted demo pages, each one is a best practice**
-
-<details>
-<summary><strong>🎨 Basic Component Showcase</strong></summary>
-
-- 🎨 **Icon Component** - Complete icon system usage guide
-- 🏙️ **Region Linkage** - Province-city-district three-level linkage
-- 📊 **Progress Bar** - Various progress display styles
-- ⏰ **Time Component** - Time selection and formatting
-- 📅 **Date Picker** - Date range selector
-- 🌆 **City Selector** - City selector component
-
+**File Processing**
+- **Excel Import/Export** - Support for complex table structures
+- **ZIP Batch Download** - File packaging compression
+- **Image Screenshot** - Html2canvas web screenshot
+- **File Upload** - Multi-format file support
 </details>
 
-<details>
-<summary><strong>📝 Forms & Tables</strong></summary>
+#### 🎮 Custom Directives
 
-- 📝 **Form Layout** - 8 form layout modes
-- 🔍 **Form Search** - Advanced search functionality
-- 📋 **Super Table** - Various advanced table usage
+`v-copy` Copy | `v-debounce` Debounce | `v-throttle` Throttle | `v-permission` Permission | `v-watermark` Watermark | `v-draggable` Draggable | `v-longpress` Long Press
 
-</details>
+### 🎪 Demo Pages (30+ Complete Examples)
 
 <details>
-<summary><strong>✏️ Editor Showcase</strong></summary>
+<summary><b>View All Demo Pages</b></summary>
 
-- 📆 **Calendar Component** - FullCalendar complete functionality
-- 💻 **Code Editor** - Multi-language syntax highlighting
-- 📖 **Markdown Editor** - Real-time preview editing
-- ✏️ **Rich Text Editor** - WangEditor complete functionality
+**🎨 Basic Component Showcase**
+- Icon Component - Complete icon system usage guide
+- Region Linkage - Province-City-District three-level linkage
+- Progress Bar - Multiple style progress displays
+- Time Component - Time selection and formatting
+- Date Picker - Date range picker
+- City Selector - City selector component
 
-</details>
+**📝 Forms & Tables**
+- Form Layout - 8 form layout modes
+- Form Search - Advanced search functionality
+- Super Table - Various advanced table usages
 
-<details>
-<summary><strong>🛠️ Practical Features</strong></summary>
+**✏️ Editor Showcase**
+- Calendar Component - FullCalendar complete functionality
+- Code Editor - Multi-language syntax highlighting
+- Markdown Editor - Real-time preview editing
+- Rich Text Editor - WangEditor complete functionality
 
-- 📦 **Export ZIP** - Batch file packaging download
-- 📋 **Copy Function** - Text copy to clipboard
-- ⬇️ **Batch Download** - Batch file download processing
-- 🔄 **Drag Sort** - List item drag sorting
-
-</details>
-
-<details>
-<summary><strong>🎯 Custom Directives</strong></summary>
-
-<div align="center">
-
-![v-copy](https://img.shields.io/badge/v--copy-Copy%20Directive-blue)
-![v-watermark](https://img.shields.io/badge/v--watermark-Watermark%20Directive-green)
-![v-draggable](https://img.shields.io/badge/v--draggable-Draggable%20Directive-purple)
-![v-debounce](https://img.shields.io/badge/v--debounce-Debounce%20Directive-orange)
-
-![v-throttle](https://img.shields.io/badge/v--throttle-Throttle%20Directive-red)
-![v-longpress](https://img.shields.io/badge/v--longpress-Long%20Press%20Directive-yellow)
-![v-permission](https://img.shields.io/badge/v--permission-Permission%20Directive-pink)
-
-</div>
-
-- 📄 **v-copy** - Copy directive
-- 💧 **v-watermark** - Watermark directive
-- 👆 **v-draggable** - Draggable directive
-- ⏱️ **v-debounce** - Debounce directive
-- 🚦 **v-throttle** - Throttle directive
-- 👆 **v-longpress** - Long press directive
-- 🔐 **v-permission** - Permission directive
-
+**🛠️ Practical Functions**
+- Export ZIP - Batch file packaging download
+- Copy Function - Text copy to clipboard
+- Batch Download - Batch file download processing
+- Drag & Drop Sort - List item drag sorting
+- 3D Display - Spline 3D scenes
+- Animation System - Smooth page transitions
+- User Guide - Onboarding guide system
 </details>
 
 ---
 
 ## 🏗️ Project Architecture
 
-### 📁 Directory Structure (Clear and Organized)
+### 📁 Directory Structure
 
-<table width="100%">
-<tr>
-<td width="50%">
+<details>
+<summary><b>View Complete Directory Structure</b></summary>
 
 ```
 Robot_Admin/
@@ -362,176 +265,115 @@ Robot_Admin/
 │   │   └── 📁 local/                # Local components
 │   ├── 📁 views/                    # Page views
 │   │   ├── 📁 dashboard/            # Data dashboard
-│   │   ├── 📁 demo/                 # Demo pages (30+ feature showcase)
-│   │   ├── 📁 sys-manage/           # System management (user, role, permission, menu)
-│   │   ├── 📁 login/                # Login and registration
+│   │   ├── 📁 demo/                 # Demo pages (30+ feature showcases)
+│   │   ├── 📁 sys-manage/           # System management
+│   │   ├── 📁 login/                # Login/Register
 │   │   └── 📁 home/                 # Project homepage
 │   ├── 📁 stores/                   # Pinia state management
 │   ├── 📁 composables/              # Composable APIs
 │   ├── 📁 hooks/                    # Custom hooks
-```
-
-</td>
-<td width="50%">
-
-```
 │   ├── 📁 router/                   # Router configuration
 │   ├── 📁 utils/                    # Utility functions
 │   ├── 📁 types/                    # TypeScript type definitions
 │   ├── 📁 directives/               # Custom directives (7 practical directives)
-│   ├── 📁 assets/                   # Static resources
-│   └── 📁 plugins/                  # Plugin configuration
+│   ├── 📁 assets/                   # Static assets
+│   └── 📁 plugins/                  # Plugin configurations
 ├── 📁 scripts/                      # Build scripts
 ├── 📁 public/                       # Static resources
 ├── ⚙️ vite.config.ts                # Vite configuration
 ├── 🎨 unocss.config.ts              # UnoCSS configuration
 ├── 📦 package.json                  # Project configuration
-├── 🔧 tsconfig.json                 # TypeScript configuration
-├── 📏 eslint.config.ts              # ESLint configuration
-└── 📖 README.md                     # Project documentation
+└── 🔧 tsconfig.json                 # TypeScript configuration
 ```
-
-</td>
-</tr>
-</table>
+</details>
 
 ### 🔄 Architecture Evolution Roadmap
 
 ```mermaid
 graph LR
-    A[🏠 Monomer<br/>Monolithic Architecture] --> B[📦 Monorepo<br/>Single Repo Multi-package]
+    A[🏠 Monomer<br/>Monolithic] --> B[📦 Monorepo<br/>Multi-package]
     B --> C[🔗 MicroApp<br/>Micro-frontend]
-    C --> D[🚀 NestJS<br/>Full-stack Solution]
-    
-    A -.->|Current Stage| E[✅ Fast Development]
-    B -.->|In Progress| F[📚 Component Library Independent]
-    C -.->|Planning| G[🔧 Plugin Architecture]
-    D -.->|Vision| H[🌟 Complete solution for PC/Mobile/Desktop 3 platforms]
+    C --> D[🚀 NestJS<br/>Full-stack]
 ```
 
 ---
 
-## 📱 Responsive Design
+## 🛠️ Developer Tools
 
-> **Adapts to all devices, whether desktop, tablet, or mobile**
+### VS Code Extensions Recommended
 
-- **🖥️ Desktop** - 1200px+ full feature experience
-- **📱 Tablet** - 768px-1200px optimized adaptation  
-- **📱 Mobile** - <768px mobile-friendly
+<details>
+<summary><b>View Complete Extension List and Usage</b></summary>
 
----
+#### Essential Extensions
+- **Vue - Official** - Vue 3 official support
+- **TypeScript Vue Plugin** - TypeScript support
+- **UnoCSS** - Atomic CSS intelligent hints
+- **Naive UI Snippets** - Naive UI code snippets
 
-## 🛠️ Recommended Developer Tools
+#### Detailed Practical Extensions
 
-### 📋 About VSCode Plugin Usage
+**1. Vscode Samge Translate Extension**
+- `desc:` For quick Chinese-English translation switching and variable naming generation
+- `use:` Ctrl+Shift+P, select Samge for corresponding functionality
+- `key:` `Alt+x` translate to Chinese, `Alt+z` translate to English
 
-<table width="100%">
-<tr>
-<td width="50%">
+**2. any-rule Extension**
+- `desc:` For quick regex generation
+- `use:` Right-click => Regex Collection
+- `key:` `@zz` popup regex options, can visualize regex based on generated options
 
-> <sub>1.  **VSCode Samge Translate Plugin**</sub>
-<sub>- `desc:` For quick Chinese-English translation switching and variable naming generation</sub>
-<sub>- `use:` Ctrl+Shift+P, select Samge for corresponding function use</sub>
-<sub>- `key:` `Alt+x` translate to Chinese, `Alt+z` translate to English</sub>
+**3. Better Comments Extension**
+- `desc:` Color-code different comment types in JS files
+- `use:` //\* green //! red //? blue
 
-> <sub>2. **any-rule Plugin**</sub>
-<sub>- `desc:` For quick regex generation</sub>
-<sub>- `use:` Right-click => Regex Encyclopedia</sub>
-<sub>- `key:` `@zz` popup regex options, graphical regex explanation</sub>
+**4. code settings sync Extension**
+- `desc:` For quick team synchronization of vscode extensions and configurations
+- `use:` [Documentation](https://marketplace.visualstudio.com/items?itemName=Alex-Chen.gitee-code-settings-sync)
 
-> <sub>3. **Better Comments Plugin**</sub>
-<sub>- `desc:` Color-coded comments in JS files</sub>
-<sub>- `use:` //\* green //! red //? blue</sub>
-<sub>- `key:` Comment modifiers [* ! ? ]</sub>
+**5. Code Spell Checker Extension**
+- `desc:` For quick checking of code and document spelling correctness
+- `use:` Add non-grammar error words to cspell.json
+- `key:` Yellow light bulb💡 above misspelled words
 
-> <sub>4. **Code Settings Sync Plugin**</sub>
-<sub>- `desc:` For quick team sync of VSCode plugins and configurations</sub>
+**6. CodeSnap Extension**
+- `desc:` For quick code screenshot generation
+- `use:` Right-click => Bottom option CodeSnap
 
-> <sub>5. **Code Spell Checker Plugin**</sub>
-<sub>- `desc:` For quick spell checking in code and documentation</sub>
-<sub>- `use:` Add typical words to cspell.json or through lightbulb</sub>
-<sub>- `key:` Yellow lightbulb 💡 above misspelled words</sub>
+**7. EmoJi Extension**
+- `desc:` For quick emoji selection
+- `use:` Input `Ctrl+Shift+P` => input `emo`
+- `key:` `F1 => emo`
 
-</td>
-<td width="50%">
+**8. JSON to JS Extension**
+- `desc:` For quick JSON to JS format conversion
+- `use:` From clipboard, select conversion, choose from 3 quote types
+- `key:` `Shift + Ctrl + Alt + V | S` or `F1 => Clipboard`
 
-> <sub>6. **CodeSnap Plugin**</sub>
-<sub>- `desc:` For quick code screenshot generation</sub>
-<sub>- `use:` Right-click => Bottom option CodeSnap</sub>
+**9. koroFileHeader Extension**
+- `desc:` For adding header comments and function comments
+- `use:` Use shortcuts in file headers or auto-generate, function comments with shortcuts
+- `key:` `ctrl+win+i` header comment `ctrl+win+t` function comment
 
-> <sub>7. **EmoJi Plugin**</sub>
-<sub>- `desc:` For quick emoji selection</sub>
-<sub>- `use:` Input `Ctrl+Shift+P` => Input `emo` select corresponding emoji</sub>
-<sub>- `key:` `F1 => emo`</sub>
+**10. TODO Tree Extension**
+- `desc:` For quick highlighting of TODO and other marker comments in code
+- `use:` Highlight display through comment keywords
+- `key:` TODO: Pending | BUG: Issue | FIXME: Fix needed | HACK: Custom
 
-> <sub>8. **JSON to JS Plugin**</sub>
-<sub>- `desc:` For quick JSON to JS format conversion</sub>
-<sub>- `use:` From clipboard, select conversion, optional quote 3 ways</sub>
-<sub>- `key:` `Shift + Ctrl + Alt + V | S` or `F1 => Clipboard`</sub>
-
-> <sub>9. **koroFileHeader Plugin**</sub>
-<sub>- `desc:` For adding file header comments and function comments</sub>
-<sub>- `use:` Use shortcut at file header or auto-generate, function comments use shortcut</sub>
-<sub>- `key:` `ctrl+win+i` header comment `ctrl+win+t` function comment</sub>
-
-> <sub>10. **TODO Tree Plugin**</sub>
-<sub>- `desc:` For highlighting TODO and other marker comments in code</sub>
-<sub>- `use:` Highlight display through comment keywords</sub>
-<sub>- `key:` TODO: To do | BUG: Issue | TAG: Tag | FIXME: To fix | HACK: Custom | MARK: Mark</sub>
-
-> <sub>11. **Turbo Console Log Plugin**</sub>
-<sub>- `desc:` For quick console log generation</sub>
-<sub>- `use:` Select variable, press shortcut to generate log statement</sub>
-<sub>- `key:` `ctrl+alt+l` generate `alt+shift+c` comment all **+u** enable all **+d** delete all</sub>
-
-</td>
-</tr>
-</table>
-
----
-
-## 🎨 Theme Customization
-
-> **Give your admin system a unique visual style**
-
-### 🌙 Dark/Light Mode
-- One-click switching
-- Auto follow system theme
-- Custom theme colors (future extension)
-
----
-
-## 🔒 Security & Permissions
-
-### 🛡️ Multi-level Permission Control
-- **Page-level Permissions** - Route access control
-- **Menu-level Permissions** - Navigation menu display control
-- **Button-level Permissions** - Operation button permission control
-- **API-level Permissions** - API call permission verification
-
-### 🔐 Authentication
-- `JWT Token` authentication
-- Refresh token auto-renewal (real API coming soon)
-- Multi-terminal login management (planned as configurable feature)
-- Password strength validation
+**11. Turbo Console Log Extension**
+- `desc:` For quick console print statement generation
+- `use:` Select variable, press shortcut to generate print statement
+- `key:` `ctrl+alt+l` generate `alt+shift+c` comment all **+u** enable all **+d** delete all
+</details>
 
 ---
 
 ## 📊 Performance Optimization
 
-### ⚡ Build Optimization
-- **Tree Shaking** - Automatic dead code elimination
-- **Code Splitting** - On-demand loading, reduce initial load time
-- **Resource Compression** - Smart CSS/JS/image compression
-- **CDN Acceleration** - Static resource CDN deployment
+### ⚡ Performance Benchmark
 
-### 🚀 Runtime Optimization
-- **Virtual Scrolling** - Smooth rendering of large data tables
-- **Component Lazy Loading** - Route-level lazy loading
-- **Image Lazy Loading** - Load images in viewport on demand
-- **Debounce & Throttle** - High-frequency operation performance optimization
-
-### ⚡ Performance Benchmarks
+<details>
+<summary><b>View Detailed Performance Data</b></summary>
 
 | Metric | Robot Admin | Traditional | Improvement |
 |:---:|:---:|:---:|:---:|
@@ -541,157 +383,143 @@ graph LR
 | 💾 Bundle Size | < 2MB | ~5MB | **60%+** |
 | 🔄 Page Switch | < 50ms | ~300ms | **85%+** |
 
-**Test Environment**: HP Pavilion 360, 16GB RAM, Node.js 22+
+**Test Environment**: HP Specter 360, 16GB RAM, Node.js 22+
+
+### Build Optimizations
+- **Tree Shaking** - Automatic dead code elimination
+- **Code Splitting** - On-demand loading, reduced initial load time
+- **Asset Compression** - Smart CSS/JS/image compression
+- **CDN Acceleration** - Static asset CDN deployment
+
+### Runtime Optimizations
+- **Virtual Scrolling** - Smooth rendering of large data tables
+- **Component Lazy Loading** - Route-level lazy loading
+- **Image Lazy Loading** - Viewport-based image loading
+- **Debounce & Throttle** - High-frequency operation performance optimization
+</details>
+
+---
+
+## 🤝 Contributing
+
+> **Come on, let's have fun! Let's build something together!** 🎉
+
+<details>
+<summary><b>View Contributing Guide</b></summary>
+
+### 🚀 30-Second Quick Contribution
+
+```bash
+# 1. Fork + Clone
+git clone https://github.com/yourusername/robot_admin.git
+
+# 2. Install dependencies
+bun install
+
+# 3. Create branch
+git checkout -b feat/awesome-feature
+
+# 4. Commit changes
+git commit -m "feat: new feature"
+
+# 5. Submit PR
+```
+
+### 💡 Contribution Directions
+
+**🎨 UI/Demo Page Contributions**
+- Create new pages under `src/views/demo/`
+- Showcase complete business scenarios
+- Code should be commented and copy-paste ready
+
+**🧩 Component Development Contributions**
+- Place in `src/components/global/`
+- Component names start with `C_`
+- Must have TypeScript type definitions
+
+**🛠️ Utility Function Contributions**
+- Under `src/utils/` directory
+- Should have unit tests
+- Should have JSDoc comments
+
+See [Contributing Guide](./CONTRIBUTING.md) for more details.
+</details>
 
 ---
 
 ## 🚀 Deployment Solutions
 
-### ☁️ Multi-environment Support
-- **Development** - Local development and debugging
-- **Testing** - Feature testing and verification
-- **Staging** - Pre-production final verification
+### ☁️ Multi-Environment Support
+
+<details>
+<summary><b>View Deployment Details</b></summary>
+
+**Environment Configuration**
+- **Development** - Local development debugging
+- **Testing** - Feature testing validation
+- **Staging** - Pre-production validation
 - **Production** - Live production environment
 
-### 📦 Deployment Options
-- **Vercel** - Zero-config deployment
+**Deployment Options**
+- **Vercel** - Zero-config deployment (Recommended)
 - **GitHub Pages** - Static deployment
 - **Docker** - Containerized deployment
 - **Traditional Server** - Nginx deployment
 
----
+```bash
+# Docker deployment
+docker build -t robot-admin .
+docker run -p 80:80 robot-admin
 
-## 💻 System Requirements
-
-### 🔧 Development Environment
-- **`Node.js`**: >= 20.19.0 (Recommended 22.12+)
-- **`Bun`**: >= 1.2.19 (Recommended latest)
-- **Memory**: >= 8GB RAM
-- **Storage**: >= 1GB available space
-- **System**: Windows 10+, macOS 12+, Ubuntu 20.04+
-
-### ⚙️ Optional Tools
-- **VS Code**: Recommended editor
-- **Git**: >= 2.20.0
-- **Docker**: >= 20.0 (for container deployment)
-
-### 🌐 Browser Requirements
-- **Chrome**: >= 90 | **Firefox**: >= 88  
-- **Safari**: >= 14 | **Edge**: >= 90
-
----
-
-## 🆚 Comparison with Other Solutions
-
-> There are many excellent projects in the community, this is just a sample comparison for reference
-
-| Feature Comparison | Robot Admin | Ant Design Pro | Vue Element Admin | Other Frameworks |
-|:---:|:---:|:---:|:---:|:---:|
-| 🚀 Startup Speed | **Bun < 100ms** | npm ~2s | yarn ~1.5s | Generally slower |
-| ⚡ Hot Reload Speed | **< 100ms ultra-fast** | ~1.5s wait | ~1s wait | Generally slower |
-| 📦 Build Tool | **Vite 7.x latest** | Webpack/Vite | Webpack 4/5 | Various tools |
-| 🎨 UI Component Library | **Naive UI lightweight** | Ant Design | Element Plus | Various choices |
-| 💪 TypeScript | **Complete type support** | Basic support | Basic support | Varying degrees |
-| 🔧 Custom Directives | **7 practical directives** | Few directives | Basic directives | Limited functionality |
-| 📊 Demo Pages | **30+ complete examples** | Limited examples | Limited examples | Basic examples |
-| 🎯 Learning Curve | **Moderately friendly** | Higher barrier | Medium barrier | Varies greatly |
-| 📈 Maintenance Status | **🔥 Actively maintained** | Continuously maintained | Continuously maintained | Varies |
-
-**🎯 Reasons to Choose Robot Admin**:
-- 🚀 **Performance First**: Bun + Vite7 dual engine, ultimate development experience
-- 🧩 **Rich Components**: 30+ business components, ready to use  
-- 🎨 **Modern Design**: Naive UI + UnoCSS, beauty and performance coexist
-- 📚 **Learning Friendly**: 30+ demo pages, each one is a best practice
+# Nginx configuration
+location / {
+  try_files $uri $uri/ /index.html;
+}
+```
+</details>
 
 ---
 
 ## 📈 Roadmap
 
 ### 🎯 Short-term Goals (Q1 2025)
-- [ ] 🎨 Theme system improvement
-- [ ] 📱 Mobile adaptation optimization
-- [ ] 🔧 UnoCSS configuration optimization
+- [x] 🎨 Theme system improvement
+- [x] 📱 Mobile adaptation optimization
+- [x] 🔧 UnoCSS configuration optimization
 - [ ] 📊 Performance monitoring integration
 
 ### 🚀 Medium-term Planning (Q2-Q3 2025)
 - [ ] 🏢 Multi-tenant system support
 - [ ] 🔗 Micro-frontend architecture support
-- [ ] 📚 Component library independent publishing
+- [ ] 📚 Independent component library release
 - [ ] 🎨 Visual page templates
 
 ### 🌟 Long-term Vision (Q4 2025+)
 - [ ] 🏗️ NestJS backend service
-- [ ] 🛠️ Low-code platform integration
-- [ ] ☁️ Cloud-native deployment solution
 - [ ] 🔌 Complete plugin ecosystem
 
 ---
 
-## 📝 Contributing Guide
+## 🌟 Ecosystem
 
-> **Come on, let's build a better open source project together!**
+### 🔗 Related Projects
 
-### 🤝 Ways to Participate
-- 🐛 **Bug Reports** - Report issues in time
-- 💡 **Feature Suggestions** - Propose improvement ideas
-- 📖 **Documentation Improvement** - Help improve documentation
-- 🔧 **Code Contribution** - Submit PRs to participate in development
+<details>
+<summary><b>View Ecosystem Projects</b></summary>
 
-### 📋 Submission Process
-```bash
-# 1. Fork the project to your account
-# 2. Create feature branch
-git checkout -b feat/awesome-feature
+**Planned Projects**
+- **[Robot UI](https://github.com/ChenyCHENYU/robot-ui)** - Independent component library
+- **[Robot CLI](https://github.com/ChenyCHENYU/robot-cli)** - Scaffolding tool
+- **[Robot Mobile](https://github.com/ChenyCHENYU/robot-mobile)** - Mobile solution
+- **[Robot Backend](https://github.com/ChenyCHENYU/robot-backend)** - NestJS backend service
 
-# 3. Commit your changes
-git commit -m 'feat: add awesome feature' 
-# (Recommend using conventional commits)
-
-# 4. Push to branch
-git push origin feat/awesome-feature
-
-# 5. Create Pull Request
-```
-
-### 📏 Code Standards
-
-We use strict code standards to ensure code quality:
-- **ESLint** - JavaScript/TypeScript code checking
-- **Prettier** - Code formatting
-- **Commitizen** - Commit message standards
-- **Husky** - Git hooks automation
-
-**Commit Standards:**
-```
-feat: new feature
-fix: bug fix
-docs: documentation update
-style: code style adjustment
-refactor: code refactoring
-test: test related
-chore: build tools/dependency updates
-```
-
----
-
-## 🌍 Environment Configuration
-
-### ⚙️ Environment Variables
-```
-.env                # Base configuration
-.env.development    # Development environment
-.env.test           # Test environment
-.env.staging        # Staging environment
-.env.production     # Production environment
-```
-
-### 🔧 Build Commands
-```bash
-bun dev               # Development environment
-bun run build:test    # Test environment build
-bun run build:staging # Staging build
-bun run build         # Production environment build
-```
+**Released Plugins**
+- **vite-console-plugin** - Vite console beautification and prompt plugin
+- **ts-type-cleaner** - TypeScript type analysis and cleaning tool
+- **robot-admin-env-manager** - Robot Admin environment configuration management tool
+- **git-branch-check-diff-commits** - Quick branch merge sync checker
+- **vite-plugin-preloader** - Smart route preloader plugin
+</details>
 
 ---
 
@@ -699,126 +527,84 @@ bun run build         # Production environment build
 
 <table width="100%">
 <tr>
-<td width="50%" align="center" style="padding: 10px;">
+<td width="50%" align="center">
 
 ![login](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot_admin/login.png)
 <br><strong>Login Page</strong>
 
 </td>
-<td width="50%" align="center" style="padding: 10px;">
+<td width="50%" align="center">
 
 ![home](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/robot_admin/home.png)
-<br><strong>Home Page</strong>
+<br><strong>Homepage</strong>
 
 </td>
 </tr>
 </table>
 
-> **🎯 [Live Preview](https://www.robotadmin.cn/)** | **📖 [Project Documentation](https://www.tzagileteam.com)**
-Note: If you are unable to access, please turn off the scientific Internet access method. Some ip addresses have restrictions, or access directly [Backup address](https://robot-admin-new.vercel.app/)
+> **🎯 [Live Demo](https://www.robotadmin.cn/)** | **📖 [Documentation](https://www.tzagileteam.com)**
+> 
+> Note: If inaccessible, please disable VPN or visit [Backup URL](https://robot-admin-new.vercel.app/)
 
 ---
 
 ## 🖥️ Browser Support
 
-**Modern browsers, no IE**
+**Modern Browsers, No IE**
 
-<table width="100%">
-<tr>
-<td width="25%" align="center">
-
-[<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>**Edge**<br/><sub>Latest 2 versions</sub>
-
-</td>
-<td width="25%" align="center">
-
-[<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>**Firefox**<br/><sub>Latest 2 versions</sub>
-
-</td>
-<td width="25%" align="center">
-
-[<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>**Chrome**<br/><sub>Latest 2 versions</sub>
-
-</td>
-<td width="25%" align="center">
-
-[<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>**Safari**<br/><sub>Latest 2 versions</sub>
-
-</td>
-</tr>
-</table>
+| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari |
+| --- | --- | --- | --- |
+| last 2 versions | last 2 versions | last 2 versions | last 2 versions |
 
 ---
 
-## 🔄 Migration Guide
+## 💻 System Requirements
 
-### Migrate from Vue Element Admin
-```bash
-# 1. Install dependencies
-bun install
+<details>
+<summary><b>View Detailed Requirements</b></summary>
 
-# 2. Migrate route configuration
-# From router/index.js to src/router/
-# Route structure is basically compatible, need to adjust meta fields
+### 🔧 Development Environment
+- **Node.js**: >= 20.19.0 (Recommended 22.12+)
+- **Bun**: >= 1.2.19 (Recommended latest)
+- **Memory**: >= 8GB RAM
+- **Storage**: >= 1GB available space
+- **OS**: Windows 10+, macOS 12+, Ubuntu 20.04+
 
-# 3. Migrate components
-# Element UI -> Naive UI
-# Component APIs have differences, but migration cost is low
-
-# 4. Migrate state management
-# Vuex -> Pinia
-# Simpler API, better performance
-```
-
-### Migrate from Ant Design Pro
-```bash
-# 1. Adjust build tools
-# Webpack -> Vite
-# Simpler configuration, faster speed
-
-# 2. Migrate component library
-# Ant Design -> Naive UI
-# Similar component functionality, more modern styling
-
-# 3. TypeScript configuration
-# Complete configuration available out of the box
-```
+### ⚙️ Optional Tools
+- **VS Code**: Recommended editor
+- **Git**: >= 2.20.0
+- **Docker**: >= 20.0 (Container deployment)
+</details>
 
 ---
 
 ## 🛠️ Troubleshooting
 
-### ❌ Bun Installation Failed
+<details>
+<summary><b>Common Issue Solutions</b></summary>
 
-**Solution:**
+### ❌ Bun Installation Failed
 ```bash
 # Windows users
 curl -fsSL https://bun.sh/install | bash
 
-# macOS users (Recommended: use Homebrew)
+# macOS users
 brew install oven-sh/bun/bun
 
-# Or install via npm
+# or use npm
 npm install -g bun
 ```
 
 ### ⚠️ Port Occupied Issue
-
-**Solution:**
 ```bash
 # Modify port in vite.config.ts
 server: {
-  port: 3001, // Change to other port
+  port: 1988, # Change to another port
   host: true
 }
-
-# Or specify port when starting
-bun dev --port 3001
 ```
 
 ### 🔧 TypeScript Type Errors
-
-**Solution:**
 ```bash
 # Regenerate type files
 bun run type:check
@@ -829,8 +615,6 @@ bun install
 ```
 
 ### 📦 Build Failed
-
-**Solution:**
 ```bash
 # Check dependency versions
 bun outdated
@@ -839,278 +623,162 @@ bun outdated
 rm -rf node_modules bun.lockb
 bun install
 
-# Force type checking
+# Force type check
 bun run type-build
 ```
+</details>
 
 ---
 
-## 🌟 Ecosystem
+## 🔒 Security & Permissions
 
-### 🔗 Related Projects
-- **[Robot UI](https://github.com/ChenyCHENYU/robot-ui)** - Independent component library (future business development)
-- **[Robot CLI](https://github.com/ChenyCHENYU/robot-cli)** - Scaffolding tool (in development)
-- **[Robot Mobile](https://github.com/ChenyCHENYU/robot-mobile)** - Mobile solution (planned)
-- **[Robot Backend](https://github.com/ChenyCHENYU/robot-backend)** - NestJS backend service (planned)
+### 🛡️ Multi-Level Permission Control
+- **Page-Level Permissions** - Route access control
+- **Menu-Level Permissions** - Navigation menu display control
+- **Button-Level Permissions** - Operation button permission control
+- **API-Level Permissions** - API call permission verification
 
-### 🧩 Plugin Ecosystem
-- **robot-plugin-charts** - Chart plugin extensions
-- **robot-plugin-editor** - Editor plugin collection  
-- **robot-plugin-auth** - Permission plugin enhancements
-- **robot-plugin-deploy** - Deployment tool plugins
-
-### 📖 Learning Resources
-- **[Official Documentation](https://www.tzagileteam.com)** - Complete usage guide (coming soon)
-- **[Video Tutorials](https://space.bilibili.com/robot-admin)** - Bilibili teaching videos (depending on usage)
-- **[Online Courses](https://www.robotadmin.cn/course)** - Systematic learning courses (planned)
-- **[Best Practices](https://www.robotadmin.cn/best-practices)** - Practical experience sharing
+### 🔐 Authentication
+- `JWT Token` authentication
+- Automatic refresh token renewal
+- Multi-device login management
+- Password strength validation
 
 ---
 
-## 👥 Community
+## 🆚 Comparison with Other Solutions
 
-### 💬 Discussion & Communication
-- **[GitHub Discussions](https://github.com/ChenyCHENYU/robot-admin/discussions)** - Project discussion area
-- **[QQ Group](https://qm.qq.com/robot-admin)** - Instant communication group (applying)
-- **[WeChat Group](https://weixin.qq.com/robot-admin)** - WeChat technical group (planned)
-- **[Discord](https://discord.gg/robot-admin)** - International community (future)
+<details>
+<summary><b>Why Choose Robot Admin?</b></summary>
 
-### 🤝 Contributors
+| Feature Comparison | Robot Admin | Ant Design Pro | Vue Element Admin | Other Frameworks |
+|:---:|:---:|:---:|:---:|:---:|
+| 🚀 Startup Speed | **Bun < 100ms** | npm ~2s | yarn ~1.5s | Generally slow |
+| ⚡ Hot Reload | **< 100ms Instant** | ~1.5s wait | ~1s wait | Generally slow |
+| 📦 Build Tool | **Vite 7.x Latest** | Webpack/Vite | Webpack 4/5 | Various tools |
+| 🎨 UI Library | **Naive UI Lightweight** | Ant Design | Element Plus | Various choices |
+| 💪 TypeScript | **Complete Type Support** | Basic support | Basic support | Varies |
+| 🔧 Custom Directives | **7 Practical Directives** | Few directives | Basic directives | Limited functionality |
+| 📊 Demo Pages | **30+ Complete Examples** | Limited examples | Limited examples | Basic examples |
+| 🎯 Learning Curve | **Medium Friendly** | High barrier | Medium barrier | Varies greatly |
+| 📈 Maintenance Status | **🔥 Active Maintenance** | Continuous maintenance | Continuous maintenance | Varies |
 
-Thanks to all developers who have contributed to the project:
-
-<a href="https://github.com/ChenyCHENYU/robot-admin/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=ChenyCHENYU/robot-admin" />
-</a>
-
-**Become a contributor:**
-- 🐛 Report Bugs | 💡 Suggest Features | 📝 Improve Docs | 🔧 Submit Code | 🌍 Translate Docs | 📢 Promote Project
-
-### 🏆 Special Thanks
-- **Vue.js Team** - Providing powerful framework foundation
-- **Naive UI Team** - Providing excellent component library
-- **Vite Team** - Providing ultra-fast build tools
-- **Bun Team** - Providing revolutionary runtime
-- **All Star and Fork developers** - Supporting and trusting the project
+**Reasons to Choose Robot Admin**:
+- 🚀 **Performance First**: Bun + Vite7 dual engine, ultimate development experience
+- 🧩 **Rich Components**: 30+ business components, ready to use  
+- 🎨 **Modern Design**: Naive UI + UnoCSS, beauty and performance coexist
+- 📚 **Learning Friendly**: 30+ demo pages, each is best practice
+</details>
 
 ---
 
-## 🔒 Security Policy
+## ❓ You Might Have Some Questions
 
-### 🛡️ Security Vulnerability Reporting
-If you find security vulnerabilities, please report through:
+<details>
+<summary><b>FAQ</b></summary>
 
-- **Encrypted Email**: [ycyplus@gmail.com](mailto:ycyplus@gmail.com) (PGP public key)
-- **Private Issues**: [GitHub Security](https://github.com/ChenyCHENYU/robot-admin/security)
-
-**⚠️ Please do not disclose security vulnerabilities in public**
-
-### 🔐 Security Best Practices
-- Regularly update dependency versions
-- Use HTTPS for data transmission
-- Implement Content Security Policy (CSP)
-- Enable Cross-Site Request Forgery (CSRF) protection
-- Use secure JWT Token configuration
-
----
-
-## 💰 Sponsorship Support
-
-If this project helps you, welcome to sponsor and support the project's continued development:
-
-### ☕ Buy the Author a Coffee
-<!-- - **Alipay**: [Scan to Pay](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/alipay-qr.png)
-- **WeChat Pay**: [Scan to Pay](https://cheny-chenyu.oss-cn-chengdu.aliyuncs.com/wechat-qr.png)
-- **GitHub Sponsors**: [Monthly Sponsorship](https://github.com/sponsors/ChenyCHENYU) -->
-
-### 🏢 Enterprise Sponsorship
-For enterprise users needing technical support, custom development, or training services, please contact:
-- **Email**: [ycyplus@gmail.com](mailto:ycyplus@gmail.com)
-
-<!-- **Sponsor Benefits:**
-- 🎯 Priority technical support
-- 📞 Dedicated Q&A service
-- 🔧 Custom feature development
-- 📚 Internal training service support
-- 🏷️ Project showcase promotion -->
-
----
-
-## 📋 Code of Conduct
-
-We are committed to creating an open, inclusive, and friendly community environment. All participants should follow these guidelines:
-
-### ✅ We Encourage
-- 🤝 Friendly and patient communication
-- 🌍 Respect for different viewpoints and experiences
-- 💡 Constructive feedback and criticism
-- 🔄 Focus on what's best for the community
-- ❤️ Show empathy towards other community members
-
-### ❌ Unacceptable Behavior
-- 🚫 Use of sexualized language or imagery
-- 🚫 Malicious comments or personal attacks
-- 🚫 Public or private harassment
-- 🚫 Publishing others' private information without permission
-- 🚫 Other conduct that could reasonably be considered inappropriate
-
-**Violation Handling**: Project maintainers have the right to remove, edit, or reject comments, commits, code, etc. that do not comply with the code of conduct.
-
----
-
-## 📄 Changelog
-
-### 🎉 v1.0.0 (2025-07-10)
-- ✨ First official release
-- 🎨 30+ core components fully implemented
-- 📊 30+ demo pages completed
-- 🔧 7 custom directives implemented
-- 🛡️ Complete permission management system
-- 📱 Responsive design fully adapted
-- 🧪 Test coverage reaches 85%+
-
-### 📋 Complete Changelog
-See [CHANGELOG.md](./CHANGELOG.md) for detailed version history.
-
----
-
-## ❓ Frequently Asked Questions
-
-#### 🔧 Why recommend using Bun?
-
-Bun is a next-generation JavaScript runtime. Compared to npm/yarn:
-- 10x+ faster installation speed
+**🔧 Why recommend using Bun?**
+- Installation speed increased by 10x+
 - Lower memory usage
 - Built-in bundler and test runner
 - Fully compatible with Node.js ecosystem
 
-#### 🎨 How to customize themes?
-
+**🎨 How to customize themes?**
 1. Modify CSS variables in `src/assets/css/theme.scss`
 2. Use `C_Theme` component for dynamic switching
-3. Support automatic dark/light mode switching
+3. Support dark/light mode auto-switching
 
-#### 🔐 How to use the permission system?
-
-The system supports 4-level permission control:
+**🔐 How to use the permission system?**
 - Page level: Route guard control
 - Menu level: Dynamic menu generation
 - Button level: v-permission directive
 - API level: axios interceptor
 
-#### 📱 Does it support mobile?
+**📱 Does it support mobile?**
+- Full support! Responsive design adapts to all devices
 
-Full support! The project uses responsive design:
-- Desktop: Complete functionality
-- Tablet: Optimized adaptation
-- Mobile: Core functionality
-
----
-
-## 🌍 Internationalization Support
-
-Robot Admin can support multiple languages, making it convenient for global developers, but it needs time to improve:
-
-### 🗣️ Supported Languages
-- 🇺🇸 **English** - Default language
-- 🇨🇳 **中文简体** - Planned support
-- Others **Others** - Depending on usage
-
----
-
-## 📚 API Documentation
-
-### 🔗 Documentation Links
-- **[Complete API Documentation](https://www.robotadmin.cn/api)** - Detailed interface documentation
-- **[Component Documentation](https://www.robotadmin.cn/components)** - Component usage guide
-- **[Utility Functions](https://www.robotadmin.cn/utils)** - Practical utility functions
-- **[Type Definitions](https://www.robotadmin.cn/types)** - TypeScript types
-
----
-
-## 📊 Example Projects
-
-Real project cases built with Robot Admin:
-
-### 🏢 Enterprise Projects
-- **[Some System (Old Version)](https://demo-crm.robotadmin.cn)** - Many more, not disclosed for sensitivity
+**🔄 How to migrate from other projects?**
+- Provide detailed migration guide
+- Component APIs are basically compatible
+- Support progressive migration
+</details>
 
 ---
 
 ## 📞 Contact Us
 
 **🧑‍💻 Author Information**
-- **Name:** CHENY (Frontend Developer & Agile Enthusiast)
-- **Introduction:** A small developer | 🐔🐤🐓 Learning and growing  
+- **Name:** CHENY (Frontend Developer & Agile Pursuer)
+- **Bio:** A little novice | 🐔🐤🐓 Chickens pecking at each other  
 - **Email:** [ycyplus@gmail.com](mailto:ycyplus@gmail.com)
 - **GitHub:** [@ChenyCHENYU](https://github.com/ChenyCHENYU)
 
-**🔗 Project Links**
-- **Preview URL:** [https://www.robotadmin.cn](https://www.robotadmin.cn)
-- **Project Documentation:** [https://www.tzagileteam.com](https://www.tzagileteam.com)
-- **GitHub Repository:** [Robot Admin](https://github.com/ChenyCHENYU/robot-admin)
+---
+
+
+### 🤝 Contributors
+
+Thanks to all developers who contributed to this project:
+
+<a href="https://github.com/ChenyCHENYU/robot-admin/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ChenyCHENYU/robot-admin" />
+</a>
+
+**We hope you become a contributor:**
+- 🐛 Report Bugs | 💡 Feature Suggestions | 📝 Improve Documentation | 🔧 Submit Code | 🌍 Translate Documentation | 📢 Promote Project
 
 ---
 
-## 🙏 Acknowledgments
+## 🏆 Special Thanks
+
+<details>
+<summary><b>Acknowledgment List</b></summary>
 
 ### 🌟 Open Source Project Acknowledgments
 
-Thanks to the following excellent open source projects that provide strong technical support for Robot Admin:
+**Core Technologies**
+- **Vue.js Team** - Providing powerful framework foundation
+- **Naive UI Team** - Providing excellent component library
+- **Vite Team** - Providing ultra-fast build tools
+- **Bun Team** - Providing revolutionary runtime
+- **Anthony Fu** - Creator of UnoCSS, unplugin and other tools
+- **Evan You** - Creator of Vue.js
 
-**🚀 Core Technologies**
-- [Vue.js](https://vuejs.org/) - Progressive JavaScript framework
-- [Vite](https://vitejs.dev/) - Next generation build tool  
-- [TypeScript](https://www.typescriptlang.org/) - JavaScript with types
-- [Naive UI](https://www.naiveui.com/) - Vue 3 component library
-- [UnoCSS](https://uno.antfu.me/) - Instant atomic CSS engine
-- [Bun](https://bun.sh/) - Ultra-fast JavaScript runtime
+**Functional Components**
+- **ECharts** - Data visualization chart library
+- **AntV X6** - Graph editing engine
+- **FullCalendar** - Calendar component
+- **WangEditor** - Rich text editor
 
-**🛠️ Development Tools**
-- [Pinia](https://pinia.vuejs.org/) - Vue state management
-- [Vue Router](https://router.vuejs.org/) - Vue routing management
-- [VueUse](https://vueuse.org/) - Vue composition API utilities
-- [ESLint](https://eslint.org/) - JavaScript code checking
-- [Prettier](https://prettier.io/) - Code formatting tool
-- [Vitest](https://vitest.dev/) - Unit testing framework
+### 👨‍💻 Community Support
+- **All developers who starred** - Giving the project confidence and motivation
+- **Users who raised issues** - Helping the project discover and improve problems
+- **Developers who contributed PRs** - Making the project better
+- **Enterprises using the project** - Validating the project's practical value
 
-**📊 Functional Components**
-- [ECharts](https://echarts.apache.org/) - Data visualization chart library
-- [AntV X6](https://x6.antv.vision/) - Graph editing engine
-- [FullCalendar](https://fullcalendar.io/) - Calendar component
-- [WangEditor](https://www.wangeditor.com/) - Rich text editor
-- [Highlight.js](https://highlightjs.org/) - Syntax highlighting library
-
-### 👨‍💻 Special Thanks
-- **Vue.js Team** - Laying the foundation for modern frontend development
-- **Anthony Fu (@antfu)** - Creator of excellent tools like UnoCSS and unplugin
-- **Evan You** - Creator and leader of Vue.js
-- **Naive UI Team** - Providing elegant Vue 3 component library
-- **All open source contributors** - Making the open source world better
-
-### 🌟 Community Support
-- **All Star developers** - Giving the project confidence and motivation
-- **Users who submit Issues** - Helping the project discover and improve problems  
-- **Developers who contribute PRs** - Making the project better
-- **Friends who promote the project** - Expanding project influence
-- **Enterprises using the project** - Validating the practical value of the project
-
-> *"One person can go fast, but a group of people can go further. Thanks to every friend who supports Robot Admin!"*
-
-### 🎯 Continuous Improvement
-
-Robot Admin will continue to improve and perfect, we promise:
-- 📈 **Regular Updates** - Keep up with the latest technology trends
-- 🐛 **Quick Fixes** - Handle discovered issues promptly
-- 📚 **Documentation Improvement** - Continuously improve usage documentation
-- 🤝 **Community Building** - Build an active developer community
-- 🌍 **Ecosystem Expansion** - Enrich the project ecosystem
+> *"One person can go fast, but a group can go far. Thanks to every friend who supports Robot Admin!"*
+</details>
 
 ---
 
-## 📜 Open Source License
+## 📄 Changelog
 
-This project is based on the [MIT License](./LICENSE) open source agreement.
+### 🎉 v1.0.0 (2025-01-10)
+- ✨ First official version released
+- 🎨 30+ core components fully implemented
+- 📊 30+ demo pages all completed
+- 🔧 7 custom directives implemented
+- 🛡️ Complete permission management system
+- 📱 Responsive design fully adapted
+- 🧪 Test coverage reached 85%+
+
+View [CHANGELOG.md](./CHANGELOG.md) for detailed version history.
+
+---
+
+## 📄 Open Source License
+
+This project is based on [MIT License](./LICENSE) open source agreement.
 
 ```
 MIT License
@@ -1128,36 +796,32 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 ```
 
-**🎯 This means you can:**
-- ✅ Use this project for free
-- ✅ Modify source code
-- ✅ Commercial use
-- ✅ Private deployment
-- ✅ Distribute and sublicense
+**This means you can:**
+✅ Free to use | ✅ Modify source code | ✅ Commercial use | ✅ Private deployment | ✅ Distribute and sublicense
 
-**📋 Only requirement:**
-- 📄 Retain copyright notice and license
+**Only requirement:**
+📄 Retain copyright notice and license
 
 ---
 
 <div align="center">
 
-## 🚀 Join Robot Admin Community
+## 🚀 Join Robot Admin 
 
 <p>
-  <strong>If this project helps you, please give it a ⭐ Star!</strong><br>
+  <strong>If this project helped you, please give it a ⭐ Star!</strong><br>
   <em>Your Star is our motivation to move forward 🌟</em>
 </p>
 
 <p>
   <a href="https://github.com/ChenyCHENYU/robot_admin">
-    <img src="https://img.shields.io/badge/⭐-Give%20a%20Star-yellow?style=for-the-badge&logo=github" alt="GitHub Star">
+    <img src="https://img.shields.io/badge/⭐-Give a Star-yellow?style=for-the-badge&logo=github" alt="GitHub Star">
   </a>
   <a href="https://github.com/ChenyCHENYU/robot_admin/fork">
-    <img src="https://img.shields.io/badge/🍴-Fork%20Project-blue?style=for-the-badge&logo=github" alt="GitHub Fork">
+    <img src="https://img.shields.io/badge/🍴-Fork Project-blue?style=for-the-badge&logo=github" alt="GitHub Fork">
   </a>
   <a href="https://www.robotadmin.cn">
-    <img src="https://img.shields.io/badge/🚀-Live%20Demo-green?style=for-the-badge&logo=vercel" alt="Live Demo">
+    <img src="https://img.shields.io/badge/🚀-Live Demo-green?style=for-the-badge&logo=vercel" alt="Live Demo">
   </a>
 </p>
 
@@ -1166,7 +830,7 @@ copies or substantial portions of the Software.
 ### 🎯 Next Steps
 
 <p>
-  🔥 <strong>Start Using Now</strong><br>
+  🔥 <strong>Start Using</strong><br>
   <code>git clone https://github.com/ChenyCHENYU/robot_admin.git</code><br>
   <em>Start your project in 30 seconds</em>
 </p>
@@ -1189,10 +853,10 @@ copies or substantial portions of the Software.
 
 <p>
   <a href="https://github.com/sponsors/ChenyCHENYU">
-    <img src="https://img.shields.io/badge/💖-Sponsor%20Support-red?style=for-the-badge&logo=github-sponsors" alt="Sponsor">
+    <img src="https://img.shields.io/badge/💖-Sponsor Support-red?style=for-the-badge&logo=github-sponsors" alt="Sponsor">
   </a>
   <a href="mailto:ycyplus@gmail.com">
-    <img src="https://img.shields.io/badge/📧-Contact%20Author-blue?style=for-the-badge&logo=gmail" alt="Contact">
+    <img src="https://img.shields.io/badge/📧-Contact Author-blue?style=for-the-badge&logo=gmail" alt="Contact">
   </a>
 </p>
 
@@ -1209,7 +873,7 @@ copies or substantial portions of the Software.
 
 <p>
   <strong>Made with ❤️ by <a href="https://github.com/ChenyCHENYU">@ChenyCHENYU</a></strong><br>
-  <em>Open source makes the world better 🌍</em>
+  <em>Thanks to open source making the world better 🌍</em>
 </p>
 
 </div>
