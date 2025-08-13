@@ -89,7 +89,7 @@
         "unplugin-icons": "^22.1.0",
         "unplugin-vue-components": "^28.5.0",
         "vite": "7",
-        "vite-console-plugin": "^2.0.10",
+        "vite-console-plugin": "^2.0.15",
         "vite-plugin-vue-devtools": "^7.7.2",
         "vitest": "^3.0.8",
         "vue-tsc": "^2.2.8",
@@ -2227,7 +2227,7 @@
 
     "vite": ["vite@7.0.6", "", { "dependencies": { "esbuild": "^0.25.0", "fdir": "^6.4.6", "picomatch": "^4.0.3", "postcss": "^8.5.6", "rollup": "^4.40.0", "tinyglobby": "^0.2.14" }, "optionalDependencies": { "fsevents": "~2.3.3" }, "peerDependencies": { "@types/node": "^20.19.0 || >=22.12.0", "jiti": ">=1.21.0", "less": "^4.0.0", "lightningcss": "^1.21.0", "sass": "^1.70.0", "sass-embedded": "^1.70.0", "stylus": ">=0.54.8", "sugarss": "^5.0.0", "terser": "^5.16.0", "tsx": "^4.8.1", "yaml": "^2.4.2" }, "optionalPeers": ["@types/node", "jiti", "less", "lightningcss", "sass", "sass-embedded", "stylus", "sugarss", "terser", "tsx", "yaml"], "bin": { "vite": "bin/vite.js" } }, "sha512-MHFiOENNBd+Bd9uvc8GEsIzdkn1JxMmEeYX35tI3fv0sJBUTfW5tQsoaOwuY4KhBI09A3dUJ/DXf2yxPVPUceg=="],
 
-    "vite-console-plugin": ["vite-console-plugin@2.0.10", "", { "dependencies": { "vite-console-plugin": "^1.1.0" }, "peerDependencies": { "vite": ">=4.0.0" } }, "sha512-dUM05KnPV7MrefTbgLaFItmHcnq49e4LiU0E7aB6AIGDNr3rzv189wXOwukTC9RtFfZkgr6UnOrqJblTp1HHOg=="],
+    "vite-console-plugin": ["vite-console-plugin@2.0.15", "", { "dependencies": { "vite-console-plugin": "^1.1.0" }, "peerDependencies": { "vite": ">=4.0.0" } }, "sha512-hESbDonGjWBhsVTbkrMnKuIjP4SYSjZg5SpyhZ/J8PoLkKo5MpG2zWJekS/tdYkORgIPZpsntPzwawqCT30hDA=="],
 
     "vite-hot-client": ["vite-hot-client@0.2.4", "https://registry.npmmirror.com/vite-hot-client/-/vite-hot-client-0.2.4.tgz", { "peerDependencies": { "vite": "^2.6.0 || ^3.0.0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0-0" } }, "sha512-a1nzURqO7DDmnXqabFOliz908FRmIppkBKsJthS8rbe8hBEXwEwe4C3Pp33Z1JoFCYfVL4kTOMLKk0ZZxREIeA=="],
 
