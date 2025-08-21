@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:35:57
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-12 01:00:55
+ * @LastEditTime: 2025-08-21 15:05:13
  * @FilePath: \Robot_Admin\src\views\login\data.ts
  * @Description: 登录页表单数据
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -31,7 +31,7 @@ type FormField = {
 export const OPTIONS: FormField[] = [
   {
     type: 'input',
-    value: 'admin',
+    value: '杨大哥',
     prop: 'username',
     placeholder: '请输入用户名',
     rules: [required('用户名')],

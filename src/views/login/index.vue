@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 23:07:28
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-30 16:58:38
+ * @LastEditTime: 2025-08-21 14:59:51
  * @FilePath: \Robot_Admin\src\views\login\index.vue
  * @Description: 登录页
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -66,7 +66,7 @@
   import { s_userStore } from '@/stores/user/index'
   import { OPTIONS } from './data'
   import { useFormSubmit } from '@/hooks/useFormSubmit'
-  import { loginApi, type LoginResponse } from '@/api/sys'
+  import { loginApi, type LoginResponse } from '@/api/auth'
   import './index.scss'
   import Spline from './components/Spline.vue'
   import C_Captcha from '@/components/global/C_Captcha/index.vue'
@@ -125,7 +125,7 @@
 
   // 生成个性化欢迎信息 - 极简版，复杂度 < 5
   const generateWelcomeMessage = (data: LoginResponse) => {
-    const username = data.data?.username || data.data?.name || 'CHENY'
+    const username = data.data?.username || 'CHENY'
     const { greeting, emoji } = getCurrentGreeting()
     const template =
       WELCOME_CONFIG.templates[
@@ -204,8 +204,11 @@
     meta: generateWelcomeMessage,
     errorMsg: '账号或密码错误',
 
-    onSuccess: async ({ token }: { token: string }) => {
+    onSuccess: async (response: LoginResponse) => {
       try {
+        const {
+          data: { token },
+        } = response // ✅ 使用解构
         userStore.handleLoginSuccess(token)
         await initDynamicRouter()
         router.push('/home')

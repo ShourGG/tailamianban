@@ -8,7 +8,7 @@
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-import { getAuthMenuListApi } from '@/api/sys'
+import { getAuthMenuListApi } from '@/api/auth'
 import { getKeepAliveRouterName, getShowMenuList } from '@/utils/d_route'
 import type { DynamicRoute } from '@/router/dynamicRouter'
 
