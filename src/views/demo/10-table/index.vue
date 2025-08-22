@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-18 15:43:20
+ * @LastEditTime: 2025-08-22 11:30:55
  * @FilePath: \Robot_Admin\src\views\demo\10-table\index.vue
  * @Description: 表格组件演示
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -129,6 +129,9 @@
   const defaultPageSize = ref(10)
   const currentPage = ref(1)
 
+  // 🎯 修复：用于跟踪模态框新增的数据ID，类型与Employee.id保持一致
+  const pendingNewRowId = ref<number | null>(null)
+
   // ================= 计算属性 =================
   const currentModeConfig = computed(() => MODE_CONFIG[editMode.value])
   const tableColumns = computed(() => getTableColumns())
@@ -225,20 +228,42 @@
    */
   const addNewRow = () => {
     const newRow = createNewEmployee()
-    tableData.value.unshift(newRow)
 
-    // 如果启用分页且不在第一页，则跳转到第一页
-    if (paginationEnabled.value && currentPage.value !== 1) {
-      currentPage.value = 1
-      message.info('新数据已添加到第一页')
-    }
+    if (editMode.value === 'modal') {
+      // 🎯 修复：直接使用number类型的ID
+      pendingNewRowId.value = newRow.id
 
-    // 根据编辑模式自动开始编辑
-    setTimeout(() => {
-      if (['modal', 'row', 'both'].includes(editMode.value)) {
-        tableRef.value?.startEdit(newRow.id)
+      // 临时插入数据（为了让 startEdit 能找到数据）
+      tableData.value.unshift(newRow)
+
+      // 如果启用分页且不在第一页，则跳转到第一页
+      if (paginationEnabled.value && currentPage.value !== 1) {
+        currentPage.value = 1
       }
-    }, 100)
+
+      // 开始编辑
+      setTimeout(() => {
+        tableRef.value?.startEdit(newRow.id)
+      }, 100)
+
+      message.info('请填写新员工信息后保存')
+    } else {
+      // 其他编辑模式保持原有逻辑不变
+      tableData.value.unshift(newRow)
+
+      // 如果启用分页且不在第一页，则跳转到第一页
+      if (paginationEnabled.value && currentPage.value !== 1) {
+        currentPage.value = 1
+        message.info('新数据已添加到第一页')
+      }
+
+      // 根据编辑模式自动开始编辑
+      setTimeout(() => {
+        if (['row', 'both'].includes(editMode.value)) {
+          tableRef.value?.startEdit(newRow.id)
+        }
+      }, 100)
+    }
   }
 
   /**
@@ -298,21 +323,41 @@
       // 模拟异步保存
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      // 计算在完整数据中的实际索引
-      const actualIndex = paginationEnabled.value
-        ? (currentPage.value - 1) * defaultPageSize.value + rowIndex
-        : rowIndex
+      // 🎯 修复：类型安全的比较
+      if (pendingNewRowId.value && rowData.id === pendingNewRowId.value) {
+        // 新增模式：数据已经在列表中了，只需要更新和重置标记
+        const actualIndex = paginationEnabled.value
+          ? (currentPage.value - 1) * defaultPageSize.value + rowIndex
+          : rowIndex
 
-      // 更新数据
-      tableData.value[actualIndex] = { ...rowData } as Employee
+        // 🎯 修复：确保ID类型一致
+        const finalData = {
+          ...rowData,
+          id: rowData.id || Date.now(),
+        } as Employee
+        tableData.value[actualIndex] = finalData
 
-      const columnTitle = tableColumns.value.find(
-        (c: any) => c.key === columnKey
-      )?.title
+        // 重置新增标记
+        pendingNewRowId.value = null
 
-      const msg = columnKey ? `${columnTitle}已更新` : '员工信息保存成功'
+        message.success('新员工信息保存成功')
+      } else {
+        // 编辑现有数据的逻辑保持不变
+        const actualIndex = paginationEnabled.value
+          ? (currentPage.value - 1) * defaultPageSize.value + rowIndex
+          : rowIndex
 
-      message.success(msg)
+        // 更新数据
+        tableData.value[actualIndex] = { ...rowData } as Employee
+
+        const columnTitle = tableColumns.value.find(
+          (c: any) => c.key === columnKey
+        )?.title
+
+        const msg = columnKey ? `${columnTitle}已更新` : '员工信息保存成功'
+
+        message.success(msg)
+      }
     } catch (error) {
       console.error('💥 保存失败:', error)
       message.error('保存失败，请重试')
@@ -326,7 +371,22 @@
    * @description 处理编辑取消操作
    */
   const handleCancel = () => {
-    message.info('已取消编辑')
+    if (pendingNewRowId.value) {
+      // 🎯 新增模式取消：移除临时插入的数据
+      const tempIndex = tableData.value.findIndex(
+        item => item.id === pendingNewRowId.value
+      )
+      if (tempIndex !== -1) {
+        tableData.value.splice(tempIndex, 1)
+      }
+
+      // 重置新增标记
+      pendingNewRowId.value = null
+      message.info('已取消新增')
+    } else {
+      // 编辑模式取消
+      message.info('已取消编辑')
+    }
   }
 </script>
 

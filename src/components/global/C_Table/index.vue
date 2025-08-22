@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-01 15:03:03
+ * @LastEditTime: 2025-08-22 11:26:25
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
  * @Description: 超级表格组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -48,6 +48,7 @@
       :mask-closable="false"
       :close-on-esc="false"
       class="w60%"
+      :closable="false"
     >
       <C_Form
         v-if="
