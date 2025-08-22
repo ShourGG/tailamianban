@@ -5,7 +5,7 @@
  * @LastEditTime: 2025-06-10 00:20:33
  * @FilePath: \Robot_Admin\src\views\demo\07-form-module\form\layouts\DefaultLayout\index.vue
  * @Description: 表单组件 - 默认布局  - 演示页面
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎. 
+ * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
 -->
 
 <template>
@@ -180,9 +180,9 @@
       await validate()
       emit('submit', formData.value)
       message.success('默认布局表单提交成功！')
-    } catch (error) {
-      message.error('表单验证失败，请检查输入')
-      throw error
+    } catch (errors) {
+      message.error('请完善表单必填信息')
+      console.log('表单验证失败:', errors)
     } finally {
       submitLoading.value = false
     }

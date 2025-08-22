@@ -220,7 +220,6 @@
       }
 
       emit('submit', submitData)
-      message.success('内联布局搜索成功！')
     } catch (error) {
       message.error('表单验证失败，请检查输入')
       throw error
