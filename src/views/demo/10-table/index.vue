@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-08-22 11:30:55
+ * @LastEditTime: 2025-08-22 14:06:37
  * @FilePath: \Robot_Admin\src\views\demo\10-table\index.vue
  * @Description: 表格组件演示
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -154,9 +154,17 @@
     }
   })
 
-  // 🎯 表格操作配置 - 使用新的内置操作方式
+  // 🎯 表格操作配置 - 添加删除功能
   const tableActions = computed(() => ({
-    // 使用默认的编辑、删除、详情按钮
+    // ✅ 添加删除配置
+    delete: {
+      onDelete: handleDelete, // 提供删除处理函数
+      confirmText: (row: DataRecord) => {
+        const employee = row as Employee
+        return `确定要删除员工 "${employee.name}" 吗？此操作不可撤销！`
+      }, // 修复类型：参数改为DataRecord
+    },
+    // 使用默认的编辑、详情按钮
     custom: [
       {
         key: 'copy',
@@ -267,6 +275,64 @@
   }
 
   /**
+   * ✅ 新增：处理删除操作
+   * @description 删除员工信息，支持分页场景下的索引计算
+   * @param row - 要删除的员工数据
+   * @param index - 当前页面中的行索引
+   */
+  const handleDelete = async (row: DataRecord, index: number) => {
+    const employeeRow = row as Employee
+
+    try {
+      // 模拟 API 删除请求（比如调用后端删除接口）
+      loading.value = true
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // 计算在完整数据中的实际索引
+      const actualIndex = paginationEnabled.value
+        ? (currentPage.value - 1) * defaultPageSize.value + index
+        : index
+
+      // 从数据源中删除
+      tableData.value.splice(actualIndex, 1)
+
+      console.log(`✅ 已删除员工: ${employeeRow.name}`, {
+        pageIndex: index,
+        actualIndex,
+        remainingCount: tableData.value.length,
+      })
+
+      // 🎯 移除重复提示：组件内部已有"删除成功"提示，这里只处理业务逻辑
+
+      // 🎯 处理分页边界情况：如果当前页没有数据了，回到上一页
+      if (paginationEnabled.value && tableData.value.length > 0) {
+        const maxPage = Math.ceil(
+          tableData.value.length / defaultPageSize.value
+        )
+        if (currentPage.value > maxPage) {
+          currentPage.value = Math.max(1, maxPage)
+          // 延迟显示分页跳转提示，避免与删除成功提示冲突
+          setTimeout(() => {
+            message.info(`已自动跳转到第 ${currentPage.value} 页`)
+          }, 1000)
+        }
+      }
+
+      // 🎯 如果删除后数据为空，重置到第一页
+      if (tableData.value.length === 0) {
+        currentPage.value = 1
+      }
+    } catch (error) {
+      console.error('💥 删除失败:', error)
+      // 删除失败时的提示保留，因为组件内部只处理成功情况
+      message.error('删除失败，请重试')
+      throw error // 让组件知道删除失败，避免界面状态错误
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
    * @description 复制员工信息，在当前行后插入副本
    * @param row - 要复制的员工数据
    * @param index - 当前行索引
@@ -323,14 +389,13 @@
       // 模拟异步保存
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      // 🎯 修复：类型安全的比较
       if (pendingNewRowId.value && rowData.id === pendingNewRowId.value) {
-        // 新增模式：数据已经在列表中了，只需要更新和重置标记
+        // 数据已经在列表中了，只需要更新和重置标记
         const actualIndex = paginationEnabled.value
           ? (currentPage.value - 1) * defaultPageSize.value + rowIndex
           : rowIndex
 
-        // 🎯 修复：确保ID类型一致
+        // 确保ID类型一致
         const finalData = {
           ...rowData,
           id: rowData.id || Date.now(),
@@ -372,7 +437,7 @@
    */
   const handleCancel = () => {
     if (pendingNewRowId.value) {
-      // 🎯 新增模式取消：移除临时插入的数据
+      // 模式取消：移除临时插入的数据
       const tempIndex = tableData.value.findIndex(
         item => item.id === pendingNewRowId.value
       )
