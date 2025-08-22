@@ -2,7 +2,7 @@
  * @Author: ChenYu
  * @Date: 2025-05-29 08:20:16
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-02 22:41:31
+ * @LastEditTime: 2025-08-22 10:43:26
  * @FilePath: \Robot_Admin\src\components\global\C_Time\index.vue
  * @Description: 基于 NaiveUI 的时间选择器组件化二次封装
  * 支持多种时间选择模式：时间段选择、单个时间选择、时分秒选择等
@@ -327,6 +327,66 @@
       singleTime.value = props.defaultSingleTime
     }
   )
+
+  // 在 C_Time 组件的 <script> 最后添加这些方法和暴露
+
+  /**
+   * 重置时间选择器
+   */
+  const reset = () => {
+    startTime.value = null
+    endTime.value = null
+    singleTime.value = null
+  }
+
+  /**
+   * 设置开始时间
+   */
+  const setStartTime = (time: number | null) => {
+    startTime.value = time
+  }
+
+  /**
+   * 设置结束时间
+   */
+  const setEndTime = (time: number | null) => {
+    endTime.value = time
+  }
+
+  /**
+   * 设置单个时间
+   */
+  const setSingleTime = (time: number | null) => {
+    singleTime.value = time
+  }
+
+  /**
+   * 获取开始时间
+   */
+  const getStartTime = () => startTime.value
+
+  /**
+   * 获取结束时间
+   */
+  const getEndTime = () => endTime.value
+
+  /**
+   * 获取单个时间
+   */
+  const getSingleTime = () => singleTime.value
+
+  /**
+   * 暴露组件方法给父组件
+   */
+  defineExpose({
+    reset,
+    setStartTime,
+    setEndTime,
+    setSingleTime,
+    getStartTime,
+    getEndTime,
+    getSingleTime,
+  })
 </script>
 
 <style scoped lang="scss">
