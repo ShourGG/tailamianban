@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-04-29 11:43:48
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-09 20:35:21
+ * @LastEditTime: 2025-08-25 15:08:35
  * @FilePath: \Robot_Admin\src\axios\request.ts
  * @Description: axios 二次封装
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -61,3 +61,33 @@ service.interceptors.response.use(
 )
 
 export default service
+
+// 增加快捷请求方式
+
+export const postData = async <T = any>(
+  url: string,
+  data?: any
+): Promise<T> => {
+  const res = await service.post(url, data)
+  return res.data
+}
+
+export const getData = async <T = any>(url: string): Promise<T> => {
+  const res = await service.get(url)
+  return res.data
+}
+
+export const putData = async <T = any>(url: string, data?: any): Promise<T> => {
+  const res = await service.put(url, data)
+  return res.data
+}
+
+export const deleteData = async <T = any>(url: string): Promise<T> => {
+  const res = await service.delete(url)
+  return res.data
+}
+
+// 极特殊的场景在api接口文件中使用示例如下：（一般情况使用快捷请求方式即可）
+
+// export const loginApi = (data: { username: string; password: string }) =>
+//   service.post('/auth/login', data).then(res => res.data)

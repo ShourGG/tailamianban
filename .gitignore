@@ -41,3 +41,6 @@ project_path.txt
 type-reports
 
 src/types/auto-imports.d.ts
+
+openapi.json 
+src/api/generated/  

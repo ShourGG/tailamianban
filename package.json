@@ -27,7 +27,9 @@
     "check-types": "ts-type-cleaner analyze",
     "deploy": "bash ./scripts/merge-and-deploy.sh",
     "sync-deploy-branch": "bash ./scripts/sync-dev.sh",
-    "analyze": "vite build --mode analyze"
+    "analyze": "vite build --mode analyze",
+    "download-openapi": "node scripts/download-openapi.js",
+    "generate-api": "openapi-ts"
   },
   "dependencies": {
     "@antv/x6": "^2.18.1",
@@ -73,6 +75,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "^0.81.1",
     "@iconify-json/ic": "^1.2.2",
     "@iconify-json/la": "^1.2.1",
     "@iconify-json/mdi": "^1.2.3",
