@@ -22,7 +22,7 @@ export interface Employee extends DataRecord {
   department: string
   joinDate: number
   status: string
-  description: string
+  description?: string // 改为可选，与API保持一致
 }
 
 // ================= 编辑模式配置 - 使用C_Icon组件 =================
@@ -68,7 +68,7 @@ export const MODE_CONFIG = {
     alertType: 'warning' as const,
   },
   modal: {
-    title: '模态框编辑模式 🎯',
+    title: '模态框编辑模式',
     description:
       '使用模态框表单进行编辑，表单验证、防抖、加载状态、错误处理全部自动化。代码简洁，功能强大。',
     alertType: 'success' as const,
@@ -120,9 +120,6 @@ export const departmentOptions: SelectOption[] = Object.entries(
 export const statusOptions: SelectOption[] = Object.entries(STATUS_MAP).map(
   ([value, label]) => ({ label, value })
 )
-
-// ================= 扩展的表格数据（已移除，现在使用API数据） =================
-// ! 注意：原有的扩展数据已移除，现在通过 getEmployeesListApi() 从API获取真实数据
 
 // ================= 表格列配置 =================
 
@@ -240,7 +237,7 @@ export const getTableColumns = (): TableColumn<DataRecord>[] => [
     },
     render: (row: DataRecord) => {
       const employee = row as Employee
-      const desc = employee.description || ''
+      const desc = employee.description || '暂无描述'
       return desc.length > 30 ? desc.substring(0, 30) + '...' : desc
     },
     required: false,
@@ -320,7 +317,7 @@ export const createNewEmployee = (): Employee => ({
   description: '新入职员工，待完善信息',
 })
 
-// ================= 🎯 新增：操作配置工厂函数 =================
+// ================= 操作配置工厂函数 =================
 
 /**
  * @description 创建标准的操作配置
@@ -387,22 +384,16 @@ export const createStandardActions = (
 })
 
 /**
- * @description 创建API模式的操作配置
+ * @description 创建API模式的操作配置（简化版）
  * @returns API操作配置对象
  */
 export const createApiActions = () => ({
-  edit: {
-    api: '/api/employees', // 真实API接口
-  },
   delete: {
-    api: '/api/employees',
     confirmText: (row: DataRecord) => {
       const employee = row as Employee
       return `确定要删除员工"${employee.name}"吗？此操作不可撤销！`
     },
   },
-  detail: {},
-
   custom: [
     {
       key: 'export',
@@ -411,8 +402,7 @@ export const createApiActions = () => ({
       type: 'success' as ButtonType,
       onClick: (row: DataRecord) => {
         const employee = row as Employee
-        console.log('导出员工信息:', employee)
-        // 实际的导出逻辑
+        console.log('导出员工信息:', employee.name)
       },
     },
   ],
