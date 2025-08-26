@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-08-22 14:21:09
+ * @LastEditTime: 2025-08-26 08:25:30
  * @FilePath: \Robot_Admin\src\views\demo\10-table\index.vue
  * @Description: 表格组件演示
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -108,11 +108,11 @@
   import {
     EDIT_MODES,
     MODE_CONFIG,
-    extendedTableData,
     getTableColumns,
     createNewEmployee,
     type Employee,
   } from './data'
+  import { getEmployeesListApi } from '@/api/auth'
 
   // ================= 组合式函数 =================
   const message = useMessage()
@@ -122,7 +122,7 @@
   const loading = ref(false)
   const tableRef = ref()
   const editMode = ref<EditMode>('modal')
-  const tableData = ref<Employee[]>([...extendedTableData])
+  const tableData = ref<Employee[]>([])
 
   // 分页相关状态
   const paginationEnabled = ref(true)
@@ -156,7 +156,7 @@
 
   // 🎯 表格操作配置 - 添加删除功能
   const tableActions = computed(() => ({
-    // ✅ 添加删除配置
+    // 添加删除配置
     delete: {
       onDelete: handleDelete, // 提供删除处理函数
       confirmText: (row: DataRecord) => {
@@ -453,6 +453,28 @@
       message.info('已取消编辑')
     }
   }
+
+  /**
+   * @description 加载员工数据
+   */
+  const loadEmployeesData = async () => {
+    try {
+      loading.value = true
+      const { data } = await getEmployeesListApi()
+
+      // 数据结构一致，直接赋值
+      tableData.value = data.list as Employee[]
+    } catch (error) {
+      console.error('加载员工数据失败:', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // ================= 生命周期 =================
+  onMounted(() => {
+    loadEmployeesData()
+  })
 </script>
 
 <style scoped lang="scss">
