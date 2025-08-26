@@ -20,27 +20,34 @@
         <NCard
           title="编辑模式选择"
           size="small"
+          class="controls-section"
         >
-          <NSpace>
-            <NRadioGroup v-model:value="editMode">
-              <NRadioButton
-                v-for="mode in EDIT_MODES"
-                :key="mode.value"
-                :value="mode.value"
-              >
-                <template #icon>
-                  <C_Icon :name="mode.icon" />
-                </template>
-                {{ mode.label }}
-              </NRadioButton>
-            </NRadioGroup>
+          <div class="controls-row">
+            <!-- 编辑模式选择组 -->
+            <div class="mode-selection">
+              <NRadioGroup v-model:value="editMode">
+                <NRadioButton
+                  v-for="mode in EDIT_MODES"
+                  :key="mode.value"
+                  :value="mode.value"
+                >
+                  <template #icon>
+                    <C_Icon :name="mode.icon" />
+                  </template>
+                  {{ mode.label }}
+                </NRadioButton>
+              </NRadioGroup>
+            </div>
 
-            <NDivider vertical />
+            <div class="elegant-divider"></div>
 
+            <!-- 添加新行按钮 -->
             <NButton
               @click="addNewRow"
               type="primary"
               :disabled="editMode === 'none'"
+              class="action-button"
+              size="medium"
             >
               <template #icon>
                 <C_Icon name="mdi:plus" />
@@ -48,20 +55,21 @@
               添加新行
             </NButton>
 
-            <NDivider vertical />
+            <div class="elegant-divider"></div>
 
             <!-- 分页状态信息 -->
-            <NSpace class="mt-4px">
-              <span>分页状态：</span>
+            <div class="pagination-status">
+              <span class="status-label">分页状态：</span>
               <NSwitch
                 v-model:value="paginationEnabled"
                 @update:value="handlePaginationToggle"
+                size="medium"
               >
                 <template #checked> 开启 </template>
                 <template #unchecked> 关闭 </template>
               </NSwitch>
-            </NSpace>
-          </NSpace>
+            </div>
+          </div>
         </NCard>
 
         <!-- 当前模式说明 -->

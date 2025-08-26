@@ -37,7 +37,7 @@ export const EDIT_MODES = [
   { value: 'both' as const, label: '混合模式', icon: 'mdi:table-edit' },
   {
     value: 'modal' as const,
-    label: '模态框编辑 🎯',
+    label: '模态框编辑',
     icon: 'mdi:window-maximize',
   },
   { value: 'none' as const, label: '禁用编辑', icon: 'mdi:lock' },

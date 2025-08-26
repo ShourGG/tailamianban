@@ -1,21 +1,109 @@
-  .table-demo-page {
-    padding: 20px;
+.table-demo-page {
+  padding: 20px;
+// ================= 简洁的按钮区域样式 =================
+  .controls-section {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
   }
 
-  .list-disc {
-    list-style-type: disc;
-  }
-
-  .list-inside {
-    list-style-position: inside;
-  }
-
-  .space-y-1 > * + * {
-    margin-top: 0.25rem;
-  }
-
-  :deep(.n-radio-button__label) {
+  .controls-row {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 24px;
+    flex-wrap: wrap;
   }
+
+  // 编辑模式选择区域
+  .mode-selection {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  // 主要操作按钮
+  .action-button {
+    border-radius: 8px !important;
+    font-weight: 500;
+    padding: 0 20px !important;
+    height: 36px !important;
+  }
+
+  // 分页状态区域
+  .pagination-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+
+    .status-label {
+      font-weight: 500;
+      margin-right: 4px;
+    }
+  }
+
+  // 分隔线样式
+  .elegant-divider {
+    height: 32px;
+    width: 1px;
+    background: rgba(0, 0, 0, 0.15);
+    margin: 0 8px;
+  }
+}
+
+.list-disc {
+  list-style-type: disc;
+}
+
+.list-inside {
+  list-style-position: inside;
+}
+
+.space-y-1>*+* {
+  margin-top: 0.25rem;
+}
+
+:deep(.n-radio-button__label) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+// ================= 简洁的单选按钮样式 =================
+:deep(.n-radio-group) {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 6px;
+  gap: 8px;
+}
+
+:deep(.n-radio-button) {
+  border-radius: 6px !important;
+  margin: 0 4px;
+  min-height: 32px;
+
+  .n-radio-button__label {
+    font-weight: 500;
+    padding: 0 12px;
+  }
+}
+
+:deep(.n-radio-button--checked) {
+  .n-radio-button__label {
+    font-weight: 600;
+  }
+}
+
+// ================= 开关组件 =================
+:deep(.n-switch) {
+  transform: scale(1.05);
+}
