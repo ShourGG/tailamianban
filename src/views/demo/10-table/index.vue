@@ -1,13 +1,3 @@
-<!--
- * @Author: ChenYu ycyplus@gmail.com
- * @Date: 2025-06-13 18:38:58
- * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-08-26 13:48:06
- * @FilePath: \Robot_Admin\src\views\demo\10-table\index.vue
- * @Description: 表格组件演示
- * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
--->
-
 <template>
   <div class="table-demo-page">
     <NH1>表格组件场景示例</NH1>
@@ -103,6 +93,100 @@
         />
       </NSpace>
     </NCard>
+
+    <!-- 员工详情弹框 -->
+    <NModal
+      v-model:show="detailModalVisible"
+      :mask-closable="true"
+      preset="card"
+      :title="detailModalTitle"
+      class="detail-modal"
+      :style="{ width: '600px' }"
+    >
+      <div
+        class="employee-detail"
+        v-if="currentEmployee"
+      >
+        <!-- 左右布局：基本信息 + 工作信息 -->
+        <div class="detail-row">
+          <div class="detail-column">
+            <h4 class="section-title">基本信息</h4>
+            <div class="info-item">
+              <span class="label">员工ID:</span>
+              <span class="value">{{ currentEmployee.id }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">姓名:</span>
+              <span class="value">{{ currentEmployee.name }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">年龄:</span>
+              <span class="value">{{ currentEmployee.age }}岁</span>
+            </div>
+            <div class="info-item">
+              <span class="label">性别:</span>
+              <NTag
+                :type="currentEmployee.gender === 'male' ? 'info' : 'warning'"
+                size="small"
+              >
+                {{ getGenderDisplay(currentEmployee.gender) }}
+              </NTag>
+            </div>
+          </div>
+
+          <div class="detail-column">
+            <h4 class="section-title">工作信息</h4>
+            <div class="info-item">
+              <span class="label">部门:</span>
+              <NTag
+                type="success"
+                size="small"
+              >
+                {{ getDepartmentName(currentEmployee.department) }}
+              </NTag>
+            </div>
+            <div class="info-item">
+              <span class="label">状态:</span>
+              <NTag
+                :type="
+                  currentEmployee.status === 'active' ? 'success' : 'error'
+                "
+                size="small"
+              >
+                {{ getStatusName(currentEmployee.status) }}
+              </NTag>
+            </div>
+            <div class="info-item">
+              <span class="label">入职日期:</span>
+              <span class="value">{{
+                formatDate(currentEmployee.joinDate)
+              }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">邮箱:</span>
+              <span class="value email">{{ currentEmployee.email }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 描述信息（全宽） -->
+        <div class="description-section">
+          <h4 class="section-title">描述信息</h4>
+          <div class="description-content">
+            {{ currentEmployee.description || '暂无描述信息' }}
+          </div>
+        </div>
+      </div>
+
+      <template #action>
+        <NButton
+          @click="detailModalVisible = false"
+          type="primary"
+        >
+          关闭
+        </NButton>
+      </template>
+    </NModal>
   </div>
 </template>
 
@@ -117,9 +201,16 @@
     MODE_CONFIG,
     getTableColumns,
     createNewEmployee,
+    DEPARTMENT_MAP,
+    STATUS_MAP,
     type Employee,
   } from './data'
-  import { getEmployeesListApi, deleteEmployeeApi } from '@/api/auth'
+  import {
+    getEmployeesListApi,
+    deleteEmployeeApi,
+    updateEmployeeApi,
+    getEmployeeByIdApi,
+  } from '@/api/auth'
 
   // ================= 组合式函数 =================
   const message = useMessage()
@@ -136,17 +227,44 @@
   const defaultPageSize = ref(10)
   const currentPage = ref(1)
 
-  // 新增行ID追踪（用于区分新增和编辑）
+  // 新增行ID追踪
   const pendingNewRowId = ref<number | null>(null)
+
+  // 详情弹框状态
+  const detailModalVisible = ref(false)
+  const detailModalTitle = ref('')
+  const currentEmployee = ref<Employee | null>(null)
+
+  // ================= 工具函数 =================
+  // 统一的日期格式化函数，支持 string 和 number 类型
+  const formatDate = (date: string | number) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : new Date(date)
+    return dateObj.toLocaleDateString('zh-CN')
+  }
+
+  // 获取部门名称
+  const getDepartmentName = (department: string) => {
+    return (
+      DEPARTMENT_MAP[department as keyof typeof DEPARTMENT_MAP] || department
+    )
+  }
+
+  // 获取状态名称
+  const getStatusName = (status: string) => {
+    return STATUS_MAP[status as keyof typeof STATUS_MAP] || status
+  }
+
+  // 获取性别显示文本
+  const getGenderDisplay = (gender: string) => {
+    return gender === 'male' ? '男' : gender === 'female' ? '女' : gender
+  }
 
   // ================= 计算属性 =================
   const currentModeConfig = computed(() => MODE_CONFIG[editMode.value])
   const tableColumns = computed(() => getTableColumns())
 
-  // 分页配置
   const paginationConfig = computed((): PaginationConfig | boolean => {
     if (!paginationEnabled.value) return false
-
     return {
       enabled: true,
       page: currentPage.value,
@@ -159,8 +277,25 @@
     }
   })
 
-  // 表格操作配置
   const tableActions = computed(() => ({
+    detail: {
+      onView: async (row: DataRecord) => {
+        const employee = row as Employee
+        try {
+          loading.value = true
+          const response = await getEmployeeByIdApi(employee.id)
+          // 确保类型一致
+          currentEmployee.value = response.data as Employee
+          detailModalTitle.value = `员工详情 - ${response.data.name}`
+          detailModalVisible.value = true
+        } catch (error) {
+          console.error('获取员工详情失败:', error)
+          message.error('获取员工详情失败，请重试')
+        } finally {
+          loading.value = false
+        }
+      },
+    },
     delete: {
       onDelete: handleDelete,
       confirmText: (row: DataRecord) => {
@@ -187,56 +322,37 @@
   }))
 
   // ================= 事件处理 =================
-
-  /**
-   * 处理分页变化事件
-   */
   const handlePaginationChange = (...args: unknown[]) => {
     const [page, pageSize] = args as [number, number]
-
     currentPage.value = page
     if (pageSize !== defaultPageSize.value) {
       defaultPageSize.value = pageSize
     }
-
     const total = tableData.value.length
     const start = (page - 1) * pageSize + 1
     const end = Math.min(page * pageSize, total)
-
     message.info(
       `已切换到第 ${page} 页，显示第 ${start}-${end} 条记录，共 ${total} 条`
     )
   }
 
-  /**
-   * 添加新行
-   */
   const addNewRow = () => {
     const newRow = createNewEmployee()
-
     if (editMode.value === 'modal') {
       pendingNewRowId.value = newRow.id
       tableData.value.unshift(newRow)
-
-      // 跳转到第一页
       if (paginationEnabled.value && currentPage.value !== 1) {
         currentPage.value = 1
       }
-
-      // 开始编辑
       nextTick(() => {
         tableRef.value?.startEdit(newRow.id)
       })
-
       message.info('请填写新员工信息后保存')
     } else {
-      // 其他编辑模式
       tableData.value.unshift(newRow)
-
       if (paginationEnabled.value && currentPage.value !== 1) {
         currentPage.value = 1
       }
-
       nextTick(() => {
         if (['row', 'both'].includes(editMode.value)) {
           tableRef.value?.startEdit(newRow.id)
@@ -245,17 +361,11 @@
     }
   }
 
-  /**
-   * 处理删除操作
-   */
   const handleDelete = async (row: DataRecord) => {
     const employee = row as Employee
-
     try {
       loading.value = true
       await deleteEmployeeApi(employee.id)
-
-      // 成功后更新本地列表
       tableData.value = tableData.value.filter(emp => emp.id !== employee.id)
       message.success(`员工 "${employee.name}" 删除成功`)
     } catch (error) {
@@ -267,9 +377,6 @@
     }
   }
 
-  /**
-   * 复制员工
-   */
   const handleCopy = (row: DataRecord, index: number) => {
     const employee = row as Employee
     const newRow: Employee = {
@@ -277,19 +384,13 @@
       id: Date.now(),
       name: `${employee.name}_副本`,
     }
-
-    // 计算实际插入位置
     const actualIndex = paginationEnabled.value
       ? (currentPage.value - 1) * defaultPageSize.value + index + 1
       : index + 1
-
     tableData.value.splice(actualIndex, 0, newRow)
     message.success('复制成功')
   }
 
-  /**
-   * 处理员工授权
-   */
   const handleAuthorize = (row: DataRecord) => {
     const employee = row as Employee
     dialog.info({
@@ -302,38 +403,30 @@
     })
   }
 
-  /**
-   * 处理数据保存
-   */
   const handleSave = async (
     rowData: Record<string, any>,
     rowIndex: number,
     columnKey?: string
   ): Promise<void> => {
     loading.value = true
-
     try {
-      // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-      // 计算实际索引
       const actualIndex = paginationEnabled.value
         ? (currentPage.value - 1) * defaultPageSize.value + rowIndex
         : rowIndex
 
-      // 更新数据
-      tableData.value[actualIndex] = { ...rowData } as Employee
-
-      // 如果是新增的行，清除标记
       if (pendingNewRowId.value && rowData.id === pendingNewRowId.value) {
+        tableData.value[actualIndex] = { ...rowData } as Employee
         pendingNewRowId.value = null
         message.success('新员工信息保存成功')
       } else {
+        const employee = rowData as Employee
+        await updateEmployeeApi(employee.id, employee)
+        tableData.value[actualIndex] = { ...rowData } as Employee
         const columnTitle = columnKey
           ? tableColumns.value.find((c: any) => c.key === columnKey)?.title
           : null
         message.success(
-          columnTitle ? `${columnTitle}已更新` : '员工信息保存成功'
+          columnTitle ? `${columnTitle}已更新` : '员工信息更新成功'
         )
       }
     } catch (error) {
@@ -345,12 +438,8 @@
     }
   }
 
-  /**
-   * 处理编辑取消
-   */
   const handleCancel = () => {
     if (pendingNewRowId.value) {
-      // 移除临时数据
       const tempIndex = tableData.value.findIndex(
         item => item.id === pendingNewRowId.value
       )
@@ -364,17 +453,12 @@
     }
   }
 
-  /**
-   * 加载员工数据
-   */
   const loadEmployeesData = async () => {
     try {
       loading.value = true
       const response = await getEmployeesListApi()
-
-      // 直接使用API数据，无需适配
-      tableData.value = response.data?.list || []
-
+      // 确保类型一致
+      tableData.value = (response.data?.list || []) as Employee[]
       message.success(`已加载 ${tableData.value.length} 条员工记录`)
     } catch (error) {
       console.error('加载数据失败:', error)
@@ -385,7 +469,6 @@
     }
   }
 
-  // ================= 生命周期 =================
   onMounted(() => {
     loadEmployeesData()
   })

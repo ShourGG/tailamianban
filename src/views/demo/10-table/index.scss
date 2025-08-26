@@ -1,6 +1,7 @@
+// ================= 页面布局样式 =================
 .table-demo-page {
   padding: 20px;
-// ================= 简洁的按钮区域样式 =================
+
   .controls-section {
     background: transparent;
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -16,7 +17,6 @@
     flex-wrap: wrap;
   }
 
-  // 编辑模式选择区域
   .mode-selection {
     display: flex;
     align-items: center;
@@ -27,7 +27,6 @@
     border: 1px solid rgba(0, 0, 0, 0.1);
   }
 
-  // 主要操作按钮
   .action-button {
     border-radius: 8px !important;
     font-weight: 500;
@@ -35,7 +34,6 @@
     height: 36px !important;
   }
 
-  // 分页状态区域
   .pagination-status {
     display: flex;
     align-items: center;
@@ -52,7 +50,6 @@
     }
   }
 
-  // 分隔线样式
   .elegant-divider {
     height: 32px;
     width: 1px;
@@ -61,24 +58,85 @@
   }
 }
 
-.list-disc {
-  list-style-type: disc;
+// ================= 简化的详情弹框样式 =================
+.detail-modal {
+  :deep(.n-card) {
+    border-radius: 12px;
+  }
 }
 
-.list-inside {
-  list-style-position: inside;
+.employee-detail {
+  // 左右布局
+  .detail-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 24px;
+  }
+
+  .detail-column {
+    .section-title {
+      margin: 0 0 16px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.85);
+      padding-bottom: 8px;
+      border-bottom: 2px solid #18a058;
+    }
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 8px;
+
+    .label {
+      font-size: 13px;
+      color: rgba(0, 0, 0, 0.6);
+      font-weight: 500;
+      min-width: 60px;
+    }
+
+    .value {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.85);
+
+      &.email {
+        color: #1890ff;
+        word-break: break-all;
+      }
+    }
+  }
+
+  // 描述信息区域
+  .description-section {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding-top: 20px;
+
+    .section-title {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.85);
+      padding-bottom: 8px;
+      border-bottom: 2px solid #18a058;
+    }
+
+    .description-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.02);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      min-height: 60px;
+    }
+  }
 }
 
-.space-y-1>*+* {
-  margin-top: 0.25rem;
-}
-
-:deep(.n-radio-button__label) {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-// ================= 简洁的单选按钮样式 =================
+// ================= 单选按钮样式 =================
 :deep(.n-radio-group) {
   background: rgba(0, 0, 0, 0.05);
   border-radius: 8px;
@@ -94,6 +152,9 @@
   .n-radio-button__label {
     font-weight: 500;
     padding: 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 }
 
@@ -103,7 +164,30 @@
   }
 }
 
-// ================= 开关组件 =================
 :deep(.n-switch) {
   transform: scale(1.05);
+}
+
+// ================= 响应式适配 =================
+@media (max-width: 768px) {
+  .table-demo-page {
+    padding: 12px;
+  }
+
+  .employee-detail {
+    .detail-row {
+      grid-template-columns: 1fr !important;
+      gap: 20px;
+    }
+  }
+
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+
+    .elegant-divider {
+      display: none;
+    }
+  }
 }

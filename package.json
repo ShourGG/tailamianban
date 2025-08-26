@@ -28,8 +28,7 @@
     "deploy": "bash ./scripts/merge-and-deploy.sh",
     "sync-deploy-branch": "bash ./scripts/sync-dev.sh",
     "analyze": "vite build --mode analyze",
-    "download-openapi": "node scripts/download-openapi.js",
-    "generate-api": "openapi-ts"
+    "generate-api": "node scripts/download-openapi.js && openapi-ts"
   },
   "dependencies": {
     "@antv/x6": "^2.18.1",

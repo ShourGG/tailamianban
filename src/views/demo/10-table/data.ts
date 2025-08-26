@@ -1,9 +1,7 @@
 import type {
   SelectOption,
   EditType,
-  ButtonType,
   TableColumn,
-  RowAction,
   DataRecord,
 } from '@/types/modules/table'
 import { PRESET_RULES } from '@/utils/v_verify'
@@ -22,14 +20,13 @@ export interface Employee extends DataRecord {
   department: string
   joinDate: number
   status: string
-  description?: string // 改为可选，与API保持一致
+  description?: string
 }
 
-// ================= 编辑模式配置 - 使用C_Icon组件 =================
+// ================= 编辑模式配置 =================
 
 /**
  * @description 表格编辑模式配置数组
- * @constant {Array} EDIT_MODES - 支持的编辑模式列表
  */
 export const EDIT_MODES = [
   { value: 'row' as const, label: '仅行编辑', icon: 'mdi:table-row' },
@@ -47,7 +44,6 @@ export const EDIT_MODES = [
 
 /**
  * @description 不同编辑模式的配置信息
- * @constant {Object} MODE_CONFIG - 编辑模式配置映射
  */
 export const MODE_CONFIG = {
   row: {
@@ -84,7 +80,6 @@ export const MODE_CONFIG = {
 
 /**
  * @description 部门映射配置
- * @constant {Object} DEPARTMENT_MAP - 部门代码到中文名称的映射
  */
 export const DEPARTMENT_MAP = {
   tech: '技术部',
@@ -95,7 +90,6 @@ export const DEPARTMENT_MAP = {
 
 /**
  * @description 员工状态映射配置
- * @constant {Object} STATUS_MAP - 状态代码到中文名称的映射
  */
 export const STATUS_MAP = {
   active: '在职',
@@ -107,7 +101,6 @@ export const STATUS_MAP = {
 
 /**
  * @description 部门选择选项
- * @constant {SelectOption[]} departmentOptions - 部门下拉选项数组
  */
 export const departmentOptions: SelectOption[] = Object.entries(
   DEPARTMENT_MAP
@@ -115,7 +108,6 @@ export const departmentOptions: SelectOption[] = Object.entries(
 
 /**
  * @description 员工状态选择选项
- * @constant {SelectOption[]} statusOptions - 状态下拉选项数组
  */
 export const statusOptions: SelectOption[] = Object.entries(STATUS_MAP).map(
   ([value, label]) => ({ label, value })
@@ -125,7 +117,6 @@ export const statusOptions: SelectOption[] = Object.entries(STATUS_MAP).map(
 
 /**
  * @description 获取表格列配置
- * @returns {TableColumn<DataRecord>[]} 表格列配置数组
  */
 export const getTableColumns = (): TableColumn<DataRecord>[] => [
   {
@@ -244,66 +235,10 @@ export const getTableColumns = (): TableColumn<DataRecord>[] => [
   },
 ]
 
-// ================= 原有的表格行操作配置（保留向下兼容） =================
-
-/**
- * @description 获取表格行操作配置（向下兼容）
- * @param message - 消息提示实例
- * @param dialog - 对话框实例
- * @param tableData - 表格数据引用
- * @returns {RowAction<DataRecord>[]} 行操作配置数组
- */
-export const getTableRowActions = (
-  message: any,
-  dialog: any,
-  tableData: any
-): RowAction<DataRecord>[] => [
-  {
-    label: '查看',
-    icon: 'mdi:eye',
-    type: 'info' as ButtonType,
-    onClick: () => {}, // 由表格组件内部处理
-  },
-  {
-    label: '复制',
-    icon: 'mdi:content-copy',
-    type: 'default' as ButtonType,
-    onClick: (row: DataRecord, index: number) => {
-      const employee = row as Employee
-      const newRow: Employee = {
-        ...employee,
-        id: Date.now(),
-        name: `${employee.name}_副本`,
-      }
-      tableData.value.splice(index + 1, 0, newRow)
-      message.success('复制成功')
-    },
-  },
-  {
-    label: '删除',
-    icon: 'mdi:delete',
-    type: 'error' as ButtonType,
-    onClick: (row: DataRecord, index: number) => {
-      const employee = row as Employee
-      dialog.warning({
-        title: '确认删除',
-        content: `确定要删除员工"${employee.name}"吗？`,
-        positiveText: '确定',
-        negativeText: '取消',
-        onPositiveClick: () => {
-          tableData.value.splice(index, 1)
-          message.success('删除成功')
-        },
-      })
-    },
-  },
-]
-
 // ================= 工具函数 =================
 
 /**
  * @description 创建新员工数据
- * @returns {Employee} 新员工对象
  */
 export const createNewEmployee = (): Employee => ({
   id: Date.now(),
@@ -315,130 +250,4 @@ export const createNewEmployee = (): Employee => ({
   joinDate: Date.now(),
   status: 'probation',
   description: '新入职员工，待完善信息',
-})
-
-// ================= 操作配置工厂函数 =================
-
-/**
- * @description 创建标准的操作配置
- * @param tableData - 表格数据引用
- * @param message - 消息提示实例
- * @param dialog - 对话框实例
- * @returns 标准操作配置对象
- */
-export const createStandardActions = (
-  tableData: any,
-  message: any,
-  dialog: any
-) => ({
-  // 内置操作使用默认配置
-  edit: {},
-  delete: {
-    confirmText: (row: DataRecord) => {
-      const employee = row as Employee
-      return `确定要删除员工"${employee.name}"吗？`
-    },
-  },
-  detail: {},
-
-  // 自定义操作
-  custom: [
-    {
-      key: 'copy',
-      label: '复制',
-      icon: 'mdi:content-copy',
-      type: 'default' as ButtonType,
-      onClick: (row: DataRecord, index: number) => {
-        const employee = row as Employee
-        const newRow: Employee = {
-          ...employee,
-          id: Date.now(),
-          name: `${employee.name}_副本`,
-        }
-        tableData.value.splice(index + 1, 0, newRow)
-        message.success('复制成功')
-      },
-      show: (row: DataRecord) => {
-        const employee = row as Employee
-        return employee.status === 'active'
-      }, // 只有在职员工显示复制按钮
-    },
-    {
-      key: 'authorize',
-      label: '授权',
-      icon: 'mdi:shield-key',
-      type: 'warning' as ButtonType,
-      onClick: (row: DataRecord) => {
-        const employee = row as Employee
-        dialog.info({
-          title: '员工授权',
-          content: `正在为员工 "${employee.name}" 配置系统权限...`,
-          positiveText: '确定',
-          onPositiveClick: () => {
-            message.success('授权配置完成')
-          },
-        })
-      },
-    },
-  ],
-})
-
-/**
- * @description 创建API模式的操作配置（简化版）
- * @returns API操作配置对象
- */
-export const createApiActions = () => ({
-  delete: {
-    confirmText: (row: DataRecord) => {
-      const employee = row as Employee
-      return `确定要删除员工"${employee.name}"吗？此操作不可撤销！`
-    },
-  },
-  custom: [
-    {
-      key: 'export',
-      label: '导出',
-      icon: 'mdi:download',
-      type: 'success' as ButtonType,
-      onClick: (row: DataRecord) => {
-        const employee = row as Employee
-        console.log('导出员工信息:', employee.name)
-      },
-    },
-  ],
-})
-
-/**
- * @description 创建自定义逻辑的操作配置
- * @param onEdit - 自定义编辑处理函数
- * @param onDelete - 自定义删除处理函数
- * @param onView - 自定义查看处理函数
- * @returns 自定义操作配置对象
- */
-export const createCustomActions = (
-  onEdit: (row: Employee) => void,
-  onDelete: (row: Employee, index: number) => void,
-  onView: (row: Employee) => void
-) => ({
-  edit: {
-    onEdit: (row: DataRecord) => {
-      const employee = row as Employee
-      console.log('自定义编辑逻辑:', employee)
-      onEdit(employee)
-    },
-  },
-  delete: {
-    onDelete: async (row: DataRecord, index: number) => {
-      const employee = row as Employee
-      console.log('自定义删除逻辑:', employee)
-      await onDelete(employee, index)
-    },
-  },
-  detail: {
-    onView: (row: DataRecord) => {
-      const employee = row as Employee
-      console.log('自定义查看逻辑:', employee)
-      onView(employee)
-    },
-  },
 })
