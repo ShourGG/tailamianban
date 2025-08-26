@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.2.0](https://github.com/ChenyCHENYU/Robot_Admin/compare/v1.1.2...v1.2.0) (2025-08-26)
+
+
+### Features
+
+* **@hey-api/openapi-ts:** add openapi auto type ([373bda9](https://github.com/ChenyCHENYU/Robot_Admin/commit/373bda93fe3cf3f77fc359ed3bc92eb96b34755e))
+* **10-table:** detail modal replace api interface ([37b497c](https://github.com/ChenyCHENYU/Robot_Admin/commit/37b497c700b688e8690114d53fc4127291127092))
+* **c_detail:** add c_detail local component ([3bd0786](https://github.com/ChenyCHENYU/Robot_Admin/commit/3bd078674410eac4332b80d421814eb12bbc7b4e))
+* **login:** use apifox api ([76d66c0](https://github.com/ChenyCHENYU/Robot_Admin/commit/76d66c08fb659f9ec8ec7b20ba0c24f9ddf5bef2))
+* **table:** add delete btn func ([7ea9244](https://github.com/ChenyCHENYU/Robot_Admin/commit/7ea9244b325e7a50176032737c179ee03d5c1644))
+
+
+### Bug Fixes
+
+* **C_VtableGantt:** move col width auto height repair ([a364e3d](https://github.com/ChenyCHENYU/Robot_Admin/commit/a364e3d0a10ebfc4c948a0aaf9ec359355f165f4))
+* **table:** modal edit unfinish add list dispose ([eb4a229](https://github.com/ChenyCHENYU/Robot_Admin/commit/eb4a22961596d56b312fb95ade6341e808a0c3ed))
+
+
+### Performance Improvements
+
+* **api:** del abandoned api file ([466bd29](https://github.com/ChenyCHENYU/Robot_Admin/commit/466bd29241833d4504fcabae50662536d41d3018))
+* **C_Time:** add custom optimiza ([ee87726](https://github.com/ChenyCHENYU/Robot_Admin/commit/ee877262f9a4828855130c6f9dc46aecbe704c74))
+* **form:** delete repeat verify tip ([b59b8d9](https://github.com/ChenyCHENYU/Robot_Admin/commit/b59b8d9b01b95f576a4d9fe305c4eb62f25ac560))
+
 ## [1.1.2](https://github.com/ChenyCHENYU/Robot_Admin/compare/v1.1.1...v1.1.2) (2025-08-10)
 
 
