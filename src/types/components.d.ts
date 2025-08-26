@@ -15,6 +15,7 @@ declare module 'vue' {
     C_City: typeof import('./../components/global/C_City/index.vue')['default']
     C_Code: typeof import('./../components/global/C_Code/index.vue')['default']
     C_Date: typeof import('./../components/global/C_Date/index.vue')['default']
+    C_detail: typeof import('./../components/local/c_detail/index.vue')['default']
     C_Draggable: typeof import('./../components/global/C_Draggable/index.vue')['default']
     C_Editor: typeof import('./../components/global/C_Editor/index.vue')['default']
     C_FilePreview: typeof import('./../components/global/C_FilePreview/index.vue')['default']

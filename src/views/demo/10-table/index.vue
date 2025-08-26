@@ -94,99 +94,15 @@
       </NSpace>
     </NCard>
 
-    <!-- 员工详情弹框 -->
-    <NModal
-      v-model:show="detailModalVisible"
-      :mask-closable="true"
-      preset="card"
+    <!-- 使用 c_detail 详情组件 -->
+    <c_detail
+      v-model:visible="detailModalVisible"
+      :data="currentEmployee || {}"
+      :config="detailConfig"
       :title="detailModalTitle"
-      class="detail-modal"
-      :style="{ width: '600px' }"
-    >
-      <div
-        class="employee-detail"
-        v-if="currentEmployee"
-      >
-        <!-- 左右布局：基本信息 + 工作信息 -->
-        <div class="detail-row">
-          <div class="detail-column">
-            <h4 class="section-title">基本信息</h4>
-            <div class="info-item">
-              <span class="label">员工ID:</span>
-              <span class="value">{{ currentEmployee.id }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">姓名:</span>
-              <span class="value">{{ currentEmployee.name }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">年龄:</span>
-              <span class="value">{{ currentEmployee.age }}岁</span>
-            </div>
-            <div class="info-item">
-              <span class="label">性别:</span>
-              <NTag
-                :type="currentEmployee.gender === 'male' ? 'info' : 'warning'"
-                size="small"
-              >
-                {{ getGenderDisplay(currentEmployee.gender) }}
-              </NTag>
-            </div>
-          </div>
-
-          <div class="detail-column">
-            <h4 class="section-title">工作信息</h4>
-            <div class="info-item">
-              <span class="label">部门:</span>
-              <NTag
-                type="success"
-                size="small"
-              >
-                {{ getDepartmentName(currentEmployee.department) }}
-              </NTag>
-            </div>
-            <div class="info-item">
-              <span class="label">状态:</span>
-              <NTag
-                :type="
-                  currentEmployee.status === 'active' ? 'success' : 'error'
-                "
-                size="small"
-              >
-                {{ getStatusName(currentEmployee.status) }}
-              </NTag>
-            </div>
-            <div class="info-item">
-              <span class="label">入职日期:</span>
-              <span class="value">{{
-                formatDate(currentEmployee.joinDate)
-              }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">邮箱:</span>
-              <span class="value email">{{ currentEmployee.email }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 描述信息（全宽） -->
-        <div class="description-section">
-          <h4 class="section-title">描述信息</h4>
-          <div class="description-content">
-            {{ currentEmployee.description || '暂无描述信息' }}
-          </div>
-        </div>
-      </div>
-
-      <template #action>
-        <NButton
-          @click="detailModalVisible = false"
-          type="primary"
-        >
-          关闭
-        </NButton>
-      </template>
-    </NModal>
+      :loading="loading"
+      @close="handleDetailClose"
+    />
   </div>
 </template>
 
@@ -196,6 +112,7 @@
     DataRecord,
     PaginationConfig,
   } from '@/types/modules/table'
+  import type { DetailConfig } from '@/components/local/c_detail/data'
   import {
     EDIT_MODES,
     MODE_CONFIG,
@@ -236,27 +153,81 @@
   const currentEmployee = ref<Employee | null>(null)
 
   // ================= 工具函数 =================
-  // 统一的日期格式化函数，支持 string 和 number 类型
-  const formatDate = (date: string | number) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : new Date(date)
-    return dateObj.toLocaleDateString('zh-CN')
-  }
-
-  // 获取部门名称
-  const getDepartmentName = (department: string) => {
+  const getDepartmentName = (department: string): string => {
     return (
       DEPARTMENT_MAP[department as keyof typeof DEPARTMENT_MAP] || department
     )
   }
 
-  // 获取状态名称
-  const getStatusName = (status: string) => {
+  const getStatusName = (status: string): string => {
     return STATUS_MAP[status as keyof typeof STATUS_MAP] || status
   }
 
-  // 获取性别显示文本
-  const getGenderDisplay = (gender: string) => {
+  const getGenderDisplay = (gender: string): string => {
     return gender === 'male' ? '男' : gender === 'female' ? '女' : gender
+  }
+
+  // ================= 详情配置 =================
+  const detailConfig: DetailConfig = {
+    sections: [
+      {
+        title: '基本信息',
+        columns: 2,
+        items: [
+          { label: '员工ID', key: 'id', type: 'number' },
+          { label: '姓名', key: 'name', type: 'text' },
+          {
+            label: '年龄',
+            key: 'age',
+            type: 'number',
+            formatter: (val: number): string => `${val}岁`,
+          },
+          {
+            label: '性别',
+            key: 'gender',
+            type: 'tag',
+            tagType: 'info',
+            formatter: (val: string): string => getGenderDisplay(val),
+          },
+        ],
+      },
+      {
+        title: '工作信息',
+        columns: 2,
+        items: [
+          {
+            label: '部门',
+            key: 'department',
+            type: 'tag',
+            tagType: 'success',
+            formatter: (val: string): string => getDepartmentName(val),
+          },
+          {
+            label: '状态',
+            key: 'status',
+            type: 'tag',
+            tagType: 'success',
+            formatter: (val: string): string => getStatusName(val),
+          },
+          { label: '入职日期', key: 'joinDate', type: 'date' },
+          { label: '邮箱', key: 'email', type: 'email' },
+        ],
+      },
+      {
+        title: '其他信息',
+        columns: 1,
+        items: [
+          {
+            label: '描述',
+            key: 'description',
+            type: 'text',
+            span: 2,
+            formatter: (val: string | undefined): string =>
+              val || '暂无描述信息',
+          },
+        ],
+      },
+    ],
   }
 
   // ================= 计算属性 =================
@@ -279,12 +250,11 @@
 
   const tableActions = computed(() => ({
     detail: {
-      onView: async (row: DataRecord) => {
+      onView: async (row: DataRecord): Promise<void> => {
         const employee = row as Employee
         try {
           loading.value = true
           const response = await getEmployeeByIdApi(employee.id)
-          // 确保类型一致
           currentEmployee.value = response.data as Employee
           detailModalTitle.value = `员工详情 - ${response.data.name}`
           detailModalVisible.value = true
@@ -298,7 +268,7 @@
     },
     delete: {
       onDelete: handleDelete,
-      confirmText: (row: DataRecord) => {
+      confirmText: (row: DataRecord): string => {
         const employee = row as Employee
         return `确定要删除员工 "${employee.name}" 吗？此操作不可撤销！`
       },
@@ -322,7 +292,8 @@
   }))
 
   // ================= 事件处理 =================
-  const handlePaginationChange = (...args: unknown[]) => {
+  // 修正分页处理函数，使其兼容未知参数
+  const handlePaginationChange = (...args: unknown[]): void => {
     const [page, pageSize] = args as [number, number]
     currentPage.value = page
     if (pageSize !== defaultPageSize.value) {
@@ -336,7 +307,7 @@
     )
   }
 
-  const addNewRow = () => {
+  const addNewRow = (): void => {
     const newRow = createNewEmployee()
     if (editMode.value === 'modal') {
       pendingNewRowId.value = newRow.id
@@ -361,7 +332,7 @@
     }
   }
 
-  const handleDelete = async (row: DataRecord) => {
+  const handleDelete = async (row: DataRecord): Promise<void> => {
     const employee = row as Employee
     try {
       loading.value = true
@@ -377,7 +348,7 @@
     }
   }
 
-  const handleCopy = (row: DataRecord, index: number) => {
+  const handleCopy = (row: DataRecord, index: number): void => {
     const employee = row as Employee
     const newRow: Employee = {
       ...employee,
@@ -391,7 +362,7 @@
     message.success('复制成功')
   }
 
-  const handleAuthorize = (row: DataRecord) => {
+  const handleAuthorize = (row: DataRecord): void => {
     const employee = row as Employee
     dialog.info({
       title: '员工授权',
@@ -404,7 +375,7 @@
   }
 
   const handleSave = async (
-    rowData: Record<string, any>,
+    rowData: Record<string, unknown>,
     rowIndex: number,
     columnKey?: string
   ): Promise<void> => {
@@ -414,7 +385,10 @@
         ? (currentPage.value - 1) * defaultPageSize.value + rowIndex
         : rowIndex
 
-      if (pendingNewRowId.value && rowData.id === pendingNewRowId.value) {
+      if (
+        pendingNewRowId.value &&
+        (rowData as Employee).id === pendingNewRowId.value
+      ) {
         tableData.value[actualIndex] = { ...rowData } as Employee
         pendingNewRowId.value = null
         message.success('新员工信息保存成功')
@@ -422,9 +396,10 @@
         const employee = rowData as Employee
         await updateEmployeeApi(employee.id, employee)
         tableData.value[actualIndex] = { ...rowData } as Employee
-        const columnTitle = columnKey
-          ? tableColumns.value.find((c: any) => c.key === columnKey)?.title
-          : null
+        const column = tableColumns.value.find(
+          (c: { key: string; title: string }) => c.key === columnKey
+        )
+        const columnTitle = column?.title
         message.success(
           columnTitle ? `${columnTitle}已更新` : '员工信息更新成功'
         )
@@ -438,7 +413,7 @@
     }
   }
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     if (pendingNewRowId.value) {
       const tempIndex = tableData.value.findIndex(
         item => item.id === pendingNewRowId.value
@@ -453,11 +428,15 @@
     }
   }
 
-  const loadEmployeesData = async () => {
+  const handleDetailClose = (): void => {
+    currentEmployee.value = null
+    detailModalTitle.value = ''
+  }
+
+  const loadEmployeesData = async (): Promise<void> => {
     try {
       loading.value = true
       const response = await getEmployeesListApi()
-      // 确保类型一致
       tableData.value = (response.data?.list || []) as Employee[]
       message.success(`已加载 ${tableData.value.length} 条员工记录`)
     } catch (error) {
