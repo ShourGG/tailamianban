@@ -7,10 +7,7 @@
     class="c-detail-modal"
     :style="{ width: modalWidth }"
   >
-    <div
-      class="c-detail-content"
-      v-loading="loading"
-    >
+    <div class="c-detail-content">
       <div
         v-for="(section, sectionIndex) in config.sections"
         :key="sectionIndex"
