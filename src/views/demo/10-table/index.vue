@@ -127,6 +127,7 @@
 
   // ================= 组合式函数 =================
   const message = useMessage()
+  const dialog = useDialog() // 👈 添加 dialog
 
   // ================= 响应式状态 =================
   const loading = ref(false)
@@ -235,6 +236,33 @@
     detailModalVisible.value = true
   }
 
+  // ================= 自定义操作函数 ⭐ =================
+  const handleCopy = (row: any, index: number): void => {
+    const employee = row as Employee
+    const newRow: Employee = {
+      ...employee,
+      id: Date.now(),
+      name: `${employee.name}_副本`,
+    }
+    const actualIndex = paginationEnabled.value
+      ? (currentPage.value - 1) * defaultPageSize.value + index + 1
+      : index + 1
+    tableData.value.splice(actualIndex, 0, newRow)
+    message.success('复制成功')
+  }
+
+  const handleAuthorize = (row: any): void => {
+    const employee = row as Employee
+    dialog.info({
+      title: '员工授权',
+      content: `正在为员工 "${employee.name}" 配置系统权限...`,
+      positiveText: '确定',
+      onPositiveClick: () => {
+        message.success('授权配置完成')
+      },
+    })
+  }
+
   // ================= 简化的表格操作配置 ⭐ =================
   const tableActions = computed(() => ({
     // 编辑API：保存时调用，组件内部处理模态框/行编辑
@@ -245,6 +273,24 @@
 
     // 详情API：点击详情时调用，组件内部处理数据提取
     detail: (row: Employee) => getEmployeeByIdApi(row.id),
+
+    // 自定义操作按钮 👈 添加这部分
+    custom: [
+      {
+        key: 'copy',
+        label: '复制',
+        icon: 'mdi:content-copy',
+        type: 'default' as const,
+        onClick: handleCopy,
+      },
+      {
+        key: 'authorize',
+        label: '授权',
+        icon: 'mdi:shield-key',
+        type: 'warning' as const,
+        onClick: handleAuthorize,
+      },
+    ],
   }))
 
   // ================= 事件处理 =================

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 15:55:10
+ * @LastEditTime: 2025-09-02 17:18:47
  * @FilePath: \Robot_Admin\src\types\modules\table.d.ts
  * @Description: 表格类型系统
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -59,7 +59,27 @@ export type RenderFunction<T extends DataRecord = DataRecord> = (
   index: number
 ) => VNodeChild
 
-/** 简化的操作配置 - 二元法则 */
+/** 自定义操作按钮配置 ⭐ */
+export interface CustomAction<T extends DataRecord = DataRecord> {
+  /** 按钮唯一键 */
+  key: string
+  /** 按钮显示文本 */
+  label: string
+  /** 按钮图标 */
+  icon: string
+  /** 按钮类型样式 */
+  type?: ButtonType
+  /** 点击事件处理器 */
+  onClick: (row: T, index: number) => void
+  /** 条件显示函数（可选） */
+  show?: (row: T, index: number) => boolean
+  /** 是否禁用（可选） */
+  disabled?: (row: T, index: number) => boolean
+  /** 按钮提示文本（可选） */
+  tooltip?: string
+}
+
+/** 简化的操作配置 - 二元法则 ⭐ */
 export interface SimpleTableActions<T extends DataRecord = DataRecord> {
   /** 编辑操作 - 直接传入函数 */
   edit?: false | ApiFunction<T>
@@ -67,8 +87,34 @@ export interface SimpleTableActions<T extends DataRecord = DataRecord> {
   delete?: false | ApiFunction<T>
   /** 详情操作 - 直接传入函数 */
   detail?: false | ApiFunction<T>
+  /** 自定义操作按钮 ⭐ */
+  custom?: CustomAction<T>[]
   /** 完全自定义渲染 - 10%场景 */
   render?: RenderFunction<T>
+}
+
+/** useTableActions Hook 选项类型 ⭐ */
+export interface UseTableActionsOptions<T extends DataRecord = DataRecord> {
+  /** 操作配置 */
+  actions: Ref<SimpleTableActions<T>> | ComputedRef<SimpleTableActions<T>>
+  /** 表格配置 */
+  config: Ref<any> | ComputedRef<any>
+  /** 表格管理器 */
+  tableManager: any
+  /** 行键获取函数 */
+  rowKey: (row: T) => DataTableRowKey
+  /** 事件发射器 */
+  emit: any
+  /** 查看详情回调 */
+  onViewDetail?: (data: T) => void
+}
+
+/** useTableActions Hook 返回类型 ⭐ */
+export interface UseTableActionsReturn<T extends DataRecord = DataRecord> {
+  /** 渲染操作列 */
+  renderActions: (rowData: T, rowIndex: number) => VNodeChild
+  /** 检查操作是否启用 */
+  isActionEnabled: (actionKey: 'edit' | 'delete' | 'detail') => boolean
 }
 
 // ================= 工具类型 =================

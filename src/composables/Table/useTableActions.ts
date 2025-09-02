@@ -2,66 +2,22 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-09-02
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 17:05:27
+ * @LastEditTime: 2025-09-02 17:25:16
  * @FilePath: \Robot_Admin\src\composables\Table\useTableActions.ts
- * @Description: 表格操作按钮渲染和处理 Hook
+ * @Description: 表格操作按钮Hook - 优化简洁版
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-import type { VNodeChild, Ref, ComputedRef } from 'vue'
+import type { VNodeChild } from 'vue'
 import type {
   DataRecord,
   ApiFunction,
-  SimpleTableActions,
+  UseTableActionsOptions,
+  UseTableActionsReturn,
 } from '@/types/modules/table'
 import type { DataTableRowKey } from 'naive-ui/es'
 import C_Icon from '@/components/global/C_Icon/index.vue'
 
-// ================= Hook 选项类型 =================
-export interface UseTableActionsOptions<T extends DataRecord = DataRecord> {
-  /** 操作配置 - 支持简化配置 */
-  actions: Ref<SimpleTableActions<T>> | ComputedRef<SimpleTableActions<T>>
-  /** 表格配置 */
-  config: Ref<any> | ComputedRef<any>
-  /** 表格管理器 */
-  tableManager: any
-  /** 行键获取函数 */
-  rowKey: (row: T) => DataTableRowKey
-  /** 事件发射器 */
-  emit: any
-  /** 查看详情回调 */
-  onViewDetail?: (data: T) => void
-}
-
-export interface UseTableActionsReturn<T extends DataRecord = DataRecord> {
-  /** 渲染操作列 */
-  renderActions: (rowData: T, rowIndex: number) => VNodeChild
-  /** 检查操作是否启用 */
-  isActionEnabled: (actionKey: 'edit' | 'delete' | 'detail') => boolean
-}
-
-// ================= 类型保护函数 =================
-/**
- * 检查是否为有效的API函数
- */
-function isValidApiFunction<T extends DataRecord>(
-  action: false | ApiFunction<T> | undefined
-): action is ApiFunction<T> {
-  return action !== false && typeof action === 'function'
-}
-
-/**
- * 自动提取API响应数据
- */
-function extractApiResponseData<T>(response: any): T {
-  // 如果响应有data字段，提取data；否则返回原始响应
-  if (response && typeof response === 'object' && 'data' in response) {
-    return response.data
-  }
-  return response
-}
-
-// ================= Hook 实现 =================
 /**
  * 表格操作Hook
  */
@@ -69,92 +25,79 @@ export function useTableActions<T extends DataRecord = DataRecord>(
   options: UseTableActionsOptions<T>
 ): UseTableActionsReturn<T> {
   const { actions, config, tableManager, rowKey, emit, onViewDetail } = options
-
   const message = useMessage()
   const dialog = useDialog()
 
-  // ================= 工具函数 =================
+  // 检查操作是否启用
+  const isActionEnabled = (key: 'edit' | 'delete' | 'detail') =>
+    actions.value?.[key] !== false
 
-  /**
-   * 检查操作是否启用
-   */
-  const isActionEnabled = (
-    actionKey: 'edit' | 'delete' | 'detail'
-  ): boolean => {
-    return actions.value?.[actionKey] !== false
+  // 类型守卫：检查是否为有效API函数
+  const isValidApiFunction = <TData extends DataRecord>(
+    action: false | ApiFunction<TData> | undefined
+  ): action is ApiFunction<TData> => {
+    return action !== false && typeof action === 'function'
   }
 
-  /**
-   * 创建操作按钮
-   */
-  const createActionButton = (buttonConfig: {
-    icon: string
-    type?: string
-    title?: string
+  // 自动提取API响应数据
+  const extractApiResponseData = <TData>(response: any): TData => {
+    if (response && typeof response === 'object' && 'data' in response) {
+      return response.data
+    }
+    return response
+  }
+
+  // 创建按钮的通用方法
+  const createButton = (
+    icon: string,
+    title: string,
+    type = 'primary',
     onClick: () => void
-  }) => {
-    return h(
-      NButton,
-      {
-        size: 'small',
-        type: buttonConfig.type || 'primary',
-        quaternary: true,
-        onClick: buttonConfig.onClick,
-      },
-      () => [
-        h(C_Icon, {
-          name: buttonConfig.icon,
-          size: 14,
-          title: buttonConfig.title,
-        }),
-      ]
-    )
-  }
+  ) =>
+    h(NButton, { size: 'small', type, quaternary: true, onClick }, () => [
+      h(C_Icon, { name: icon, size: 14, title }),
+    ])
 
-  // ================= 智能操作处理 =================
-
-  /**
-   * 智能处理编辑操作 - 修复版本
-   */
+  // 处理编辑操作
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSmartEdit = async (row: T, index: number) => {
-    const editAction = actions.value?.edit
+  const handleEdit = (row: T, index: number) => {
     const rowKeyValue = rowKey(row)
+    const editAction = actions.value?.edit
 
-    // 始终打开编辑界面（模态框或行编辑）
     if (config.value.editMode === 'modal') {
-      // 模态框编辑：将编辑API传递给模态框保存逻辑
       tableManager.editStates.modalEdit.startEdit(
         rowKeyValue,
         { ...row },
         editAction
       )
     } else {
-      // 行编辑：启动行编辑状态
       tableManager.editStates.rowEdit.startEditRow(rowKeyValue, editAction)
     }
   }
 
-  /**
-   * 智能处理删除操作
-   */
-  const handleSmartDelete = async (row: T, index: number) => {
+  // 执行删除API（拆分复杂逻辑）
+  const executeDelete = async (
+    deleteAction: ApiFunction<T>,
+    row: T,
+    index: number
+  ) => {
+    try {
+      await deleteAction(row, index)
+      message.success('删除成功')
+      emit('row-delete', row, index)
+    } catch (error) {
+      console.error('删除失败:', error)
+      message.error('删除失败')
+      throw error // 错误抛出逻辑
+    }
+  }
+
+  // 处理删除操作
+  const handleDelete = (row: T, index: number) => {
     const deleteAction = actions.value?.delete
 
     if (!isValidApiFunction(deleteAction)) {
       return
-    }
-
-    const executeDelete = async () => {
-      try {
-        await deleteAction(row, index)
-        message.success('删除成功')
-        emit('row-delete', row, index)
-      } catch (error) {
-        console.error('删除失败:', error)
-        message.error('删除失败')
-        throw error
-      }
     }
 
     dialog.warning({
@@ -162,14 +105,12 @@ export function useTableActions<T extends DataRecord = DataRecord>(
       content: '确定要删除这条记录吗？',
       positiveText: '确定',
       negativeText: '取消',
-      onPositiveClick: executeDelete,
+      onPositiveClick: () => executeDelete(deleteAction, row, index),
     })
   }
 
-  /**
-   * 智能处理详情操作 - 修复版本
-   */
-  const handleSmartDetail = async (row: T, index: number) => {
+  // 处理详情操作
+  const handleDetail = async (row: T, index: number) => {
     const detailAction = actions.value?.detail
 
     if (!isValidApiFunction(detailAction)) {
@@ -192,124 +133,135 @@ export function useTableActions<T extends DataRecord = DataRecord>(
     }
   }
 
-  // ================= 渲染函数 =================
+  // 渲染行编辑按钮
+  const renderRowEditButtons = (rowKeyValue: DataTableRowKey) => {
+    const isEditing = tableManager.editStates.rowEdit.isEditingRow(rowKeyValue)
 
-  /**
-   * 渲染行编辑操作按钮
-   */
-  const renderRowEditActions = (rowKey: DataTableRowKey): VNodeChild[] => {
-    const isEditing = tableManager.editStates.rowEdit.isEditingRow(rowKey)
+    if (isEditing) {
+      return [
+        createButton('mdi:check', '保存', 'primary', () =>
+          tableManager.editStates.rowEdit.saveEditRow()
+        ),
+        createButton('mdi:close', '取消', 'default', () =>
+          tableManager.editStates.rowEdit.cancelEditRow()
+        ),
+      ]
+    }
 
-    return isEditing
-      ? [
-          createActionButton({
-            icon: 'mdi:check',
-            title: '保存',
-            onClick: () => tableManager.editStates.rowEdit.saveEditRow(),
-          }),
-          createActionButton({
-            icon: 'mdi:close',
-            title: '取消',
-            type: 'default',
-            onClick: () => tableManager.editStates.rowEdit.cancelEditRow(),
-          }),
-        ]
-      : [
-          createActionButton({
-            icon: 'mdi:pencil',
-            title: '编辑',
-            onClick: () => tableManager.editStates.rowEdit.startEditRow(rowKey),
-          }),
-        ]
+    return [
+      createButton('mdi:pencil', '编辑', 'warning', () =>
+        tableManager.editStates.rowEdit.startEditRow(rowKeyValue)
+      ),
+    ]
   }
 
-  /**
-   * 渲染内置操作按钮
-   */
-  const renderBuiltinActions = (rowData: T, rowIndex: number): VNodeChild[] => {
-    const builtinActions: VNodeChild[] = []
+  // 渲染基础操作按钮
+  const renderBasicActions = (row: T, index: number) => {
+    const buttons: VNodeChild[] = []
 
-    // 详情按钮：根据是否有详情API来显示
+    // 详情按钮
     if (isActionEnabled('detail')) {
-      builtinActions.push(
-        createActionButton({
-          icon: 'mdi:eye',
-          type: 'info',
-          title: '详情',
-          onClick: () => handleSmartDetail(rowData, rowIndex),
-        })
+      buttons.push(
+        createButton('mdi:eye', '详情', 'info', () => handleDetail(row, index))
       )
     }
 
-    // 编辑按钮：只在模态框模式显示，其他模式使用行编辑按钮
+    // 编辑按钮（仅模态框模式）
     if (
       config.value.editMode === 'modal' &&
       (isActionEnabled('edit') || config.value.editable)
     ) {
-      builtinActions.push(
-        createActionButton({
-          icon: 'mdi:pencil',
-          title: '编辑',
-          type: 'warning',
-          onClick: () => handleSmartEdit(rowData, rowIndex),
-        })
+      buttons.push(
+        createButton('mdi:pencil', '编辑', 'warning', () =>
+          handleEdit(row, index)
+        )
       )
     }
 
-    // 删除按钮：根据是否有删除API来显示
+    // 删除按钮
     if (isActionEnabled('delete')) {
-      builtinActions.push(
-        createActionButton({
-          icon: 'mdi:delete',
-          type: 'error',
-          title: '删除',
-          onClick: () => handleSmartDelete(rowData, rowIndex),
-        })
+      buttons.push(
+        createButton('mdi:delete', '删除', 'error', () =>
+          handleDelete(row, index)
+        )
       )
     }
 
-    return builtinActions
+    return buttons
   }
 
-  /**
-   * 主渲染函数 - 组合所有操作按钮
-   */
-  const renderActions = (rowData: T, rowIndex: number): VNodeChild => {
-    // 如果配置了完全自定义渲染，直接使用
+  // 渲染自定义操作下拉菜单
+  const renderCustomDropdown = (row: T, index: number) => {
+    const customActions = actions.value?.custom
+    if (!customActions?.length) return null
+
+    // 过滤可见的操作
+    const visibleActions = customActions.filter(action =>
+      action.show ? action.show(row, index) : true
+    )
+
+    if (!visibleActions.length) return null
+
+    // 构建下拉选项
+    const options = visibleActions.map(action => ({
+      label: action.label,
+      key: action.key,
+      icon: () => h(C_Icon, { name: action.icon, size: 14 }),
+      disabled: action.disabled?.(row, index) || false,
+    }))
+
+    return h(
+      NDropdown,
+      {
+        options,
+        onSelect: (key: string) => {
+          const action = visibleActions.find(a => a.key === key)
+          if (action) {
+            try {
+              action.onClick(row, index)
+            } catch (error) {
+              console.error(`操作"${action.label}"执行失败:`, error)
+              message.error(`${action.label}失败`)
+            }
+          }
+        },
+      },
+      () => createButton('mdi:dots-horizontal', '更多操作', 'default', () => {})
+    )
+  }
+
+  // 主渲染方法
+  const renderActions = (row: T, index: number): VNodeChild => {
+    // 完全自定义渲染
     if (actions.value?.render) {
-      return actions.value.render(rowData, rowIndex)
+      return actions.value.render(row, index)
     }
 
-    const rowKeyValue = rowKey(rowData)
-    const editModeChecker = {
-      isRowEditMode: () => ['row', 'both'].includes(config.value.editMode),
+    const rowKeyValue = rowKey(row)
+    const isRowEditMode = ['row', 'both'].includes(config.value.editMode)
+
+    // 行编辑模式且正在编辑时，只显示保存/取消按钮
+    if (
+      isRowEditMode &&
+      tableManager.editStates.rowEdit.isEditingRow(rowKeyValue)
+    ) {
+      return h(NSpace, { size: 2, wrap: false }, () =>
+        renderRowEditButtons(rowKeyValue)
+      )
     }
 
-    // 如果是行编辑模式且正在编辑，优先显示编辑操作
-    if (editModeChecker.isRowEditMode()) {
-      const isEditing =
-        tableManager.editStates.rowEdit.isEditingRow(rowKeyValue)
-      if (isEditing) {
-        return h(NSpace, { size: 2, wrap: false }, () =>
-          renderRowEditActions(rowKeyValue)
-        )
-      }
-    }
-
-    // 组合所有操作按钮
-    const allActions: VNodeChild[] = [
-      ...(editModeChecker.isRowEditMode()
-        ? renderRowEditActions(rowKeyValue)
-        : []),
-      ...renderBuiltinActions(rowData, rowIndex),
+    // 组合所有按钮
+    const allButtons = [
+      ...(isRowEditMode ? renderRowEditButtons(rowKeyValue) : []),
+      ...renderBasicActions(row, index),
     ]
 
-    return h(NSpace, { size: 2, wrap: false }, () => allActions)
+    // 添加自定义操作下拉菜单
+    const dropdown = renderCustomDropdown(row, index)
+    if (dropdown) allButtons.push(dropdown)
+
+    return h(NSpace, { size: 2, wrap: false }, () => allButtons)
   }
 
-  // ================= 返回接口 =================
-  return {
-    renderActions,
-    isActionEnabled,
-  }
+  return { renderActions, isActionEnabled }
 }
