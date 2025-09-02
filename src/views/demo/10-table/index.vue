@@ -236,7 +236,7 @@
     detailModalVisible.value = true
   }
 
-  // ================= 自定义操作函数 ⭐ =================
+  // ================= 自定义操作函数  =================
   const handleCopy = (row: any, index: number): void => {
     const employee = row as Employee
     const newRow: Employee = {
@@ -263,7 +263,7 @@
     })
   }
 
-  // ================= 简化的表格操作配置 ⭐ =================
+  // ================= 简化的表格操作配置  =================
   const tableActions = computed(() => ({
     // 编辑API：保存时调用，组件内部处理模态框/行编辑
     edit: (row: Employee) => updateEmployeeApi(row.id, row),

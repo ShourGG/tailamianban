@@ -25,11 +25,12 @@
           ref="tableRef"
           v-model:data="tableData"
           :columns="columns"
-          :row-actions="rowActions"
+          :actions="tableActions"
           :preset="tablePreset"
           @row-add="handleRowAdd"
           @row-delete="handleRowDelete"
           @save="handleSave"
+          @view-detail="handleViewDetail"
         />
 
         <!-- 自动铺满水印 -->
@@ -95,7 +96,7 @@
   import type {
     TableColumn,
     DataRecord,
-    RowAction,
+    SimpleTableActions,
   } from '@/types/modules/table'
 
   // ================= 类型定义 =================
@@ -288,18 +289,23 @@
     },
   ]
 
-  const rowActions: RowAction<DataRecord>[] = [
-    {
-      label: '详情',
-      icon: 'i-mdi:eye',
-      type: 'info',
-      onClick: (row: DataRecord) => {
-        const employee = row as Employee
-        message.info(`查看 ${employee.name} 的详细信息`)
-        addLog('edit', `查看了 ${employee.name} 的详情`)
+  // ================= 精简的操作配置 =================
+  const tableActions = computed(
+    (): SimpleTableActions<DataRecord> => ({
+      detail: async (row: DataRecord) => {
+        await new Promise(resolve => setTimeout(resolve, 200))
+        return { data: row }
       },
-    },
-  ]
+      edit: async (row: DataRecord) => {
+        await new Promise(resolve => setTimeout(resolve, 300))
+        return { success: true, data: row }
+      },
+      delete: async () => {
+        await new Promise(resolve => setTimeout(resolve, 200))
+        return { success: true }
+      },
+    })
+  )
 
   const tablePreset = {
     dynamicRows: {
@@ -323,8 +329,7 @@
         },
       },
       onRowChange: (data: DataRecord[]) => {
-        const employees = data as Employee[]
-        console.log('行数据变化:', employees.length, '行')
+        console.log('行数据变化:', data.length, '行')
       },
       defaultRowData: (): DataRecord =>
         ({
@@ -339,7 +344,7 @@
     },
     edit: {
       enabled: true,
-      mode: 'both' as const,
+      mode: 'modal' as const, // 👈 修复1：确保编辑按钮显示
       showRowActions: true,
       modalTitle: '编辑员工信息',
       modalWidth: 700,
@@ -356,27 +361,25 @@
   }
 
   // ================= 事件处理函数 =================
+  const handleViewDetail = (data: DataRecord) => {
+    // 👈 修复2：去掉不必要的类型映射，直接使用
+    message.info(`查看 ${data.name} 的详细信息`)
+    addLog('edit', `查看了 ${data.name} 的详情`)
+  }
 
-  const handleRowAdd = (...args: unknown[]): void => {
-    const [newRow] = args as [Employee]
+  const handleRowAdd = (newRow: DataRecord): void => {
     addLog('add', `添加了新员工：${newRow.name}`)
   }
 
   const handleRowDelete = (...args: unknown[]): void => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [deletedRow, index] = args as [Employee, number]
-
+    const [deletedRow] = args as [DataRecord, number]
     addLog('delete', `删除了员工：${deletedRow.name}`)
-
     if (selectedEmployee.value?.id === deletedRow.id) {
       selectedEmployee.value = null
     }
   }
 
-  const handleSave = async (...args: unknown[]): Promise<void> => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [rowData, rowIndex, columnKey] = args as [Employee, number, string?]
-
+  const handleSave = (rowData: DataRecord): void => {
     message.success(`保存成功：${rowData.name}`)
     addLog('edit', `编辑了员工 ${rowData.name} 的信息`)
   }
@@ -422,67 +425,5 @@
 </script>
 
 <style scoped lang="scss">
-  .demo-container {
-    padding: 20px;
-    min-height: 100vh;
-  }
-
-  .table-card {
-    margin-bottom: 20px;
-  }
-
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    h3 {
-      margin: 0;
-    }
-  }
-
-  .c-table-wrapper {
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .auto-watermark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 10;
-    opacity: 1;
-  }
-
-  .selected-info {
-    margin-top: 16px;
-  }
-
-  .logs {
-    max-height: 200px;
-    overflow-y: auto;
-
-    .log-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border-color);
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      .log-time {
-        margin-left: auto;
-      }
-    }
-  }
+  @use './index.scss';
 </style>
