@@ -2,13 +2,13 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-14 22:06:22
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 12:30:40
+ * @LastEditTime: 2025-09-02 10:41:40
  * @FilePath: \Robot_Admin\src\components\global\C_Table\data.ts
- * @Description: 表格数据处理模块 - 重构版本（分页逻辑抽离）
+ * @Description: 表格数据处理模块
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
-import type { DataTableProps, DataTableRowKey } from 'naive-ui/es'
+import type { DataTableProps } from 'naive-ui/es'
 import type {
   TableColumn,
   TableProps,
@@ -22,7 +22,7 @@ import type { DynamicRowsOptions } from '@/composables/Table/useDynamicRow'
 import type { VNodeChild } from 'vue'
 import C_Icon from '@/components/global/C_Icon/index.vue'
 
-// ================= 类型定义 =================
+// ================= 预设配置类型 =================
 export interface TablePresetConfig<T extends DataRecord = DataRecord> {
   dynamicRows?: DynamicRowsOptions<T> | boolean
   expandable?: ExpandableConfig<T> | boolean
@@ -33,7 +33,7 @@ export interface TablePresetConfig<T extends DataRecord = DataRecord> {
 
 export interface ExpandableConfig<T extends DataRecord = DataRecord> {
   enabled?: boolean
-  defaultExpanded?: DataTableRowKey[]
+  defaultExpanded?: import('naive-ui/es').DataTableRowKey[]
   onLoadData?: (row: T) => Promise<any[]> | any[]
   renderContent?: (
     row: T,
@@ -46,7 +46,7 @@ export interface ExpandableConfig<T extends DataRecord = DataRecord> {
 
 export interface SelectionConfig<T extends DataRecord = DataRecord> {
   enabled?: boolean
-  defaultChecked?: DataTableRowKey[]
+  defaultChecked?: import('naive-ui/es').DataTableRowKey[]
   rowCheckable?: (row: T) => boolean
   maxSelection?: number
   childSelection?: {
@@ -83,21 +83,9 @@ export const EDIT_COMPONENTS: Record<EditType, any> = {
 
 // ================= 配置处理工具 =================
 
-/**
- * * @description 通用配置获取工具
- * ? @param preset - 预设配置值
- * ? @param prop - 属性配置值
- * ? @param fallback - 默认回退值
- * ! @return 最终配置值
- */
 const getValue = (preset: any, prop: any, fallback: any) =>
   preset ?? prop ?? fallback
 
-/**
- * * @description 创建配置构建器高阶函数
- * ? @param defaults - 默认配置对象
- * ! @return 配置构建函数
- */
 const createConfigBuilder =
   <T extends Record<string, any>>(defaults: T) =>
   (preset: any, props: any, mapping: Record<keyof T, [string, string]>) => {
@@ -113,44 +101,26 @@ const createConfigBuilder =
     return result
   }
 
-/**
- * * @description 构建动态行配置
- * ? @param preset - 预设配置对象
- * ? @param props - 组件属性对象
- * ! @return 处理后的动态行配置对象
- */
-const buildDynamicConfig = (preset: any, props: any) => {
-  const defaultDynamicRows = {
-    enableRadioSelection: true,
-    enableAdd: true,
-    enableInsert: true,
-    enableDelete: true,
-    enableCopy: true,
-    enableMove: true,
-    enablePrint: true,
-  }
+const buildDynamicConfig = (preset: any, props: any) => ({
+  dynamicRows:
+    preset.dynamicRows === true
+      ? {
+          enableRadioSelection: true,
+          enableAdd: true,
+          enableInsert: true,
+          enableDelete: true,
+          enableCopy: true,
+          enableMove: true,
+          enablePrint: true,
+        }
+      : preset.dynamicRows || props.dynamicRowsOptions,
+})
 
-  return {
-    dynamicRows:
-      preset.dynamicRows === true
-        ? defaultDynamicRows
-        : preset.dynamicRows || props.dynamicRowsOptions,
-  }
-}
-
-/**
- * * @description 构建分页配置 - 简化版本
- * ? @param preset - 预设配置对象
- * ? @param props - 组件属性对象
- * ! @return 处理后的分页配置对象
- */
 const buildPaginationConfig = (preset: any, props: any) => {
-  // 如果明确设置为 false，则禁用分页
   if (props.pagination === false) {
     return { pagination: null }
   }
 
-  // 默认分页配置
   const defaultPagination: PaginationConfig = {
     enabled: true,
     page: 1,
@@ -162,42 +132,25 @@ const buildPaginationConfig = (preset: any, props: any) => {
     size: 'medium',
   }
 
-  // 预设配置优先级最高
-  if (preset.pagination) {
-    if (preset.pagination === true) {
-      return { pagination: defaultPagination }
-    }
-    if (typeof preset.pagination === 'object') {
-      return {
-        pagination: {
-          ...defaultPagination,
-          ...preset.pagination,
-        },
-      }
-    }
+  if (preset.pagination === true) {
+    return { pagination: defaultPagination }
   }
 
-  // 组件属性配置
+  if (typeof preset.pagination === 'object') {
+    return { pagination: { ...defaultPagination, ...preset.pagination } }
+  }
+
   if (props.pagination === true || !props.pagination) {
     return { pagination: defaultPagination }
   }
 
-  // 如果是对象，则合并配置
   if (typeof props.pagination === 'object') {
-    return {
-      pagination: {
-        ...defaultPagination,
-        ...props.pagination,
-      },
-    }
+    return { pagination: { ...defaultPagination, ...props.pagination } }
   }
 
   return { pagination: defaultPagination }
 }
 
-/**
- * * @description 展开配置构建器
- */
 const buildExpandConfig = createConfigBuilder({
   expandable: false,
   defaultExpandedKeys: undefined,
@@ -206,9 +159,6 @@ const buildExpandConfig = createConfigBuilder({
   rowExpandable: undefined,
 })
 
-/**
- * * @description 编辑配置构建器
- */
 const buildEditConfig = createConfigBuilder({
   editable: true,
   editMode: 'both',
@@ -217,9 +167,6 @@ const buildEditConfig = createConfigBuilder({
   modalWidth: 600,
 })
 
-/**
- * * @description 选择配置构建器
- */
 const buildSelectionConfig = createConfigBuilder({
   enableSelection: false,
   defaultCheckedKeys: undefined,
@@ -231,10 +178,10 @@ const buildSelectionConfig = createConfigBuilder({
   parentChildLinkMode: 'loose',
 })
 
+// ================= 主要配置函数 =================
+
 /**
- * * @description 创建统一配置对象
- * ? @param props - 组件属性对象
- * ! @return 统一的配置对象
+ * 创建统一配置对象
  */
 export function createUnifiedConfig(props: any) {
   const preset = props.preset || {}
@@ -270,48 +217,24 @@ export function createUnifiedConfig(props: any) {
       enableParentChildLink: ['link.enabled', 'enableParentChildLink'],
       parentChildLinkMode: ['link.mode', 'parentChildLinkMode'],
     }),
-    // 分页配置 - 简化处理
     ...buildPaginationConfig(preset, props),
   }
 }
 
-// ================= 编辑模式检查器 =================
-
 /**
- * * @description 创建编辑模式检查器
- * ? @param config - 表格配置对象
- * ! @return 编辑模式检查方法集合
+ * 创建编辑模式检查器
  */
 export const createEditModeChecker = (config: any) => ({
-  /**
-   * * @description 检查列是否不可编辑
-   * ? @param column - 列配置对象
-   * ! @return 是否不可编辑
-   */
   isNonEditable: (column: TableColumn) =>
     !config.editable || column.editable === false || config.editMode === 'none',
-
-  /**
-   * * @description 检查是否为行编辑模式
-   * ! @return 是否为行编辑模式
-   */
   isRowEditMode: () => ['row', 'both'].includes(config.editMode),
-
-  /**
-   * * @description 检查是否为单元格编辑模式
-   * ! @return 是否为单元格编辑模式
-   */
   isCellEditMode: () => ['cell', 'both'].includes(config.editMode),
 })
 
 // ================= 渲染工具函数 =================
 
 /**
- * * @description 渲染编辑组件
- * ? @param column - 列配置对象
- * ? @param value - 当前值
- * ? @param onUpdate - 更新回调函数
- * ! @return 渲染的编辑组件
+ * 渲染编辑组件
  */
 export function renderEditComponent(
   column: TableColumn,
@@ -336,12 +259,7 @@ export function renderEditComponent(
 }
 
 /**
- * * @description 渲染显示单元格
- * ? @param column - 列配置对象
- * ? @param rowData - 行数据对象
- * ? @param rowIndex - 行索引
- * ? @param value - 单元格值
- * ! @return 渲染的显示内容
+ * 渲染显示单元格
  */
 export function renderDisplayCell(
   column: TableColumn,
@@ -355,46 +273,7 @@ export function renderDisplayCell(
 }
 
 /**
- * * @description 创建操作按钮
- * ? @param name - 按钮名称
- * ? @param title - 按钮标题
- * ? @param onClick - 点击回调函数
- * ! @return 渲染的按钮元素
- */
-const createActionButton = (
-  name: string,
-  title: string,
-  onClick: (e: Event) => void
-) =>
-  h(
-    'button',
-    {
-      class: `cell-action-btn cell-action-${name}`,
-      title,
-      type: 'button',
-      onClick: (e: Event) => {
-        e.stopPropagation()
-        e.preventDefault()
-        onClick(e)
-      },
-    },
-    [
-      h(C_Icon, {
-        name: `mdi:${name === 'save' ? 'check' : 'close'}`,
-        title: `${name === 'save' ? '保存' : '取消'}`,
-        size: 12,
-      }),
-    ]
-  )
-
-/**
- * * @description 渲染编辑状态单元格
- * ? @param column - 列配置对象
- * ? @param value - 当前值
- * ? @param onUpdate - 更新回调函数
- * ? @param onSave - 保存回调函数
- * ? @param onCancel - 取消回调函数
- * ! @return 渲染的编辑状态单元格
+ * 渲染编辑状态单元格
  */
 export function renderEditingCell(
   column: TableColumn,
@@ -403,6 +282,32 @@ export function renderEditingCell(
   onSave: () => void,
   onCancel: () => void
 ): VNodeChild {
+  const createActionButton = (
+    name: string,
+    title: string,
+    onClick: (e: Event) => void
+  ) =>
+    h(
+      'button',
+      {
+        class: `cell-action-btn cell-action-${name}`,
+        title,
+        type: 'button',
+        onClick: (e: Event) => {
+          e.stopPropagation()
+          e.preventDefault()
+          onClick(e)
+        },
+      },
+      [
+        h(C_Icon, {
+          name: `mdi:${name === 'save' ? 'check' : 'close'}`,
+          title: `${name === 'save' ? '保存' : '取消'}`,
+          size: 12,
+        }),
+      ]
+    )
+
   return h('div', { class: 'cell-editing-container' }, [
     h('div', { class: 'cell-editing-input' }, [
       renderEditComponent(column, value, onUpdate),
@@ -415,13 +320,7 @@ export function renderEditingCell(
 }
 
 /**
- * * @description 渲染可编辑单元格
- * ? @param column - 列配置对象
- * ? @param rowData - 行数据对象
- * ? @param rowIndex - 行索引
- * ? @param value - 单元格值
- * ? @param onStartEdit - 开始编辑回调函数
- * ! @return 渲染的可编辑单元格
+ * 渲染可编辑单元格
  */
 export function renderEditableCell(
   column: TableColumn,
@@ -450,45 +349,10 @@ export function renderEditableCell(
   ])
 }
 
-// ================= 显示值处理器 =================
-
-/**
- * * @description 显示值处理器映射表
- */
-const VALUE_HANDLERS = {
-  switch: (value: any): string => (value ? '是' : '否'),
-  select: (value: any, column: TableColumn): string => {
-    const options = column.editProps?.options || []
-    const option = options.find((opt: any) => opt.value === value)
-    return option?.label || String(value)
-  },
-  date: (value: any): string =>
-    value instanceof Date ? value.toLocaleDateString('zh-CN') : String(value),
-} as const
-
-/**
- * * @description 获取显示值
- * ? @param column - 列配置对象
- * ? @param data - 数据对象
- * ! @return 格式化后的显示值
- */
-export const getDisplayValue = (
-  column: TableColumn,
-  data: Record<string, any>
-): string => {
-  const value = data[column.key]
-  if (value === null || value === undefined) return '-'
-
-  const handler = VALUE_HANDLERS[column.editType as keyof typeof VALUE_HANDLERS]
-  return handler ? handler(value, column) : String(value)
-}
-
 // ================= 表单和工具函数 =================
 
 /**
- * * @description 生成表单选项配置
- * ? @param columns - 列配置数组
- * ! @return 表单选项配置数组
+ * 生成表单选项配置
  */
 export const generateFormOptions = (columns: TableColumn[]): FormOption[] => {
   const typeMap: Record<string, ComponentType> = {
@@ -529,9 +393,7 @@ export const generateFormOptions = (columns: TableColumn[]): FormOption[] => {
 }
 
 /**
- * * @description 获取表格属性配置
- * ? @param props - 组件属性对象
- * ! @return 表格属性配置
+ * 获取表格属性配置
  */
 export const getTableProps = (props: TableProps): Partial<DataTableProps> => ({
   striped: props.striped,
@@ -544,9 +406,7 @@ export const getTableProps = (props: TableProps): Partial<DataTableProps> => ({
 })
 
 /**
- * * @description 处理列配置
- * ? @param columns - 原始列配置数组
- * ! @return 处理后的列配置数组
+ * 处理列配置
  */
 export const processColumnConfig = (columns: TableColumn[]): TableColumn[] =>
   columns.map(column => ({
@@ -558,10 +418,35 @@ export const processColumnConfig = (columns: TableColumn[]): TableColumn[] =>
     titleAlign: column.titleAlign || 'center',
   }))
 
+// ================= 显示值处理器 =================
+
+const VALUE_HANDLERS = {
+  switch: (value: any): string => (value ? '是' : '否'),
+  select: (value: any, column: TableColumn): string => {
+    const options = column.editProps?.options || []
+    const option = options.find((opt: any) => opt.value === value)
+    return option?.label || String(value)
+  },
+  date: (value: any): string =>
+    value instanceof Date ? value.toLocaleDateString('zh-CN') : String(value),
+} as const
+
 /**
- * * @description 获取描述项跨度
- * ? @param column - 列配置对象
- * ! @return 描述项跨度值
+ * 获取显示值（用于模态框显示）
+ */
+export const getDisplayValue = (
+  column: TableColumn,
+  data: Record<string, any>
+): string => {
+  const value = data[column.key]
+  if (value === null || value === undefined) return '-'
+
+  const handler = VALUE_HANDLERS[column.editType as keyof typeof VALUE_HANDLERS]
+  return handler ? handler(value, column) : String(value)
+}
+
+/**
+ * 获取描述项跨度（用于模态框显示）
  */
 export const getDescriptionSpan = (column: TableColumn): number =>
   column.key === 'description' || column.editProps?.type === 'textarea' ? 2 : 1

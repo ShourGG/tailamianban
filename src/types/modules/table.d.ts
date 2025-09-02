@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-10 11:52:03
+ * @LastEditTime: 2025-09-02 10:35:51
  * @FilePath: \Robot_Admin\src\types\modules\table.d.ts
  * @Description: 表格类型系统
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -44,6 +44,31 @@ export interface PaginationConfig {
   pageSizes?: number[]
   simple?: boolean
   size?: 'small' | 'medium' | 'large'
+}
+
+// ================= Actions 配置类型 =================
+/** API 函数类型 */
+export type ApiFunction<T extends DataRecord = DataRecord> = (
+  row: T,
+  index: number
+) => Promise<any> | any
+
+/** 渲染函数类型 */
+export type RenderFunction<T extends DataRecord = DataRecord> = (
+  row: T,
+  index: number
+) => VNodeChild
+
+/** 简化的操作配置 - 二元法则 */
+export interface SimpleTableActions<T extends DataRecord = DataRecord> {
+  /** 编辑操作 - 直接传入函数 */
+  edit?: false | ApiFunction<T>
+  /** 删除操作 - 直接传入函数 */
+  delete?: false | ApiFunction<T>
+  /** 详情操作 - 直接传入函数 */
+  detail?: false | ApiFunction<T>
+  /** 完全自定义渲染 - 10%场景 */
+  render?: RenderFunction<T>
 }
 
 // ================= 工具类型 =================
@@ -107,16 +132,6 @@ export interface TableColumn<T extends DataRecord = DataRecord>
   render?: (rowData: T, rowIndex: number) => VNodeChild
 }
 
-export interface RowAction<T extends DataRecord = DataRecord> {
-  label: string
-  key?: string
-  icon?: string
-  type?: ButtonType
-  onClick: (row: T, index: number) => void
-  show?: (row: T, index: number) => boolean
-  disabled?: (row: T, index: number) => boolean
-}
-
 // ================= 选择和展开功能类型 =================
 export interface ChildSelectionState {
   selectedKeys: DataTableRowKey[]
@@ -175,7 +190,6 @@ export interface TableEditProps<T extends DataRecord = DataRecord> {
   ) => void | Promise<void>
   onCancel?: (rowData: T, rowIndex: number) => void
   showRowActions?: boolean
-  rowActions?: RowAction<T>[]
   modalTitle?: string
   modalWidth?: number
   columnWidth?: number
@@ -212,8 +226,10 @@ export interface TableProps<T extends DataRecord = DataRecord>
     TableEditProps<T>,
     TableExpandProps<T>,
     TableSelectionProps<T> {
-  // 新增分页配置
+  // 分页配置
   pagination?: PaginationConfig | boolean
+  // 简化的操作配置
+  actions?: SimpleTableActions<T>
 }
 
 // ================= 事件系统 =================
@@ -252,8 +268,10 @@ export interface TableEmits<T extends DataRecord = DataRecord>
   extends TableExpandEvents<T>,
     TableSelectionEvents<T>,
     TableEditEvents<T> {
-  // 新增分页事件
+  // 分页事件
   'pagination-change': [page: number, pageSize: number]
+  // 操作相关事件
+  'row-delete': [deletedRow: T, index: number]
 }
 
 // ================= 实例方法系统 =================
@@ -295,10 +313,33 @@ export interface TableSelectionMethods<T extends DataRecord = DataRecord> {
   clearAllSelections: () => void
 }
 
+export interface TableDynamicRowsMethods<T extends DataRecord = DataRecord> {
+  addRow: () => void
+  insertRow: () => void
+  deleteRow: () => void
+  copyRow: () => void
+  moveRowUp: () => void
+  moveRowDown: () => void
+  clearRowSelection: () => void
+  getSelectedRowData: () => T | null
+  printTable: (elementRef?: HTMLElement) => Promise<void>
+  downloadTableScreenshot: (
+    elementRef?: HTMLElement,
+    filename?: string
+  ) => Promise<void>
+}
+
+export interface TablePaginationMethods {
+  resetToFirstPage: () => void
+  getTotalPages: () => number
+}
+
 export interface TableInstance<T extends DataRecord = DataRecord>
   extends TableEditMethods<T>,
     TableExpandMethods<T>,
-    TableSelectionMethods<T> {}
+    TableSelectionMethods<T>,
+    TableDynamicRowsMethods<T>,
+    TablePaginationMethods {}
 
 // ================= useTableExpand Hook类型 =================
 export interface UseTableExpandOptions<

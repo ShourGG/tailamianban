@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 10:02:04
+ * @LastEditTime: 2025-09-02 14:03:24
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
- * @Description: 超级表格组件 - 重构版本（分页和操作逻辑抽离）
+ * @Description: 超级表格组件 - 简化版本
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  -->
 
@@ -42,22 +42,13 @@
     <TableEditModal
       v-if="config.editMode === 'modal'"
       v-model:visible="tableManager.editStates.modalEdit.isModalVisible.value"
-      v-model:editing-data="tableManager.editStates.modalEdit.editingData"
+      :editing-data="tableManager.editStates.modalEdit.editingData.value"
       :title="config.modalTitle"
       :width="config.modalWidth"
       :form-options="formOptions"
       :form-key="formKey"
-      @save="tableManager.editStates.modalEdit.saveEdit"
+      @save="handleModalSave"
       @cancel="tableManager.editStates.modalEdit.cancelEdit"
-    />
-
-    <!-- 查看模态框 -->
-    <TableViewModal
-      v-model:visible="viewModalVisible"
-      :data="viewingData"
-      :columns="displayColumns"
-      :width="config.modalWidth"
-      @close="viewModalVisible = false"
     />
 
     <!-- 动态行确认删除模态框 -->
@@ -78,17 +69,16 @@
     TableEmits,
     DataRecord,
     ParentChildLinkMode,
+    SimpleTableActions,
   } from '@/types/modules/table'
   import type { DynamicRowsOptions } from '@/composables/Table/useDynamicRow'
   import { useTableManager } from '@/composables/Table/useTableManager'
   import { usePagination } from '@/composables/Table/usePagination'
   import { useTableActions } from '@/composables/Table/useTableActions'
   import TableEditModal from './components/TableEditModal.vue'
-  import TableViewModal from './components/TableViewModal.vue'
   import {
     generateFormOptions,
     getTableProps,
-    processColumnConfig,
     createUnifiedConfig,
     createEditModeChecker,
     renderEditComponent,
@@ -99,40 +89,10 @@
   } from './data'
 
   // ================= 类型定义 =================
-
-  export interface TableActions<T extends DataRecord = DataRecord> {
-    edit?:
-      | false
-      | {
-          api?: string
-          onEdit?: (row: T, index: number) => void | Promise<void>
-        }
-    delete?:
-      | false
-      | {
-          api?: string
-          onDelete?: (row: T, index: number) => void | Promise<void>
-          confirmText?: string | ((row: T) => string)
-        }
-    detail?:
-      | false
-      | {
-          onView?: (row: T, index: number) => void
-        }
-    custom?: Array<{
-      key: string
-      label: string
-      icon?: string
-      type?: 'default' | 'primary' | 'info' | 'success' | 'warning' | 'error'
-      onClick: (row: T, index: number) => void | Promise<void>
-      show?: (row: T, index: number) => boolean
-    }>
-  }
-
   interface EnhancedTableProps<T extends DataRecord = DataRecord>
     extends TableProps<T> {
     preset?: TablePresetConfig<T>
-    actions?: TableActions<T>
+    actions?: SimpleTableActions<T>
     expandable?: boolean
     onLoadExpandData?: (row: T) => Promise<any[]> | any[]
     renderExpandContent?: (
@@ -190,13 +150,12 @@
         selectedRow: DataRecord | null,
       ]
       'pagination-change': [page: number, pageSize: number]
+      'view-detail': [data: DataRecord]
     }
   >()
 
   // ================= 响应式状态 =================
   const tableRef = ref<ComponentPublicInstance>()
-  const viewModalVisible = ref(false)
-  const viewingData = ref<DataRecord>({})
 
   // ================= 计算属性 =================
   const config = computed(() => ({
@@ -207,16 +166,18 @@
   const editableColumns = computed(() =>
     props.columns.filter((col): col is TableColumn => col.editable !== false)
   )
-  const displayColumns = computed(() =>
-    processColumnConfig(props.columns).filter(col => col.key !== '_actions')
-  )
+
   const tableProps = computed(() => getTableProps(props))
+
   const formKey = computed(
     () =>
       `edit-form-${tableManager.editStates.modalEdit.editingRowKey.value || 'new'}`
   )
+
   const formOptions = computed(() => generateFormOptions(editableColumns.value))
+
   const renderExpandFunction = computed(() => undefined)
+
   const editModeChecker = computed(() => createEditModeChecker(config.value))
 
   // ================= Hooks 初始化 =================
@@ -236,19 +197,28 @@
     emit,
   })
 
-  // 操作按钮 Hook
+  // 操作按钮 Hook - 简化处理
   const tableActions = useTableActions({
     actions: computed(() => props.actions || {}),
     config,
     tableManager,
     rowKey: props.rowKey,
     emit,
-    onViewDetail: (data: DataRecord) => {
-      viewingData.value = { ...data }
-      viewModalVisible.value = true
-    },
-    rowActions: props.rowActions,
+    onViewDetail: (data: DataRecord) => emit('view-detail', data),
   })
+
+  // ================= 事件处理 =================
+
+  /**
+   * 处理模态框保存
+   */
+  const handleModalSave = async (formData: DataRecord) => {
+    try {
+      await tableManager.editStates.modalEdit.saveEdit(formData)
+    } catch (error) {
+      console.error('模态框保存失败:', error)
+    }
+  }
 
   // ================= 单元格渲染函数 =================
   const renderCell = (
@@ -354,26 +324,7 @@
   })
 
   // ================= 组件暴露 =================
-  defineExpose<
-    TableInstance & {
-      addRow: () => void
-      insertRow: () => void
-      deleteRow: () => void
-      copyRow: () => void
-      moveRowUp: () => void
-      moveRowDown: () => void
-      clearRowSelection: () => void
-      getSelectedRowData: () => DataRecord | null
-      printTable: (elementRef?: HTMLElement) => Promise<void>
-      downloadTableScreenshot: (
-        elementRef?: HTMLElement,
-        filename?: string
-      ) => Promise<void>
-      // 分页相关方法
-      resetToFirstPage: () => void
-      getTotalPages: () => number
-    }
-  >({
+  defineExpose<TableInstance>({
     // 编辑相关
     startEdit: tableManager.stateManager.edit.start,
     cancelEdit: tableManager.stateManager.edit.cancel,

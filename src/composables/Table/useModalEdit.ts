@@ -2,24 +2,20 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 20:09:41
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-06-14 19:56:25
- * @FilePath: \Robot_Admin\src\components\global\C_Table\composables\useModalEdit.ts
- * @Description: 模态框编辑组合函数，提供弹窗形式的数据编辑功能
+ * @LastEditTime: 2025-09-02 12:51:42
+ * @FilePath: \Robot_Admin\src\composables\Table\useModalEdit.ts
+ * @Description: 模态框编辑组合函数
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
 import type { DataTableRowKey } from 'naive-ui/es'
-import { ref, reactive } from 'vue'
+import { ref, computed } from 'vue'
 
 /**
- * * @description 模态框编辑配置选项
- * ? @property data - 获取表格数据的函数
- * ? @property rowKey - 获取行唯一标识的函数
- * ? @property onSave - 保存回调函数，接收编辑数据和行索引
- * ? @property onCancel - 取消回调函数，接收原始数据和行索引
+ * 模态框编辑配置选项
  */
 export interface ModalEditOptions<T = Record<string, any>> {
-  data: () => T[] // 🔥 简化：使用函数获取最新数据
+  data: () => T[]
   rowKey: (row: T) => DataTableRowKey
   onSave?: (
     editingData: Record<string, any>,
@@ -29,147 +25,144 @@ export interface ModalEditOptions<T = Record<string, any>> {
 }
 
 /**
- * * @description 模态框编辑组合函数，提供弹窗形式的数据编辑功能
- * ? @param options - 模态框编辑配置选项
- * ! @return 返回编辑状态、数据操作和控制方法的对象
+ * 模态框编辑组合函数，提供弹窗形式的数据编辑功能
  */
 export function useModalEdit<T = Record<string, any>>(
   options: ModalEditOptions<T>
 ) {
   const isModalVisible = ref(false)
-  const editingRowIndex = ref(-1)
   const editingRowKey = ref<DataTableRowKey | null>(null)
-  const editingData = reactive<Record<string, any>>({})
+  const editingData = ref<Record<string, any>>({})
 
   /**
-   * * @description 重置所有编辑状态到初始值
-   * ! @return 无返回值
+   * 计算属性：获取当前编辑行的索引
+   */
+  const editingRowIndex = computed(() => {
+    if (!editingRowKey.value) return -1
+    const currentData = options.data()
+    if (!currentData || !Array.isArray(currentData)) return -1
+
+    return currentData.findIndex(
+      row => options.rowKey(row) === editingRowKey.value
+    )
+  })
+
+  /**
+   * 重置编辑状态
    */
   const resetEditingState = () => {
-    editingRowIndex.value = -1
     editingRowKey.value = null
-    Object.keys(editingData).forEach(key => delete editingData[key])
+    editingData.value = {}
   }
 
   /**
-   * * @description 根据rowKey实时查找最新的行数据和索引
-   * ? @param rowKey - 行唯一标识
-   * ! @return { data: 行数据, index: 行索引 } 或 null
+   * 开始编辑指定行
    */
-  const findLatestRowData = (rowKey: DataTableRowKey) => {
+  const startEdit = (rowKey: DataTableRowKey) => {
+    console.log('🚀 开始编辑:', rowKey)
+
     const currentData = options.data()
     if (!currentData || !Array.isArray(currentData)) {
-      return null
+      console.warn('数据源为空或不是数组')
+      return
     }
 
     const rowIndex = currentData.findIndex(
       row => options.rowKey(row) === rowKey
     )
-    if (rowIndex === -1) return null
 
-    return {
-      data: currentData[rowIndex],
-      index: rowIndex,
-    }
-  }
-
-  /**
-   * * @description 开始编辑指定行，将数据复制到编辑缓存并显示模态框
-   * ? @param rowKey - 行唯一标识
-   * ! @return 无返回值
-   */
-  const startEdit = (rowKey: DataTableRowKey) => {
-    console.log('🎯 startEdit 开始:', { rowKey })
-
-    // 🔥 关键修复：每次都获取最新数据
-    const latestRowInfo = findLatestRowData(rowKey)
-    if (!latestRowInfo) {
-      console.warn('🎯 未找到对应的行数据:', rowKey)
+    if (rowIndex === -1) {
+      console.warn('未找到对应的行数据:', rowKey)
       return
     }
 
-    const { data: rowData, index: rowIndex } = latestRowInfo
+    const rowData = currentData[rowIndex]
+    console.log('找到行数据:', rowData)
 
-    console.log('🎯 找到最新行数据:', { rowIndex, rowData })
-
-    editingRowIndex.value = rowIndex
+    // 设置编辑状态
     editingRowKey.value = rowKey
+    // 深拷贝行数据，避免污染原数据
+    editingData.value = JSON.parse(JSON.stringify(rowData))
 
-    // 🔥 关键修复：确保获取最新数据，完全清空旧数据
-    Object.keys(editingData).forEach(key => delete editingData[key])
+    console.log('编辑数据已准备:', editingData.value)
 
-    // 🔥 深拷贝最新数据，避免引用问题
-    const latestRowData = JSON.parse(JSON.stringify(rowData))
-    Object.assign(editingData, latestRowData)
-
-    console.log('🎯 编辑数据已设置:', { ...editingData })
-
+    // 显示模态框
     isModalVisible.value = true
   }
 
   /**
-   * * @description 取消编辑，调用取消回调并关闭模态框
-   * ! @return Promise<void>
+   * 保存编辑
    */
-  const cancelEdit = async () => {
-    try {
-      if (editingRowKey.value && editingRowIndex.value > -1) {
-        const latestRowInfo = findLatestRowData(editingRowKey.value)
-        if (latestRowInfo) {
-          await options.onCancel?.(latestRowInfo.data, latestRowInfo.index)
-        }
-      }
-    } finally {
-      isModalVisible.value = false
-      resetEditingState()
+  const saveEdit = async (formData?: Record<string, any>) => {
+    const dataToSave = formData || editingData.value
+    const currentIndex = editingRowIndex.value
+
+    console.log('💾 保存编辑:', {
+      rowKey: editingRowKey.value,
+      index: currentIndex,
+      data: dataToSave,
+    })
+
+    if (currentIndex === -1) {
+      console.warn('无法找到编辑行的索引')
+      return
     }
-  }
-
-  /**
-   * * @description 保存编辑，调用保存回调并关闭模态框
-   * ! @return Promise<void>
-   */
-  const saveEdit = async () => {
-    if (editingRowIndex.value === -1) return
 
     try {
-      console.log('🎯 saveEdit 开始:', {
-        editingRowIndex: editingRowIndex.value,
-        editingData: { ...editingData },
-      })
+      // 调用保存回调
+      await options.onSave?.(dataToSave, currentIndex)
 
-      // 🔥 修复：确保使用最新的行索引
-      let currentRowIndex = editingRowIndex.value
-
-      // 如果有rowKey，重新查找最新索引（防止数据重排后索引变化）
-      if (editingRowKey.value) {
-        const latestRowInfo = findLatestRowData(editingRowKey.value)
-        if (latestRowInfo) {
-          currentRowIndex = latestRowInfo.index
-          console.log('🎯 更新行索引:', {
-            old: editingRowIndex.value,
-            new: currentRowIndex,
-          })
-        }
-      }
-
-      // 🔥 传递编辑数据给 handleSave
-      await options.onSave?.(editingData, currentRowIndex)
-
+      // 关闭模态框并重置状态
       isModalVisible.value = false
       resetEditingState()
 
-      console.log('🎯 saveEdit 完成')
+      console.log('✅ 保存成功')
     } catch (error) {
-      console.error('🎯 保存失败:', error)
+      console.error('❌ 保存失败:', error)
       throw error
     }
   }
 
   /**
-   * * @description 检查指定行是否正在编辑状态
-   * ? @param rowKey - 行唯一标识
-   * ! @return 是否正在编辑该行
+   * 取消编辑
+   */
+  const cancelEdit = async () => {
+    console.log('🚫 取消编辑')
+
+    try {
+      const currentIndex = editingRowIndex.value
+      if (editingRowKey.value && currentIndex > -1) {
+        const currentData = options.data()
+        if (currentData && currentData[currentIndex]) {
+          await options.onCancel?.(currentData[currentIndex], currentIndex)
+        }
+      }
+    } finally {
+      // 关闭模态框并重置状态
+      isModalVisible.value = false
+      resetEditingState()
+    }
+  }
+
+  /**
+   * 更新编辑数据
+   */
+  const updateEditingData = (data: Record<string, any>) => {
+    editingData.value = { ...data }
+  }
+
+  /**
+   * 获取当前编辑的行数据
+   */
+  const getEditingRowData = (rowKey: DataTableRowKey) => {
+    if (editingRowKey.value === rowKey) {
+      return editingData.value
+    }
+    return null
+  }
+
+  /**
+   * 检查是否正在编辑指定行
    */
   const isEditingRow = (rowKey: DataTableRowKey) => {
     return editingRowKey.value === rowKey && isModalVisible.value
@@ -184,12 +177,13 @@ export function useModalEdit<T = Record<string, any>>(
 
     // 核心方法
     startEdit,
-    cancelEdit,
     saveEdit,
+    cancelEdit,
+    updateEditingData,
     resetEditingState,
 
     // 查询方法
     isEditingRow,
-    findLatestRowData,
+    getEditingRowData,
   }
 }

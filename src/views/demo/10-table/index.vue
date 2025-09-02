@@ -79,22 +79,24 @@
         <C_Table
           ref="tableRef"
           v-model:data="tableData"
-          :columns="tableColumns"
+          :columns="tableColumns as any"
           :loading="loading"
           :edit-mode="editMode"
           :editable="editMode !== 'none'"
           modal-title="编辑员工信息"
           :modal-width="700"
-          :actions="tableActions"
+          :actions="tableActions as any"
           :pagination="paginationConfig"
           @save="handleSave"
           @cancel="handleCancel"
           @pagination-change="handlePaginationChange"
+          @row-delete="handleRowDelete"
+          @view-detail="handleViewDetail"
         />
       </NSpace>
     </NCard>
 
-    <!-- 使用 c_detail 详情组件 -->
+    <!-- 详情模态框 -->
     <c_detail
       v-model:visible="detailModalVisible"
       :data="currentEmployee || {}"
@@ -107,19 +109,13 @@
 </template>
 
 <script setup lang="ts">
-  import type {
-    EditMode,
-    DataRecord,
-    PaginationConfig,
-  } from '@/types/modules/table'
+  import type { EditMode, PaginationConfig } from '@/types/modules/table'
   import type { DetailConfig } from '@/components/local/c_detail/data'
   import {
     EDIT_MODES,
     MODE_CONFIG,
     getTableColumns,
     createNewEmployee,
-    DEPARTMENT_MAP,
-    STATUS_MAP,
     type Employee,
   } from './data'
   import {
@@ -131,7 +127,6 @@
 
   // ================= 组合式函数 =================
   const message = useMessage()
-  const dialog = useDialog()
 
   // ================= 响应式状态 =================
   const loading = ref(false)
@@ -151,21 +146,6 @@
   const detailModalVisible = ref(false)
   const detailModalTitle = ref('')
   const currentEmployee = ref<Employee | null>(null)
-
-  // ================= 工具函数 =================
-  const getDepartmentName = (department: string): string => {
-    return (
-      DEPARTMENT_MAP[department as keyof typeof DEPARTMENT_MAP] || department
-    )
-  }
-
-  const getStatusName = (status: string): string => {
-    return STATUS_MAP[status as keyof typeof STATUS_MAP] || status
-  }
-
-  const getGenderDisplay = (gender: string): string => {
-    return gender === 'male' ? '男' : gender === 'female' ? '女' : gender
-  }
 
   // ================= 详情配置 =================
   const detailConfig: DetailConfig = {
@@ -187,7 +167,8 @@
             key: 'gender',
             type: 'tag',
             tagType: 'info',
-            formatter: (val: string): string => getGenderDisplay(val),
+            formatter: (val: string): string =>
+              val === 'male' ? '男' : val === 'female' ? '女' : val,
           },
         ],
       },
@@ -200,14 +181,12 @@
             key: 'department',
             type: 'tag',
             tagType: 'success',
-            formatter: (val: string): string => getDepartmentName(val),
           },
           {
             label: '状态',
             key: 'status',
             type: 'tag',
             tagType: 'success',
-            formatter: (val: string): string => getStatusName(val),
           },
           { label: '入职日期', key: 'joinDate', type: 'date' },
           { label: '邮箱', key: 'email', type: 'email' },
@@ -248,51 +227,33 @@
     }
   })
 
+  // ================= 详情处理函数 =================
+  const handleViewDetail = (data: any): void => {
+    const employee = data as Employee
+    currentEmployee.value = employee
+    detailModalTitle.value = `员工详情 - ${employee.name}`
+    detailModalVisible.value = true
+  }
+
+  // ================= 简化的表格操作配置 ⭐ =================
   const tableActions = computed(() => ({
-    detail: {
-      onView: async (row: DataRecord): Promise<void> => {
-        const employee = row as Employee
-        try {
-          loading.value = true
-          const response = await getEmployeeByIdApi(employee.id)
-          currentEmployee.value = response.data as Employee
-          detailModalTitle.value = `员工详情 - ${response.data.name}`
-          detailModalVisible.value = true
-        } catch (error) {
-          console.error('获取员工详情失败:', error)
-          message.error('获取员工详情失败，请重试')
-        } finally {
-          loading.value = false
-        }
-      },
-    },
-    delete: {
-      onDelete: handleDelete,
-      confirmText: (row: DataRecord): string => {
-        const employee = row as Employee
-        return `确定要删除员工 "${employee.name}" 吗？此操作不可撤销！`
-      },
-    },
-    custom: [
-      {
-        key: 'copy',
-        label: '复制',
-        icon: 'mdi:content-copy',
-        type: 'default' as const,
-        onClick: handleCopy,
-      },
-      {
-        key: 'authorize',
-        label: '授权',
-        icon: 'mdi:shield-key',
-        type: 'warning' as const,
-        onClick: handleAuthorize,
-      },
-    ],
+    // 编辑API：保存时调用，组件内部处理模态框/行编辑
+    edit: (row: Employee) => updateEmployeeApi(row.id, row),
+
+    // 删除API：确认后调用，组件内部处理确认对话框
+    delete: (row: Employee) => deleteEmployeeApi(row.id),
+
+    // 详情API：点击详情时调用，组件内部处理数据提取
+    detail: (row: Employee) => getEmployeeByIdApi(row.id),
   }))
 
   // ================= 事件处理 =================
-  // 修正分页处理函数，使其兼容未知参数
+
+  const handleRowDelete = (...args: unknown[]): void => {
+    const [deletedRow] = args as [Employee, number]
+    tableData.value = tableData.value.filter(emp => emp.id !== deletedRow.id)
+  }
+
   const handlePaginationChange = (...args: unknown[]): void => {
     const [page, pageSize] = args as [number, number]
     currentPage.value = page
@@ -332,77 +293,19 @@
     }
   }
 
-  const handleDelete = async (row: DataRecord): Promise<void> => {
-    const employee = row as Employee
-    try {
-      loading.value = true
-      await deleteEmployeeApi(employee.id)
-      tableData.value = tableData.value.filter(emp => emp.id !== employee.id)
-      message.success(`员工 "${employee.name}" 删除成功`)
-    } catch (error) {
-      console.error('删除失败:', error)
-      message.error('删除失败，请重试')
-      throw error
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const handleCopy = (row: DataRecord, index: number): void => {
-    const employee = row as Employee
-    const newRow: Employee = {
-      ...employee,
-      id: Date.now(),
-      name: `${employee.name}_副本`,
-    }
-    const actualIndex = paginationEnabled.value
-      ? (currentPage.value - 1) * defaultPageSize.value + index + 1
-      : index + 1
-    tableData.value.splice(actualIndex, 0, newRow)
-    message.success('复制成功')
-  }
-
-  const handleAuthorize = (row: DataRecord): void => {
-    const employee = row as Employee
-    dialog.info({
-      title: '员工授权',
-      content: `正在为员工 "${employee.name}" 配置系统权限...`,
-      positiveText: '确定',
-      onPositiveClick: () => {
-        message.success('授权配置完成')
-      },
-    })
-  }
-
   const handleSave = async (
-    rowData: Record<string, unknown>,
-    rowIndex: number,
-    columnKey?: string
+    rowData: Record<string, unknown>
   ): Promise<void> => {
     loading.value = true
     try {
-      const actualIndex = paginationEnabled.value
-        ? (currentPage.value - 1) * defaultPageSize.value + rowIndex
-        : rowIndex
+      const employee = rowData as Employee
 
-      if (
-        pendingNewRowId.value &&
-        (rowData as Employee).id === pendingNewRowId.value
-      ) {
-        tableData.value[actualIndex] = { ...rowData } as Employee
+      if (pendingNewRowId.value && employee.id === pendingNewRowId.value) {
         pendingNewRowId.value = null
         message.success('新员工信息保存成功')
       } else {
-        const employee = rowData as Employee
-        await updateEmployeeApi(employee.id, employee)
-        tableData.value[actualIndex] = { ...rowData } as Employee
-        const column = tableColumns.value.find(
-          (c: { key: string; title: string }) => c.key === columnKey
-        )
-        const columnTitle = column?.title
-        message.success(
-          columnTitle ? `${columnTitle}已更新` : '员工信息更新成功'
-        )
+        // 注意：这里不再需要手动调用API，因为组件内部会调用tableActions.edit
+        message.success('员工信息更新成功')
       }
     } catch (error) {
       console.error('保存失败:', error)

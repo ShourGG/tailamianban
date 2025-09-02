@@ -2,8 +2,8 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-09-02
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 09:54:04
- * @FilePath: \Robot_Admin\src\components\global\C_Table\TableEditModal.vue
+ * @LastEditTime: 2025-09-02 12:51:35
+ * @FilePath: \Robot_Admin\src\components\global\C_Table\components\TableEditModal.vue
  * @Description: 表格编辑模态框组件
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  -->
@@ -23,12 +23,11 @@
       v-if="visible && formOptions.length"
       ref="cFormRef"
       :key="formKey"
-      :model-value="editingData"
+      v-model="localEditingData"
       :options="formOptions"
       layout-type="grid"
       :layout-config="{ grid: { cols: 2, xGap: 16, yGap: 16 } }"
       :show-default-actions="false"
-      @update:model-value="handleFormUpdate"
     />
 
     <template #action>
@@ -73,7 +72,7 @@
   interface EditModalEmits {
     'update:visible': [visible: boolean]
     'update:editingData': [data: DataRecord]
-    save: []
+    save: [data: DataRecord]
     cancel: []
   }
 
@@ -89,20 +88,39 @@
   const cFormRef = ref<CFormInstance>()
   const submitLoading = ref(false)
 
+  // 使用本地数据副本，避免直接修改 props
+  const localEditingData = ref<DataRecord>({})
+
   // ================= 计算属性 =================
   const visible = computed({
     get: () => props.visible,
     set: (value: boolean) => emit('update:visible', value),
   })
 
-  // ================= 事件处理 =================
+  // ================= 监听器 =================
+  // 当 editingData 变化时，更新本地副本
+  watch(
+    () => props.editingData,
+    newData => {
+      if (newData && Object.keys(newData).length > 0) {
+        // 深拷贝，避免引用污染
+        localEditingData.value = JSON.parse(JSON.stringify(newData))
+      }
+    },
+    { immediate: true, deep: true }
+  )
 
-  /**
-   * 表单数据更新处理
-   */
-  const handleFormUpdate = (value: DataRecord) => {
-    emit('update:editingData', { ...props.editingData, ...value })
-  }
+  // 当模态框关闭时，清空本地数据
+  watch(visible, newVisible => {
+    if (!newVisible) {
+      // 延迟清空，等动画结束
+      setTimeout(() => {
+        localEditingData.value = {}
+      }, 300)
+    }
+  })
+
+  // ================= 事件处理 =================
 
   /**
    * 保存处理
@@ -113,7 +131,8 @@
     submitLoading.value = true
     try {
       await cFormRef.value.validate()
-      emit('save')
+      // 发送本地编辑的数据
+      emit('save', localEditingData.value)
     } catch (error) {
       console.error('表单验证失败:', error)
     } finally {
@@ -125,6 +144,8 @@
    * 取消处理
    */
   const handleCancel = () => {
+    // 重置本地数据
+    localEditingData.value = {}
     emit('cancel')
   }
 
