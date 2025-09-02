@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-14 22:06:22
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-10 12:30:40
+ * @LastEditTime: 2025-09-02 12:30:40
  * @FilePath: \Robot_Admin\src\components\global\C_Table\data.ts
- * @Description: 表格数据处理模块
+ * @Description: 表格数据处理模块 - 重构版本（分页逻辑抽离）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
@@ -139,13 +139,19 @@ const buildDynamicConfig = (preset: any, props: any) => {
 }
 
 /**
- * * @description 构建分页配置
+ * * @description 构建分页配置 - 简化版本
  * ? @param preset - 预设配置对象
  * ? @param props - 组件属性对象
  * ! @return 处理后的分页配置对象
  */
 const buildPaginationConfig = (preset: any, props: any) => {
-  const defaultPagination = {
+  // 如果明确设置为 false，则禁用分页
+  if (props.pagination === false) {
+    return { pagination: null }
+  }
+
+  // 默认分页配置
+  const defaultPagination: PaginationConfig = {
     enabled: true,
     page: 1,
     pageSize: 10,
@@ -153,26 +159,40 @@ const buildPaginationConfig = (preset: any, props: any) => {
     showQuickJumper: true,
     pageSizes: [10, 20, 50, 100],
     simple: false,
-    size: 'medium' as const,
+    size: 'medium',
   }
 
-  // 如果明确设置为 false，则禁用分页
-  if (props.pagination === false) {
-    return { pagination: { enabled: false } }
+  // 预设配置优先级最高
+  if (preset.pagination) {
+    if (preset.pagination === true) {
+      return { pagination: defaultPagination }
+    }
+    if (typeof preset.pagination === 'object') {
+      return {
+        pagination: {
+          ...defaultPagination,
+          ...preset.pagination,
+        },
+      }
+    }
   }
 
-  // 如果设置为 true 或未设置，使用默认配置
+  // 组件属性配置
   if (props.pagination === true || !props.pagination) {
     return { pagination: defaultPagination }
   }
 
   // 如果是对象，则合并配置
-  return {
-    pagination: {
-      ...defaultPagination,
-      ...props.pagination,
-    },
+  if (typeof props.pagination === 'object') {
+    return {
+      pagination: {
+        ...defaultPagination,
+        ...props.pagination,
+      },
+    }
   }
+
+  return { pagination: defaultPagination }
 }
 
 /**
@@ -250,7 +270,7 @@ export function createUnifiedConfig(props: any) {
       enableParentChildLink: ['link.enabled', 'enableParentChildLink'],
       parentChildLinkMode: ['link.mode', 'parentChildLinkMode'],
     }),
-    // 新增分页配置
+    // 分页配置 - 简化处理
     ...buildPaginationConfig(preset, props),
   }
 }

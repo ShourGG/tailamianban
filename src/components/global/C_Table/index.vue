@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-08-22 11:26:25
+ * @LastEditTime: 2025-09-02 09:03:13
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
- * @Description: 超级表格组件
+ * @Description: 超级表格组件 - 重构版本（分页逻辑抽离）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  -->
 
@@ -21,7 +21,7 @@
       ref="tableRef"
       v-bind="tableProps"
       :columns="computedColumns"
-      :data="paginatedData"
+      :data="pagination.paginatedData.value"
       :loading="loading"
       :row-key="rowKey"
       :expanded-row-keys="tableManager.expandedKeys.value"
@@ -33,8 +33,8 @@
 
     <!-- 分页组件 -->
     <NPagination
-      v-if="paginationConfig"
-      v-bind="paginationConfig"
+      v-if="pagination.paginationConfig.value"
+      v-bind="pagination.paginationConfig.value"
       class="pagination-wrapper"
     />
 
@@ -133,6 +133,7 @@
   } from '@/types/modules/table'
   import type { DynamicRowsOptions } from '@/composables/Table/useDynamicRow'
   import { useTableManager } from '@/composables/Table/useTableManager'
+  import { usePagination } from '@/composables/Table/usePagination'
   import {
     getDisplayValue,
     generateFormOptions,
@@ -255,10 +256,6 @@
   const message = useMessage()
   const dialog = useDialog()
 
-  // ================= 分页相关响应式状态 =================
-  const currentPage = ref(1)
-  const currentPageSize = ref(10)
-
   // ================= 计算属性 =================
   const config = computed(() => ({
     ...createUnifiedConfig(props),
@@ -280,37 +277,16 @@
   const renderExpandFunction = computed(() => undefined)
   const editModeChecker = computed(() => createEditModeChecker(config.value))
 
-  // ================= 分页计算属性 =================
-  const paginatedData = computed(() => {
-    if (!config.value.pagination?.enabled) {
-      return props.data
-    }
+  // ================= Hooks 初始化 =================
 
-    const start = (currentPage.value - 1) * currentPageSize.value
-    const end = start + currentPageSize.value
-    return props.data.slice(start, end)
+  // 分页 Hook
+  const pagination = usePagination({
+    data: toRef(props, 'data'),
+    config: computed(() => config.value.pagination),
+    emit,
   })
 
-  const paginationConfig = computed(() => {
-    if (!config.value.pagination?.enabled) return null
-
-    return {
-      page: currentPage.value,
-      pageSize: currentPageSize.value,
-      itemCount: props.data.length, // 使用 itemCount 而不是 total
-      showSizePicker: config.value.pagination.showSizePicker ?? true,
-      showQuickJumper: config.value.pagination.showQuickJumper ?? true,
-      pageSizes: config.value.pagination.pageSizes ?? [10, 20, 50, 100],
-      simple: config.value.pagination.simple ?? false,
-      size: config.value.pagination.size ?? 'medium',
-      prefix: (info: any) => `共 ${info.itemCount} 条`,
-      suffix: (info: any) => `第 ${info.startIndex + 1}-${info.endIndex} 条`,
-      'onUpdate:page': handlePageChange,
-      'onUpdate:pageSize': handlePageSizeChange,
-    }
-  })
-
-  // ================= 表格管理器 =================
+  // 表格管理器
   const tableManager = useTableManager({
     config: config.value,
     data: () => props.data,
@@ -324,39 +300,6 @@
   ): boolean => {
     return props.actions?.[actionKey] !== false
   }
-
-  // ================= 分页事件处理 =================
-  const handlePageChange = (page: number) => {
-    currentPage.value = page
-    emit('pagination-change', page, currentPageSize.value)
-  }
-
-  const handlePageSizeChange = (pageSize: number) => {
-    currentPageSize.value = pageSize
-    currentPage.value = 1 // 重置到第一页
-    emit('pagination-change', 1, pageSize)
-  }
-
-  // ================= 初始化分页配置 =================
-  watchEffect(() => {
-    if (config.value.pagination?.enabled) {
-      currentPage.value = config.value.pagination.page ?? 1
-      currentPageSize.value = config.value.pagination.pageSize ?? 10
-    }
-  })
-
-  // 监听数据变化，确保分页状态正确
-  watch(
-    () => props.data.length,
-    newLength => {
-      if (config.value.pagination?.enabled && currentPage.value > 1) {
-        const maxPage = Math.ceil(newLength / currentPageSize.value)
-        if (currentPage.value > maxPage) {
-          currentPage.value = Math.max(1, maxPage)
-        }
-      }
-    }
-  )
 
   // ================= 事件处理 =================
   const handleFormUpdate = (value: DataRecord) => {
@@ -737,6 +680,9 @@
         elementRef?: HTMLElement,
         filename?: string
       ) => Promise<void>
+      // 分页相关方法
+      resetToFirstPage: () => void
+      getTotalPages: () => number
     }
   >({
     // 编辑相关
@@ -781,6 +727,10 @@
     getSelectedRowData: tableManager.stateManager.dynamicRows.getSelected,
     printTable: tableManager.stateManager.dynamicRows.print,
     downloadTableScreenshot: tableManager.stateManager.dynamicRows.download,
+
+    // 分页相关方法
+    resetToFirstPage: pagination.resetToFirstPage,
+    getTotalPages: pagination.getTotalPages,
   })
 </script>
 
