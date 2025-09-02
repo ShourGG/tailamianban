@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 10:35:51
+ * @LastEditTime: 2025-09-02 15:55:10
  * @FilePath: \Robot_Admin\src\types\modules\table.d.ts
  * @Description: 表格类型系统
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -426,4 +426,15 @@ export interface DemoConfig {
   enableSelection: boolean
   enableChildSelection: boolean
   parentChildLinkMode: ParentChildLinkMode
+}
+
+/** 行操作按钮配置 */
+export interface RowAction<T extends DataRecord = DataRecord> {
+  label: string
+  icon?: string
+  type?: ButtonType
+  disabled?: boolean | ((row: T, index: number) => boolean)
+  show?: boolean | ((row: T, index: number) => boolean)
+  onClick?: (row: T, index: number) => void | Promise<void>
+  tooltip?: string
 }

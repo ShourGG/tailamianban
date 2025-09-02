@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 14:03:24
+ * @LastEditTime: 2025-09-02 15:51:08
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
  * @Description: 超级表格组件 - 简化版本
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -65,7 +65,6 @@
   import type {
     TableColumn,
     TableProps,
-    TableInstance,
     TableEmits,
     DataRecord,
     ParentChildLinkMode,
@@ -323,54 +322,28 @@
     return columns
   })
 
-  // ================= 组件暴露 =================
-  defineExpose<TableInstance>({
-    // 编辑相关
-    startEdit: tableManager.stateManager.edit.start,
-    cancelEdit: tableManager.stateManager.edit.cancel,
-    saveEdit: tableManager.stateManager.edit.save,
-    isEditing: tableManager.stateManager.edit.isEditing,
-    getEditingData: tableManager.stateManager.edit.getEditingData,
+  // 解构出需要的管理器
+  const { edit, expand, selection, dynamicRows } = tableManager.stateManager
 
-    // 展开相关
-    expandRow: tableManager.stateManager.expand.row,
-    collapseRow: tableManager.stateManager.expand.collapse,
-    toggleExpand: tableManager.stateManager.expand.toggle,
-    expandAll: tableManager.stateManager.expand.all,
-    collapseAll: tableManager.stateManager.expand.collapseAll,
-    isExpanded: tableManager.stateManager.expand.isExpanded,
-
-    // 选择相关
-    selectRow: tableManager.stateManager.selection.select,
-    unselectRow: tableManager.stateManager.selection.unselect,
-    selectAll: tableManager.stateManager.selection.all,
-    clearSelection: tableManager.stateManager.selection.clear,
-    isRowSelected: tableManager.stateManager.selection.isSelected,
-    getSelectedRows: tableManager.stateManager.selection.getSelected,
-
-    // 子选择相关
-    selectChildRow: tableManager.stateManager.childSelection.select,
-    unselectChildRow: tableManager.stateManager.childSelection.unselect,
-    selectAllChildren: tableManager.stateManager.childSelection.selectAll,
-    clearChildrenSelection: tableManager.stateManager.childSelection.clear,
-    getChildSelectedRows: tableManager.stateManager.childSelection.getSelected,
+  defineExpose({
+    // 核心方法
+    startEdit: edit.start,
+    expandAll: expand.all,
+    collapseAll: expand.collapseAll,
+    selectAll: selection.all,
+    clearSelection: selection.clear,
     clearAllSelections: tableManager.stateManager.clearAllSelections,
-
-    // 动态行相关
-    addRow: tableManager.stateManager.dynamicRows.add,
-    insertRow: tableManager.stateManager.dynamicRows.insert,
-    deleteRow: tableManager.stateManager.dynamicRows.delete,
-    copyRow: tableManager.stateManager.dynamicRows.copy,
-    moveRowUp: tableManager.stateManager.dynamicRows.moveUp,
-    moveRowDown: tableManager.stateManager.dynamicRows.moveDown,
-    clearRowSelection: tableManager.stateManager.dynamicRows.clearSelection,
-    getSelectedRowData: tableManager.stateManager.dynamicRows.getSelected,
-    printTable: tableManager.stateManager.dynamicRows.print,
-    downloadTableScreenshot: tableManager.stateManager.dynamicRows.download,
-
-    // 分页相关方法
+    clearRowSelection: dynamicRows?.clearSelection,
     resetToFirstPage: pagination.resetToFirstPage,
-    getTotalPages: pagination.getTotalPages,
+
+    // 获取状态方法
+    getSelectedRows: selection.getSelected,
+    getEditingData: edit.getEditingData,
+    isEditing: edit.isEditing,
+    isExpanded: expand.isExpanded,
+
+    // 逃生通道
+    getManager: () => tableManager.stateManager,
   })
 </script>
 

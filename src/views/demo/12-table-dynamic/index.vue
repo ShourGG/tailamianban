@@ -187,13 +187,13 @@
     // 创建 SVG 水印
     const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${xGap}" height="${yGap}">
-      <text 
-        x="50%" 
-        y="50%" 
-        text-anchor="middle" 
+      <text
+        x="50%"
+        y="50%"
+        text-anchor="middle"
         dominant-baseline="middle"
-        font-family="Arial" 
-        font-size="${fontSize}" 
+        font-family="Arial"
+        font-size="${fontSize}"
         fill="${color}"
         transform="rotate(${rotate} ${xGap / 2} ${yGap / 2})"
       >${text}</text>
@@ -356,35 +356,39 @@
   }
 
   // ================= 事件处理函数 =================
-  const handleRowAdd = (newRow: DataRecord) => {
-    const employee = newRow as Employee
-    message.success(`添加员工：${employee.name}`)
-    addLog('add', `添加了新员工：${employee.name}`)
+
+  const handleRowAdd = (...args: unknown[]): void => {
+    const [newRow] = args as [Employee]
+    addLog('add', `添加了新员工：${newRow.name}`)
   }
 
-  const handleRowDelete = (deletedRow: DataRecord) => {
-    const employee = deletedRow as Employee
-    message.success(`删除员工：${employee.name}`)
-    addLog('delete', `删除了员工：${employee.name}`)
-    if (selectedEmployee.value?.id === employee.id) {
+  const handleRowDelete = (...args: unknown[]): void => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [deletedRow, index] = args as [Employee, number]
+
+    addLog('delete', `删除了员工：${deletedRow.name}`)
+
+    if (selectedEmployee.value?.id === deletedRow.id) {
       selectedEmployee.value = null
     }
   }
 
-  const handleSave = (rowData: DataRecord) => {
-    const employee = rowData as Employee
-    message.success(`保存成功：${employee.name}`)
-    addLog('edit', `编辑了员工 ${employee.name} 的信息`)
+  const handleSave = async (...args: unknown[]): Promise<void> => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [rowData, rowIndex, columnKey] = args as [Employee, number, string?]
+
+    message.success(`保存成功：${rowData.name}`)
+    addLog('edit', `编辑了员工 ${rowData.name} 的信息`)
   }
 
-  const resetData = () => {
+  const resetData = (): void => {
     tableData.value = [...initialData]
     logs.value = []
     selectedEmployee.value = null
     message.success('数据已重置')
   }
 
-  const addEmployee = () => {
+  const addEmployee = (): void => {
     const names = ['赵六', '钱七', '孙八', '李九']
     const depts = ['技术部', '产品部', '设计部']
 
@@ -403,7 +407,7 @@
     addLog('add', `手动添加了员工：${newEmployee.name}`)
   }
 
-  const clearSelection = () => {
+  const clearSelection = (): void => {
     selectedEmployee.value = null
     tableRef.value?.clearRowSelection()
     message.info('已清空选择')
