@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 09:47:31
+ * @LastEditTime: 2025-09-02 10:02:04
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
- * @Description: 超级表格组件
+ * @Description: 超级表格组件 - 重构版本（分页和操作逻辑抽离）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  -->
 
@@ -39,77 +39,26 @@
     />
 
     <!-- 编辑模态框 -->
-    <NModal
+    <TableEditModal
       v-if="config.editMode === 'modal'"
-      v-model:show="tableManager.editStates.modalEdit.isModalVisible.value"
+      v-model:visible="tableManager.editStates.modalEdit.isModalVisible.value"
+      v-model:editing-data="tableManager.editStates.modalEdit.editingData"
       :title="config.modalTitle"
       :width="config.modalWidth"
-      preset="card"
-      :mask-closable="false"
-      :close-on-esc="false"
-      class="w60%"
-      :closable="false"
-    >
-      <C_Form
-        v-if="
-          tableManager.editStates.modalEdit.isModalVisible.value &&
-          formOptions.length
-        "
-        ref="cFormRef"
-        :key="formKey"
-        :model-value="tableManager.editStates.modalEdit.editingData"
-        :options="formOptions"
-        layout-type="grid"
-        :layout-config="{ grid: { cols: 2, xGap: 16, yGap: 16 } }"
-        :show-default-actions="false"
-        @update:model-value="handleFormUpdate"
-      />
-
-      <template #action>
-        <NSpace justify="end">
-          <NButton @click="tableManager.editStates.modalEdit.cancelEdit"
-            >取消</NButton
-          >
-          <NButton
-            type="primary"
-            :loading="submitLoading"
-            @click="handleModalSave"
-          >
-            保存
-          </NButton>
-        </NSpace>
-      </template>
-    </NModal>
+      :form-options="formOptions"
+      :form-key="formKey"
+      @save="tableManager.editStates.modalEdit.saveEdit"
+      @cancel="tableManager.editStates.modalEdit.cancelEdit"
+    />
 
     <!-- 查看模态框 -->
-    <NModal
-      v-model:show="viewModalVisible"
-      title="查看详情"
+    <TableViewModal
+      v-model:visible="viewModalVisible"
+      :data="viewingData"
+      :columns="displayColumns"
       :width="config.modalWidth"
-      preset="card"
-      class="w60%"
-    >
-      <NDescriptions
-        v-if="viewModalVisible"
-        :column="2"
-        label-placement="left"
-      >
-        <NDescriptionsItem
-          v-for="column in displayColumns"
-          :key="column.key"
-          :label="column.title"
-          :span="getDescriptionSpan(column)"
-        >
-          {{ getDisplayValue(column, viewingData) }}
-        </NDescriptionsItem>
-      </NDescriptions>
-
-      <template #action>
-        <NSpace justify="end">
-          <NButton @click="viewModalVisible = false">关闭</NButton>
-        </NSpace>
-      </template>
-    </NModal>
+      @close="viewModalVisible = false"
+    />
 
     <!-- 动态行确认删除模态框 -->
     <component
@@ -134,12 +83,12 @@
   import { useTableManager } from '@/composables/Table/useTableManager'
   import { usePagination } from '@/composables/Table/usePagination'
   import { useTableActions } from '@/composables/Table/useTableActions'
+  import TableEditModal from './components/TableEditModal.vue'
+  import TableViewModal from './components/TableViewModal.vue'
   import {
-    getDisplayValue,
     generateFormOptions,
     getTableProps,
     processColumnConfig,
-    getDescriptionSpan,
     createUnifiedConfig,
     createEditModeChecker,
     renderEditComponent,
@@ -150,9 +99,6 @@
   } from './data'
 
   // ================= 类型定义 =================
-  interface CFormInstance {
-    validate: () => Promise<void>
-  }
 
   export interface TableActions<T extends DataRecord = DataRecord> {
     edit?:
@@ -249,10 +195,8 @@
 
   // ================= 响应式状态 =================
   const tableRef = ref<ComponentPublicInstance>()
-  const cFormRef = ref<CFormInstance>()
   const viewModalVisible = ref(false)
   const viewingData = ref<DataRecord>({})
-  const submitLoading = ref(false)
 
   // ================= 计算属性 =================
   const config = computed(() => ({
@@ -305,23 +249,6 @@
     },
     rowActions: props.rowActions,
   })
-
-  // ================= 模态框事件处理 =================
-  const handleFormUpdate = (value: DataRecord) => {
-    Object.assign(tableManager.editStates.modalEdit.editingData, value)
-  }
-
-  const handleModalSave = async () => {
-    if (!cFormRef.value) return
-
-    submitLoading.value = true
-    try {
-      await cFormRef.value.validate()
-      await tableManager.editStates.modalEdit.saveEdit()
-    } finally {
-      submitLoading.value = false
-    }
-  }
 
   // ================= 单元格渲染函数 =================
   const renderCell = (
