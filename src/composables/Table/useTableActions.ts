@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-09-02
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 14:39:52
+ * @LastEditTime: 2025-09-02 17:05:27
  * @FilePath: \Robot_Admin\src\composables\Table\useTableActions.ts
- * @Description: 表格操作按钮渲染和处理 Hook - 修复版本
+ * @Description: 表格操作按钮渲染和处理 Hook
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
@@ -224,10 +224,22 @@ export function useTableActions<T extends DataRecord = DataRecord>(
   }
 
   /**
-   * 渲染内置操作按钮 - 修复版本
+   * 渲染内置操作按钮
    */
   const renderBuiltinActions = (rowData: T, rowIndex: number): VNodeChild[] => {
     const builtinActions: VNodeChild[] = []
+
+    // 详情按钮：根据是否有详情API来显示
+    if (isActionEnabled('detail')) {
+      builtinActions.push(
+        createActionButton({
+          icon: 'mdi:eye',
+          type: 'info',
+          title: '详情',
+          onClick: () => handleSmartDetail(rowData, rowIndex),
+        })
+      )
+    }
 
     // 编辑按钮：只在模态框模式显示，其他模式使用行编辑按钮
     if (
@@ -238,6 +250,7 @@ export function useTableActions<T extends DataRecord = DataRecord>(
         createActionButton({
           icon: 'mdi:pencil',
           title: '编辑',
+          type: 'warning',
           onClick: () => handleSmartEdit(rowData, rowIndex),
         })
       )
@@ -251,18 +264,6 @@ export function useTableActions<T extends DataRecord = DataRecord>(
           type: 'error',
           title: '删除',
           onClick: () => handleSmartDelete(rowData, rowIndex),
-        })
-      )
-    }
-
-    // 详情按钮：根据是否有详情API来显示
-    if (isActionEnabled('detail')) {
-      builtinActions.push(
-        createActionButton({
-          icon: 'mdi:eye',
-          type: 'info',
-          title: '详情',
-          onClick: () => handleSmartDetail(rowData, rowIndex),
         })
       )
     }
