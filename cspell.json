@@ -116,6 +116,7 @@
     "TINYINT",
     "treemap",
     "tsmerge",
+    "TYPELESS",
     "unocss",
     "unocsss",
     "unplugin",
