@@ -15,6 +15,25 @@ export const defaultConfig: DemoConfig = {
   parentChildLinkMode: 'loose',
 }
 
+// ================= 通用序号列配置 =================
+export const INDEX_COLUMN: TableColumn<any> = {
+  title: '序号',
+  key: '_index',
+  width: 50,
+  render: (_: any, index: number) => index + 1,
+  editable: false,
+}
+
+// ================= 通用选择列配置 =================
+export const SELECTION_COLUMN: TableColumn<any> = {
+  type: 'selection',
+}
+
+// ================= 通用展开列配置 =================
+export const EXPAND_COLUMN: TableColumn<any> = {
+  type: 'expand',
+}
+
 // ================= 测试数据 =================
 export const tableData: TestRecord[] = [
   {
@@ -83,17 +102,49 @@ export const mockChildData: Record<number, ChildData[]> = {
   ],
 }
 
+// ================= 子表格列配置 =================
+export const PROJECT_COLUMNS: TableColumn<any>[] = [
+  INDEX_COLUMN,
+  { key: 'project', title: '项目名称', width: 150 },
+  { key: 'progress', title: '进度', width: 100 },
+  { key: 'status', title: '状态', width: 100 },
+]
+
+export const REQUIREMENT_COLUMNS: TableColumn<any>[] = [
+  INDEX_COLUMN,
+  { key: 'requirement', title: '需求名称', width: 150 },
+  { key: 'priority', title: '优先级', width: 100 },
+  { key: 'status', title: '状态', width: 100 },
+]
+
+export const SERVICE_COLUMNS: TableColumn<any>[] = [
+  INDEX_COLUMN,
+  { key: 'service', title: '服务名称', width: 150 },
+  { key: 'version', title: '版本', width: 100 },
+  { key: 'status', title: '状态', width: 100 },
+]
+
 // ================= 表格列配置 =================
 export const dataColumns: TableColumn<DataRecord>[] = [
+  // 注意：选择列和展开列由系统自动添加，不需要在这里定义
+  // 序号列
+  INDEX_COLUMN,
+  // 数据列
   {
-    title: '序号',
-    key: '_index',
-    width: 60,
-    render: (_: DataRecord, index: number) => index + 1,
+    key: 'name',
+    title: '姓名',
+    width: 120,
   },
-  { key: 'name', title: '姓名', width: 120 },
-  { key: 'department', title: '部门', width: 120 },
-  { key: 'role', title: '角色', width: 150 },
+  {
+    key: 'department',
+    title: '部门',
+    width: 120,
+  },
+  {
+    key: 'role',
+    title: '角色',
+    width: 150,
+  },
   {
     key: 'status',
     title: '状态',

@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 15:51:08
+ * @LastEditTime: 2025-09-04 16:00:32
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
  * @Description: 超级表格组件 - 简化版本
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -289,7 +289,7 @@
       align: 'center' as const,
       render: (rowData: DataRecord, rowIndex: number) =>
         renderCell(column, rowData, rowIndex),
-    }))
+    })) as DataTableColumn[] // 添加类型断言
 
     // 功能列增强
     if (tableManager.dynamicRowsState) {

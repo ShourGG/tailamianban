@@ -97,6 +97,7 @@
           :rowExpandable="isRowExpandable"
           :rowCheckable="isRowCheckable"
           :showRowActions="false"
+          :scrollX="600"
         />
       </NCard>
     </NSpace>
@@ -104,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-  import { type DataTableRowKey } from 'naive-ui/es'
+  import { type DataTableRowKey, NSpin } from 'naive-ui/es'
   import type { VNodeChild } from 'vue'
   import type {
     DataRecord,
@@ -116,7 +117,15 @@
   import C_Table from '@/components/global/C_Table/index.vue'
 
   // 从 data.ts 导入数据
-  import { defaultConfig, tableData, mockChildData, dataColumns } from './data'
+  import {
+    defaultConfig,
+    tableData,
+    mockChildData,
+    dataColumns,
+    PROJECT_COLUMNS,
+    REQUIREMENT_COLUMNS,
+    SERVICE_COLUMNS,
+  } from './data'
 
   // ================= 配置状态 =================
   const config = reactive<DemoConfig>({ ...defaultConfig })
@@ -148,7 +157,7 @@
   // ================= 展开渲染逻辑 =================
   const renderExpandContent = (
     row: DataRecord,
-    expandData: ChildData[], // 使用具体的类型
+    expandData: ChildData[],
     loading: boolean
   ): VNodeChild => {
     const testRow = row as TestRecord
@@ -166,36 +175,28 @@
       return h('div', { class: 'text-center py-4 text-gray-400' }, '暂无数据')
     }
 
-    // 构建子表格列配置
-    const childColumns: TableColumn<ChildData>[] = [
-      {
-        title: '序号',
-        key: '_index',
-        width: 60,
-        render: (_: ChildData, index: number) => index + 1,
-      },
-    ]
-
-    // 动态添加数据列
+    // 根据数据类型选择对应的列配置
     const firstItem = expandData[0]
-    if (firstItem.project) {
-      childColumns.push(
-        { key: 'project', title: '项目名称', width: 150 },
-        { key: 'progress', title: '进度', width: 100 }
-      )
-    } else if (firstItem.requirement) {
-      childColumns.push(
-        { key: 'requirement', title: '需求名称', width: 150 },
-        { key: 'priority', title: '优先级', width: 100 }
-      )
-    } else if (firstItem.service) {
-      childColumns.push(
-        { key: 'service', title: '服务名称', width: 150 },
-        { key: 'version', title: '版本', width: 100 }
-      )
-    }
+    let childColumns: TableColumn<any>[]
 
-    childColumns.push({ key: 'status', title: '状态', width: 100 })
+    if (firstItem.project) {
+      childColumns = PROJECT_COLUMNS
+    } else if (firstItem.requirement) {
+      childColumns = REQUIREMENT_COLUMNS
+    } else if (firstItem.service) {
+      childColumns = SERVICE_COLUMNS
+    } else {
+      // 默认列配置
+      childColumns = [
+        {
+          title: '序号',
+          key: '_index',
+          width: 50,
+          render: (_: any, index: number) => index + 1,
+        },
+        { key: 'status', title: '状态', width: 100 },
+      ]
+    }
 
     return h('div', { class: 'p-4 bg-gray-50' }, [
       h(
@@ -211,7 +212,8 @@
         rowKey: (child: DataRecord) => (child as ChildData).id,
         enableSelection: config.enableChildSelection,
         showRowActions: false,
-        pagination: false, // 禁用子表格的分页功能
+        pagination: false,
+        scrollX: 400,
       }),
     ])
   }

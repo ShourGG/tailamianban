@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-02 17:18:47
+ * @LastEditTime: 2025-09-04 15:38:21
  * @FilePath: \Robot_Admin\src\types\modules\table.d.ts
  * @Description: 表格类型系统
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -166,10 +166,16 @@ export interface EditProps {
   readonly?: boolean
 }
 
-export interface TableColumn<T extends DataRecord = DataRecord>
-  extends Omit<DataTableColumns<T>[number], 'key' | 'render'> {
-  key: keyof T | string
-  title: string
+/**
+ * ================= 列类型系统（已修复） =================
+ * 说明：
+ * - BaseTableColumn：去除了 naive 的 key/title/render，提供扩展位
+ * - NormalTableColumn：普通数据列，必须有 key + title
+ * - BuiltInTableColumn：内置列（selection/expand），不需要 key/title
+ * - TableColumn：以上二者联合
+ */
+interface BaseTableColumn<T extends DataRecord = DataRecord>
+  extends Omit<DataTableColumns<T>[number], 'key' | 'title' | 'render'> {
   editable?: boolean
   required?: boolean
   editType?: EditType
@@ -177,6 +183,24 @@ export interface TableColumn<T extends DataRecord = DataRecord>
   editRender?: (value: any, rowData: T, rowIndex: number) => VNodeChild
   render?: (rowData: T, rowIndex: number) => VNodeChild
 }
+
+interface NormalTableColumn<T extends DataRecord = DataRecord>
+  extends BaseTableColumn<T> {
+  key: keyof T | string
+  title: string
+}
+
+interface BuiltInTableColumn<T extends DataRecord = DataRecord>
+  extends BaseTableColumn<T> {
+  /** 内置列类型：无需 key / title */
+  type: 'selection' | 'expand'
+  /** 展开行渲染函数（仅当 type = expand 时有效） */
+  renderExpand?: (rowData: T, rowIndex: number) => VNodeChild
+}
+
+export type TableColumn<T extends DataRecord = DataRecord> =
+  | NormalTableColumn<T>
+  | BuiltInTableColumn<T>
 
 // ================= 选择和展开功能类型 =================
 export interface ChildSelectionState {

@@ -2,9 +2,9 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-15 19:30:00
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-07-01 18:07:10
+ * @LastEditTime: 2025-09-04 13:50:18
  * @FilePath: \Robot_Admin\src\composables\Table\useTableExpand.ts
- * @Description: 表格展开功能 - 修复版本
+ * @Description: 表格展开功能
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 import type { VNodeChild, Ref } from 'vue'
@@ -506,27 +506,33 @@ const useRenderer = <T extends DataRecord, C>(
     )
   }
 
+  // getTableColumns 方法
   const getTableColumns = (originalColumns: TableColumn<T>[]): any[] => {
-    const columns: any[] = [...originalColumns]
+    return originalColumns.map(column => {
+      // 增强选择列
+      if (column.type === 'selection' && options.enableSelection) {
+        return {
+          type: 'selection',
+          disabled: (row: T) => !utils.isRowCheckable(row),
+          multiple: !options.maxSelection || options.maxSelection > 1,
+        }
+      }
 
-    // 添加选择列
-    if (options.enableSelection) {
-      columns.unshift({
-        type: 'selection',
-        disabled: (row: T) => !utils.isRowCheckable(row),
-        multiple: !options.maxSelection || options.maxSelection > 1,
-      })
-    }
+      // 增强展开列
+      if (
+        column.type === 'expand' &&
+        (options.onLoadData || options.renderContent)
+      ) {
+        return {
+          type: 'expand',
+          expandable: utils.isRowExpandable,
+          renderExpand: renderExpandContent,
+        }
+      }
 
-    // 添加展开列
-    const expandIndex = options.enableSelection ? 1 : 0
-    columns.splice(expandIndex, 0, {
-      type: 'expand',
-      expandable: utils.isRowExpandable,
-      renderExpand: renderExpandContent,
+      // 普通列直接返回
+      return column
     })
-
-    return columns
   }
 
   return {
