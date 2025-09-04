@@ -167,7 +167,7 @@ export interface EditProps {
 }
 
 /**
- * ================= 列类型系统（已修复） =================
+ * ================= 列类型系统 =================
  * 说明：
  * - BaseTableColumn：去除了 naive 的 key/title/render，提供扩展位
  * - NormalTableColumn：普通数据列，必须有 key + title
@@ -193,7 +193,7 @@ interface NormalTableColumn<T extends DataRecord = DataRecord>
 interface BuiltInTableColumn<T extends DataRecord = DataRecord>
   extends BaseTableColumn<T> {
   /** 内置列类型：无需 key / title */
-  type: 'selection' | 'expand'
+  type: 'selection' | 'expand' | 'index' // 添加 index 类型
   /** 展开行渲染函数（仅当 type = expand 时有效） */
   renderExpand?: (rowData: T, rowIndex: number) => VNodeChild
 }
@@ -475,21 +475,12 @@ export interface TestRecord extends DataRecord {
   hasChildren: boolean
 }
 
-export interface ChildData extends DataRecord {
-  id: number
-  project?: string
-  requirement?: string
-  service?: string
-  progress?: string
-  status: string
-  priority?: string
-  version?: string
-}
+// 移除了不需要的 ChildData 接口，因为现在有更具体的子数据类型
 
 export interface SelectedChildGroup {
   parentKey: number
   parentName: string
-  children: ChildData[]
+  children: any[] // 使用 any[] 因为子数据类型可能不同
 }
 
 export interface DemoConfig {

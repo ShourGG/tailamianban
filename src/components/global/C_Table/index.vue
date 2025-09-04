@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-04 16:00:32
+ * @LastEditTime: 2025-09-04 16:22:09
  * @FilePath: \Robot_Admin\src\components\global\C_Table\index.vue
  * @Description: 超级表格组件 - 简化版本
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -281,15 +281,34 @@
   }
 
   // ================= 计算列配置 =================
+  // 在 C_Table 组件的 computedColumns 计算属性中添加这个逻辑
+
   const computedColumns = computed((): DataTableColumn[] => {
-    let columns: DataTableColumn[] = props.columns.map(column => ({
-      ...column,
-      width: column.width || props.columnWidth,
-      titleAlign: 'center' as const,
-      align: 'center' as const,
-      render: (rowData: DataRecord, rowIndex: number) =>
-        renderCell(column, rowData, rowIndex),
-    })) as DataTableColumn[] // 添加类型断言
+    let columns: DataTableColumn[] = props.columns.map(column => {
+      // 🔥 自动处理序号列
+      if (column.type === 'index') {
+        return {
+          key: '_index',
+          title: column.title || '序号',
+          width: column.width || 50,
+          titleAlign: 'center' as const,
+          align: 'center' as const,
+          render: (_: DataRecord, index: number) => index + 1,
+          // 序号列不参与编辑系统
+          editable: false,
+        }
+      }
+
+      // 其他原有处理逻辑
+      return {
+        ...column,
+        width: column.width || props.columnWidth,
+        titleAlign: 'center' as const,
+        align: 'center' as const,
+        render: (rowData: DataRecord, rowIndex: number) =>
+          renderCell(column, rowData, rowIndex),
+      }
+    }) as DataTableColumn[]
 
     // 功能列增强
     if (tableManager.dynamicRowsState) {

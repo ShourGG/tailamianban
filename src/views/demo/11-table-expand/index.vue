@@ -37,14 +37,14 @@
         <NSpace>
           <NButtonGroup>
             <NButton
-              @click="handleExpandAll"
+              @click="tableRef?.expandAll()"
               type="primary"
               size="small"
             >
               全部展开
             </NButton>
             <NButton
-              @click="handleCollapseAll"
+              @click="tableRef?.collapseAll()"
               size="small"
             >
               全部折叠
@@ -52,14 +52,14 @@
           </NButtonGroup>
           <NButtonGroup v-if="config.enableSelection">
             <NButton
-              @click="handleSelectAll"
+              @click="tableRef?.selectAll()"
               type="success"
               size="small"
             >
               父表格全选
             </NButton>
             <NButton
-              @click="handleClearSelection"
+              @click="tableRef?.clearSelection()"
               size="small"
             >
               父表格清空
@@ -67,7 +67,7 @@
           </NButtonGroup>
           <NButton
             v-if="config.enableSelection || config.enableChildSelection"
-            @click="handleClearAllSelections"
+            @click="tableRef?.clearAllSelections()"
             type="error"
             size="small"
           >
@@ -111,20 +111,18 @@
     DataRecord,
     TableColumn,
     TestRecord,
-    ChildData,
     DemoConfig,
   } from '@/types/modules/table'
   import C_Table from '@/components/global/C_Table/index.vue'
 
-  // 从 data.ts 导入数据
+  // 从 data.ts 导入数据和类型
   import {
     defaultConfig,
     tableData,
     mockChildData,
     dataColumns,
-    PROJECT_COLUMNS,
-    REQUIREMENT_COLUMNS,
-    SERVICE_COLUMNS,
+    getChildColumns,
+    type ChildDataType,
   } from './data'
 
   // ================= 配置状态 =================
@@ -141,7 +139,7 @@
     (row as TestRecord).status === '在职'
 
   // ================= 数据加载 =================
-  const loadChildData = async (row: DataRecord): Promise<ChildData[]> => {
+  const loadChildData = async (row: DataRecord): Promise<ChildDataType[]> => {
     const testRow = row as TestRecord
     try {
       // 模拟异步加载
@@ -157,7 +155,7 @@
   // ================= 展开渲染逻辑 =================
   const renderExpandContent = (
     row: DataRecord,
-    expandData: ChildData[],
+    expandData: DataRecord[],
     loading: boolean
   ): VNodeChild => {
     const testRow = row as TestRecord
@@ -175,28 +173,10 @@
       return h('div', { class: 'text-center py-4 text-gray-400' }, '暂无数据')
     }
 
-    // 根据数据类型选择对应的列配置
-    const firstItem = expandData[0]
-    let childColumns: TableColumn<any>[]
-
-    if (firstItem.project) {
-      childColumns = PROJECT_COLUMNS
-    } else if (firstItem.requirement) {
-      childColumns = REQUIREMENT_COLUMNS
-    } else if (firstItem.service) {
-      childColumns = SERVICE_COLUMNS
-    } else {
-      // 默认列配置
-      childColumns = [
-        {
-          title: '序号',
-          key: '_index',
-          width: 50,
-          render: (_: any, index: number) => index + 1,
-        },
-        { key: 'status', title: '状态', width: 100 },
-      ]
-    }
+    // 获取对应的子表格列配置
+    const childColumns = getChildColumns(
+      expandData[0] as unknown as ChildDataType
+    )
 
     return h('div', { class: 'p-4 bg-gray-50' }, [
       h(
@@ -209,34 +189,13 @@
         columns: childColumns as TableColumn<DataRecord>[],
         size: 'small',
         striped: true,
-        rowKey: (child: DataRecord) => (child as ChildData).id,
+        rowKey: (child: DataRecord) => (child as unknown as ChildDataType).id,
         enableSelection: config.enableChildSelection,
         showRowActions: false,
         pagination: false,
         scrollX: 400,
       }),
     ])
-  }
-
-  // ================= 操作方法 =================
-  const handleExpandAll = () => {
-    tableRef.value?.expandAll()
-  }
-
-  const handleCollapseAll = () => {
-    tableRef.value?.collapseAll()
-  }
-
-  const handleSelectAll = () => {
-    tableRef.value?.selectAll()
-  }
-
-  const handleClearSelection = () => {
-    tableRef.value?.clearSelection()
-  }
-
-  const handleClearAllSelections = () => {
-    tableRef.value?.clearAllSelections()
   }
 </script>
 
