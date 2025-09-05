@@ -53,6 +53,16 @@ export function useTableData<T = any>(
     onError,
   } = options
 
+  // ================= 在顶部调用组合式API =================
+  // 🚀 修复：在 setup 阶段调用 useMessage，避免在异步回调中调用
+  let message: any = null
+  try {
+    message = useMessage?.()
+  } catch {
+    // 如果 useMessage 不可用，保持 null
+    console.log('useMessage 不可用，将使用控制台输出')
+  }
+
   // ================= 状态管理 =================
   const loading = ref(false)
   const tableData = shallowRef<T[]>([]) // 使用 shallowRef 避免 UnwrapRefSimple 类型问题
@@ -102,14 +112,10 @@ export function useTableData<T = any>(
     if (response.data.page) pagination.page = response.data.page
     if (response.data.pageSize) pagination.pageSize = response.data.pageSize
 
-    // 内置成功处理 - 使用 try-catch 处理 message 可能不存在的情况
-    try {
-      const message = useMessage?.()
-      if (message) {
-        message.success(`已加载 ${tableData.value.length} 条记录`)
-      }
-    } catch {
-      // 如果 useMessage 不可用，只在控制台输出
+    // ✅ 修复：直接使用预先调用的 message 实例
+    if (message) {
+      message.success(`已加载 ${tableData.value.length} 条记录`)
+    } else {
       console.log(`已加载 ${tableData.value.length} 条记录`)
     }
 
@@ -125,14 +131,10 @@ export function useTableData<T = any>(
     tableData.value = []
     total.value = 0
 
-    // 内置错误处理 - 使用 try-catch 处理 message 可能不存在的情况
-    try {
-      const message = useMessage?.()
-      if (message) {
-        message.error('加载数据失败，请重试')
-      }
-    } catch {
-      // 如果 useMessage 不可用，只在控制台输出
+    // ✅ 修复：直接使用预先调用的 message 实例
+    if (message) {
+      message.error('加载数据失败，请重试')
+    } else {
       console.error('加载数据失败，请重试')
     }
 
