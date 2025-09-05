@@ -58,6 +58,21 @@
                 <template #unchecked> 关闭 </template>
               </NSwitch>
             </div>
+
+            <div class="elegant-divider"></div>
+
+            <!-- 刷新按钮 -->
+            <NButton
+              @click="refresh"
+              type="info"
+              size="medium"
+              :loading="loading"
+            >
+              <template #icon>
+                <C_Icon name="mdi:refresh" />
+              </template>
+              刷新数据
+            </NButton>
           </div>
         </NCard>
 
@@ -124,16 +139,18 @@
     updateEmployeeApi,
     getEmployeeByIdApi,
   } from '@/api/10-table'
+  import { useTableData } from '@/composables/Table/useTableData'
 
   // ================= 组合式函数 =================
   const message = useMessage()
-  const dialog = useDialog() // 👈 添加 dialog
+  const dialog = useDialog()
+
+  // 使用 useTableData 自动加载数据 - 与第一个文件保持一致
+  const { tableData, loading, refresh } = useTableData(getEmployeesListApi)
 
   // ================= 响应式状态 =================
-  const loading = ref(false)
   const tableRef = ref()
   const editMode = ref<EditMode>('modal')
-  const tableData = ref<Employee[]>([])
 
   // 分页相关状态
   const paginationEnabled = ref(true)
@@ -274,7 +291,7 @@
     // 详情API：点击详情时调用，组件内部处理数据提取
     detail: (row: Employee) => getEmployeeByIdApi(row.id),
 
-    // 自定义操作按钮 👈 添加这部分
+    // 自定义操作按钮
     custom: [
       {
         key: 'copy',
@@ -342,7 +359,6 @@
   const handleSave = async (
     rowData: Record<string, unknown>
   ): Promise<void> => {
-    loading.value = true
     try {
       const employee = rowData as Employee
 
@@ -357,8 +373,6 @@
       console.error('保存失败:', error)
       message.error('保存失败，请重试')
       throw error
-    } finally {
-      loading.value = false
     }
   }
 
@@ -381,25 +395,6 @@
     currentEmployee.value = null
     detailModalTitle.value = ''
   }
-
-  const loadEmployeesData = async (): Promise<void> => {
-    try {
-      loading.value = true
-      const response = await getEmployeesListApi()
-      tableData.value = (response.data?.list || []) as Employee[]
-      message.success(`已加载 ${tableData.value.length} 条员工记录`)
-    } catch (error) {
-      console.error('加载数据失败:', error)
-      message.error('加载数据失败，请重试')
-      tableData.value = []
-    } finally {
-      loading.value = false
-    }
-  }
-
-  onMounted(() => {
-    loadEmployeesData()
-  })
 </script>
 
 <style scoped lang="scss">

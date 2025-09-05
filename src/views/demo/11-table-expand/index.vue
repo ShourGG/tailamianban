@@ -76,7 +76,7 @@
             清空所有选择
           </NButton>
           <NButton
-            @click="loadTableData"
+            @click="refresh"
             type="info"
             size="small"
             :loading="loading"
@@ -129,21 +129,22 @@
   } from '@/types/modules/table'
   import C_Table from '@/components/global/C_Table/index.vue'
   import { getEmployeesExpandListApi } from '@/api/11-table-expand'
-  import type { GetEmployeesExpandListResponse } from '@/api/generated'
+  import { useTableData } from '@/composables/Table/useTableData'
   import {
     defaultConfig,
     dataColumns,
     getChildColumns,
     type ChildDataType,
     type EnhancedTestRecord,
-    type EmployeeData,
   } from './data'
 
-  const message = useMessage()
   const config = reactive<DemoConfig>({ ...defaultConfig })
   const tableRef = ref()
-  const loading = ref(false)
-  const tableData = ref<EnhancedTestRecord[]>([])
+
+  // 使用 useTableData 自动加载数据 - 与第一个文件保持一致
+  const { tableData, loading, refresh } = useTableData(
+    getEmployeesExpandListApi
+  )
 
   // 工具函数
   const getRowKey = (row: DataRecord): DataTableRowKey => (row as TestRecord).id
@@ -151,25 +152,6 @@
     (row as EnhancedTestRecord).hasChildren
   const isRowCheckable = (row: DataRecord): boolean =>
     (row as TestRecord).status === '在职'
-
-  // API数据加载
-  const loadTableData = async (): Promise<void> => {
-    try {
-      loading.value = true
-      const response: GetEmployeesExpandListResponse =
-        await getEmployeesExpandListApi()
-      const rawData: EmployeeData[] = response.data?.list || []
-
-      tableData.value = rawData
-      message.success(`已加载 ${tableData.value.length} 条记录`)
-    } catch (error) {
-      console.error('加载数据失败:', error)
-      message.error('加载数据失败，请重试')
-      tableData.value = []
-    } finally {
-      loading.value = false
-    }
-  }
 
   const loadChildData = async (row: DataRecord): Promise<ChildDataType[]> => {
     try {
@@ -223,6 +205,4 @@
       }),
     ])
   }
-
-  onMounted(loadTableData)
 </script>

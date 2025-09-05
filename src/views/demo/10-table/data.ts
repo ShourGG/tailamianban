@@ -14,9 +14,9 @@ export interface Employee extends DataRecord {
   age: number
   gender: 'male' | 'female'
   email: string
-  department: string
+  department: 'tech' | 'hr' | 'market' | 'finance'
   joinDate: number
-  status: string
+  status: 'active' | 'inactive' | 'probation'
   description?: string
 }
 

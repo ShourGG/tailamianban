@@ -10,8 +10,8 @@ import type {
  * * @description: 获取员工列表接口
  * ! @return {Promise<GetEmployeesListResponse>} 员工列表响应数据，包含分页信息
  */
-export const getEmployeesListApi = () =>
-  getData<GetEmployeesListResponse>('/employees/list')
+export const getEmployeesListApi = (params: any) =>
+  getData<GetEmployeesListResponse>('/employees/list', { params })
 
 /**
  * * @description: 根据ID查询员工详情接口
