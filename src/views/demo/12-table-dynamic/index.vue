@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 min-h-screen bg-gray-1">
+  <div class="p-6 min-h-screen">
     <NH1>动态表格场景示例</NH1>
 
     <NCard class="shadow-md mb-6">
@@ -27,6 +27,7 @@
           :columns="dynamicTableColumns"
           :actions="tableActions"
           :preset="tablePreset"
+          :loading="loading"
           @row-add="handleRowAdd"
           @row-delete="handleRowDelete"
           @save="handleSave"
@@ -96,6 +97,7 @@
   import type { DataRecord, SimpleTableActions } from '@/types/modules/table'
   import C_Table from '@/components/global/C_Table/index.vue'
   import { getDynamicEmployeesListApi } from '@/api/12-table-dynamic'
+  import { useTableData } from '@/composables/Table/useTableData'
   import {
     type DynamicEmployee,
     type Log,
@@ -104,7 +106,6 @@
     createDefaultEmployee,
     generateRandomEmployee,
   } from './data'
-  import type { GetEmployeesDynamicListResponse } from '@/api/generated'
 
   const message = useMessage()
   const tableRef = ref()
@@ -112,10 +113,11 @@
   const watermarkLayer = ref<HTMLElement>()
   const selectedEmployee = ref<DynamicEmployee | null>(null)
   const logs = ref<Log[]>([])
-  const loading = ref(false)
 
-  // 使用新的数据结构
-  const tableData = ref<DynamicEmployee[]>([])
+  // 最简单的使用方式 - 自动加载数据
+  const { tableData, loading, refresh } = useTableData(
+    getDynamicEmployeesListApi
+  )
 
   // 自动水印样式
   const watermarkStyle = ref('')
@@ -166,31 +168,6 @@
     background-repeat: repeat;
     background-position: 0 0;
   `
-  }
-
-  // 加载员工数据
-  const loadEmployeeData = async (): Promise<void> => {
-    try {
-      loading.value = true
-      // 使用真实API接口
-      const response: GetEmployeesDynamicListResponse =
-        await getDynamicEmployeesListApi({
-          page: 1,
-          pageSize: 10,
-        })
-
-      const apiData = response.data?.list || []
-      // 使用类型断言解决API类型和本地类型的差异
-      tableData.value = [...apiData] as DynamicEmployee[]
-
-      message.success(`已加载 ${tableData.value.length} 条员工记录`)
-    } catch (error) {
-      console.error('加载员工数据失败:', error)
-      message.error('加载数据失败，请重试')
-      tableData.value = []
-    } finally {
-      loading.value = false
-    }
   }
 
   const tableActions = computed(
@@ -254,7 +231,6 @@
     if (logs.value.length > 20) logs.value.splice(20)
   }
 
-  // 事件处理函数
   const handleViewDetail = (data: DataRecord) => {
     const employee = data as DynamicEmployee
     message.info(`查看 ${employee.name} 的详细信息`)
@@ -282,7 +258,7 @@
   }
 
   const resetData = (): void => {
-    loadEmployeeData()
+    refresh() // 直接刷新数据
     logs.value = []
     selectedEmployee.value = null
     message.success('数据已重置')
@@ -290,7 +266,8 @@
 
   const addEmployee = (): void => {
     const newEmployee = generateRandomEmployee()
-    tableData.value.push(newEmployee)
+    // 直接修改 hook 的数据
+    ;(tableData.value as DynamicEmployee[]).push(newEmployee)
     message.success(`添加员工：${newEmployee.name}`)
     addLog('add', `手动添加了员工：${newEmployee.name}`)
   }
@@ -301,11 +278,7 @@
     message.info('已清空选择')
   }
 
-  // 生命周期
   onMounted(() => {
-    loadEmployeeData()
-    nextTick(() => {
-      createWatermark()
-    })
+    createWatermark()
   })
 </script>

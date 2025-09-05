@@ -2,15 +2,59 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-04 15:38:21
+ * @LastEditTime: 2025-09-05 15:33:14
  * @FilePath: \Robot_Admin\src\types\modules\table.d.ts
- * @Description: 表格类型系统
+ * @Description: 表格类型系统（包含useTableData相关类型）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 
 import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
 import type { VNodeChild, Ref, ComputedRef } from 'vue'
 import type { FormItemRule } from 'naive-ui/es/form'
+
+// ================= useTableData Hook 相关类型 =================
+/** 列表API函数类型 - 支持timestamp等额外字段 */
+export type ListApiFn<T = any> = (params?: Record<string, any>) => Promise<{
+  data: {
+    list: T[]
+    total: number
+    page: number
+    pageSize: number
+  }
+  code: string
+  message: string
+  [key: string]: any // 允许任意额外字段，如 timestamp
+}>
+
+/** useTableData 配置选项 */
+export interface UseTableDataOptions<T = any> {
+  immediate?: boolean // 是否立即加载，默认true
+  defaultParams?: Record<string, any> // 默认参数
+  transform?: (data: any[]) => T[] // 数据转换函数
+  onSuccess?: (data: T[]) => void // 成功回调
+  onError?: (error: any) => void // 错误回调
+}
+
+/** useTableData 返回类型 */
+export type UseTableDataReturn<T = any> = {
+  loading: Ref<boolean>
+  tableData: Ref<T[]>
+  total: Ref<number>
+  pagination: {
+    readonly page: number
+    readonly pageSize: number
+  }
+  searchParams: Ref<Record<string, any>>
+  loadData: (params?: Record<string, any>) => Promise<void>
+  search: (params: Record<string, any>) => Promise<void>
+  refresh: () => Promise<void>
+  resetSearch: () => Promise<void>
+  handlePageChange: (page: number, pageSize?: number) => Promise<void>
+  resetToFirstPage: () => Promise<void>
+  isEmpty: Ref<boolean>
+  hasData: Ref<boolean>
+  currentParams: Ref<Record<string, any>>
+}
 
 // ================= 核心类型定义 =================
 export type DataRecord = Record<string, unknown>
@@ -474,8 +518,6 @@ export interface TestRecord extends DataRecord {
   status: string
   hasChildren: boolean
 }
-
-// 移除了不需要的 ChildData 接口，因为现在有更具体的子数据类型
 
 export interface SelectedChildGroup {
   parentKey: number

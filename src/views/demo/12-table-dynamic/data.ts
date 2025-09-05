@@ -20,7 +20,7 @@ export interface DynamicEmployee extends DataRecord {
   department: string
   role: string
   salary: number
-  status: '在职' | '离职'
+  status: string
   hasChildren: boolean
   childData: ChildWorkData[]
 }
