@@ -14,42 +14,6 @@ export const defaultConfig: DemoConfig = {
   parentChildLinkMode: 'loose',
 }
 
-// ================= 测试数据 =================
-export const tableData: TestRecord[] = [
-  {
-    id: 1,
-    name: '张三',
-    department: '技术部',
-    role: '前端工程师',
-    status: '在职',
-    hasChildren: true,
-  },
-  {
-    id: 2,
-    name: '李四',
-    department: '产品部',
-    role: '产品经理',
-    status: '在职',
-    hasChildren: true,
-  },
-  {
-    id: 3,
-    name: '王五',
-    department: '设计部',
-    role: 'UI设计师',
-    status: '离职',
-    hasChildren: false,
-  },
-  {
-    id: 4,
-    name: '赵六',
-    department: '技术部',
-    role: '后端工程师',
-    status: '在职',
-    hasChildren: true,
-  },
-]
-
 // ================= 子表数据类型 =================
 export interface ProjectChild {
   id: number
@@ -75,24 +39,76 @@ export interface ServiceChild {
 // 联合类型，方便类型推断
 export type ChildDataType = ProjectChild | RequirementChild | ServiceChild
 
-// ================= 子表数据 =================
-// 修复索引类型问题：使用 Record 类型并明确键的类型
-export const mockChildData: Record<number, ChildDataType[]> = {
-  1: [
-    { id: 101, project: '管理系统前端', progress: '80%', status: '进行中' },
-    { id: 102, project: '移动应用开发', progress: '60%', status: '设计中' },
-    { id: 103, project: '组件库建设', progress: '90%', status: '测试中' },
-  ] as ProjectChild[],
-  2: [
-    { id: 201, requirement: '用户需求调研', status: '已完成', priority: '高' },
-    { id: 202, requirement: '竞品分析报告', status: '进行中', priority: '中' },
-    { id: 203, requirement: '原型设计评审', status: '待开始', priority: '高' },
-  ] as RequirementChild[],
-  4: [
-    { id: 401, service: 'API接口开发', version: 'v2.1', status: '已部署' },
-    { id: 402, service: '数据库优化', version: 'v1.3', status: '测试中' },
-  ] as ServiceChild[],
+// ================= 增强的测试记录类型 =================
+export interface EnhancedTestRecord extends TestRecord {
+  childData?: ChildDataType[] // 🔥 使用 childData 避免 NaiveUI 自动树形检测
 }
+
+// ================= 合并后的完整数据源 =================
+export const tableData: EnhancedTestRecord[] = [
+  {
+    id: 1,
+    name: '张三',
+    department: '技术部',
+    role: '前端工程师',
+    status: '在职',
+    hasChildren: true,
+    childData: [
+      { id: 101, project: '管理系统前端', progress: '80%', status: '进行中' },
+      { id: 102, project: '移动应用开发', progress: '60%', status: '设计中' },
+      { id: 103, project: '组件库建设', progress: '90%', status: '测试中' },
+    ] as ProjectChild[],
+  },
+  {
+    id: 2,
+    name: '李四',
+    department: '产品部',
+    role: '产品经理',
+    status: '在职',
+    hasChildren: true,
+    childData: [
+      {
+        id: 201,
+        requirement: '用户需求调研',
+        status: '已完成',
+        priority: '高',
+      },
+      {
+        id: 202,
+        requirement: '竞品分析报告',
+        status: '进行中',
+        priority: '中',
+      },
+      {
+        id: 203,
+        requirement: '原型设计评审',
+        status: '待开始',
+        priority: '高',
+      },
+    ] as RequirementChild[],
+  },
+  {
+    id: 3,
+    name: '王五',
+    department: '设计部',
+    role: 'UI设计师',
+    status: '离职',
+    hasChildren: false,
+    childData: [], // 空数组表示无子数据
+  },
+  {
+    id: 4,
+    name: '赵六',
+    department: '技术部',
+    role: '后端工程师',
+    status: '在职',
+    hasChildren: true,
+    childData: [
+      { id: 401, service: 'API接口开发', version: 'v2.1', status: '已部署' },
+      { id: 402, service: '数据库优化', version: 'v1.3', status: '测试中' },
+    ] as ServiceChild[],
+  },
+]
 
 // ================= 子表格列配置 =================
 export const childColumnsConfig = {
@@ -146,7 +162,7 @@ export const getChildColumns = (
   return childColumnsConfig.project as TableColumn<DataRecord>[]
 }
 
-// ================= 主表格列配置 =================
+// ================= 主表格列配置 - 保持原样 =================
 export const dataColumns: TableColumn[] = [
   // 序号列 - 直接定义，简单明了
   {

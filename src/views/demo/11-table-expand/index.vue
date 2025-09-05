@@ -115,14 +115,14 @@
   } from '@/types/modules/table'
   import C_Table from '@/components/global/C_Table/index.vue'
 
-  // 从 data.ts 导入数据和类型
+  // 从合并后的数据文件导入
   import {
     defaultConfig,
     tableData,
-    mockChildData,
     dataColumns,
     getChildColumns,
     type ChildDataType,
+    type EnhancedTestRecord,
   } from './data'
 
   // ================= 配置状态 =================
@@ -133,19 +133,26 @@
 
   // ================= 工具函数 =================
   const getRowKey = (row: DataRecord): DataTableRowKey => (row as TestRecord).id
-  const isRowExpandable = (row: DataRecord): boolean =>
-    (row as TestRecord).hasChildren
+
+  // 基于 childData 字段判断是否可展开
+  const isRowExpandable = (row: DataRecord): boolean => {
+    const testRow = row as EnhancedTestRecord
+    return Array.isArray(testRow.childData) && testRow.childData.length > 0
+  }
+
   const isRowCheckable = (row: DataRecord): boolean =>
     (row as TestRecord).status === '在职'
 
-  // ================= 数据加载 =================
+  // ================= 数据加载 - 从合并数据源获取 =================
   const loadChildData = async (row: DataRecord): Promise<ChildDataType[]> => {
-    const testRow = row as TestRecord
+    const testRow = row as EnhancedTestRecord
+
     try {
-      // 模拟异步加载
+      // 模拟网络延迟（实际项目中可以去掉）
       await new Promise(resolve => setTimeout(resolve, 300))
-      const data = mockChildData[testRow.id] || []
-      return data
+
+      // 直接从合并后的数据源获取子数据
+      return testRow.childData || []
     } catch (error) {
       console.error('加载子数据失败:', error)
       return []
@@ -158,7 +165,7 @@
     expandData: DataRecord[],
     loading: boolean
   ): VNodeChild => {
-    const testRow = row as TestRecord
+    const testRow = row as EnhancedTestRecord
 
     // 加载中状态
     if (loading) {
