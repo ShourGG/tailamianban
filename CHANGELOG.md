@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.3.0](https://github.com/ChenyCHENYU/Robot_Admin/compare/v1.2.1...v1.3.0) (2025-09-05)
+
+
+### Features
+
+* **useTableData:** 增加获取表格列表钩子函数，封装通用的api，简化调用 ([8a4df86](https://github.com/ChenyCHENYU/Robot_Admin/commit/8a4df860db984941fa468fb9dd9debab5292ca8d))
+
+
+### Bug Fixes
+
+* **useTableData:** 解决异步回调提示的警告 ([e0b184f](https://github.com/ChenyCHENYU/Robot_Admin/commit/e0b184f43ecbc670ef4d060c5713e034053c0eb9))
+
+
+### Performance Improvements
+
+* **11-table-expand/展开表格:** 使用apifox接口替换写死的数据，演示页面优化完成 ([2ea064d](https://github.com/ChenyCHENYU/Robot_Admin/commit/2ea064d93ac7d48c48d40b03a6744aebbce1f256))
+* **11-table-expand:** mock data optimiza ([c59267d](https://github.com/ChenyCHENYU/Robot_Admin/commit/c59267def9a44d0ad0d68322dee3b7315423736c))
+* **12-table-dynamic/动态表格:** 使用 apifox 接口，优化相应的页面逻辑 ([3927d76](https://github.com/ChenyCHENYU/Robot_Admin/commit/3927d766d0cc2f14e8434439b3d900e4ffa761c6))
+* **api:** 优化接口api定义 ([5ee0ee6](https://github.com/ChenyCHENYU/Robot_Admin/commit/5ee0ee6ac91357342acd0be0a6d1b52453ae4d5d))
+
 ## [1.2.1](https://github.com/ChenyCHENYU/Robot_Admin/compare/v1.2.0...v1.2.1) (2025-09-05)
 
 
