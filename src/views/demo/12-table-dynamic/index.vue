@@ -1,11 +1,11 @@
 <template>
-  <div class="demo-container">
+  <div class="p-6 min-h-screen bg-gray-1">
     <NH1>动态表格场景示例</NH1>
 
-    <NCard class="table-card">
+    <NCard class="shadow-md mb-6">
       <template #header>
-        <div class="card-header">
-          <h3>员工信息管理（例）</h3>
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-semibold">员工信息管理（例）</h3>
           <NSpace>
             <NButton @click="resetData">重置数据</NButton>
             <NButton
@@ -19,12 +19,12 @@
 
       <div
         ref="tableContainer"
-        class="c-table-wrapper"
+        class="c-table-wrapper relative"
       >
         <C_Table
           ref="tableRef"
           v-model:data="tableData"
-          :columns="columns"
+          :columns="dynamicTableColumns"
           :actions="tableActions"
           :preset="tablePreset"
           @row-add="handleRowAdd"
@@ -36,7 +36,7 @@
         <!-- 自动铺满水印 -->
         <div
           ref="watermarkLayer"
-          class="auto-watermark"
+          class="auto-watermark absolute inset-0 pointer-events-none"
           :style="watermarkStyle"
         ></div>
       </div>
@@ -44,7 +44,7 @@
       <NAlert
         v-if="selectedEmployee"
         type="info"
-        class="selected-info"
+        class="mt-4"
         closable
         @close="clearSelection"
       >
@@ -53,10 +53,10 @@
       </NAlert>
     </NCard>
 
-    <NCard>
+    <NCard class="shadow-md">
       <template #header>
-        <div class="card-header">
-          <h3>操作日志</h3>
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-semibold">操作日志</h3>
           <NButton
             size="small"
             @click="logs = []"
@@ -65,22 +65,22 @@
         </div>
       </template>
 
-      <div class="logs">
+      <div class="space-y-2">
         <div
           v-for="log in logs.slice(0, 6)"
           :key="log.time"
-          class="log-item"
+          class="flex items-center gap-3 p-2 rounded bg-gray-50"
         >
           <NTag
             :type="getLogTagType(log.type)"
             size="small"
             >{{ log.type }}</NTag
           >
-          <span>{{ log.message }}</span>
+          <span class="flex-1">{{ log.message }}</span>
           <NTime
             :time="new Date(log.time)"
             type="relative"
-            class="log-time"
+            class="text-sm text-gray-5"
           />
         </div>
         <NEmpty
@@ -93,70 +93,31 @@
 </template>
 
 <script setup lang="ts">
-  import type {
-    TableColumn,
-    DataRecord,
-    SimpleTableActions,
-  } from '@/types/modules/table'
+  import type { DataRecord, SimpleTableActions } from '@/types/modules/table'
+  import C_Table from '@/components/global/C_Table/index.vue'
+  import { getDynamicEmployeesListApi } from '@/api/12-table-dynamic'
+  import {
+    type DynamicEmployee,
+    type Log,
+    dynamicTableColumns,
+    getLogTagType,
+    createDefaultEmployee,
+    generateRandomEmployee,
+  } from './data'
+  import type { GetEmployeesDynamicListResponse } from '@/api/generated'
 
-  // ================= 类型定义 =================
-  interface Employee extends DataRecord {
-    id: string
-    name: string
-    age: number
-    email: string
-    department: string
-    salary: number
-    status: 'active' | 'inactive'
-  }
-
-  interface Log {
-    type: 'add' | 'delete' | 'edit' | 'select'
-    message: string
-    time: string
-  }
-
-  // ================= 响应式数据 =================
   const message = useMessage()
   const tableRef = ref()
   const tableContainer = ref<HTMLElement>()
   const watermarkLayer = ref<HTMLElement>()
-  const selectedEmployee = ref<Employee | null>(null)
+  const selectedEmployee = ref<DynamicEmployee | null>(null)
   const logs = ref<Log[]>([])
+  const loading = ref(false)
 
-  const initialData: Employee[] = [
-    {
-      id: '1',
-      name: '张三',
-      age: 28,
-      email: 'zhang@example.com',
-      department: '技术部',
-      salary: 15000,
-      status: 'active',
-    },
-    {
-      id: '2',
-      name: '李四',
-      age: 32,
-      email: 'li@example.com',
-      department: '产品部',
-      salary: 18000,
-      status: 'active',
-    },
-    {
-      id: '3',
-      name: '王五',
-      age: 26,
-      email: 'wang@example.com',
-      department: '设计部',
-      salary: 12000,
-      status: 'inactive',
-    },
-  ]
+  // 使用新的数据结构
+  const tableData = ref<DynamicEmployee[]>([])
 
-  const tableData = ref<Employee[]>([...initialData])
-
-  // ================= 自动水印 =================
+  // 自动水印样式
   const watermarkStyle = ref('')
 
   const createWatermark = () => {
@@ -165,14 +126,12 @@
     const color = 'rgba(100, 100, 100, 0.25)'
     const rotate = -45
 
-    // 创建 canvas 来测量文字尺寸
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')!
     ctx.font = `${fontSize}px Arial`
     const textWidth = ctx.measureText(text).width
     const textHeight = fontSize
 
-    // 计算旋转后的实际尺寸
     const radians = (rotate * Math.PI) / 180
     const rotatedWidth =
       Math.abs(textWidth * Math.cos(radians)) +
@@ -181,11 +140,9 @@
       Math.abs(textWidth * Math.sin(radians)) +
       Math.abs(textHeight * Math.cos(radians))
 
-    // 设置水印间距（稍微大一点避免重叠）
     const xGap = Math.max(rotatedWidth + 50, 180)
     const yGap = Math.max(rotatedHeight + 30, 100)
 
-    // 创建 SVG 水印
     const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${xGap}" height="${yGap}">
       <text
@@ -211,85 +168,31 @@
   `
   }
 
-  // ================= 工具函数 =================
-  const getLogTagType = (type: Log['type']) => {
-    const typeMap = {
-      add: 'success',
-      delete: 'error',
-      edit: 'warning',
-      select: 'info',
+  // 加载员工数据
+  const loadEmployeeData = async (): Promise<void> => {
+    try {
+      loading.value = true
+      // 使用真实API接口
+      const response: GetEmployeesDynamicListResponse =
+        await getDynamicEmployeesListApi({
+          page: 1,
+          pageSize: 10,
+        })
+
+      const apiData = response.data?.list || []
+      // 使用类型断言解决API类型和本地类型的差异
+      tableData.value = [...apiData] as DynamicEmployee[]
+
+      message.success(`已加载 ${tableData.value.length} 条员工记录`)
+    } catch (error) {
+      console.error('加载员工数据失败:', error)
+      message.error('加载数据失败，请重试')
+      tableData.value = []
+    } finally {
+      loading.value = false
     }
-    return typeMap[type] || 'default'
   }
 
-  // ================= 表格配置 =================
-  const columns: TableColumn<DataRecord>[] = [
-    {
-      key: 'name',
-      title: '姓名',
-      width: 100,
-      editable: true,
-      editType: 'input',
-    },
-    {
-      key: 'age',
-      title: '年龄',
-      width: 80,
-      editable: true,
-      editType: 'number',
-    },
-    {
-      key: 'email',
-      title: '邮箱',
-      width: 200,
-      editable: true,
-      editType: 'email',
-    },
-    {
-      key: 'department',
-      title: '部门',
-      width: 100,
-      editable: true,
-      editType: 'select',
-      editProps: {
-        options: [
-          { label: '技术部', value: '技术部' },
-          { label: '产品部', value: '产品部' },
-          { label: '设计部', value: '设计部' },
-        ],
-      },
-    },
-    {
-      key: 'salary',
-      title: '薪资',
-      width: 100,
-      editable: true,
-      editType: 'number',
-      render: (row: DataRecord) => {
-        const employee = row as Employee
-        return `¥${employee.salary.toLocaleString()}`
-      },
-    },
-    {
-      key: 'status',
-      title: '状态',
-      width: 80,
-      editable: true,
-      editType: 'select',
-      editProps: {
-        options: [
-          { label: '活跃', value: 'active' },
-          { label: '非活跃', value: 'inactive' },
-        ],
-      },
-      render: (row: DataRecord) => {
-        const employee = row as Employee
-        return employee.status === 'active' ? '🟢 活跃' : '🔴 非活跃'
-      },
-    },
-  ]
-
-  // ================= 精简的操作配置 =================
   const tableActions = computed(
     (): SimpleTableActions<DataRecord> => ({
       detail: async (row: DataRecord) => {
@@ -331,20 +234,11 @@
       onRowChange: (data: DataRecord[]) => {
         console.log('行数据变化:', data.length, '行')
       },
-      defaultRowData: (): DataRecord =>
-        ({
-          id: '',
-          name: '新员工',
-          age: 25,
-          email: '',
-          department: '技术部',
-          salary: 8000,
-          status: 'active',
-        }) as Employee,
+      defaultRowData: createDefaultEmployee,
     },
     edit: {
       enabled: true,
-      mode: 'modal' as const, // 👈 修复1：确保编辑按钮显示
+      mode: 'modal' as const,
       showRowActions: true,
       modalTitle: '编辑员工信息',
       modalWidth: 700,
@@ -360,51 +254,42 @@
     if (logs.value.length > 20) logs.value.splice(20)
   }
 
-  // ================= 事件处理函数 =================
+  // 事件处理函数
   const handleViewDetail = (data: DataRecord) => {
-    // 👈 修复2：去掉不必要的类型映射，直接使用
-    message.info(`查看 ${data.name} 的详细信息`)
-    addLog('edit', `查看了 ${data.name} 的详情`)
+    const employee = data as DynamicEmployee
+    message.info(`查看 ${employee.name} 的详细信息`)
+    addLog('select', `查看了 ${employee.name} 的详情`)
   }
 
   const handleRowAdd = (newRow: DataRecord): void => {
-    addLog('add', `添加了新员工：${newRow.name}`)
+    const employee = newRow as DynamicEmployee
+    addLog('add', `添加了新员工：${employee.name}`)
   }
 
   const handleRowDelete = (...args: unknown[]): void => {
     const [deletedRow] = args as [DataRecord, number]
-    addLog('delete', `删除了员工：${deletedRow.name}`)
-    if (selectedEmployee.value?.id === deletedRow.id) {
+    const employee = deletedRow as DynamicEmployee
+    addLog('delete', `删除了员工：${employee.name}`)
+    if (selectedEmployee.value?.id === employee.id) {
       selectedEmployee.value = null
     }
   }
 
   const handleSave = (rowData: DataRecord): void => {
-    message.success(`保存成功：${rowData.name}`)
-    addLog('edit', `编辑了员工 ${rowData.name} 的信息`)
+    const employee = rowData as DynamicEmployee
+    message.success(`保存成功：${employee.name}`)
+    addLog('edit', `编辑了员工 ${employee.name} 的信息`)
   }
 
   const resetData = (): void => {
-    tableData.value = [...initialData]
+    loadEmployeeData()
     logs.value = []
     selectedEmployee.value = null
     message.success('数据已重置')
   }
 
   const addEmployee = (): void => {
-    const names = ['赵六', '钱七', '孙八', '李九']
-    const depts = ['技术部', '产品部', '设计部']
-
-    const newEmployee: Employee = {
-      id: Date.now().toString(),
-      name: names[Math.floor(Math.random() * names.length)],
-      age: Math.floor(Math.random() * 20) + 23,
-      email: `user${Date.now()}@example.com`,
-      department: depts[Math.floor(Math.random() * depts.length)],
-      salary: Math.floor(Math.random() * 10000) + 8000,
-      status: 'active',
-    }
-
+    const newEmployee = generateRandomEmployee()
     tableData.value.push(newEmployee)
     message.success(`添加员工：${newEmployee.name}`)
     addLog('add', `手动添加了员工：${newEmployee.name}`)
@@ -416,14 +301,11 @@
     message.info('已清空选择')
   }
 
-  // ================= 生命周期 =================
+  // 生命周期
   onMounted(() => {
+    loadEmployeeData()
     nextTick(() => {
       createWatermark()
     })
   })
 </script>
-
-<style scoped lang="scss">
-  @use './index.scss';
-</style>
