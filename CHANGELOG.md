@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.2.1](https://github.com/ChenyCHENYU/Robot_Admin/compare/v1.2.0...v1.2.1) (2025-09-05)
+
+
+### Performance Improvements
+
+* **C_Table:** add Edit or View component optimiza ([cbcc06d](https://github.com/ChenyCHENYU/Robot_Admin/commit/cbcc06dae55bacd2a8210cbef3571e75e3b8d71c))
+* **C_Table:** add useTableActions optimiza ([42436dc](https://github.com/ChenyCHENYU/Robot_Admin/commit/42436dc9555fea112ef50ab42f66f693cae8d2c4))
+* **C_Table:** defineExpose code optimiza ([f7f13ed](https://github.com/ChenyCHENYU/Robot_Admin/commit/f7f13ed370744ff5111b83d5e74e45bcc03a2b2c))
+* **table-dynamic:** code optimiza ([ee6813e](https://github.com/ChenyCHENYU/Robot_Admin/commit/ee6813e6f402635ea0a06e2537621ae4bc5345cf))
+* **table:** optimiza auto config column config ([0c0fc45](https://github.com/ChenyCHENYU/Robot_Admin/commit/0c0fc4572401bfc275fdfdb01c4ec2b74653a58d))
+
 ## [1.2.0](https://github.com/ChenyCHENYU/Robot_Admin/compare/v1.1.2...v1.2.0) (2025-08-26)
 
 
