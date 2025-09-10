@@ -12,12 +12,12 @@
   
   <p><strong>Robot Admin</strong></p>
   <p>
-    <a href="https://github.com/ChenyCHENYU/robot_admin/actions"><img src="https://img.shields.io/github/actions/workflow/status/ChenyCHENYU/robot_admin/main.yml" alt="Build Status"></a>
-    <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-brightgreen" alt="Code Style"></a>
     <img src="https://img.shields.io/badge/bun-%E2%89%A51.x-ff1e56?style=flat&logo=bun" alt="Bun Version">
     <img src="https://img.shields.io/badge/vue-3.5.13-4FC08D?style=flat&logo=vue.js" alt="Vue Version">
     <img src="https://img.shields.io/badge/typescript-5.8.0-blue?style=flat&logo=typescript" alt="TypeScript Version">
     <img src="https://img.shields.io/badge/vite-7.0.6-646CFF?style=flat&logo=vite" alt="Vite Version">
+    <a href="https://vercel.com"><img src="https://img.shields.io/github/deployments/ChenyCHENYU/robot_admin/production?label=vercel&logo=vercel" alt="Vercel"></a>
+    <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-brightgreen" alt="Code Style"></a>
   </p>
   <p>
     <img src="https://img.shields.io/badge/components-30+-success?style=flat" alt="Components">
