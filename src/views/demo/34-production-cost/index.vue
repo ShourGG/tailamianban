@@ -57,7 +57,7 @@
                 @click="handleFactorySelect(factory)"
               >
                 <NTooltip
-                  :disabled="factory.costCenterDesc.length <= 10"
+                  :disabled="factory.costCenterDesc.length <= 8"
                   placement="right"
                 >
                   <template #trigger>
@@ -70,35 +70,29 @@
                     <div
                       class="progress-fill"
                       :style="{
-                        width:
-                          (factory.progressPercentage ||
-                            Math.min((factory.amtUnitReal / 200) * 100, 100)) +
-                          '%',
+                        width: getProgressWidth(factory, 'actual') + '%',
                       }"
                     >
-                      <span class="progress-text">
-                        {{
-                          factory.progressPercentage ||
-                          Math.round((factory.amtUnitReal / 200) * 100)
-                        }}%
-                      </span>
+                      <span class="progress-text"
+                        >{{ getProgressWidth(factory, 'actual') }}%</span
+                      >
                     </div>
                   </div>
                   <div class="progress-bar">
                     <div
                       class="progress-fill cyan"
                       :style="{
-                        width: (factory.standardPercentage || 85) + '%',
+                        width: getProgressWidth(factory, 'standard') + '%',
                       }"
                     >
                       <span class="progress-text"
-                        >{{ factory.standardPercentage || 85 }}%</span
+                        >{{ getProgressWidth(factory, 'standard') }}%</span
                       >
                     </div>
                   </div>
-                  <span class="status-indicator">
-                    {{ factory.amtUnitDiff.toFixed(2) }}
-                  </span>
+                  <span class="status-indicator">{{
+                    factory.amtUnitDiff.toFixed(2)
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -239,9 +233,9 @@
               max-height="190"
             />
           </div>
-          <div class="completion-notice">
-            {{ pageConfig.panels.productionNotice }}
-          </div>
+          <div class="completion-notice">{{
+            pageConfig.panels.productionNotice
+          }}</div>
         </div>
       </div>
     </div>
@@ -313,8 +307,6 @@
   // 加载状态
   const loading = ref<boolean>(false)
   const error = ref<any>(null)
-  const kpiLoading = ref<boolean>(false)
-  const trendLoading = ref<boolean>(false)
 
   // UI状态
   const currentDate = ref<string>('2025.03.12')
@@ -333,10 +325,50 @@
   let costChartInstance: echarts.ECharts | null = null
   let trendChartInstance: echarts.ECharts | null = null
 
-  // 事件处理函数 - 提取为具名函数
-  const handleResize = (): void => {
-    costChartInstance?.resize()
-    trendChartInstance?.resize()
+  // 工具函数
+  const getProgressWidth = (
+    factory: FactoryData,
+    type: 'actual' | 'standard'
+  ): number => {
+    if (type === 'actual') {
+      return (
+        factory.progressPercentage ||
+        Math.min((factory.amtUnitReal / 200) * 100, 100)
+      )
+    }
+    return factory.standardPercentage || 85
+  }
+
+  const formatCurrency = (value: number): string => value.toLocaleString()
+  const formatPercentage = (value: number): string =>
+    `${(value * 100).toFixed(2)}%`
+
+  // 创建表格渲染函数
+  const createStatusCell = (row: any, key: string, isPercentage = false) => {
+    const status = getStatus(row.amtUnitDiffRate)
+    const value = isPercentage
+      ? formatPercentage(row[key])
+      : formatCurrency(row[key])
+
+    return h('div', { class: 'status-cell' }, [
+      h('span', { class: ['status-light', status] }),
+      h('span', { style: 'margin-left: 4px; color: #fff;' }, value),
+    ])
+  }
+
+  const createCostValueCell = (row: any, key: string) => {
+    const status = getStatus(row.amtUnitDiffRate)
+    return h('div', { class: 'status-cell' }, [
+      h(
+        'span',
+        {
+          class: 'cost-value',
+          style: 'color: #40a9f3; font-weight: bold; font-size: 11px;',
+        },
+        formatCurrency(row[key] || 0)
+      ),
+      h('span', { class: ['status-light', status] }),
+    ])
   }
 
   // 计算属性
@@ -347,60 +379,49 @@
   const realKeyIndicators = computed(() => createKeyIndicators(kpiData.value))
   const realTrendData = computed(() => createTrendData(trendData.value))
 
-  // Naive UI 表格列配置
+  // 优化后的表格列配置
   const dataTableColumns: any[] = [
     {
       title: '厂别',
       key: 'costCenterDesc',
-      width: 180,
+      width: 140, // 减小宽度，让内容可见
       ellipsis: { tooltip: true },
     },
     {
       title: '产量',
       key: 'wgt',
-      width: 100,
-      render: (row: any) => (row.wgt || 0).toLocaleString(),
+      width: 90, // 紧凑一些
+      render: (row: any) => formatCurrency(row.wgt || 0),
     },
     {
       title: '综合成本',
       key: 'amtReal',
-      width: 120,
-      render: (row: any) => (row.amtReal || 0).toLocaleString(),
+      width: 100, // 紧凑一些
+      render: (row: any) => formatCurrency(row.amtReal || 0),
     },
     {
       title: '综合单本',
       key: 'amtUnitReal',
-      width: 100,
+      width: 90, // 紧凑一些
       render: (row: any) => (row.amtUnitReal || 0).toFixed(2),
     },
     {
       title: '标准成本',
       key: 'amtStandard',
-      width: 120,
-      render: (row: any) => (row.amtStandard || 0).toLocaleString(),
+      width: 100,
+      render: (row: any) => formatCurrency(row.amtStandard || 0),
     },
     {
       title: '偏差',
       key: 'amtUnitDiff',
-      width: 80,
+      width: 70, // 紧凑一些
       render: (row: any) => (row.amtUnitDiff || 0).toFixed(2),
     },
     {
       title: '偏差率',
       key: 'amtUnitDiffRate',
       width: 80,
-      render: (row: any) => {
-        const status = getStatus(row.amtUnitDiffRate)
-        const percentage = ((row.amtUnitDiffRate || 0) * 100).toFixed(2)
-        return h('div', { class: 'status-cell' }, [
-          h('span', { class: ['status-light', status] }),
-          h(
-            'span',
-            { style: 'margin-left: 4px; color: #fff;' },
-            `${percentage}%`
-          ),
-        ])
-      },
+      render: (row: any) => createStatusCell(row, 'amtUnitDiffRate', true),
     },
   ]
 
@@ -408,7 +429,7 @@
     {
       title: '分厂',
       key: 'costCenterDesc',
-      width: 100,
+      width: 80, // 减小宽度
       ellipsis: { tooltip: true },
       render: (row: any) =>
         h(
@@ -420,7 +441,7 @@
     {
       title: '环比',
       key: 'mom',
-      width: 60,
+      width: 55, // 紧凑
       render: (row: any) =>
         h(
           'span',
@@ -431,7 +452,7 @@
     {
       title: '同比',
       key: 'yoy',
-      width: 60,
+      width: 55, // 紧凑
       render: (row: any) =>
         h(
           'span',
@@ -442,21 +463,8 @@
     {
       title: '综合单本',
       key: 'amtUnitReal',
-      minWidth: 80,
-      render: (row: any) => {
-        const status = getStatus(row.amtUnitDiffRate)
-        return h('div', { class: 'status-cell' }, [
-          h(
-            'span',
-            {
-              class: 'cost-value',
-              style: 'color: #40a9f3; font-weight: bold; font-size: 11px;',
-            },
-            (row.amtUnitReal || 0).toLocaleString()
-          ),
-          h('span', { class: ['status-light', status] }),
-        ])
-      },
+      minWidth: 75, // 稍微减小
+      render: (row: any) => createCostValueCell(row, 'amtUnitReal'),
     },
   ]
 
@@ -464,7 +472,7 @@
     {
       title: '分厂',
       key: 'costCenterDesc',
-      minWidth: 100,
+      minWidth: 80, // 减小宽度
       ellipsis: { tooltip: true },
       render: (row: any) =>
         h(
@@ -476,79 +484,28 @@
     {
       title: '计划产量',
       key: 'wgt',
-      minWidth: 80,
-      render: (row: any) => {
-        const status = getStatus(row.wgtDiffRate)
-        return h('div', { class: 'status-cell' }, [
-          h(
-            'span',
-            {
-              class: 'cost-value',
-              style: 'color: #40a9f3; font-weight: bold; font-size: 11px;',
-            },
-            (row.wgt || 0).toLocaleString()
-          ),
-          h('span', { class: ['status-light', status] }),
-        ])
-      },
+      minWidth: 70, // 紧凑
+      render: (row: any) => createCostValueCell(row, 'wgt'),
     },
     {
       title: '计划偏差',
       key: 'wgtDiff',
-      minWidth: 70,
+      minWidth: 60, // 紧凑
       render: (row: any) =>
         h(
           'span',
           { style: 'color: #fff; font-size: 11px;' },
-          (row.wgtDiff || 0).toLocaleString()
+          formatCurrency(row.wgtDiff || 0)
         ),
     },
   ]
 
-  // 数据获取方法
-  const loadBoardData = async (): Promise<void> => {
-    try {
-      loading.value = true
-      error.value = null
-      const data = await fetchBoardData()
-      apiData.value = data
-      console.log('数据加载完成，共', data.length, '个分厂')
-    } catch (err: any) {
-      console.error('接口调用失败:', err)
-      error.value = err
-    } finally {
-      loading.value = false
-    }
+  // 事件处理函数
+  const handleResize = (): void => {
+    costChartInstance?.resize()
+    trendChartInstance?.resize()
   }
 
-  const loadKpiData = async (factory: FactoryData): Promise<void> => {
-    try {
-      kpiLoading.value = true
-      const data = await fetchKpiData(factory)
-      kpiData.value = data
-      console.log('KPI数据更新完成:', data)
-    } catch (err: any) {
-      console.error('KPI接口调用失败:', err)
-      kpiData.value = { wgtDiffRate: 0, amtUnitDiffRate: 0, amtUnitDiff: 0 }
-    } finally {
-      kpiLoading.value = false
-    }
-  }
-
-  const loadTrendData = async (factory: FactoryData): Promise<void> => {
-    try {
-      trendLoading.value = true
-      const data = await fetchTrendData(factory)
-      trendData.value = data
-      console.log('趋势数据更新完成:', data)
-    } catch (err: any) {
-      console.error('趋势接口调用失败:', err)
-    } finally {
-      trendLoading.value = false
-    }
-  }
-
-  // 事件处理方法
   const updateTime = (): void => {
     const now = new Date()
     currentDate.value = now.toLocaleDateString('zh-CN').replace(/\//g, '.')
@@ -562,46 +519,110 @@
     Promise.all([loadKpiData(factory), loadTrendData(factory)])
   }
 
-  // 滚动控制
-  const startAutoScroll = (): void => {
-    if (
-      !factoryListRef.value ||
-      scrollTimer.value ||
-      apiData.value.length === 0
+  // 数据获取方法 - 合并加载状态管理
+  const loadData = async <T,>(
+    loadFn: () => Promise<T>,
+    loadingRef: Ref<boolean>,
+    errorHandler?: (err: any) => T | null
+  ): Promise<T | null> => {
+    try {
+      loadingRef.value = true
+      return await loadFn()
+    } catch (err: any) {
+      console.error('数据加载失败:', err)
+      return errorHandler ? errorHandler(err) : null
+    } finally {
+      loadingRef.value = false
+    }
+  }
+
+  const loadBoardData = async (): Promise<void> => {
+    const data = await loadData(fetchBoardData, loading, () => [])
+    if (data) {
+      apiData.value = data
+      console.log('数据加载完成，共', data.length, '个分厂')
+    }
+  }
+
+  const loadKpiData = async (factory: FactoryData): Promise<void> => {
+    const kpiLoading = ref(false)
+    const data = await loadData(
+      () => fetchKpiData(factory),
+      kpiLoading,
+      () => ({ wgtDiffRate: 0, amtUnitDiffRate: 0, amtUnitDiff: 0 })
     )
-      return
+    if (data) {
+      kpiData.value = data
+      console.log('KPI数据更新完成:', data)
+    }
+  }
 
-    const container = factoryListRef.value
-    const itemHeight = 42
-    const totalHeight = apiData.value.length * itemHeight
+  const loadTrendData = async (factory: FactoryData): Promise<void> => {
+    const trendLoading = ref(false)
+    const data = await loadData(() => fetchTrendData(factory), trendLoading)
+    if (data) {
+      trendData.value = data
+      console.log('趋势数据更新完成:', data)
+    }
+  }
 
-    if (container.scrollHeight <= container.clientHeight) return
+  // 滚动控制方法
+  const scrollControls = {
+    /**
+     *
+     */
+    start() {
+      if (
+        !factoryListRef.value ||
+        scrollTimer.value ||
+        apiData.value.length === 0
+      )
+        return
 
-    const scroll = (): void => {
-      if (isScrollPaused.value) return
-      container.scrollTop += scrollSpeed.value
-      if (container.scrollTop >= totalHeight) {
-        container.scrollTop = 0
+      const container = factoryListRef.value
+      const itemHeight = 42
+      const totalHeight = apiData.value.length * itemHeight
+
+      if (container.scrollHeight <= container.clientHeight) return
+
+      const scroll = (): void => {
+        if (isScrollPaused.value) return
+        container.scrollTop += scrollSpeed.value
+        if (container.scrollTop >= totalHeight) {
+          container.scrollTop = 0
+        }
       }
-    }
 
-    scrollTimer.value = setInterval(scroll, 20)
+      scrollTimer.value = setInterval(scroll, 20)
+    },
+
+    /**
+     *
+     */
+    pause() {
+      isScrollPaused.value = true
+    },
+
+    /**
+     *
+     */
+    resume() {
+      isScrollPaused.value = false
+    },
+
+    /**
+     *
+     */
+    stop() {
+      if (scrollTimer.value) {
+        clearInterval(scrollTimer.value)
+        scrollTimer.value = null
+      }
+    },
   }
 
-  const pauseScroll = (): void => {
-    isScrollPaused.value = true
-  }
-
-  const resumeScroll = (): void => {
-    isScrollPaused.value = false
-  }
-
-  const stopAutoScroll = (): void => {
-    if (scrollTimer.value) {
-      clearInterval(scrollTimer.value)
-      scrollTimer.value = null
-    }
-  }
+  const pauseScroll = scrollControls.pause
+  const resumeScroll = scrollControls.resume
 
   // 图表方法
   const updateCostChart = (factory: FactoryData): void => {
@@ -647,19 +668,15 @@
     }
   }
 
-  const initCostChart = (): void => {
+  const initCharts = (): void => {
     if (costChart.value) {
       costChartInstance = echarts.init(costChart.value)
-      const option = getCostChartOption(getDefaultCostData())
-      costChartInstance.setOption(option)
+      costChartInstance.setOption(getCostChartOption(getDefaultCostData()))
     }
-  }
 
-  const initTrendChart = (): void => {
     if (trendChart.value) {
       trendChartInstance = echarts.init(trendChart.value)
-      const option = getTrendChartOption(realTrendData.value)
-      trendChartInstance.setOption(option)
+      trendChartInstance.setOption(getTrendChartOption(realTrendData.value))
 
       if (realTrendData.value.length > 0) {
         trendCurrentValue.value = Math.round(
@@ -683,27 +700,23 @@
     updateTime()
     setInterval(updateTime, 1000)
 
-    // 立即加载数据
     await loadBoardData()
 
     nextTick(() => {
-      initCostChart()
-      initTrendChart()
+      initCharts()
 
-      // 等待数据加载完成后再启动滚动
       setTimeout(() => {
         if (factoryListRef.value && apiData.value.length > 0) {
-          startAutoScroll()
+          scrollControls.start()
         }
       }, 800)
 
-      // 使用具名函数添加事件监听器
       window.addEventListener('resize', handleResize)
     })
   })
 
   onUnmounted(() => {
-    stopAutoScroll()
+    scrollControls.stop()
 
     if (costChartInstance) {
       costChartInstance.dispose()
@@ -714,7 +727,6 @@
       trendChartInstance = null
     }
 
-    // 使用相同的具名函数引用移除事件监听器
     window.removeEventListener('resize', handleResize)
   })
 </script>

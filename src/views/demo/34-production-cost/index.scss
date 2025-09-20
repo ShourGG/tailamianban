@@ -1,4 +1,4 @@
-/* index.scss - 晋钢日成本管控大屏SCSS样式 */
+/* index.scss - 日成本管控大屏SCSS样式 */
 
 // ========== SCSS变量定义 ==========
 $primary-blue: #40a9f3;
@@ -76,7 +76,7 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
 .jingang-dashboard {
   width: 100%;
   height: 100vh;
-  background: 
+  background:
     url('@/assets/images/cost-day-bg.png') center/cover,
     linear-gradient(135deg, #1a2f5a 0%, #2d4a8a 50%, #1a2f5a 100%);
   color: $text-white;
@@ -89,7 +89,7 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
     content: '';
     position: absolute;
     inset: 0;
-    background-image: 
+    background-image:
       radial-gradient(circle at 20% 20%, rgba(66, 165, 245, 0.08), transparent 50%),
       radial-gradient(circle at 80% 80%, rgba(156, 39, 176, 0.08), transparent 50%),
       linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.02) 50%, transparent),
@@ -135,7 +135,7 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
         border: 1px solid rgba($primary-blue, 0.3);
         border-radius: 20px;
         backdrop-filter: blur(15px);
-        box-shadow: 
+        box-shadow:
           0 4px 15px rgba(0, 0, 0, 0.2),
           inset 0 1px 0 rgba(255, 255, 255, 0.2);
       }
@@ -217,7 +217,7 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
   // ========== 分厂列表 ==========
   .factory-header {
     @include flex-between;
-    padding: 8px 15px 8px 15px;
+    padding: 8px 15px 8px 20px; // 左侧稍微增加padding
     padding-right: 6px;
     background: rgba($primary-blue, 0.15);
     border-bottom: 1px solid rgba($primary-blue, 0.2);
@@ -225,18 +225,18 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
     color: $primary-blue;
 
     .factory-name-header {
-      width: 105px;
-      font-size: 12px; // 统一字体大小
+      width: 115px; // 适度增加宽度
+        font-size: 12px;
     }
 
     .factory-data-header {
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
-      padding-left: 22px;
+      gap: 12px; // 保持原有间距
+        padding-left: 15px; // 适当的间距，不贴太紧
 
       .progress-label {
-        width: 48px;
+        width: 46px; // 稍微减小宽度
         text-align: center;
         font-size: 10px;
         opacity: 0.9;
@@ -260,7 +260,7 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
 
     .factory-item {
       @include flex-between;
-      padding: 10px 15px;
+      padding: 10px 8px;
       border-bottom: 1px solid rgba($primary-blue, 0.15);
       cursor: pointer;
       transition: all $transition-duration ease;
@@ -277,9 +277,9 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
       }
 
       .factory-name {
-        font-size: 11px !important; // 稍微小一点与表头区分
+        font-size: 11px !important;
         line-height: 1.4 !important;
-        width: 110px !important;
+        width: 115px !important; // 与表头保持一致
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -288,14 +288,14 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
       .factory-data {
         display: flex;
         align-items: center;
-        gap: 18px;
+        gap: 15px; // 适当的间距
       }
     }
   }
 
   // ========== 进度条样式 ==========
   .progress-bar {
-    width: 48px;
+    width: 46px; // 与表头标签宽度保持一致
     height: 10px;
     background: rgba(0, 0, 0, 0.4);
     border-radius: 5px;
@@ -546,7 +546,7 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
 
 // ========== Naive UI 表格样式覆盖 ==========
 .jingang-dashboard {
-  
+
   // 全局表格样式重置
   :deep(.n-data-table) {
     // 去掉默认背景
@@ -555,20 +555,20 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
     --n-border-color: rgba(64, 169, 243, 0.2) !important;
     --n-th-text-color: #ffffff !important;
     --n-td-text-color: #ffffff !important;
-    
+
     background: transparent !important;
-    
+
     // 表格wrapper
     .n-data-table-wrapper {
       background: transparent !important;
       border: none !important;
     }
-    
+
     // 表格基础容器
     .n-data-table-base-table {
       background: transparent !important;
     }
-    
+
     // 表头
     .n-data-table-th {
       background: rgba($dark-blue, 0.4) !important;
@@ -580,7 +580,7 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
       padding: 8px 12px !important;
       text-align: center !important; // 表头居中
     }
-    
+
     // 表体单元格
     .n-data-table-td {
       background: transparent !important;
@@ -591,25 +591,25 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
       padding: 8px 12px !important;
       text-align: center !important; // 表体居中
     }
-    
+
     // 表体行
     .n-data-table-tbody .n-data-table-tr {
       background: transparent !important;
-      
+
       &:hover .n-data-table-td {
         background: rgba($primary-blue, 0.1) !important;
       }
-      
+
       // 斑马纹效果
       &:nth-child(even) .n-data-table-td {
         background: rgba($primary-blue, 0.05) !important;
       }
-      
+
       &:nth-child(even):hover .n-data-table-td {
         background: rgba($primary-blue, 0.15) !important;
       }
     }
-    
+
     // 最后一行去掉下边框
     .n-data-table-tbody .n-data-table-tr:last-child .n-data-table-td {
       border-bottom: none !important;
@@ -621,13 +621,13 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
     .factory-name {
       font-size: 12px !important;
       line-height: 1.4 !important;
-      width: 110px !important; // 增加宽度避免截断
+      width: 130px !important; // 与表头对齐，增加宽度
     }
-    
+
     .progress-text {
       font-size: 8px !important;
     }
-    
+
     .status-indicator {
       font-size: 10px !important;
     }
@@ -704,7 +704,7 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
   .jingang-dashboard {
     .dashboard-header {
       padding: 12px 30px;
-      
+
       h1 {
         font-size: 24px;
         margin-left: 35%;
@@ -730,7 +730,7 @@ $box-shadow-indicator: 0 4px 15px rgba($primary-blue, 0.3);
   .jingang-dashboard {
     background: white !important;
     color: black !important;
-    
+
     * {
       background: transparent !important;
       color: black !important;
