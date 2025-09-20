@@ -428,6 +428,47 @@
       ]
     },
     {
+      "path": "/large-screen",
+      "name": "large-screen",
+      "redirect": "/large-screen/production-cost",
+      "meta": {
+        "icon": "mdi:monitor-screenshot",
+        "title": "大屏模板",
+        "hidden": false,
+        "full": false,
+        "affix": false,
+        "keepAlive": false
+      },
+      "children": [
+        {
+          "path": "code-editor",
+          "name": "editor-code",
+          "component": "/demo/34-production-cost/index",
+          "meta": {
+            "icon": "mdi:attach-money",
+            "title": "日成本看板",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
+        },
+        {
+          "path": "markdown-editor",
+          "name": "editor-markdown",
+          "component": "/demo/35-xxx/index",
+          "meta": {
+            "icon": "mdi:performance",
+            "title": "绩效看板",
+            "hidden": false,
+            "full": false,
+            "affix": false,
+            "keepAlive": false
+          }
+        }
+      ]
+    },
+    {
       "path": "/hooks",
       "name": "hooks",
       "component": "layout",

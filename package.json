@@ -21,7 +21,7 @@
     "build:check": "bun run type-build && bun run build",
     "lint": "oxlint . --fix -D correctness --ignore-path .gitignore && eslint . --fix",
     "format": "prettier --write src/",
-    "prepare": "husky install",
+    "prepare": "husky",
     "commit": "bunx cz",
     "check-branch": "gbd",
     "check-types": "ts-type-cleaner analyze",
@@ -54,7 +54,6 @@
     "file-saver": "^2.0.5",
     "highlight.js": "^11.11.1",
     "html2canvas": "^1.4.1",
-    "husky": "7.0.1",
     "jszip": "^3.10.1",
     "jszip-utils": "^0.1.0",
     "mammoth": "^1.9.1",
@@ -101,9 +100,10 @@
     "eslint-plugin-oxlint": "^0.15.13",
     "eslint-plugin-vue": "~10.0.0",
     "git-branch-check-diff-commits": "^1.2.2",
+    "husky": "^9.1.7",
     "jiti": "^2.4.2",
     "jsdom": "^26.0.0",
-    "lint-staged": "^15.5.0",
+    "lint-staged": "^16.1.6",
     "naive-ui": "^2.41.0",
     "npm-run-all2": "^7.0.2",
     "oxlint": "^0.15.13",
@@ -129,6 +129,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,vue}": [
+      "oxlint --max-warnings 0 --deny-warnings",
       "eslint --fix --no-cache",
       "prettier --write"
     ]
