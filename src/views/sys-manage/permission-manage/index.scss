@@ -105,7 +105,7 @@
   // 统计卡片悬停效果
   :deep(.n-card) {
     transition: all 0.2s ease;
-    
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -119,7 +119,7 @@
         color: var(--n-text-color-disabled);
       }
     }
-    
+
     :deep(.n-select) {
       .n-base-selection-placeholder {
         color: var(--n-text-color-disabled);
@@ -145,7 +145,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      
+
       .type-icon {
         opacity: 0.8;
       }
@@ -159,7 +159,7 @@
         color: var(--n-text-color-disabled);
         line-height: 1.4;
         margin-bottom: 2px;
-        
+
         &:last-child {
           margin-bottom: 0;
         }
@@ -195,10 +195,10 @@
   .permission-detail {
     .permission-help {
       margin-bottom: 16px;
-      
+
       :deep(.n-alert) {
         border-radius: 8px;
-        
+
         .n-alert__header {
           display: flex;
           align-items: center;
@@ -238,7 +238,7 @@
         color: var(--n-text-color-base);
         width: 100px;
       }
-      
+
       .n-descriptions-item-content {
         color: var(--n-text-color-base);
       }
@@ -255,10 +255,10 @@
     .permission-code-input {
       .n-input__suffix {
         color: var(--n-text-color-disabled);
-        
+
         .n-button {
           color: var(--n-primary-color);
-          
+
           &:hover {
             color: var(--n-primary-color-hover);
             background: var(--n-primary-color-suppl);
@@ -301,7 +301,7 @@
   // 分页器样式
   :deep(.n-pagination) {
     justify-content: flex-end;
-    
+
     .n-pagination-item {
       &.n-pagination-item--active {
         background: var(--n-primary-color);
@@ -321,7 +321,7 @@
     &.status-active {
       color: var(--n-success-color);
     }
-    
+
     &.status-inactive {
       color: var(--n-error-color);
     }
@@ -331,11 +331,11 @@
   .code-copy {
     position: relative;
     cursor: pointer;
-    
+
     &:hover {
       background: var(--n-primary-color-suppl);
     }
-    
+
     .copy-tooltip {
       position: absolute;
       top: -30px;
@@ -358,17 +358,17 @@
       border-left: 4px solid var(--n-info-color);
       padding-left: 8px;
     }
-    
+
     &.level-function {
       border-left: 4px solid var(--n-success-color);
       padding-left: 8px;
     }
-    
+
     &.level-button {
       border-left: 4px solid var(--n-warning-color);
       padding-left: 8px;
     }
-    
+
     &.level-api {
       border-left: 4px solid var(--n-error-color);
       padding-left: 8px;
@@ -379,13 +379,13 @@
   .empty-state {
     padding: 60px 20px;
     text-align: center;
-    
+
     .empty-icon {
       font-size: 48px;
       color: var(--n-text-color-disabled);
       margin-bottom: 16px;
     }
-    
+
     .empty-text {
       color: var(--n-text-color-disabled);
       font-size: 14px;
@@ -395,7 +395,7 @@
   // 加载状态
   .loading-overlay {
     position: relative;
-    
+
     &::after {
       content: '';
       position: absolute;
@@ -421,7 +421,7 @@
     margin-bottom: 16px;
     font-size: 12px;
     color: var(--n-info-color);
-    
+
     .hint-icon {
       margin-right: 6px;
     }
@@ -445,7 +445,7 @@
     .n-drawer-header {
       border-bottom: 1px solid var(--n-border-color);
       padding-bottom: 12px;
-      
+
       .n-drawer-header__main {
         font-weight: 600;
       }
@@ -459,7 +459,7 @@
   // 标签样式增强
   :deep(.n-tag) {
     font-weight: 500;
-    
+
     &.n-tag--info {
       background-color: var(--n-info-color-suppl);
       border-color: var(--n-info-color-hover);
@@ -495,19 +495,19 @@
   @media (max-width: 768px) {
     padding: 8px;
     gap: 8px;
-    
+
     .header-card {
       :deep(.n-space) {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
-        
+
         .search-filters {
           :deep(.n-space) {
             flex-wrap: wrap;
             gap: 8px;
           }
-          
+
           .n-input,
           .n-select {
             min-width: 150px;
@@ -516,16 +516,16 @@
         }
       }
     }
-    
+
     .stat-grid {
       :deep(.n-grid) {
         grid-template-columns: repeat(2, 1fr);
       }
     }
-    
+
     :deep(.n-data-table) {
       font-size: 12px;
-      
+
       .n-data-table-th,
       .n-data-table-td {
         padding: 8px 4px;
@@ -552,7 +552,7 @@
 
   @media (max-width: 480px) {
     padding: 4px;
-    
+
     .stat-grid {
       :deep(.n-grid) {
         grid-template-columns: 1fr;
@@ -573,7 +573,7 @@
       background: rgba(255, 255, 255, 0.1);
       border-color: rgba(255, 255, 255, 0.2);
     }
-    
+
     .stat-icon {
       background: rgba(255, 255, 255, 0.05);
     }

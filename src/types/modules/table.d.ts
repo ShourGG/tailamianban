@@ -108,13 +108,13 @@ export interface CustomAction<T extends DataRecord = DataRecord> {
   /** 按钮唯一键 */
   key: string
   /** 按钮显示文本 */
-  label: string
+  label: string | ((row: T, index: number) => string)
   /** 按钮图标 */
-  icon: string
+  icon: string | ((row: T, index: number) => string)
   /** 按钮类型样式 */
-  type?: ButtonType
+  type?: ButtonType | ((row: T, index: number) => ButtonType)
   /** 点击事件处理器 */
-  onClick: (row: T, index: number) => void
+  onClick: (row: T, index: number) => void | Promise<void>
   /** 条件显示函数（可选） */
   show?: (row: T, index: number) => boolean
   /** 是否禁用（可选） */
