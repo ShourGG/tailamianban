@@ -64,7 +64,7 @@
       >
         <!-- 左侧字典树 -->
         <NGi
-          :span="10"
+          :span="8"
           :md="12"
           :sm="24"
         >
@@ -94,7 +94,7 @@
 
         <!-- 右侧详情面板 -->
         <NGi
-          :span="14"
+          :span="16"
           :md="12"
           :sm="24"
         >
@@ -541,6 +541,7 @@
                   name="mdi:folder-table"
                   :size="16"
                   color="#1890ff"
+                  class="vertical-middle"
                 />
                 <NText>字典类型</NText>
               </NSpace>
@@ -551,6 +552,7 @@
                   name="mdi:tag"
                   :size="16"
                   color="#52c41a"
+                  class="vertical-middle"
                 />
                 <NText>字典项</NText>
               </NSpace>

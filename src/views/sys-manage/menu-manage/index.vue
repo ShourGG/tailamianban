@@ -64,7 +64,7 @@
       >
         <!-- 左侧菜单树 -->
         <NGi
-          :span="10"
+          :span="8"
           :md="12"
           :sm="24"
         >
@@ -94,7 +94,7 @@
 
         <!-- 右侧详情面板 -->
         <NGi
-          :span="14"
+          :span="16"
           :md="12"
           :sm="24"
         >
@@ -426,6 +426,7 @@
                   name="mdi:folder"
                   :size="16"
                   color="#1890ff"
+                  class="vertical-middle"
                 />
                 <NText>目录</NText>
               </NSpace>
@@ -436,6 +437,7 @@
                   name="mdi:file-document"
                   :size="16"
                   color="#52c41a"
+                  class="vertical-middle"
                 />
                 <NText>菜单</NText>
               </NSpace>
@@ -446,6 +448,7 @@
                   name="mdi:button-cursor"
                   :size="16"
                   color="#fa8c16"
+                  class="vertical-middle"
                 />
                 <NText>按钮</NText>
               </NSpace>

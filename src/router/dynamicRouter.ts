@@ -124,7 +124,7 @@ export const initDynamicRouter = async (): Promise<boolean> => {
     clearExistingRoutes(['login', '404', '401'])
 
     routes
-      .map(route => processRoute(route))
+      .map(route => processRoute(route as DynamicRoute))
       .forEach(route => router.addRoute(route))
 
     if (import.meta.env.DEV) {

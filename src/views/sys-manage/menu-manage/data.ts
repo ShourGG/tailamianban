@@ -247,11 +247,9 @@ export const MOCK_BUTTON_PERMISSIONS = generateButtonPermissionsData()
 
 // ==================== 辅助函数 ====================
 export const generateMenuId = (route: any): string => {
-  return (
-    route.name ||
-    route.path.replace(/\//g, '-').replace(/^-/, '') ||
-    `menu-${Date.now()}`
-  )
+  if (route.name) return route.name
+  if (route.path) return route.path.replace(/\//g, '-').replace(/^-/, '')
+  return `menu-${Date.now()}`
 }
 
 export const processIcon = (icon?: string): string => {
@@ -280,20 +278,30 @@ export const determineMenuType = (route: any): MenuType => {
     : 'menu'
 }
 
-export const createMenuFromRoute = (
+// 检查是否应该跳过当前路由
+const shouldSkipRoute = (route: any, meta: any): boolean => {
+  return !meta.title || (route.path === '/' && route.redirect)
+}
+
+// 检查是否是需要扁平化的单子菜单容器
+const shouldFlattenContainer = (route: any): boolean => {
+  return (
+    !route.path &&
+    !route.name &&
+    route.component === 'layout' &&
+    route.children?.length === 1
+  )
+}
+
+// 构建基础菜单数据
+const buildMenuData = (
   route: any,
-  parentId: string | null = null,
-  sort: number = 0
-): MenuData | null => {
-  const meta = getRouteMeta(route)
-
-  if (!meta.title || (route.path === '/' && route.redirect)) {
-    return null
-  }
-
-  const menuId = generateMenuId(route)
-
-  const menu: MenuData = {
+  meta: any,
+  menuId: string,
+  parentId: string | null,
+  sort: number
+): MenuData => {
+  return {
     id: menuId,
     name: meta.title,
     type: determineMenuType(route),
@@ -307,6 +315,25 @@ export const createMenuFromRoute = (
     remark: meta.title,
     children: undefined,
   }
+}
+
+export const createMenuFromRoute = (
+  route: any,
+  parentId: string | null = null,
+  sort: number = 0
+): MenuData | null => {
+  const meta = getRouteMeta(route)
+
+  if (shouldSkipRoute(route, meta)) {
+    return null
+  }
+
+  if (shouldFlattenContainer(route)) {
+    return createMenuFromRoute(route.children[0], parentId, sort)
+  }
+
+  const menuId = generateMenuId(route)
+  const menu = buildMenuData(route, meta, menuId, parentId, sort)
 
   if (route.children) {
     menu.children = route.children
