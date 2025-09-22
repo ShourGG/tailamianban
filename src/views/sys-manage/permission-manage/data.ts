@@ -42,19 +42,6 @@ export interface SearchForm {
 }
 
 // ==================== 常量配置 ====================
-export const ICONS = {
-  search: 'material-symbols:search',
-  plus: 'material-symbols:add',
-  refresh: 'material-symbols:refresh',
-  edit: 'material-symbols:edit',
-  delete: 'material-symbols:delete',
-  eye: 'material-symbols:visibility',
-  copy: 'material-symbols:content-copy',
-  export: 'material-symbols:download',
-  import: 'material-symbols:upload',
-  filter: 'material-symbols:filter-alt',
-}
-
 export const PERMISSION_TYPE_CONFIG = {
   module: {
     text: '模块权限',

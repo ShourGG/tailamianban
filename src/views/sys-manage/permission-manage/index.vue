@@ -16,7 +16,7 @@
           >
             <template #prefix>
               <C_Icon
-                :name="ICONS.search"
+                name="material-symbols:search"
                 :size="16"
               />
             </template>
@@ -53,7 +53,7 @@
           >
             <template #icon>
               <C_Icon
-                :name="ICONS.plus"
+                name="material-symbols:add"
                 :size="16"
               />
             </template>
@@ -65,7 +65,7 @@
           >
             <template #icon>
               <C_Icon
-                :name="ICONS.export"
+                name="material-symbols:download"
                 :size="16"
               />
             </template>
@@ -74,7 +74,7 @@
           <NButton @click="refresh">
             <template #icon>
               <C_Icon
-                :name="ICONS.refresh"
+                name="material-symbols:refresh"
                 :size="16"
               />
             </template>
@@ -379,7 +379,6 @@
     PERMISSION_FORM_RULES,
     DEFAULT_PERMISSION_FORM_DATA,
     UI_CONFIG,
-    ICONS,
     PERMISSION_TYPE_CONFIG,
     SYSTEM_MODULES,
     getTableColumns,
@@ -419,13 +418,11 @@
   })
 
   // ============ 表格数据管理 ============
-  // 创建一个包装函数来解决API类型问题
   const wrappedGetPermissionsListApi = async (params?: {
     page?: number | string
     pageSize?: number | string
   }) => {
     const result = await getPermissionsListApi(params)
-    // 转换数据类型以匹配PermissionData接口
     const transformedResult = {
       ...result,
       data: {
@@ -603,7 +600,16 @@
     ],
   }
 
-  // ============ 表格操作配置 ============
+  // ============ 事件处理函数（提前声明） ============
+  const handleExport = async () => {
+    exportLoading.value = true
+    try {
+      message.info('导出功能开发中...')
+    } finally {
+      exportLoading.value = false
+    }
+  }
+
   const copyPermission = (permission: PermissionData) => {
     const next = { ...permission }
     next.name = `${permission.name} - 副本`
@@ -622,7 +628,7 @@
     }
   }
 
-  // 修复后的 tableActions - 移除不必要的 try/catch
+  // ============ 表格操作配置 ============
   const tableActions = computed(() => ({
     edit: async (row: any) => {
       await updatePermissionApi(row.id, row)
@@ -687,10 +693,9 @@
     handleSearch()
   }
 
-  // ============ 事件处理 ============
+  // ============ 更多事件处理 ============
   const handleSearch = () => {
     // 前端筛选已通过 filteredData 计算属性实现
-    // 如需要服务端筛选，可以调用 search(searchForm)
   }
 
   const handleSave = async (rowData: any) => {
@@ -698,7 +703,6 @@
       const permission = rowData as PermissionData
       await updatePermissionApi(permission.id, permission)
       message.success('修改成功')
-      // 延迟刷新，避免提示重叠
       setTimeout(async () => {
         await refresh()
       }, 500)
@@ -709,7 +713,6 @@
   }
 
   const handleRowDelete = async () => {
-    // 用户已封装删除提示，这里只刷新数据
     await refresh()
   }
 
@@ -757,16 +760,6 @@
   const closePermissionModal = () => {
     showModal.value = false
     Object.assign(formData, DEFAULT_PERMISSION_FORM_DATA)
-  }
-
-  const handleExport = async () => {
-    exportLoading.value = true
-    try {
-      message.info('导出功能开发中...')
-      // 实现导出逻辑
-    } finally {
-      exportLoading.value = false
-    }
   }
 
   const handleTypeChange = (type: string) => {
@@ -818,3 +811,6 @@
     }
   }
 </script>
+<style scoped lang="scss">
+  @use './index.scss';
+</style>
