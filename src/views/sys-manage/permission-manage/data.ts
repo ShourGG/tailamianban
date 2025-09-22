@@ -109,7 +109,8 @@ export const getTableColumns = (): TableColumn<PermissionData>[] => [
   {
     key: 'name',
     title: '权限名称',
-    width: 200,
+    width: 120,
+    fixed: 'left', // 🆕 固定权限名称列到左侧
     editable: true,
     required: true,
     editType: 'input',

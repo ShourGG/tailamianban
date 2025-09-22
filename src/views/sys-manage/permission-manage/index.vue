@@ -120,15 +120,16 @@
 
     <!-- 筛选标签显示 -->
     <div
-      class="filter-tags"
       v-if="hasActiveFilters"
+      class="filter-tags"
     >
       <NSpace>
         <NText
           depth="3"
           style="margin-right: 8px"
-          >当前筛选：</NText
         >
+          当前筛选：
+        </NText>
         <NTag
           v-if="searchForm.keyword"
           closable
@@ -296,8 +297,8 @@
             :disabled="modalMode === 'edit'"
           >
             <template
-              #suffix
               v-if="modalMode === 'add'"
+              #suffix
             >
               <NButton
                 text

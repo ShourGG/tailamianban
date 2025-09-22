@@ -39,8 +39,8 @@
 // 操作列固定宽度（适应4个按钮的布局）
 :deep(.n-data-table-th:last-child, 
        .n-data-table-td:last-child) {
-  width: 200px !important;
-  min-width: 200px !important;
+  width: 180px !important;
+  min-width: 160px !important;
   max-width: 200px !important;
   text-align: center !important;
   padding: 8px 12px !important;

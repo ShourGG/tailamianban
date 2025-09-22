@@ -2,7 +2,7 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-06-13 18:38:58
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-09-05 15:33:14
+ * @LastEditTime: 2025-09-22 21:04:34
  * @FilePath: \Robot_Admin\src\types\modules\table.d.ts
  * @Description: 表格类型系统（包含useTableData相关类型）
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
@@ -226,6 +226,8 @@ interface BaseTableColumn<T extends DataRecord = DataRecord>
   editProps?: EditProps
   editRender?: (value: any, rowData: T, rowIndex: number) => VNodeChild
   render?: (rowData: T, rowIndex: number) => VNodeChild
+  // 🆕 添加固定列支持
+  fixed?: 'left' | 'right'
 }
 
 interface NormalTableColumn<T extends DataRecord = DataRecord>
