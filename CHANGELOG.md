@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/ChenyCHENYU/Robot_Admin/compare/v1.3.0...v1.4.0) (2025-09-22)
+
+
+### Features
+
+* **C_Table:** 增加操作列固定，并优化相关样式 ([efc5105](https://github.com/ChenyCHENYU/Robot_Admin/commit/efc5105c4bb910e2552cd5ae2c4465ee9746af5e))
+* **大屏模板/日成本看板:** 增加看板模板，同时升级bun、.husky版本和相关钩子命令 ([b7ed22a](https://github.com/ChenyCHENYU/Robot_Admin/commit/b7ed22ad2c58e784a4496b6c4bde4370c82b32ff))
+
+
+### Bug Fixes
+
+* **系统管理/菜单管理:** 修复非嵌套路由菜单name及path缺失情况下的逻辑短路问题 ([748f5c7](https://github.com/ChenyCHENYU/Robot_Admin/commit/748f5c7418eb19446643f590cefda73b6d5a37e3))
+
 ## [1.3.0](https://github.com/ChenyCHENYU/Robot_Admin/compare/v1.2.1...v1.3.0) (2025-09-05)
 
 
