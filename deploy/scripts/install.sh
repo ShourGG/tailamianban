@@ -20,7 +20,7 @@ WEB_USER="terraria"
 WEB_GROUP="terraria"
 DOMAIN_NAME=""
 SSL_EMAIL=""
-DB_PASSWORD=""
+DB_PASSWORD="123456"
 JWT_SECRET=""
 REDIS_PASSWORD=""
 
@@ -437,12 +437,12 @@ interactive_setup() {
     if [[ ! -t 0 ]] || [[ -n "${TERRARIA_AUTO_INSTALL:-}" ]]; then
         log_info "Auto-installation mode detected"
         DOMAIN_NAME=""
-        DB_PASSWORD="terraria123"
-        log_info "Using defaults: IP access, password=terraria123"
+        DB_PASSWORD="123456"
+        log_info "Using defaults: IP access, password=123456"
     else
         # Interactive mode with smart defaults
         echo "Quick Setup Options:"
-        echo "  1) Auto setup (IP access, default password) - RECOMMENDED"
+        echo "  1) Auto setup (IP access, password=123456) - RECOMMENDED"
         echo "  2) Custom setup (domain, custom password)"
         echo
         read -p "Choose option (1/2) [default: 1]: " -t 10 SETUP_CHOICE
@@ -452,7 +452,7 @@ interactive_setup() {
         if [[ -z "$SETUP_CHOICE" ]] || [[ "$SETUP_CHOICE" == "1" ]]; then
             log_info "Using auto setup with defaults"
             DOMAIN_NAME=""
-            DB_PASSWORD="terraria123"
+            DB_PASSWORD="123456"
         else
             # Custom setup
             echo "Domain Configuration:"
@@ -462,9 +462,9 @@ interactive_setup() {
             fi
 
             echo
-            read -p "Database password [default: terraria123]: " DB_PASSWORD
+            read -p "Database password [default: 123456]: " DB_PASSWORD
             if [[ -z "$DB_PASSWORD" ]]; then
-                DB_PASSWORD="terraria123"
+                DB_PASSWORD="123456"
             fi
         fi
     fi
@@ -531,22 +531,27 @@ main() {
         echo "  http://$(curl -s ifconfig.me)"
     fi
     echo
-    echo "Default credentials:"
+    echo "Login credentials:"
     echo "  Username: admin"
-    echo "  Password: changeme"
+    echo "  Password: 123456"
+    echo
+    echo "Database info:"
+    echo "  Database: terraria_panel"
+    echo "  Username: terraria"
+    echo "  Password: $DB_PASSWORD"
     echo
     echo "Important files:"
-    echo "  Config: $INSTALL_DIR/backend/.env"
-    echo "  Logs: $INSTALL_DIR/backend/logs/"
-    echo "  Systemd: /etc/systemd/system/terraria-panel.service"
+    echo "  Config: $INSTALL_DIR/.env"
+    echo "  Logs: journalctl -u terraria-panel -f"
+    echo "  Service: /etc/systemd/system/terraria-panel.service"
     echo
     echo "Commands:"
     echo "  Start:   systemctl start terraria-panel"
     echo "  Stop:    systemctl stop terraria-panel"
     echo "  Status:  systemctl status terraria-panel"
-    echo "  Logs:    journalctl -u terraria-panel -f"
+    echo "  Restart: systemctl restart terraria-panel"
     echo
-    log_warn "Please change the default password immediately!"
+    log_warn "Remember: Username=admin, Password=123456"
 }
 
 # Auto-install mode support

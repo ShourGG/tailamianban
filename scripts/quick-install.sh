@@ -18,7 +18,7 @@ WEB_USER="terraria"
 WEB_GROUP="terraria"
 DOMAIN_NAME=""  # Leave empty for HTTP only
 SSL_EMAIL=""    # Only needed if DOMAIN_NAME is set
-DB_PASSWORD="terraria123"  # Change this!
+DB_PASSWORD="123456"  # Simple default password
 JWT_SECRET=$(openssl rand -base64 32 2>/dev/null || echo "default-jwt-secret-change-me")
 REDIS_PASSWORD=$(openssl rand -base64 24 2>/dev/null || echo "default-redis-password")
 
@@ -268,17 +268,20 @@ main() {
     echo "Access your panel at:"
     echo "  http://$(curl -s ifconfig.me 2>/dev/null || echo 'YOUR_SERVER_IP')"
     echo
-    echo "Default credentials:"
+    echo "Login credentials:"
     echo "  Username: admin"
-    echo "  Password: changeme"
+    echo "  Password: 123456"
+    echo
+    echo "Database info:"
+    echo "  Username: terraria"
+    echo "  Password: $DB_PASSWORD"
     echo
     echo "Service commands:"
     echo "  Status:  systemctl status terraria-panel"
     echo "  Logs:    journalctl -u terraria-panel -f"
     echo "  Restart: systemctl restart terraria-panel"
     echo
-    log_warn "Please change the default password immediately!"
-    log_warn "Database password is set to: $DB_PASSWORD"
+    log_warn "Remember: admin/123456 for panel login"
 }
 
 # Run main function
