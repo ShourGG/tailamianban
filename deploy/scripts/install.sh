@@ -426,46 +426,47 @@ backup_existing() {
     fi
 }
 
-# Interactive setup
+# Interactive setup with auto-detection
 interactive_setup() {
     echo -e "${BLUE}======================================${NC}"
     echo -e "${BLUE}   Terraria Panel Deployment Setup    ${NC}"
     echo -e "${BLUE}======================================${NC}"
     echo
 
-    # Domain name (optional, default to IP)
-    echo "Domain Configuration:"
-    echo "  - Press ENTER to use server IP (recommended for testing)"
-    echo "  - Or enter your domain name for SSL setup"
-    read -p "Domain name (optional): " DOMAIN_NAME
-    if [[ -z "$DOMAIN_NAME" ]]; then
-        log_info "Using server IP - HTTP only setup"
-    else
-        log_info "Using domain: $DOMAIN_NAME"
-        read -p "Enter email for SSL certificate: " SSL_EMAIL
-    fi
-
-    echo
-    echo "Database Configuration:"
-    echo "  Default: username=terraria, password=terraria123"
-    read -p "Use default database password 'terraria123'? (y/n): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # Check if running in non-interactive mode (CI/automated)
+    if [[ ! -t 0 ]] || [[ -n "${TERRARIA_AUTO_INSTALL:-}" ]]; then
+        log_info "Auto-installation mode detected"
+        DOMAIN_NAME=""
         DB_PASSWORD="terraria123"
-        log_info "Using default database password"
+        log_info "Using defaults: IP access, password=terraria123"
     else
-        # Custom password
-        while true; do
-            read -s -p "Enter PostgreSQL password for 'terraria' user: " DB_PASSWORD
-            echo
-            read -s -p "Confirm PostgreSQL password: " DB_PASSWORD_CONFIRM
-            echo
-            if [[ "$DB_PASSWORD" == "$DB_PASSWORD_CONFIRM" ]]; then
-                break
-            else
-                log_warn "Passwords do not match. Please try again."
+        # Interactive mode with smart defaults
+        echo "Quick Setup Options:"
+        echo "  1) Auto setup (IP access, default password) - RECOMMENDED"
+        echo "  2) Custom setup (domain, custom password)"
+        echo
+        read -p "Choose option (1/2) [default: 1]: " -t 10 SETUP_CHOICE
+        echo
+
+        # Default to option 1 if no input or timeout
+        if [[ -z "$SETUP_CHOICE" ]] || [[ "$SETUP_CHOICE" == "1" ]]; then
+            log_info "Using auto setup with defaults"
+            DOMAIN_NAME=""
+            DB_PASSWORD="terraria123"
+        else
+            # Custom setup
+            echo "Domain Configuration:"
+            read -p "Domain name (leave empty for IP): " DOMAIN_NAME
+            if [[ -n "$DOMAIN_NAME" ]]; then
+                read -p "Enter email for SSL certificate: " SSL_EMAIL
             fi
-        done
+
+            echo
+            read -p "Database password [default: terraria123]: " DB_PASSWORD
+            if [[ -z "$DB_PASSWORD" ]]; then
+                DB_PASSWORD="terraria123"
+            fi
+        fi
     fi
 
     # Generate secure tokens
@@ -474,17 +475,24 @@ interactive_setup() {
 
     echo
     log_info "Installation Summary:"
-    echo "  Domain: ${DOMAIN_NAME:-Server IP (HTTP only)}"
+    echo "  Access: ${DOMAIN_NAME:-Server IP (HTTP only)}"
     echo "  SSL Email: ${SSL_EMAIL:-Not configured}"
     echo "  Database User: terraria"
     echo "  Database Password: $DB_PASSWORD"
     echo "  Install Directory: $INSTALL_DIR"
     echo
 
-    read -p "Continue with installation? (y/n): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        log_error "Installation cancelled"
+    # Auto-confirm in non-interactive mode
+    if [[ ! -t 0 ]] || [[ -n "${TERRARIA_AUTO_INSTALL:-}" ]]; then
+        log_info "Auto-confirming installation..."
+        sleep 2
+    else
+        read -p "Continue with installation? [Y/n]: " -t 10 -r
+        echo
+        # Default to Yes if no input or timeout
+        if [[ -n "$REPLY" ]] && [[ ! $REPLY =~ ^[Yy]$ ]] && [[ ! -z "$REPLY" ]]; then
+            log_error "Installation cancelled"
+        fi
     fi
 }
 
@@ -540,6 +548,10 @@ main() {
     echo
     log_warn "Please change the default password immediately!"
 }
+
+# Auto-install mode support
+# Set TERRARIA_AUTO_INSTALL=1 to skip all prompts
+# Example: TERRARIA_AUTO_INSTALL=1 curl -fsSL ... | bash
 
 # Run main function
 main "$@"
