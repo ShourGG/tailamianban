@@ -47,3 +47,93 @@ src/api/generated/
 
 
 .mgit-push.json
+
+# ===================================================================
+# 🎮 Terraria Panel - Source Code Protection Configuration
+# 老王精心配置，保护源码不被二改！专门用于GitHub发布版本
+# ===================================================================
+
+# Backend Go source protection - 保护所有Go源码
+backend/cmd/
+backend/internal/
+backend/pkg/
+backend/*.go
+backend/go.mod
+backend/go.sum
+
+# Frontend Vue source protection - 保护所有前端源码
+src/
+public/
+index.html
+vite.config.ts
+tsconfig.json
+package.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Configuration files - 保护配置文件
+*.config.js
+*.config.ts
+.eslintrc.*
+.prettierrc.*
+.babelrc
+.browserslistrc
+
+# Development scripts - 保护开发脚本
+scripts/build.sh
+scripts/build.bat
+scripts/dev.sh
+scripts/dev.bat
+
+# Documentation source - 保护实现细节文档
+docs/
+README.md
+CHANGELOG.md
+TODO.md
+
+# Environment and secrets - 保护敏感信息
+envs/
+*.env.development
+*.env.production
+*.key
+*.pem
+*.cert
+
+# Build working directories
+release/
+build/
+
+# ===================================================================
+# 🚀 WHITELIST: Files to INCLUDE in GitHub releases
+# 只有这些文件对最终用户可见
+# ===================================================================
+
+# Allow deployment scripts
+!scripts/build-release.sh
+!scripts/deploy-ultra.sh
+!scripts/install.sh
+
+# Allow deployment configuration
+!deploy/
+!DEPLOYMENT.md
+
+# Allow license and basic info
+!LICENSE
+!.gitignore
+
+# Allow release binaries (when created)
+!terraria-panel-*.tar.gz
+!terraria-panel-*.zip
+!terraria-panel-linux
+!terraria-panel-windows.exe
+
+# Allow built binaries and frontend dist
+!backend/terraria-panel
+!backend/terraria-panel.exe
+!backend/dist/
+
+# Allow configuration templates
+!config.example.yaml
+!docker-compose.yml
+!Dockerfile

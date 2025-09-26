@@ -1,0 +1,1 @@
+import{e as t,f as o,h as e}from"./index-DecMlK-y.js";const c=()=>t("/servers"),i=r=>e("/servers",r),S=r=>o(`/servers/${r}`),g=r=>e(`/servers/${r}/start`),A=r=>e(`/servers/${r}/stop`),$=r=>e(`/servers/${r}/restart`),l=(r,n)=>{const s=new URLSearchParams().toString(),a=`/servers/${r}/logs${s?`?${s}`:""}`;return t(a)};export{A as a,l as b,i as c,S as d,c as g,$ as r,g as s};

@@ -1,0 +1,1 @@
+import{f as r,h as s,e as t}from"./index-C2dfl6FL.js";const o=()=>t("/servers"),v=e=>s("/servers",e),p=e=>r(`/servers/${e}`),c=e=>s(`/servers/${e}/start`),i=e=>s(`/servers/${e}/stop`),n=e=>s(`/servers/${e}/restart`);export{i as a,v as c,p as d,o as g,n as r,c as s};

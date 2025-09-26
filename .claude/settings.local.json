@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p deploy/{nginx,docker,scripts,configs,systemd,security,docs})",
+      "Bash(npm run dev)",
+      "Bash(chmod +x \"D:/Web项目制作/泰拉瑞亚面板1版/scripts/deploy-ultra.sh\")",
+      "Bash(chmod +x \"D:/Web项目制作/泰拉瑞亚面板1版/scripts/build-ultra.sh\")",
+      "Bash(go mod tidy)",
+      "Bash(go run cmd/main.go)",
+      "Bash(set SERVER_PORT=8081)",
+      "Bash(export SERVER_PORT=8081)",
+      "Bash(curl http://localhost:8080/api/monitoring/system)",
+      "Bash(curl http://localhost:8080/api/monitoring/status)",
+      "Bash(chmod +x \"D:/Web项目制作/泰拉瑞亚面板1版/scripts/install.sh\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -14,9 +14,14 @@ export default {
   open: true,
   proxy: {
     '^/api': {
-      target: 'https://apifoxmock.com/m1/4902805-4559325-default', //代理接口
+      target: 'http://localhost:8080', // 泰拉瑞亚面板后端API
       changeOrigin: true,
-      rewrite: (path: string) => path.replace(/^\/api/, ''),
+      secure: false
     },
+    '^/ws': {
+      target: 'ws://localhost:8080', // WebSocket连接
+      ws: true,
+      changeOrigin: true
+    }
   },
 }

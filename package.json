@@ -1,8 +1,8 @@
 {
-  "name": "robot-admin",
-  "version": "1.4.0",
+  "name": "terraria-panel",
+  "version": "1.0.0",
   "private": true,
-  "description": "Robot 中后台管理系统团队架构模板 - 基于 Vue3 + Vite 的企业级中后台解决方案",
+  "description": "泰拉瑞亚服务器管理面板 - 基于 Vue3 + Go 的现代化游戏服务器管理解决方案",
   "author": {
     "name": "ChenY",
     "email": "ycyplus@gmail.com",
@@ -28,7 +28,19 @@
     "deploy": "bash ./scripts/merge-and-deploy.sh",
     "sync-deploy-branch": "bash ./scripts/sync-dev.sh",
     "analyze": "vite build --mode analyze",
-    "generate-api": "node scripts/download-openapi.js && openapi-ts"
+    "generate-api": "node scripts/download-openapi.js && openapi-ts",
+    "build:ultra": "bash ./scripts/build-ultra.sh",
+    "deploy:ultra": "bash ./scripts/deploy-ultra.sh deploy",
+    "start:ultra": "bash ./scripts/deploy-ultra.sh start",
+    "daemon:ultra": "bash ./scripts/deploy-ultra.sh daemon",
+    "stop:ultra": "bash ./scripts/deploy-ultra.sh stop",
+    "status:ultra": "bash ./scripts/deploy-ultra.sh status",
+    "build:win": "powershell -ExecutionPolicy Bypass -File .\\scripts\\deploy-ultra.ps1 build",
+    "deploy:win": "powershell -ExecutionPolicy Bypass -File .\\scripts\\deploy-ultra.ps1 deploy",
+    "start:win": "powershell -ExecutionPolicy Bypass -File .\\scripts\\deploy-ultra.ps1 start",
+    "daemon:win": "powershell -ExecutionPolicy Bypass -File .\\scripts\\deploy-ultra.ps1 daemon",
+    "stop:win": "powershell -ExecutionPolicy Bypass -File .\\scripts\\deploy-ultra.ps1 stop",
+    "status:win": "powershell -ExecutionPolicy Bypass -File .\\scripts\\deploy-ultra.ps1 status"
   },
   "dependencies": {
     "@antv/x6": "^2.18.1",

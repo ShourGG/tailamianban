@@ -58,13 +58,39 @@ const resolveComponent = (path?: string) => {
     const viewPath = `/src/views${normalizedPath}.vue`
     const modules = import.meta.glob('@/views/**/*.vue')
 
-    // 添加组件不存在的警告
+    // 开发环境下打印所有可用模块用于调试
+    if (import.meta.env.DEV) {
+      console.debug('[动态路由] 查找组件:', viewPath)
+      console.debug('[动态路由] 可用组件:', Object.keys(modules))
+    }
+
+    // 直接查找精确匹配
     if (modules[viewPath]) {
       return modules[viewPath]
     }
 
+    // 尝试模糊匹配，处理路径格式不一致问题
+    const possiblePaths = [
+      `/src/views${normalizedPath}.vue`,
+      `/src/views${normalizedPath}/index.vue`,
+      normalizedPath.endsWith('/index')
+        ? `/src/views${normalizedPath}.vue`
+        : `/src/views${normalizedPath}/index.vue`
+    ]
+
+    for (const possiblePath of possiblePaths) {
+      if (modules[possiblePath]) {
+        console.log(`[动态路由] 路径匹配成功: ${possiblePath}`)
+        return modules[possiblePath]
+      }
+    }
+
+    // 更详细的错误日志
     console.warn(
-      `[动态路由] 组件不存在，请检查路径及是否未创建 component 对应的 viewPage : ${viewPath}`
+      `[动态路由] 组件不存在，请检查路径:\n` +
+      `  期望路径: ${viewPath}\n` +
+      `  尝试路径: ${possiblePaths.join(', ')}\n` +
+      `  可用组件: ${Object.keys(modules).filter(key => key.includes(normalizedPath.split('/').pop() || '')).join(', ')}`
     )
     return COMPONENTS['404']
   } catch (error) {

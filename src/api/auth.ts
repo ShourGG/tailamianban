@@ -11,7 +11,7 @@ export type LoginResponse = PostAuthLoginResponse
  */
 
 export const loginApi = (data: NonNullable<PostAuthLoginData['body']>) =>
-  postData<PostAuthLoginResponse>('/auth/login', data)
+  postData<PostAuthLoginResponse>('/login', data)
 
 /**
  * * @description: 获取用户菜单权限列表

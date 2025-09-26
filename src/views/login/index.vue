@@ -9,10 +9,13 @@
 -->
 <template>
   <div class="login-container bg-[#181818]">
+    <!-- 泰拉瑞亚Logo -->
+    <div class="login-logo"></div>
+
     <!-- 打字机组件 -->
     <Typewriter
       v-if="showTypewriter"
-      text="Hey！伙计，欢迎来到我的世界。"
+      text="Hey！伙计，欢迎来到泰拉瑞亚面板。"
       :duration="2000"
       :delay="300"
       :pause-after="1000"
@@ -28,7 +31,7 @@
     </div>
 
     <div class="login-wrapper">
-      <h3 class="login-title">{{ 'Robot Admin 管理系统' }}</h3>
+      <h3 class="login-title">{{ '泰拉瑞亚服务器管理面板' }}</h3>
       <C_Form
         class="login-form"
         :options="OPTIONS"

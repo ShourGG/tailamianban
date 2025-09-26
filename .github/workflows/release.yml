@@ -1,0 +1,286 @@
+name: 🎮 Build and Release Terraria Panel
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-release:
+    name: 🚀 Build and Create Release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: 🐹 Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: 🔧 Cache Dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.npm
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-deps-${{ hashFiles('**/package-lock.json', '**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-deps-
+
+    - name: 📦 Install Frontend Dependencies
+      run: npm ci
+
+    - name: 🏗️ Build Frontend (Production)
+      run: |
+        export NODE_ENV=production
+        npm run build
+
+    - name: 📊 Check Build Size
+      run: |
+        echo "Frontend build size:"
+        du -sh dist/
+        ls -la dist/
+
+    - name: 🐹 Build Backend (Multi-platform)
+      run: |
+        cd backend
+
+        # Install dependencies
+        go mod tidy
+
+        # Build for Linux x64
+        echo "Building Linux x64..."
+        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o terraria-panel-linux cmd/main.go
+
+        # Build for Windows x64
+        echo "Building Windows x64..."
+        GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o terraria-panel-windows.exe cmd/main.go
+
+        # Check binary sizes
+        echo "Binary sizes:"
+        ls -lh terraria-panel-*
+
+    - name: 📋 Extract Version
+      id: extract_version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
+
+    - name: 📦 Create Release Packages
+      run: |
+        VERSION="${{ steps.extract_version.outputs.version }}"
+        RELEASE_NAME="terraria-panel-${VERSION#v}"
+
+        # Create release directory structure
+        mkdir -p "release/$RELEASE_NAME/backend"
+        mkdir -p "release/$RELEASE_NAME/scripts"
+
+        # Copy frontend dist
+        cp -r dist "release/$RELEASE_NAME/backend/"
+
+        # Copy backend binaries
+        cp backend/terraria-panel-linux "release/$RELEASE_NAME/backend/"
+        cp backend/terraria-panel-windows.exe "release/$RELEASE_NAME/backend/"
+
+        # Copy deployment scripts
+        cp scripts/deploy-ultra.sh "release/$RELEASE_NAME/scripts/"
+        cp scripts/install.sh "release/$RELEASE_NAME/scripts/"
+        chmod +x "release/$RELEASE_NAME/scripts/"*.sh
+
+        # Create production config template
+        cat > "release/$RELEASE_NAME/backend/config.yaml" << 'EOF'
+        # Terraria Panel Production Configuration
+        app:
+          name: "Terraria Panel"
+          environment: "production"
+          debug: false
+
+        server:
+          port: 8080
+          read_timeout: 30
+          write_timeout: 30
+          idle_timeout: 120
+
+        database:
+          type: "sqlite"
+          path: "./data/panel.db"
+
+        log:
+          level: "info"
+          format: "json"
+          output: "stdout"
+
+        jwt:
+          secret: "your-secret-key-change-this"
+          expiration: 24
+
+        terraria:
+          server_path: "./terraria-servers"
+          world_path: "./worlds"
+          backup_path: "./backups"
+          download_url: "https://terraria.org/api/download/pc-dedicated-server/terraria-server-1449.zip"
+          max_servers: 10
+          port_range: "7777-7800"
+          default_world: "world1"
+        EOF
+
+        # Create README for release
+        cat > "release/$RELEASE_NAME/README.md" << EOF
+        # 🎮 Terraria Panel - Production Release ${VERSION}
+
+        ## 🚀 Quick Start
+
+        ### Linux (Recommended)
+        \`\`\`bash
+        # One-click installation
+        curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/install.sh | bash
+
+        # Or manual installation
+        wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/${RELEASE_NAME}-linux.tar.gz
+        tar -xzf ${RELEASE_NAME}-linux.tar.gz
+        cd ${RELEASE_NAME}
+        chmod +x scripts/deploy-ultra.sh
+        ./scripts/deploy-ultra.sh start
+        \`\`\`
+
+        ### Windows
+        \`\`\`cmd
+        # Download and extract the Windows release
+        # Run: backend/terraria-panel-windows.exe
+        \`\`\`
+
+        ## 📋 System Requirements
+
+        - **Linux**: CentOS 7+, Ubuntu 18.04+, Debian 9+
+        - **Windows**: Windows Server 2016+, Windows 10+
+        - **Memory**: 512MB minimum, 1GB+ recommended
+        - **Disk**: 100MB minimum, 1GB+ recommended
+
+        ## 🎯 Features
+
+        - ✅ **Single-Port Deployment** - Panel + API on port 8080
+        - ✅ **UltraThink Monitoring** - Real-time system metrics
+        - ✅ **Smart Port Management** - Auto-detect and allocate ports
+        - ✅ **Server Management** - Start/stop Terraria servers
+        - ✅ **World Management** - Upload/download/backup worlds
+        - ✅ **Player Statistics** - Real-time player monitoring
+
+        ## 🔧 Configuration
+
+        Edit \`backend/config.yaml\` to customize settings.
+
+        ## 📞 Support
+
+        - Version: ${VERSION}
+        - Build Date: $(date)
+        - Repository: https://github.com/${{ github.repository }}
+
+        ---
+        © 2025 Terraria Panel Team. Built with ❤️ for the Terraria community.
+        EOF
+
+        # Create compressed archives
+        cd release
+
+        # Linux release
+        tar -czf "${RELEASE_NAME}-linux.tar.gz" "$RELEASE_NAME"
+
+        # Windows release (if zip is available)
+        if command -v zip >/dev/null 2>&1; then
+          zip -r "${RELEASE_NAME}-windows.zip" "$RELEASE_NAME"
+        fi
+
+        # List created files
+        echo "Created release files:"
+        ls -lh *.tar.gz *.zip 2>/dev/null || ls -lh *.tar.gz
+
+    - name: 📤 Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.extract_version.outputs.version }}
+        name: 🎮 Terraria Panel ${{ steps.extract_version.outputs.version }}
+        body: |
+          # 🎮 Terraria Panel Release ${{ steps.extract_version.outputs.version }}
+
+          ## 🚀 What's New
+
+          - ✨ UltraThink real-time monitoring system
+          - 🔧 Single-port deployment (panel + backend on 8080)
+          - 📊 Enhanced system performance monitoring
+          - 🛡️ Improved security and stability
+          - 🎯 Smart game server port management
+
+          ## 🔽 Quick Installation
+
+          ### Linux (Recommended)
+          ```bash
+          curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/install.sh | bash
+          ```
+
+          ### Manual Installation
+          1. Download the appropriate archive below
+          2. Extract to your desired location
+          3. Follow the README instructions
+
+          ## 📋 System Requirements
+
+          - **Linux**: CentOS 7+, Ubuntu 18.04+, Debian 9+
+          - **Windows**: Windows Server 2016+, Windows 10+
+          - **Memory**: 512MB minimum, 1GB+ recommended
+          - **Network**: Ports 8080 (panel) and 7777-7800 (game servers)
+
+          ## 🎯 Access Your Panel
+
+          After installation, visit: `http://your-server-ip:8080`
+
+          ---
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/v1.3.0...${{ steps.extract_version.outputs.version }}
+        files: |
+          release/*.tar.gz
+          release/*.zip
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 🎉 Release Summary
+      run: |
+        echo "🎉 Release ${{ steps.extract_version.outputs.version }} has been created successfully!"
+        echo "📦 Release includes:"
+        echo "   - Linux release: release/*-linux.tar.gz"
+        echo "   - Windows release: release/*-windows.zip"
+        echo "   - One-click installer: scripts/install.sh"
+        echo ""
+        echo "🔗 Users can install with:"
+        echo "   curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/install.sh | bash"

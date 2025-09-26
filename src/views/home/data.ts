@@ -191,10 +191,10 @@ export const toolCategories = [
 export const quickSteps = [
   {
     title: '克隆项目',
-    code: 'git clone https://github.com/ChenyCHENYU/robot-admin.git',
+    code: 'git clone https://github.com/yourorg/terraria-panel.git',
   },
-  { title: '安装依赖', code: 'bun install' },
-  { title: '启动项目', code: 'bun run dev' },
+  { title: '安装依赖', code: 'npm install --legacy-peer-deps' },
+  { title: '启动项目', code: 'npm run dev' },
 ]
 
 // 文件树数据结构
@@ -208,7 +208,7 @@ export interface TreeNode {
 
 // 项目结构数据 - 替代原来 200+ 行的硬编码标签
 export const projectStructure: TreeNode = {
-  name: 'Robot_Admin/',
+  name: 'Terraria_Panel/',
   type: 'folder',
   icon: '📁',
   children: [
