@@ -433,38 +433,51 @@ interactive_setup() {
     echo -e "${BLUE}======================================${NC}"
     echo
 
-    # Domain name
-    read -p "Enter your domain name (e.g., terraria.example.com): " DOMAIN_NAME
+    # Domain name (optional, default to IP)
+    echo "Domain Configuration:"
+    echo "  - Press ENTER to use server IP (recommended for testing)"
+    echo "  - Or enter your domain name for SSL setup"
+    read -p "Domain name (optional): " DOMAIN_NAME
     if [[ -z "$DOMAIN_NAME" ]]; then
-        log_warn "No domain name provided - will setup HTTP only"
-    fi
-
-    # SSL email
-    if [[ -n "$DOMAIN_NAME" ]]; then
+        log_info "Using server IP - HTTP only setup"
+    else
+        log_info "Using domain: $DOMAIN_NAME"
         read -p "Enter email for SSL certificate: " SSL_EMAIL
     fi
 
-    # Database password
-    while true; do
-        read -s -p "Enter PostgreSQL password for 'terraria' user: " DB_PASSWORD
-        echo
-        read -s -p "Confirm PostgreSQL password: " DB_PASSWORD_CONFIRM
-        echo
-        if [[ "$DB_PASSWORD" == "$DB_PASSWORD_CONFIRM" ]]; then
-            break
-        else
-            log_warn "Passwords do not match. Please try again."
-        fi
-    done
+    echo
+    echo "Database Configuration:"
+    echo "  Default: username=terraria, password=terraria123"
+    read -p "Use default database password 'terraria123'? (y/n): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        DB_PASSWORD="terraria123"
+        log_info "Using default database password"
+    else
+        # Custom password
+        while true; do
+            read -s -p "Enter PostgreSQL password for 'terraria' user: " DB_PASSWORD
+            echo
+            read -s -p "Confirm PostgreSQL password: " DB_PASSWORD_CONFIRM
+            echo
+            if [[ "$DB_PASSWORD" == "$DB_PASSWORD_CONFIRM" ]]; then
+                break
+            else
+                log_warn "Passwords do not match. Please try again."
+            fi
+        done
+    fi
 
     # Generate secure tokens
     JWT_SECRET=$(openssl rand -base64 32)
     REDIS_PASSWORD=$(openssl rand -base64 24)
 
     echo
-    log_info "Configuration:"
-    echo "  Domain: ${DOMAIN_NAME:-Not configured}"
+    log_info "Installation Summary:"
+    echo "  Domain: ${DOMAIN_NAME:-Server IP (HTTP only)}"
     echo "  SSL Email: ${SSL_EMAIL:-Not configured}"
+    echo "  Database User: terraria"
+    echo "  Database Password: $DB_PASSWORD"
     echo "  Install Directory: $INSTALL_DIR"
     echo
 
