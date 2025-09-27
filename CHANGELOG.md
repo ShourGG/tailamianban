@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/ShourGG/tailamianban/compare/v1.0.0...v1.1.0) (2025-09-27)
+
+
+### Features
+
+* 优化部署配置和脚本，移除冗余文件，完善安装流程 ([373f350](https://github.com/ShourGG/tailamianban/commit/373f350e341c9dd9b512f56927f35bb3668e9021))
+* 添加v1.0.0发布包，支持Linux一键部署 ([0c48a12](https://github.com/ShourGG/tailamianban/commit/0c48a126272c2932596a02470da8fbbe43de510e))
+
+
+### Bug Fixes
+
+* 修复run.sh下载链接问题，支持直接从仓库下载release包 ([6d124ff](https://github.com/ShourGG/tailamianban/commit/6d124ffa3e434d2f4a795613c651934566dfd8f9))
+
 ## [1.4.0](https://github.com/ChenyCHENYU/Robot_Admin/compare/v1.3.0...v1.4.0) (2025-09-22)
 
 
