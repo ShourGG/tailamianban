@@ -118,7 +118,7 @@ import{av as gn,aw as _n,ax as hr,ay as He,az as bn,r as Ye,c as Ae,k as vn,o as
           letter-spacing: 1.5px;
           opacity: 0;
           animation: fadeIn 0.3s ease-out 0.1s forwards;
-        ">Robot Admin</h1>
+        ">Terraria Panel</h1>
       </div>
     </div>
   `;document.body.insertAdjacentHTML("afterbegin",o);const n=document.createElement("style");n.setAttribute("data-loading-styles","true"),n.textContent=`

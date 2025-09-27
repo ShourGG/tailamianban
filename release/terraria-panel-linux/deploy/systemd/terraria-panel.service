@@ -1,0 +1,60 @@
+[Unit]
+Description=Terraria Panel Backend Service
+After=network.target postgresql.service
+Wants=network-online.target
+Documentation=https://github.com/yourusername/terraria-panel
+
+[Service]
+Type=simple
+User=terraria
+Group=terraria
+WorkingDirectory=/opt/terraria-panel/backend
+
+# Environment configuration
+EnvironmentFile=/opt/terraria-panel/backend/.env
+Environment="APP_ENV=production"
+Environment="SERVER_PORT=8080"
+
+# Service execution
+ExecStartPre=/usr/bin/mkdir -p /opt/terraria-panel/backend/logs
+ExecStartPre=/usr/bin/chown -R terraria:terraria /opt/terraria-panel/backend
+ExecStart=/opt/terraria-panel/backend/terraria-panel
+ExecReload=/bin/kill -USR1 $MAINPID
+KillMode=mixed
+KillSignal=SIGTERM
+
+# Restart policy
+Restart=always
+RestartSec=10s
+StartLimitInterval=200
+StartLimitBurst=5
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/terraria-panel/backend/logs /opt/terraria-panel/terraria-servers /opt/terraria-panel/worlds /opt/terraria-panel/backups
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+# Resource limits
+LimitNOFILE=65535
+LimitNPROC=512
+TimeoutStopSec=30s
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=terraria-panel
+
+[Install]
+WantedBy=multi-user.target

@@ -316,9 +316,9 @@ func main() {
     fmt.Println("服务器启动在 :8080")
     log.Fatal(http.ListenAndServe(":8080", r))
 }`,json:`{
-  "name": "robot-admin",
+  "name": "terraria-panel",
   "version": "1.0.0",
-  "description": "Vue 3 管理后台",
+  "description": "Terraria Server Management Panel",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build", 

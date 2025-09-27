@@ -2,7 +2,7 @@
   "packages": {
     ".": {
       "release-type": "node",
-      "package-name": "robot-admin",
+      "package-name": "terraria-panel",
       "extra-files": ["src/lib/version.ts"],
       "changelog-sections": [
         { "type": "feat", "section": "🎯 新功能" },
