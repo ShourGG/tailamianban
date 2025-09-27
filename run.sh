@@ -101,31 +101,43 @@ get_status() {
 # Download latest release
 download_service() {
     log_info "正在下载最新版本..."
-    
-    # Get latest release URL
-    local download_url=$(curl -s "https://api.github.com/repos/$GITHUB_REPO/releases/latest" | \
+
+    # Try to get latest release URL first
+    local download_url=$(curl -s "https://api.github.com/repos/$GITHUB_REPO/releases/latest" 2>/dev/null | \
                         grep "browser_download_url.*linux.*tar.gz" | \
                         cut -d '"' -f 4)
-    
+
+    # If no release found, use direct download from main branch
     if [[ -z "$download_url" ]]; then
-        log_error "无法获取下载链接"
+        log_warning "未找到GitHub Release，使用直接下载方式"
+        download_url="https://raw.githubusercontent.com/$GITHUB_REPO/main/release/terraria-panel-v1.0.0-linux-amd64.tar.gz"
+    fi
+
+    log_info "下载地址: $download_url"
+
+    # Download and extract
+    if wget -O terraria-panel-linux.tar.gz "$download_url"; then
+        tar -xzf terraria-panel-linux.tar.gz
+
+        # Move binary to current directory
+        if [[ -d "terraria-panel-linux" ]]; then
+            cp terraria-panel-linux/terraria-panel ./$BINARY_NAME
+            chmod +x $BINARY_NAME
+            rm -rf terraria-panel-linux terraria-panel-linux.tar.gz
+        elif [[ -f "terraria-panel" ]]; then
+            mv terraria-panel $BINARY_NAME
+            chmod +x $BINARY_NAME
+            rm -f terraria-panel-linux.tar.gz
+        else
+            log_error "解压后未找到可执行文件"
+            return 1
+        fi
+
+        log_success "下载完成"
+    else
+        log_error "下载失败，请检查网络连接"
         return 1
     fi
-    
-    log_info "下载地址: $download_url"
-    
-    # Download and extract
-    wget -O terraria-panel-linux.tar.gz "$download_url"
-    tar -xzf terraria-panel-linux.tar.gz
-    
-    # Move binary to current directory
-    if [[ -d "terraria-panel-linux" ]]; then
-        cp terraria-panel-linux/$BINARY_NAME .
-        chmod +x $BINARY_NAME
-        rm -rf terraria-panel-linux terraria-panel-linux.tar.gz
-    fi
-    
-    log_success "下载完成"
 }
 
 # Start service
