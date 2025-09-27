@@ -389,20 +389,25 @@ download_app() {
 
     cd /opt
 
-    # Download the latest release or clone repository
-    if curl -s https://api.github.com/repos/ShourGG/tailamianban/releases/latest | grep -q "tag_name"; then
-        log_info "Downloading latest release..."
-        LATEST_VERSION=$(curl -s https://api.github.com/repos/ShourGG/tailamianban/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-        wget -q "https://github.com/ShourGG/tailamianban/archive/refs/tags/${LATEST_VERSION}.tar.gz" -O terraria-panel.tar.gz
-        tar -xzf terraria-panel.tar.gz
-        mv "tailamianban-${LATEST_VERSION#v}" terraria-panel
-        rm terraria-panel.tar.gz
-    else
-        log_info "No releases found, cloning repository..."
-        git clone https://github.com/ShourGG/tailamianban.git terraria-panel
+    # Remove existing directory if it exists
+    if [[ -d "terraria-panel" ]]; then
+        log_info "Removing existing terraria-panel directory..."
+        rm -rf terraria-panel
     fi
 
+    # Download from main branch (contains pre-built binaries)
+    log_info "Downloading from main branch..."
+    git clone https://github.com/ShourGG/tailamianban.git terraria-panel
+
     cd terraria-panel
+
+    # Verify we have the pre-built binary
+    if [[ -f "backend/terraria-panel" ]]; then
+        log_info "Found pre-built Linux binary"
+        chmod +x backend/terraria-panel
+    else
+        log_error "Pre-built binary not found in repository"
+    fi
 
     log_success "Application downloaded"
 }
