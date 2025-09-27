@@ -101,7 +101,9 @@ envs/
 *.cert
 
 # Build working directories
-release/
+release/terraria-panel-linux/
+release/terraria-panel-windows/
+release/terraria-panel-source/
 build/
 
 # ===================================================================
