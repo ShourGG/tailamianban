@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ===================================================================
-# 🎮 Terraria Panel - Linux One-Click Manager
-# 老王精心打造的简单部署脚本，参考DST管理平台风格！
+# 🎮 Terraria Panel - Linux One-Click Manager v3.0 - 老王出品
+# 专门解决前端缓存和后台运行问题的完美脚本！
 # ===================================================================
 
 set -e  # Exit on any error
@@ -25,6 +25,7 @@ DEFAULT_PORT=8080
 BINARY_NAME="terraria-panel"
 PID_FILE="/tmp/terraria-panel.pid"
 LOG_FILE="terraria-panel.log"
+DOWNLOAD_URL="https://raw.githubusercontent.com/ShourGG/tailamianban/main/release/terraria-panel-v1.0.0-linux-amd64.tar.gz"
 
 print_banner() {
     echo ""
