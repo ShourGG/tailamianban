@@ -1,11 +1,13 @@
 # 🚀 Terraria Panel 一键部署指南
 
-## 📦 快速部署 (Linux推荐)
+## 📦 快速部署 (Linux Only)
 
-### 方法1: 超级简单一键部署
+### 方法1: 超级简单一键部署 (推荐)
 ```bash
-# 下载并执行一键安装脚本
-curl -fsSL https://raw.githubusercontent.com/ShourGG/tailamianban/main/scripts/install.sh | bash
+# 下载并执行管理脚本
+wget https://raw.githubusercontent.com/ShourGG/tailamianban/main/run.sh
+chmod +x run.sh
+./run.sh
 ```
 
 ### 方法2: 手动下载部署
@@ -16,54 +18,34 @@ wget https://github.com/ShourGG/tailamianban/releases/latest/download/terraria-p
 # 2. 解压
 tar -xzf terraria-panel-v1.0.0-linux.tar.gz
 
-# 3. 进入目录
+# 3. 进入目录并直接运行
 cd terraria-panel-v1.0.0
-
-# 4. 启动服务
-chmod +x scripts/deploy-ultra.sh
-./scripts/deploy-ultra.sh start
+./terraria-panel
 ```
 
-## 🖥️ Windows 部署
 
-```cmd
-# 1. 下载 Windows 发布包
-# https://github.com/ShourGG/tailamianban/releases/latest/download/terraria-panel-v1.0.0-windows.zip
-
-# 2. 解压到目标目录
-
-# 3. 直接运行
-cd backend
-terraria-panel-windows.exe
-```
 
 ## 🎯 访问面板
 
 部署完成后，打开浏览器访问:
 - **管理面板**: http://your-server-ip:8080
-- **UltraThink监控**: http://your-server-ip:8080/monitor
 - **API文档**: http://your-server-ip:8080/api
 
-## 🔧 服务管理 (Linux systemd)
+## 🔧 服务管理
+
+使用 `run.sh` 脚本管理服务：
 
 ```bash
-# 查看服务状态
-sudo systemctl status terraria-panel
+# 启动管理脚本
+./run.sh
 
-# 启动服务
-sudo systemctl start terraria-panel
-
-# 停止服务
-sudo systemctl stop terraria-panel
-
-# 重启服务
-sudo systemctl restart terraria-panel
-
-# 查看日志
-sudo journalctl -u terraria-panel -f
-
-# 开机自启
-sudo systemctl enable terraria-panel
+# 或者直接使用命令
+./run.sh  # 然后选择对应的操作
+# [1]: 启动服务
+# [2]: 停止服务
+# [3]: 重启服务
+# [7]: 查看状态
+# [8]: 查看日志
 ```
 
 ## 📋 系统要求
@@ -108,56 +90,36 @@ jwt:
   secret: "your-super-secure-secret-key-here"
 ```
 
-### 3. 设置 HTTPS (可选)
-使用 Nginx 反向代理:
-```nginx
-server {
-    listen 443 ssl;
-    server_name your-domain.com;
+### 3. 设置防火墙 (推荐)
+```bash
+# Ubuntu/Debian
+sudo ufw allow 8080/tcp
+sudo ufw enable
 
-    ssl_certificate /path/to/cert.pem;
-    ssl_certificate_key /path/to/key.pem;
-
-    location / {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        # WebSocket support for UltraThink monitoring
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-    }
-}
+# CentOS/RHEL
+sudo firewall-cmd --permanent --add-port=8080/tcp
+sudo firewall-cmd --reload
 ```
 
 ## 🔄 升级指南
 
 ### 自动升级 (推荐)
 ```bash
-# 重新运行一键安装脚本即可自动升级
-curl -fsSL https://raw.githubusercontent.com/ShourGG/tailamianban/main/scripts/install.sh | bash
+# 使用管理脚本升级
+./run.sh
+# 然后选择 [4]: 更新管理平台
 ```
 
 ### 手动升级
 ```bash
 # 1. 停止服务
-sudo systemctl stop terraria-panel
+./run.sh  # 选择 [2]: 停止服务
 
-# 2. 备份数据
-cp -r /opt/terraria-panel/backend/data /backup/terraria-panel-data-$(date +%Y%m%d)
+# 2. 备份数据 (可选)
+cp -r data backup-$(date +%Y%m%d)
 
-# 3. 下载新版本
-wget https://github.com/ShourGG/tailamianban/releases/latest/download/terraria-panel-latest-linux.tar.gz
-
-# 4. 解压并替换
-tar -xzf terraria-panel-latest-linux.tar.gz
-sudo cp -r terraria-panel-*/backend/* /opt/terraria-panel/backend/
-
-# 5. 启动服务
-sudo systemctl start terraria-panel
+# 3. 强制更新
+./run.sh  # 选择 [5]: 强制更新平台
 ```
 
 ## 📊 监控和维护
@@ -242,20 +204,17 @@ sudo systemctl start terraria-panel
 
 ## 🚀 高级配置
 
-### 1. 多服务器负载均衡
-使用 Nginx 配置多个面板实例:
-```nginx
-upstream terraria_panel {
-    server 127.0.0.1:8080 weight=1;
-    server 127.0.0.1:8081 weight=1;
-}
+### 1. 多端口部署
+运行多个面板实例:
+```bash
+# 实例1 - 端口8080
+./terraria-panel &
 
-server {
-    listen 80;
-    location / {
-        proxy_pass http://terraria_panel;
-    }
-}
+# 实例2 - 端口8081
+./terraria-panel -port=8081 &
+
+# 实例3 - 端口8082
+./terraria-panel -port=8082 &
 ```
 
 ### 2. Docker 部署 (实验性)

@@ -568,7 +568,7 @@ location / {
 - **Bun**: >= 1.2.19 (推荐最新版)
 - **内存**: >= 8GB RAM
 - **存储**: >= 1GB 可用空间
-- **系统**: Windows 10+, macOS 12+, Ubuntu 20.04+
+- **系统**: Ubuntu 20.04+, CentOS 7+, Debian 9+
 
 ### ⚙️ 可选工具
 - **VS Code**: 推荐编辑器
@@ -585,10 +585,10 @@ location / {
 
 ### ❌ Bun 安装失败
 ```bash
-# Windows 用户
+# Linux 用户
 curl -fsSL https://bun.sh/install | bash
 
-# macOS 用户
+# macOS 用户 (开发环境)
 brew install oven-sh/bun/bun
 
 # 或使用 npm 安装

@@ -2,7 +2,7 @@
 
 # ===================================================================
 # 🎮 Terraria Panel - Linux One-Click Installer
-# 老王亲自制作的一键部署脚本，从GitHub下载并自动部署！
+# 老王精心制作的简化一键部署脚本，参考DST风格！
 # ===================================================================
 
 set -e  # Exit on any error
@@ -20,9 +20,8 @@ NC='\033[0m' # No Color
 # Configuration
 GITHUB_REPO="ShourGG/tailamianban"
 VERSION="latest"
-INSTALL_DIR="/opt/terraria-panel"
+INSTALL_DIR="$HOME/terraria-panel"
 SERVICE_NAME="terraria-panel"
-USER="terraria"
 
 print_banner() {
     echo ""
