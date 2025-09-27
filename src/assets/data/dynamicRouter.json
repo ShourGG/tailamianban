@@ -4,7 +4,7 @@
     {
       "path": "/",
       "component": "layout",
-      "redirect": "/dashboard/overview",
+      "redirect": "/home",
       "children": [
         {
           "path": "home",
@@ -15,6 +15,19 @@
             "title": "首页",
             "hidden": false,
             "affix": true,
+            "keepAlive": false,
+            "full": false
+          }
+        },
+        {
+          "path": "dashboard/overview",
+          "name": "dashboard-overview",
+          "component": "/dashboard/overview/index",
+          "meta": {
+            "icon": "mdi:view-dashboard",
+            "title": "仪表盘",
+            "hidden": true,
+            "affix": false,
             "keepAlive": false,
             "full": false
           }
