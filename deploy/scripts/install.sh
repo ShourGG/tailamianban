@@ -166,17 +166,34 @@ EOF
 setup_redis() {
     log_info "Setting up Redis..."
 
-    # Configure Redis password (escape special characters)
-    if grep -q "^requirepass" /etc/redis/redis.conf; then
-        sed -i "s/^requirepass .*/requirepass $REDIS_PASSWORD/" /etc/redis/redis.conf
-    elif grep -q "^# requirepass" /etc/redis/redis.conf; then
-        sed -i "s/^# requirepass .*/requirepass $REDIS_PASSWORD/" /etc/redis/redis.conf
+    # Configure Redis password (find correct config file)
+    REDIS_CONF=""
+    if [[ -f "/etc/redis/redis.conf" ]]; then
+        REDIS_CONF="/etc/redis/redis.conf"
+    elif [[ -f "/etc/redis.conf" ]]; then
+        REDIS_CONF="/etc/redis.conf"
     else
-        echo "requirepass $REDIS_PASSWORD" >> /etc/redis/redis.conf
+        log_warn "Redis config file not found, skipping password setup"
+        return
     fi
 
-    systemctl enable redis
-    systemctl restart redis
+    # Set password in config file
+    if grep -q "^requirepass" "$REDIS_CONF"; then
+        sed -i "s/^requirepass .*/requirepass $REDIS_PASSWORD/" "$REDIS_CONF"
+    elif grep -q "^# requirepass" "$REDIS_CONF"; then
+        sed -i "s/^# requirepass .*/requirepass $REDIS_PASSWORD/" "$REDIS_CONF"
+    else
+        echo "requirepass $REDIS_PASSWORD" >> "$REDIS_CONF"
+    fi
+
+    # Enable and start Redis (service name varies by OS)
+    if systemctl list-unit-files | grep -q "redis-server.service"; then
+        systemctl enable redis-server
+        systemctl restart redis-server
+    else
+        systemctl enable redis
+        systemctl restart redis
+    fi
 
     log_success "Redis configured"
 }
