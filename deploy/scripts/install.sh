@@ -177,11 +177,15 @@ setup_redis() {
         return
     fi
 
-    # Set password in config file
+    # Set password in config file (escape special characters)
     if grep -q "^requirepass" "$REDIS_CONF"; then
-        sed -i "s/^requirepass .*/requirepass $REDIS_PASSWORD/" "$REDIS_CONF"
+        # Remove existing requirepass line
+        sed -i '/^requirepass /d' "$REDIS_CONF"
+        echo "requirepass $REDIS_PASSWORD" >> "$REDIS_CONF"
     elif grep -q "^# requirepass" "$REDIS_CONF"; then
-        sed -i "s/^# requirepass .*/requirepass $REDIS_PASSWORD/" "$REDIS_CONF"
+        # Remove commented requirepass line and add new one
+        sed -i '/^# requirepass /d' "$REDIS_CONF"
+        echo "requirepass $REDIS_PASSWORD" >> "$REDIS_CONF"
     else
         echo "requirepass $REDIS_PASSWORD" >> "$REDIS_CONF"
     fi
