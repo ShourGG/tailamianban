@@ -166,8 +166,14 @@ EOF
 setup_redis() {
     log_info "Setting up Redis..."
 
-    # Configure Redis password
-    sed -i "s/^# requirepass .*/requirepass ${REDIS_PASSWORD}/" /etc/redis/redis.conf
+    # Configure Redis password (escape special characters)
+    if grep -q "^requirepass" /etc/redis/redis.conf; then
+        sed -i "s/^requirepass .*/requirepass $REDIS_PASSWORD/" /etc/redis/redis.conf
+    elif grep -q "^# requirepass" /etc/redis/redis.conf; then
+        sed -i "s/^# requirepass .*/requirepass $REDIS_PASSWORD/" /etc/redis/redis.conf
+    else
+        echo "requirepass $REDIS_PASSWORD" >> /etc/redis/redis.conf
+    fi
 
     systemctl enable redis
     systemctl restart redis
