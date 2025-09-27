@@ -226,15 +226,33 @@ build_frontend() {
     log_info "Current directory: $(pwd)"
     log_info "Looking for: backend/dist/index.html"
 
-    if [[ -d "backend/dist" && -f "backend/dist/index.html" ]]; then
-        log_info "Found pre-built frontend files"
-        # Copy to nginx directory
-        rm -rf $INSTALL_DIR/dist.old
-        [[ -d $INSTALL_DIR/dist ]] && mv $INSTALL_DIR/dist $INSTALL_DIR/dist.old
-        cp -r backend/dist $INSTALL_DIR/
-        log_info "Pre-built frontend files copied successfully"
+    # Debug: Check what's actually in backend/dist
+    if [[ -d "backend/dist" ]]; then
+        log_info "backend/dist directory exists"
+        log_info "Contents of backend/dist: $(ls -la backend/dist/ | head -10)"
+
+        # Look for any HTML file, not just index.html
+        if find backend/dist -name "*.html" -type f | head -1 | grep -q .; then
+            log_info "Found HTML files in pre-built frontend"
+            # Copy to nginx directory
+            rm -rf $INSTALL_DIR/dist.old
+            [[ -d $INSTALL_DIR/dist ]] && mv $INSTALL_DIR/dist $INSTALL_DIR/dist.old
+            cp -r backend/dist $INSTALL_DIR/
+            log_info "Pre-built frontend files copied successfully"
+        else
+            log_info "No HTML files found in backend/dist, building from source..."
+            log_info "Files in backend/dist: $(find backend/dist -type f | head -10)"
+
+            # Check if Node.js is available
+            if ! command -v npm &> /dev/null; then
+                log_error "Node.js/npm is not installed and no pre-built frontend found. Please install Node.js or use a release with pre-built files."
+            fi
+
+            npm install --legacy-peer-deps
+            npm run build
+        fi
     else
-        log_info "Pre-built frontend not found, building from source..."
+        log_info "backend/dist directory not found, building from source..."
         log_info "Directory contents: $(ls -la)"
         log_info "Backend directory: $(ls -la backend/ 2>/dev/null || echo 'backend directory not found')"
 
@@ -243,7 +261,7 @@ build_frontend() {
             log_error "Node.js/npm is not installed and no pre-built frontend found. Please install Node.js or use a release with pre-built files."
         fi
 
-        npm install
+        npm install --legacy-peer-deps
         npm run build
 
         # Move dist to nginx directory
