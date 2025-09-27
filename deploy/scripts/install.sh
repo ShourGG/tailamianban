@@ -187,12 +187,29 @@ setup_redis() {
     fi
 
     # Enable and start Redis (service name varies by OS)
-    if systemctl list-unit-files | grep -q "redis-server.service"; then
+    log_info "Configuring Redis service..."
+
+    # Try redis-server first (Ubuntu/Debian)
+    if systemctl list-unit-files redis-server.service >/dev/null 2>&1; then
+        log_info "Using redis-server service"
         systemctl enable redis-server
         systemctl restart redis-server
-    else
+        systemctl status redis-server --no-pager -l
+    # Try redis service (CentOS/RHEL)
+    elif systemctl list-unit-files redis.service >/dev/null 2>&1; then
+        log_info "Using redis service"
         systemctl enable redis
         systemctl restart redis
+        systemctl status redis --no-pager -l
+    else
+        log_warn "Redis service not found, trying manual start..."
+        # Try to start redis-server directly
+        if command -v redis-server >/dev/null 2>&1; then
+            log_info "Starting redis-server manually"
+            redis-server --daemonize yes
+        else
+            log_error "Redis not properly installed"
+        fi
     fi
 
     log_success "Redis configured"
