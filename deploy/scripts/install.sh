@@ -205,14 +205,21 @@ build_frontend() {
     cd $INSTALL_DIR
 
     # Check if pre-built dist directory exists
+    log_info "Checking for pre-built frontend files..."
+    log_info "Current directory: $(pwd)"
+    log_info "Looking for: backend/dist/index.html"
+
     if [[ -d "backend/dist" && -f "backend/dist/index.html" ]]; then
-        log_info "Using pre-built frontend files"
+        log_info "Found pre-built frontend files"
         # Copy to nginx directory
         rm -rf $INSTALL_DIR/dist.old
         [[ -d $INSTALL_DIR/dist ]] && mv $INSTALL_DIR/dist $INSTALL_DIR/dist.old
         cp -r backend/dist $INSTALL_DIR/
+        log_info "Pre-built frontend files copied successfully"
     else
         log_info "Pre-built frontend not found, building from source..."
+        log_info "Directory contents: $(ls -la)"
+        log_info "Backend directory: $(ls -la backend/ 2>/dev/null || echo 'backend directory not found')"
 
         # Check if Node.js is available
         if ! command -v npm &> /dev/null; then
