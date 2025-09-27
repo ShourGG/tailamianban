@@ -318,8 +318,20 @@ setup_nginx() {
     # Copy Nginx configuration
     cp $INSTALL_DIR/deploy/nginx/nginx.conf /etc/nginx/nginx.conf
 
+    # Fix user for Ubuntu (www-data instead of nginx)
+    if id "www-data" &>/dev/null; then
+        sed -i "s/user nginx;/user www-data;/" /etc/nginx/nginx.conf
+        log_info "Updated Nginx user to www-data for Ubuntu"
+    fi
+
     # Update domain name in config
-    sed -i "s/terraria-panel.example.com/${DOMAIN_NAME}/g" /etc/nginx/nginx.conf
+    if [[ -n "$DOMAIN_NAME" ]]; then
+        sed -i "s/terraria-panel.example.com/${DOMAIN_NAME}/g" /etc/nginx/nginx.conf
+    else
+        # Use server IP for HTTP access
+        SERVER_IP=$(curl -s ifconfig.me || echo "localhost")
+        sed -i "s/terraria-panel.example.com/${SERVER_IP}/g" /etc/nginx/nginx.conf
+    fi
 
     # Create directories
     mkdir -p /var/www/terraria-panel
