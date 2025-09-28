@@ -16,7 +16,7 @@ terraria-panel
 go.work
 
 # Runtime data
-data/
+/data/
 logs/
 *.log
 *.pid
