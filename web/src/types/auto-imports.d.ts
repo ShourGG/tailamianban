@@ -104,6 +104,7 @@ declare global {
   const usePreloader: (typeof import('../composables/usePreloader'))['usePreloader']
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']
+  const useServerStore: typeof import('../stores/server')['useServerStore']
   const useSlots: typeof import('vue')['useSlots']
   const useTemplateRef: typeof import('vue')['useTemplateRef']
   const watch: typeof import('vue')['watch']
@@ -119,6 +120,9 @@ declare global {
   // @ts-ignore
   export type { User, LoginResponse } from '../stores/auth'
   import('../stores/auth')
+  // @ts-ignore
+  export type { ServerInfo } from '../stores/server'
+  import('../stores/server')
 }
 
 // for vue template auto import
@@ -223,6 +227,7 @@ declare module 'vue' {
     readonly useNotification: UnwrapRef<typeof import('naive-ui')['useNotification']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
+    readonly useServerStore: UnwrapRef<typeof import('../stores/server')['useServerStore']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
