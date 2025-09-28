@@ -1,4 +1,4 @@
-import { http } from '@/axios'
+import http from '@/axios/request'
 
 // API响应类型定义
 export interface ApiResponse<T = any> {

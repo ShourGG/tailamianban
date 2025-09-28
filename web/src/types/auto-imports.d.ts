@@ -107,6 +107,7 @@ declare global {
   const useServerStore: typeof import('../stores/server')['useServerStore']
   const useSlots: typeof import('vue')['useSlots']
   const useTemplateRef: typeof import('vue')['useTemplateRef']
+  const useWebSocketStore: typeof import('../stores/websocket')['useWebSocketStore']
   const watch: typeof import('vue')['watch']
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']
@@ -230,6 +231,7 @@ declare module 'vue' {
     readonly useServerStore: UnwrapRef<typeof import('../stores/server')['useServerStore']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>
+    readonly useWebSocketStore: UnwrapRef<typeof import('../stores/websocket')['useWebSocketStore']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('vue')['watchPostEffect']>
