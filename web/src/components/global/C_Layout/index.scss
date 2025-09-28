@@ -1,0 +1,242 @@
+/*
+ * ==== 基础布局样式 ====
+ * 定义整个应用的基础布局结构
+ */
+
+/* 主布局容器样式 */
+.layout-container {
+  height: 100vh; /* 视口高度 */
+  overflow: hidden; /* 隐藏溢出内容 */
+}
+
+/*
+ * ==== 内容区域样式 ====
+ * 定义主要内容区域的样式
+ */
+
+/* 带标题的内容区域 */
+.layout-container :deep(.content-with-header) {
+  margin-top: 100px; /* 顶部留出标题空间 */
+  height: calc(100vh - 150px); /* 计算高度：100px标题 + 50px页脚 */
+}
+
+/* Naive UI布局内容区域 */
+.layout-container :deep(.n-layout-content) {
+  display: flex;
+  flex-direction: column; /* 垂直排列 */
+  flex: 1; /* 填充剩余空间 */
+  overflow-x: hidden; /* 禁用横向滚动 */
+}
+
+/* 主内容区域 */
+.main-content {
+  flex: 1; /* 填充剩余空间 */
+  padding: 16px; /* 内边距 */
+  overflow-y: auto; /* 允许垂直滚动 */
+  overflow-x: hidden; /* 禁用横向滚动 */
+  width: 100%; /* 宽度自适应 */
+  border-radius: 8px;
+}
+
+/*
+ * ==== 主题相关样式 ====
+ * 定义不同主题下的颜色和过渡效果
+ */
+
+/* 明亮主题 */
+.layout-container :deep(.light-theme) {
+  background-color: #ffffff !important; /* 白色背景 */
+}
+
+/* 暗黑主题 */
+.layout-container :deep(.dark-theme) {
+  background-color: #1c1c1c !important; /* 深色背景 */
+}
+
+/* 明亮模式下的滚动容器 */
+.layout-container.light-mode :deep(.n-layout .n-layout-scroll-container) {
+  background-color: #f4f7f9 !important; /* 浅灰色背景 */
+  border-radius: 10px;
+}
+
+/* 暗黑/系统模式下的滚动容器 */
+.layout-container.dark-mode :deep(.n-layout .n-layout-scroll-container),
+.layout-container.system-mode :deep(.n-layout .n-layout-scroll-container) {
+  background-color: #121212 !important; /* 深黑色背景 */
+}
+
+/* 主题切换时的过渡效果 */
+.layout-container.theme-transitioning {
+  opacity: 0.95; /* 轻微透明效果 */
+}
+
+/*
+ * ==== 侧边栏和菜单样式 ====
+ * 定义侧边栏和导航菜单的样式
+ */
+
+/* 侧边栏基础样式 */
+.layout-sider {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 平滑过渡 */
+  transform: translateZ(0); /* 启用GPU加速 */
+  backface-visibility: hidden; /* 优化渲染 */
+  perspective: 1000px; /* 3D透视 */
+  contain: strict; /* 优化性能 */
+}
+
+/* 明亮主题侧边栏 */
+.layout-sider.light-theme {
+  background-color: #081426; /* 深蓝色背景 */
+}
+
+/* 暗黑主题侧边栏 */
+.layout-sider.dark-theme {
+  background-color: #1c1c1c; /* 深灰色背景 */
+}
+
+/* 侧边栏滚动条优化 */
+.layout-sider :deep(.n-scrollbar-rail) {
+  width: 0 !important; /* 隐藏滚动条轨道 */
+}
+.layout-sider :deep(.n-scrollbar-content) {
+  padding-right: 0 !important; /* 移除内容右侧padding */
+}
+
+/* 侧边栏布局 */
+.layout-container :deep(.n-layout-sider) {
+  flex-shrink: 0; /* 禁止收缩 */
+  height: 100%; /* 填充高度 */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 禁用滚动 */
+}
+
+/* 菜单滚动容器 */
+.menu-scroll-container {
+  height: calc(100vh - 56px); /* 计算高度 */
+  overflow-y: scroll; /* 垂直滚动 */
+  scrollbar-width: none; /* 隐藏滚动条(Firefox) */
+  -ms-overflow-style: none; /* 隐藏滚动条(IE) */
+  flex: 1; /* 填充空间 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 隐藏Webkit滚动条 */
+.menu-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* 垂直菜单样式 */
+.layout-container :deep(.n-menu.n-menu--vertical) {
+  flex: 1; /* 填充空间 */
+  min-height: min-content; /* 最小高度 */
+  overflow-y: auto; /* 垂直滚动 */
+  overflow-x: hidden; /* 禁用横向滚动 */
+}
+
+/* 菜单图标样式 */
+.layout-container :deep(.n-menu-item-content__icon) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // margin-top: -8px; /* 微调位置 */
+  vertical-align: top;
+  width: 24px; /* 固定宽度 */
+  height: 24px; /* 固定高度 */
+  margin-right: 8px; /* 右侧间距 */
+}
+
+/*
+ * ==== 折叠菜单样式 ====
+ * 定义菜单折叠状态下的样式
+ */
+
+/* 折叠菜单容器 */
+.layout-container :deep(.n-menu.n-menu--collapsed) {
+  width: 64px !important; /* 固定宽度 */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 居中对齐 */
+}
+
+/* 折叠菜单项内容 */
+.layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item-content) {
+  justify-content: center !important; /* 居中对齐 */
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  width: 64px; /* 固定宽度 */
+}
+
+/* 折叠菜单图标定位 */
+.layout-container :deep(.n-menu.n-menu--collapsed .n-icon) {
+  margin-left: 38px !important; /* 精确居中 */
+  margin-top: 4px !important; /* 垂直居中 */
+}
+
+/* 折叠菜单项 */
+.layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item) {
+  padding: 0 !important;
+  display: flex;
+  justify-content: center;
+  width: 100%; /* 填充宽度 */
+}
+
+/* 折叠菜单项标题 */
+.layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item-content-header) {
+  margin: 0 auto; /* 水平居中 */
+  margin-top: -10px;
+  padding: 0;
+}
+
+/* 折叠菜单图标间距 */
+.layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item-content__icon) {
+  margin-right: 0; /* 移除右侧间距 */
+}
+
+/* 折叠菜单选中状态图标 */
+.layout-container :deep(
+  .n-menu.n-menu--collapsed
+    .n-menu-item-content--child-active
+    .n-menu-item-content__icon
+) {
+  color: var(--n-item-color-active) !important; /* 使用主题色 */
+}
+
+/* 折叠菜单选中状态 */
+.layout-container :deep(.n-menu.n-menu--collapsed .n-menu-item-content--child-active) {
+  opacity: 0.85; /* 半透明效果 */
+  &::before {
+    background: rgba(251, 255, 253, 0.15); /* 半透明背景 */
+    border-radius: 6px; /* 圆角 */
+  }
+}
+
+/* 折叠菜单图标颜色 */
+:deep(.n-menu--collapsed .n-menu-item-content__icon) {
+  color: rgba(229, 231, 235, 0.9) !important; /* 浅灰色图标 */
+}
+
+/*
+ * ==== 其他辅助样式 ====
+ * 各种辅助类和布局优化
+ */
+
+/* 确保Naive UI布局自适应 */
+.layout-container :deep(.n-layout) {
+  width: 100%; /* 填充宽度 */
+  min-width: 0; /* 允许收缩 */
+}
+
+/* 布局容器高度 */
+.layout-container {
+  height: 100vh; /* 视口高度 */
+  display: flex;
+  flex-direction: column; /* 垂直布局 */
+}
+
+/* 彻底禁用横向滚动 */
+.no-horizontal-scroll {
+  overflow-x: hidden !important; /* 强制隐藏横向滚动 */
+}

@@ -1,0 +1,87 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+terraria-panel
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Go workspace file
+go.work
+
+# Runtime data
+data/
+logs/
+*.log
+*.pid
+
+# Temporary files
+tmp/
+temp/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node.js dependencies (frontend)
+web/node_modules/
+web/dist/
+web/.temp/
+web/.cache/
+
+# Frontend build artifacts
+web/auto-imports.d.ts
+web/components.d.ts
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Development only - dist directory
+# Note: In production/release, we include dist/ for embedded frontend
+# Uncomment the line below for development
+# dist/
+
+# Reference projects (development only)
+references/
+
+# Backup files
+*.bak
+*.backup
+
+# Database files (development)
+*.db
+*.sqlite
+*.sqlite3
+
+# Certificate files
+*.pem
+*.key
+*.crt
+
+# Compressed files
+*.tar.gz
+*.zip
+*.rar
+
+# Documentation build
+docs/_build/

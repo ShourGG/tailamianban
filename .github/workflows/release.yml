@@ -1,0 +1,174 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Build frontend
+      run: |
+        cd web
+        npm ci
+        npm run build
+        cd ..
+        
+    - name: Upload frontend artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-dist
+        path: web/dist
+
+  build-backend:
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            suffix: linux-amd64
+          - goos: linux
+            goarch: arm64
+            suffix: linux-arm64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download frontend artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-dist
+        path: dist
+
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+
+    - name: Install dependencies
+      run: |
+        go mod download
+
+    - name: Build binary
+      env:
+        CGO_ENABLED: 1
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+      run: |
+        # 安装交叉编译工具
+        if [ "${{ matrix.goarch }}" = "arm64" ]; then
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          export CC=aarch64-linux-gnu-gcc
+        fi
+        
+        # 编译二进制文件（嵌入前端资源）
+        go build -ldflags "-s -w -X main.Version=${{ github.event.inputs.version || github.ref_name }}" \
+          -o terraria-panel cmd/main.go
+        
+        # 确保二进制文件可执行
+        chmod +x terraria-panel
+
+    - name: Package release
+      run: |
+        # 创建发布包结构
+        mkdir -p release/terraria-panel
+        
+        # 复制核心文件
+        cp terraria-panel release/terraria-panel/
+        cp -r scripts release/terraria-panel/
+        cp -r configs release/terraria-panel/ || true
+        cp README.md release/terraria-panel/
+        
+        # 如果dist目录存在且二进制文件没有嵌入，则复制
+        if [ -d "dist" ] && [ ! -f "internal/embedded/embed.go" ]; then
+          cp -r dist release/terraria-panel/
+        fi
+        
+        # 创建必要的空目录
+        mkdir -p release/terraria-panel/data
+        mkdir -p release/terraria-panel/logs
+        mkdir -p release/terraria-panel/worlds
+        
+        # 打包
+        cd release
+        tar -czf terraria-panel-${{ matrix.suffix }}.tar.gz terraria-panel
+        cd ..
+
+    - name: Upload release artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: terraria-panel-${{ matrix.suffix }}
+        path: release/terraria-panel-${{ matrix.suffix }}.tar.gz
+
+  create-release:
+    needs: build-backend
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.event.inputs.version || github.ref_name }}
+        name: Release ${{ github.event.inputs.version || github.ref_name }}
+        draft: false
+        prerelease: false
+        files: |
+          terraria-panel-linux-amd64/terraria-panel-linux-amd64.tar.gz
+          terraria-panel-linux-arm64/terraria-panel-linux-arm64.tar.gz
+        body: |
+          ## 🎮 泰拉瑞亚面板 ${{ github.event.inputs.version || github.ref_name }}
+          
+          ### 📦 安装方法
+          
+          **一键安装（推荐）：**
+          ```bash
+          curl -fsSL https://raw.githubusercontent.com/ShourGG/tailamianban/main/scripts/install.sh | sudo bash
+          ```
+          
+          **手动安装：**
+          ```bash
+          # 下载对应架构的版本
+          wget https://github.com/ShourGG/tailamianban/releases/download/${{ github.event.inputs.version || github.ref_name }}/terraria-panel-linux-amd64.tar.gz
+          
+          # 解压
+          tar -xzf terraria-panel-linux-amd64.tar.gz
+          cd terraria-panel
+          
+          # 启动
+          ./scripts/run.sh start
+          ```
+          
+          ### 🔄 更新内容
+          - 详见提交记录
+          
+          ### 📝 默认配置
+          - 端口: 8080
+          - 用户名: admin
+          - 密码: admin123

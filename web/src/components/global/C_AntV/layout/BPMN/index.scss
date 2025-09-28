@@ -1,0 +1,171 @@
+.bpmn-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: #f8f9fa;
+  border-radius: 6px;
+  overflow: hidden;
+
+  .top-toolbar {
+    background: #ffffff;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 10px 16px;
+    flex-shrink: 0;
+
+    .toolbar-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .toolbar-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+  }
+
+  .main-content {
+    display: flex;
+    flex: 1;
+    height: 0;
+
+    .left-panel {
+      width: 180px;
+      background: #ffffff;
+      border-right: 1px solid #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+
+      .panel-title {
+        padding: 16px;
+        font-weight: 600;
+        font-size: 14px;
+        color: #333;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .element-grid {
+        padding: 16px 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+
+        .element-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          padding: 16px 8px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 12px;
+          color: #555;
+          transition: all 0.2s;
+          border: 1px solid transparent;
+
+          &:hover {
+            background: #e6f7ff;
+            border-color: #91d5ff;
+            color: #1890ff;
+          }
+
+          .element-icon {
+            flex-shrink: 0;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &.circle {
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+            }
+
+            &.rect {
+              width: 32px;
+              height: 20px;
+              border-radius: 4px;
+            }
+
+            &.diamond {
+              width: 24px;
+              height: 24px;
+              transform: rotate(45deg);
+              border-radius: 3px;
+            }
+
+            &.start-event {
+              border-color: #52c41a;
+              background: #f6ffed;
+            }
+
+            &.end-event {
+              border-color: #ff4d4f;
+              background: #fff2f0;
+            }
+
+            &.activity {
+              border-color: #1890ff;
+              background: #e6f7ff;
+            }
+
+            &.gateway {
+              border-color: #722ed1;
+              background: #f9f0ff;
+            }
+          }
+        }
+      }
+    }
+
+    .graph-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .graph-container {
+        flex: 1;
+        width: 100%;
+        background: #ffffff;
+        border: 1px solid #e8e8e8;
+        margin: 16px;
+        border-radius: 6px;
+        overflow: hidden;
+
+        :deep(.x6-graph),
+        :deep(.x6-graph-svg) {
+          width: 100% !important;
+          height: 100% !important;
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+.n-drawer {
+  .property-panel {
+    padding: 16px;
+
+    .property-item {
+      margin-bottom: 16px;
+
+      .property-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 8px;
+      }
+    }
+
+    .form-actions {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+  }
+}
