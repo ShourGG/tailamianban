@@ -14,7 +14,7 @@ import (
 	static "github.com/soulteary/gin-static"
 )
 
-//go:embed ../dist
+//go:embed all:dist
 var EmbedFS embed.FS
 
 var (

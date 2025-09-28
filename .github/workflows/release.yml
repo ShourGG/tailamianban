@@ -57,7 +57,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: frontend-dist
-        path: dist
+        path: cmd/dist
 
     - name: Setup Go
       uses: actions/setup-go@v4
