@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"log"
-	"time"
 
 	_ "modernc.org/sqlite"
 )
@@ -44,7 +43,7 @@ func createTables() error {
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			last_login_at DATETIME
 		)`,
-		
+
 		`CREATE TABLE IF NOT EXISTS audit_logs (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			user_id TEXT,
@@ -54,7 +53,7 @@ func createTables() error {
 			timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (user_id) REFERENCES users (id)
 		)`,
-		
+
 		`CREATE TABLE IF NOT EXISTS server_configs (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			key TEXT UNIQUE NOT NULL,
@@ -63,7 +62,7 @@ func createTables() error {
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		)`,
-		
+
 		`CREATE TABLE IF NOT EXISTS worlds (
 			id TEXT PRIMARY KEY,
 			name TEXT NOT NULL,
@@ -74,7 +73,7 @@ func createTables() error {
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			last_played_at DATETIME
 		)`,
-		
+
 		`CREATE TABLE IF NOT EXISTS players (
 			id TEXT PRIMARY KEY,
 			name TEXT NOT NULL,
@@ -87,7 +86,7 @@ func createTables() error {
 			banned_at DATETIME,
 			banned_by TEXT
 		)`,
-		
+
 		`CREATE TABLE IF NOT EXISTS system_metrics (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			cpu_usage REAL,
