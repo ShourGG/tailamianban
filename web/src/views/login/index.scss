@@ -110,6 +110,27 @@ $transition-time: 0.3s;
     }
   }
 
+  /* Robot avatar - positioned at top of login form */
+  .robot-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+  }
+
   /* 登录标题 */
   .login-title {
     margin-top: 16px;

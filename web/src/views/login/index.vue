@@ -12,7 +12,7 @@
     <!-- 打字机组件 -->
     <Typewriter
       v-if="showTypewriter"
-      text="Hey！伙计，欢迎来到我的世界。"
+      text="Hey！伙计，欢迎来到泰拉瑞亚。"
       :duration="2000"
       :delay="300"
       :pause-after="1000"
@@ -28,7 +28,12 @@
     </div>
 
     <div class="login-wrapper">
-      <h3 class="login-title">{{ 'Robot Admin 管理系统' }}</h3>
+      <!-- Robot avatar -->
+      <div class="robot-avatar">
+        <img src="/robot-avatar.png" alt="Robot Avatar" />
+      </div>
+      
+      <h3 class="login-title">{{ '泰拉瑞亚管理面板' }}</h3>
       <C_Form
         class="login-form"
         :options="OPTIONS"
