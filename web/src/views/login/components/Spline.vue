@@ -98,7 +98,8 @@
 
   function eventHandler(name: SplineEventName, handler?: (e: any) => void) {
     if (!handler || !splineApp.value) return
-    const debouncedHandler = useDebounceFn(handler, 50, { maxWait: 100 })
+    // 增加防抖时间，减少事件触发频率
+    const debouncedHandler = useDebounceFn(handler, 100, { maxWait: 200 })
     splineApp.value.addEventListener(name, debouncedHandler)
     return () => splineApp.value?.removeEventListener(name, debouncedHandler)
   }
@@ -115,7 +116,9 @@
       }
 
       splineApp.value = new Application(canvasRef.value, {
-        renderOnDemand: props.renderOnDemand,
+        renderOnDemand: true,  // 强制按需渲染，提升性能
+        alpha: false,           // 禁用透明度，提升性能
+        antialias: false,       // 禁用抗锯齿，提升性能
       })
 
       const originalWarn = console.warn
@@ -137,25 +140,18 @@
 
       console.warn = originalWarn
 
+      // 移除不必要的事件监听器，提升性能
       const cleanUpFns = [
-        eventHandler('mouseDown', (e: any) => emit('spline-mouse-down', e)),
-        eventHandler('mouseUp', (e: any) => emit('spline-mouse-up', e)),
-        eventHandler('mouseHover', (e: any) => {
-          console.log('🖱️ 鼠标移动事件:', e)
-          emit('spline-mouse-hover', e)
-        }),
-        eventHandler('keyDown', (e: any) => emit('spline-key-down', e)),
-        eventHandler('keyUp', (e: any) => emit('spline-key-up', e)),
+        // 注释掉不需要的事件以提升性能
+        // eventHandler('mouseDown', (e: any) => emit('spline-mouse-down', e)),
+        // eventHandler('mouseUp', (e: any) => emit('spline-mouse-up', e)),
+        // eventHandler('mouseHover', (e: any) => emit('spline-mouse-hover', e)),
+        // eventHandler('keyDown', (e: any) => emit('spline-key-down', e)),
+        // eventHandler('keyUp', (e: any) => emit('spline-key-up', e)),
         eventHandler('start', (e: any) => emit('spline-start', e)),
-        eventHandler('lookAt', (e: any) => {
-          console.log('👁️ LookAt事件触发:', e)
-          emit('spline-look-at', e)
-        }),
-        eventHandler('follow', (e: any) => {
-          console.log('🎯 Follow事件触发:', e)
-          emit('spline-follow', e)
-        }),
-        eventHandler('scroll', (e: any) => emit('spline-scroll', e)),
+        // eventHandler('lookAt', (e: any) => emit('spline-look-at', e)),
+        // eventHandler('follow', (e: any) => emit('spline-follow', e)),
+        // eventHandler('scroll', (e: any) => emit('spline-scroll', e)),
       ].filter(Boolean)
 
       isLoading.value = false
