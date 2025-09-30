@@ -17,11 +17,11 @@ import (
 
 // SystemMetrics represents system resource metrics
 type SystemMetrics struct {
-	CPU    CPUMetrics    `json:"cpu"`
-	Memory MemoryMetrics `json:"memory"`
-	Disk   DiskMetrics   `json:"disk"`
-	Network NetworkMetrics `json:"network"`
-	Timestamp time.Time  `json:"timestamp"`
+	CPU       CPUMetrics     `json:"cpu"`
+	Memory    MemoryMetrics  `json:"memory"`
+	Disk      DiskMetrics    `json:"disk"`
+	Network   NetworkMetrics `json:"network"`
+	Timestamp time.Time      `json:"timestamp"`
 }
 
 // CPUMetrics represents CPU usage information
@@ -33,10 +33,10 @@ type CPUMetrics struct {
 
 // MemoryMetrics represents memory usage information
 type MemoryMetrics struct {
-	Total       uint64  `json:"total"`
-	Used        uint64  `json:"used"`
-	Free        uint64  `json:"free"`
-	UsedPercent float64 `json:"used_percent"`
+	Total       uint64      `json:"total"`
+	Used        uint64      `json:"used"`
+	Free        uint64      `json:"free"`
+	UsedPercent float64     `json:"used_percent"`
 	Swap        SwapMetrics `json:"swap"`
 }
 
@@ -69,13 +69,13 @@ type NetworkMetrics struct {
 
 // ProcessInfo represents process information
 type ProcessInfo struct {
-	PID         int32   `json:"pid"`
-	Name        string  `json:"name"`
-	CPU         float64 `json:"cpu_percent"`
-	Memory      float32 `json:"memory_percent"`
-	Status      string  `json:"status"`
-	CreateTime  int64   `json:"create_time"`
-	Username    string  `json:"username"`
+	PID        int32   `json:"pid"`
+	Name       string  `json:"name"`
+	CPU        float64 `json:"cpu_percent"`
+	Memory     float32 `json:"memory_percent"`
+	Status     string  `json:"status"`
+	CreateTime int64   `json:"create_time"`
+	Username   string  `json:"username"`
 }
 
 // GetSystemMetrics returns current system metrics
@@ -91,12 +91,12 @@ func GetSystemMetrics(c *gin.Context) {
 	}
 
 	cpuCount, _ := cpu.Counts(true)
-	
+
 	cpuMetrics := CPUMetrics{
 		UsagePercent: cpuPercent[0],
 		Cores:        cpuCount,
 	}
-	
+
 	// Load average is typically not available on Windows
 	// For Linux systems, you can get it from /proc/loadavg
 
@@ -111,14 +111,14 @@ func GetSystemMetrics(c *gin.Context) {
 	}
 
 	swapStat, _ := mem.SwapMemory()
-	
+
 	memoryMetrics := MemoryMetrics{
 		Total:       vmStat.Total,
 		Used:        vmStat.Used,
 		Free:        vmStat.Free,
 		UsedPercent: vmStat.UsedPercent,
 	}
-	
+
 	if swapStat != nil {
 		memoryMetrics.Swap = SwapMetrics{
 			Total:       swapStat.Total,
@@ -188,7 +188,7 @@ func GetMetricsHistory(c *gin.Context) {
 	// Get query parameters
 	duration := c.DefaultQuery("duration", "1h")
 	resolution := c.DefaultQuery("resolution", "1m")
-	
+
 	// Parse duration
 	dur, err := time.ParseDuration(duration)
 	if err != nil {
@@ -231,10 +231,10 @@ func GetSystemInfo(c *gin.Context) {
 
 	// Get runtime information
 	runtimeInfo := map[string]interface{}{
-		"go_version": runtime.Version(),
-		"go_arch":    runtime.GOARCH,
-		"go_os":      runtime.GOOS,
-		"num_cpu":    runtime.NumCPU(),
+		"go_version":    runtime.Version(),
+		"go_arch":       runtime.GOARCH,
+		"go_os":         runtime.GOOS,
+		"num_cpu":       runtime.NumCPU(),
 		"num_goroutine": runtime.NumGoroutine(),
 	}
 
@@ -242,19 +242,19 @@ func GetSystemInfo(c *gin.Context) {
 	terrariaInfo, _ := service.GetTerrariaServerInfo()
 
 	systemInfo := map[string]interface{}{
-		"hostname":     hostStat.Hostname,
-		"platform":     hostStat.Platform,
-		"platform_family": hostStat.PlatformFamily,
+		"hostname":         hostStat.Hostname,
+		"platform":         hostStat.Platform,
+		"platform_family":  hostStat.PlatformFamily,
 		"platform_version": hostStat.PlatformVersion,
-		"kernel_version": hostStat.KernelVersion,
-		"kernel_arch":  hostStat.KernelArch,
-		"uptime":       hostStat.Uptime,
-		"boot_time":    hostStat.BootTime,
-		"procs":        hostStat.Procs,
-		"os":           hostStat.OS,
-		"host_id":      hostStat.HostID,
-		"runtime":      runtimeInfo,
-		"terraria":     terrariaInfo,
+		"kernel_version":   hostStat.KernelVersion,
+		"kernel_arch":      hostStat.KernelArch,
+		"uptime":           hostStat.Uptime,
+		"boot_time":        hostStat.BootTime,
+		"procs":            hostStat.Procs,
+		"os":               hostStat.OS,
+		"host_id":          hostStat.HostID,
+		"runtime":          runtimeInfo,
+		"terraria":         terrariaInfo,
 	}
 
 	c.JSON(http.StatusOK, systemInfo)
@@ -263,9 +263,9 @@ func GetSystemInfo(c *gin.Context) {
 // GetProcessList returns list of running processes
 func GetProcessList(c *gin.Context) {
 	// Get filter parameters
-	sortBy := c.DefaultQuery("sort", "cpu")
+	_ = c.DefaultQuery("sort", "cpu") // sortBy for future use
 	limit := 50
-	
+
 	// Get all processes
 	processes, err := process.Processes()
 	if err != nil {
@@ -302,7 +302,7 @@ func GetProcessList(c *gin.Context) {
 		}
 
 		processList = append(processList, processInfo)
-		
+
 		// Limit the number of processes
 		if len(processList) >= limit {
 			break

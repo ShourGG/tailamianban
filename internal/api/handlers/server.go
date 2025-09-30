@@ -72,19 +72,19 @@ func StartServer(c *gin.Context) {
 	// Start the server
 	err = service.StartTerrariaServer()
 	if err != nil {
-		service.LogAuditEvent(userID.(string), "server.start_failed", 
+		service.LogAuditEvent(userID.(string), "server.start_failed",
 			"Failed to start server: "+err.Error(), c.ClientIP())
-		
+
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to start server",
-			"code":  "SERVER_START_FAILED",
+			"error":   "Failed to start server",
+			"code":    "SERVER_START_FAILED",
 			"details": err.Error(),
 		})
 		return
 	}
 
 	// Log successful start
-	service.LogAuditEvent(userID.(string), "server.start", 
+	service.LogAuditEvent(userID.(string), "server.start",
 		"Terraria server started", c.ClientIP())
 
 	c.JSON(http.StatusOK, gin.H{
@@ -110,19 +110,19 @@ func StopServer(c *gin.Context) {
 	// Stop the server
 	err = service.StopTerrariaServer()
 	if err != nil {
-		service.LogAuditEvent(userID.(string), "server.stop_failed", 
+		service.LogAuditEvent(userID.(string), "server.stop_failed",
 			"Failed to stop server: "+err.Error(), c.ClientIP())
-		
+
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to stop server",
-			"code":  "SERVER_STOP_FAILED",
+			"error":   "Failed to stop server",
+			"code":    "SERVER_STOP_FAILED",
 			"details": err.Error(),
 		})
 		return
 	}
 
 	// Log successful stop
-	service.LogAuditEvent(userID.(string), "server.stop", 
+	service.LogAuditEvent(userID.(string), "server.stop",
 		"Terraria server stopped", c.ClientIP())
 
 	c.JSON(http.StatusOK, gin.H{
@@ -140,9 +140,9 @@ func RestartServer(c *gin.Context) {
 	if err == nil && status.Status == "running" {
 		err = service.StopTerrariaServer()
 		if err != nil {
-			service.LogAuditEvent(userID.(string), "server.restart_failed", 
+			service.LogAuditEvent(userID.(string), "server.restart_failed",
 				"Failed to stop server during restart: "+err.Error(), c.ClientIP())
-			
+
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Failed to stop server for restart",
 				"code":  "SERVER_RESTART_STOP_FAILED",
@@ -154,9 +154,9 @@ func RestartServer(c *gin.Context) {
 	// Start the server
 	err = service.StartTerrariaServer()
 	if err != nil {
-		service.LogAuditEvent(userID.(string), "server.restart_failed", 
+		service.LogAuditEvent(userID.(string), "server.restart_failed",
 			"Failed to start server during restart: "+err.Error(), c.ClientIP())
-		
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to start server for restart",
 			"code":  "SERVER_RESTART_START_FAILED",
@@ -165,7 +165,7 @@ func RestartServer(c *gin.Context) {
 	}
 
 	// Log successful restart
-	service.LogAuditEvent(userID.(string), "server.restart", 
+	service.LogAuditEvent(userID.(string), "server.restart",
 		"Terraria server restarted", c.ClientIP())
 
 	c.JSON(http.StatusOK, gin.H{
@@ -195,8 +195,8 @@ func UpdateServerConfig(c *gin.Context) {
 	var req ServerConfigRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid configuration format",
-			"code":  "INVALID_CONFIG",
+			"error":   "Invalid configuration format",
+			"code":    "INVALID_CONFIG",
 			"details": err.Error(),
 		})
 		return
@@ -215,68 +215,23 @@ func UpdateServerConfig(c *gin.Context) {
 
 	err := service.UpdateTerrariaServerConfig(config)
 	if err != nil {
-		service.LogAuditEvent(userID.(string), "server.config_update_failed", 
+		service.LogAuditEvent(userID.(string), "server.config_update_failed",
 			"Failed to update server config: "+err.Error(), c.ClientIP())
-		
+
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to update server configuration",
-			"code":  "CONFIG_UPDATE_FAILED",
+			"error":   "Failed to update server configuration",
+			"code":    "CONFIG_UPDATE_FAILED",
 			"details": err.Error(),
 		})
 		return
 	}
 
 	// Log successful update
-	service.LogAuditEvent(userID.(string), "server.config_update", 
+	service.LogAuditEvent(userID.(string), "server.config_update",
 		"Server configuration updated", c.ClientIP())
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Configuration updated successfully",
 		"config":  config,
-	})
-}
-
-// GetServerLogs returns server logs
-func GetServerLogs(c *gin.Context) {
-	// Get query parameters
-	lines := c.DefaultQuery("lines", "100")
-	follow := c.DefaultQuery("follow", "false")
-
-	logs, err := service.GetTerrariaServerLogs(lines, follow == "true")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get server logs",
-			"code":  "LOGS_GET_FAILED",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"logs": logs,
-	})
-}
-
-// ClearServerLogs clears server logs
-func ClearServerLogs(c *gin.Context) {
-	userID, _ := c.Get("user_id")
-
-	err := service.ClearTerrariaServerLogs()
-	if err != nil {
-		service.LogAuditEvent(userID.(string), "server.logs_clear_failed", 
-			"Failed to clear server logs: "+err.Error(), c.ClientIP())
-		
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to clear server logs",
-			"code":  "LOGS_CLEAR_FAILED",
-		})
-		return
-	}
-
-	// Log successful clear
-	service.LogAuditEvent(userID.(string), "server.logs_clear", 
-		"Server logs cleared", c.ClientIP())
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Server logs cleared successfully",
 	})
 }

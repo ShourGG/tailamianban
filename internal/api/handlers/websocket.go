@@ -1,12 +1,11 @@
 package handlers
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"sync"
-	"time"
 	"terraria-panel/internal/service"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -65,7 +64,7 @@ func WebSocketHandler(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-	
+
 	username, _ := c.Get("username")
 
 	// Upgrade HTTP connection to WebSocket
@@ -99,16 +98,16 @@ func (h *WebSocketHub) run() {
 			h.mutex.Lock()
 			h.clients[client] = true
 			h.mutex.Unlock()
-			
+
 			log.Printf("WebSocket client connected: %s", client.username)
-			
+
 			// Send welcome message
 			welcome := WebSocketMessage{
 				Type:      "welcome",
 				Data:      map[string]string{"message": "Connected to Terraria Panel"},
 				Timestamp: time.Now(),
 			}
-			
+
 			select {
 			case client.send <- welcome:
 			default:
@@ -230,7 +229,7 @@ func (c *WebSocketClient) handleMessage(msg WebSocketMessage) {
 			Data:      status,
 			Timestamp: time.Now(),
 		}
-		
+
 		select {
 		case c.send <- response:
 		default:
@@ -248,7 +247,7 @@ func BroadcastMessage(msgType string, data interface{}) {
 		Data:      data,
 		Timestamp: time.Now(),
 	}
-	
+
 	select {
 	case hub.broadcast <- message:
 	default:
