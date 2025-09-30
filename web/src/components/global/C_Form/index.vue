@@ -152,7 +152,7 @@
   } as const
 
   const COMPONENT_MAP: Partial<Record<ComponentType, any>> = {
-    input: resolveComponent('NInput'),
+    input: resolveComponent('NInput'),  // 输入框组件
     textarea: resolveComponent('NInput'),
     inputNumber: resolveComponent('NInputNumber'),
     switch: resolveComponent('NSwitch'),
