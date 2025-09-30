@@ -11,6 +11,11 @@ on:
         required: true
         default: 'v1.0.0'
 
+# 授予 GitHub Actions 必要的权限
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-frontend:
     runs-on: ubuntu-latest
