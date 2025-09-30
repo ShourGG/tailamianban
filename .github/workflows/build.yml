@@ -6,6 +6,11 @@ on:
       - 'v*'
   workflow_dispatch:
 
+# 防止重复构建：同一tag只保留最新的构建
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build for Linux

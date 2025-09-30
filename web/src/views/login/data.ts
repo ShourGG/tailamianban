@@ -31,7 +31,7 @@ type FormField = {
 export const OPTIONS: FormField[] = [
   {
     type: 'input',
-    value: '',
+    value: 'admin',  // 默认用户名
     prop: 'username',
     placeholder: '请输入用户名',
     rules: [required('用户名')],
@@ -42,7 +42,7 @@ export const OPTIONS: FormField[] = [
   },
   {
     type: 'input',
-    value: '',
+    value: 'admin123',  // 默认密码
     placeholder: '请输入密码',
     prop: 'password',
     rules: [required('密码'), length('密码', 6, 15)],
