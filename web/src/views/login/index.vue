@@ -35,26 +35,44 @@
       
       <h3 class="login-title">{{ '泰拉瑞亚管理面板' }}</h3>
       <div class="version-info" style="text-align: center; color: #666; font-size: 12px; margin-bottom: 10px;">
-        版本: v1.1.9.7
+        版本: v1.1.9.7 (DEBUG)
       </div>
-      <C_Form
+      
+      <!-- 临时调试：直接使用 NForm -->
+      <NForm
+        ref="formRef"
         class="login-form"
-        :options="OPTIONS"
-        layout-type="default"
+        :model="formModel"
+        :rules="formRules"
       >
-        <template #action="formScope">
-          <!-- 登录按钮 -->
+        <NFormItem label="用户名" path="username">
+          <NInput
+            v-model:value="formModel.username"
+            placeholder="请输入用户名"
+            clearable
+          />
+        </NFormItem>
+        <NFormItem label="密码" path="password">
+          <NInput
+            v-model:value="formModel.password"
+            type="password"
+            placeholder="请输入密码"
+            show-password-on="mousedown"
+            clearable
+          />
+        </NFormItem>
+        <NFormItem>
           <NButton
             class="login-btn"
             type="primary"
             :loading="loading"
             :disabled="!captchaValid"
-            @click.prevent="handleLogin(formScope)"
+            @click.prevent="handleDirectLogin"
           >
             {{ captchaValid ? '登录' : '请先点击下方图标完成人机验证' }}
           </NButton>
-        </template>
-      </C_Form>
+        </NFormItem>
+      </NForm>
 
       <!-- 验证码组件 -->
       <C_Captcha
@@ -73,7 +91,7 @@
 <script setup lang="ts">
   import { initDynamicRouter } from '@/router/dynamicRouter'
   import { s_userStore } from '@/stores/user/index'
-  import { OPTIONS } from './data'
+  // import { PRESET_RULES } from '@/utils/v_verify' // 暂时不需要
   import { useFormSubmit } from '@/hooks/useFormSubmit'
   import { loginApi, type LoginResponse } from '@/api/auth'
   import './index.scss'
