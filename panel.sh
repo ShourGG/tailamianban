@@ -53,6 +53,24 @@ get_latest_version() {
     echo "$version"
 }
 
+# 获取本地版本 (通过 API)
+get_local_version() {
+    if ! check_running; then
+        echo "未运行"
+        return
+    fi
+    
+    # 尝试从 API 获取版本
+    local version=$(curl -s --connect-timeout 2 http://localhost:8080/api/version 2>/dev/null | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
+    
+    # 如果 API 失败，尝试命令行
+    if [ -z "$version" ] && [ -f "$INSTALL_DIR/terraria-panel" ]; then
+        version=$($INSTALL_DIR/terraria-panel --version 2>/dev/null | head -1 || echo "未知")
+    fi
+    
+    echo "${version:-未知}"
+}
+
 # 检查面板是否已安装
 check_installed() {
     [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/terraria-panel" ]
@@ -144,7 +162,8 @@ update_panel() {
         return
     fi
     
-    local current=$($INSTALL_DIR/terraria-panel --version 2>/dev/null | head -1 || echo "未知")
+    # 获取当前版本
+    local current=$(get_local_version)
     print_info "当前版本: $current"
     
     local latest=$(get_latest_version)
@@ -233,7 +252,7 @@ view_status() {
     
     if check_installed; then
         print_success "安装状态: 已安装 ($INSTALL_DIR)"
-        local ver=$($INSTALL_DIR/terraria-panel --version 2>/dev/null | head -1 || echo "未知")
+        local ver=$(get_local_version)
         print_info "当前版本: $ver"
     else
         print_warning "安装状态: 未安装"

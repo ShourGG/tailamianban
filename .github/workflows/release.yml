@@ -86,8 +86,15 @@ jobs:
           export CC=aarch64-linux-gnu-gcc
         fi
         
-        # 编译二进制文件（嵌入前端资源）
-        go build -ldflags "-s -w -X main.Version=${{ github.event.inputs.version || github.ref_name }}" \
+        # 获取版本号
+        VERSION="${{ github.event.inputs.version || github.ref_name }}"
+        
+        # 编译二进制文件（嵌入前端资源并注入版本号）
+        go build -ldflags "-s -w \
+          -X main.Version=${VERSION} \
+          -X main.Build=release \
+          -X terraria-panel/internal/api/handlers.AppVersion=${VERSION} \
+          -X terraria-panel/internal/api/handlers.BuildInfo=release" \
           -o terraria-panel cmd/main.go
         
         # 确保二进制文件可执行

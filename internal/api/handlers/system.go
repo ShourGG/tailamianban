@@ -15,6 +15,12 @@ import (
 	"github.com/shirou/gopsutil/v3/process"
 )
 
+// Version information (injected at build time)
+var (
+	AppVersion = "1.0.0"
+	BuildInfo  = "dev"
+)
+
 // SystemMetrics represents system resource metrics
 type SystemMetrics struct {
 	CPU       CPUMetrics     `json:"cpu"`
@@ -313,5 +319,16 @@ func GetProcessList(c *gin.Context) {
 		"processes": processList,
 		"count":     len(processList),
 		"total":     len(processes),
+	})
+}
+
+// GetVersion returns application version information
+func GetVersion(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"version":    AppVersion,
+		"build":      BuildInfo,
+		"go_version": runtime.Version(),
+		"os":         runtime.GOOS,
+		"arch":       runtime.GOARCH,
 	})
 }

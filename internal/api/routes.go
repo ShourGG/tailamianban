@@ -12,9 +12,10 @@ func SetupRoutes(r *gin.Engine) {
 	// API group
 	api := r.Group("/api")
 	{
-		// Health check
+		// Health check and version info (public)
 		api.GET("/health", handlers.HealthCheck)
-		
+		api.GET("/version", handlers.GetVersion)
+
 		// Authentication routes (public)
 		auth := api.Group("/auth")
 		{

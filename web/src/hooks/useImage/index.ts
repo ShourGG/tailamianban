@@ -19,9 +19,9 @@ export const useImage = (imagePath: string) => {
   const imageName = path.includes('/') ? path.split('/').pop()! : path
 
   try {
-    // 动态导入图片
+    // 动态导入图片 - 使用相对路径避免构建时的路径解析问题
     const modules = import.meta.glob(
-      '@/assets/images/**/*.{png,jpg,jpeg,svg}',
+      '../../assets/images/**/*.{png,jpg,jpeg,svg,gif,webp}',
       { eager: true }
     )
     const matchedPath = Object.keys(modules).find(

@@ -8,6 +8,7 @@ import (
 	"os"
 	"runtime"
 	"terraria-panel/internal/api"
+	"terraria-panel/internal/api/handlers"
 	"terraria-panel/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -18,8 +19,9 @@ import (
 var EmbedFS embed.FS
 
 var (
-	VERSION = "1.0.0"
-	BUILD   = "dev"
+	// Version will be set by ldflags during build
+	Version = "1.0.0"
+	Build   = "dev"
 )
 
 func main() {
@@ -27,7 +29,7 @@ func main() {
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "--version", "-v":
-			fmt.Printf("Terraria Panel %s (Build: %s)\n", VERSION, BUILD)
+			fmt.Printf("Terraria Panel %s (Build: %s)\n", Version, Build)
 			fmt.Printf("Go Version: %s\n", runtime.Version())
 			fmt.Printf("OS/Arch: %s/%s\n", runtime.GOOS, runtime.GOARCH)
 			return
@@ -39,6 +41,11 @@ func main() {
 
 	// Initialize services
 	log.Println("🚀 Starting Terraria Panel...")
+	log.Printf("📌 Version: %s (Build: %s)", Version, Build)
+
+	// Set version information in handlers
+	handlers.AppVersion = Version
+	handlers.BuildInfo = Build
 
 	// Initialize database and services
 	if err := service.InitializeServices(); err != nil {
@@ -117,7 +124,7 @@ Examples:
   GIN_MODE=debug terraria-panel     # Start in debug mode
 
 For more information, visit: https://github.com/ShourGG/tailamianban
-`, VERSION)
+`, Version)
 }
 
 func corsMiddleware() gin.HandlerFunc {
@@ -142,14 +149,16 @@ func securityMiddleware() gin.HandlerFunc {
 		c.Header("X-Frame-Options", "SAMEORIGIN")
 		c.Header("X-XSS-Protection", "1; mode=block")
 		c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
-		// Relaxed CSP for Vue application and Monaco Editor compatibility
+		// Relaxed CSP for Vue application, Monaco Editor, and Spline 3D compatibility
 		c.Header("Content-Security-Policy",
 			"default-src 'self'; "+
-				"script-src 'self' 'unsafe-inline' 'unsafe-eval'; "+
+				"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://prod.spline.design; "+
 				"style-src 'self' 'unsafe-inline' https:; "+
 				"font-src 'self' data: https:; "+
-				"img-src 'self' data: https:; "+
-				"connect-src 'self' ws: wss:")
+				"img-src 'self' data: https: blob:; "+
+				"connect-src 'self' ws: wss: https://prod.spline.design https://*.spline.design; "+
+				"worker-src 'self' blob:; "+
+				"child-src 'self' blob:")
 
 		c.Next()
 	}
