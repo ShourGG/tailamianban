@@ -14,7 +14,7 @@ import (
 	static "github.com/soulteary/gin-static"
 )
 
-//go:embed all:web/dist
+//go:embed all:dist
 var EmbedFS embed.FS
 
 var (
@@ -62,7 +62,7 @@ func main() {
 
 	// Static files (embedded frontend)
 	// Static files (embedded frontend)
-	embedFS, err := static.EmbedFolder(EmbedFS, "web/dist")
+	embedFS, err := static.EmbedFolder(EmbedFS, "dist")
 	if err != nil {
 		log.Printf("⚠️  Failed to create embed folder: %v", err)
 		log.Println("📌 Frontend assets may not be available")
@@ -72,7 +72,7 @@ func main() {
 
 	// Fallback for SPA routing
 	r.NoRoute(func(c *gin.Context) {
-		data, err := EmbedFS.ReadFile("web/dist/index.html")
+		data, err := EmbedFS.ReadFile("dist/index.html")
 		if err != nil {
 			c.String(404, "Page not found")
 			return
