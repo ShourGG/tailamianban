@@ -306,6 +306,100 @@ uninstall_panel() {
     read -p "按回车返回..."
 }
 
+# 设置虚拟内存
+setup_swap() {
+    print_banner
+    echo -e "${GREEN}设置虚拟内存 (Swap)${NC}\n"
+    
+    # 检查现有 swap
+    local existing_swap=$(swapon --show 2>/dev/null | grep -v "^NAME" | wc -l)
+    if [ "$existing_swap" -gt 0 ]; then
+        print_warning "检测到已配置的虚拟内存:"
+        swapon --show
+        echo ""
+        read -p "是否重新配置? (y/N): " -n 1 -r
+        echo
+        [[ ! $REPLY =~ ^[Yy]$ ]] && return
+        
+        print_info "移除现有虚拟内存..."
+        swapoff -a
+        sed -i '/swap/d' /etc/fstab
+        rm -f /swapfile
+    fi
+    
+    # 显示当前内存信息
+    local total_mem=$(free -h | awk '/^Mem:/ {print $2}')
+    print_info "当前物理内存: $total_mem"
+    
+    echo ""
+    echo "推荐虚拟内存大小:"
+    echo "  1. 1GB  (适合 512MB-1GB 内存)"
+    echo "  2. 2GB  (适合 1GB-2GB 内存，推荐)"
+    echo "  3. 4GB  (适合 2GB-4GB 内存)"
+    echo "  4. 8GB  (适合 4GB+ 内存)"
+    echo "  5. 自定义大小"
+    echo "  0. 取消"
+    echo ""
+    read -p "请选择 [0-5]: " swap_choice
+    
+    local swap_size=""
+    case $swap_choice in
+        1) swap_size="1G" ;;
+        2) swap_size="2G" ;;
+        3) swap_size="4G" ;;
+        4) swap_size="8G" ;;
+        5)
+            read -p "请输入大小 (例如: 2G, 4096M): " swap_size
+            [[ ! $swap_size =~ ^[0-9]+[MG]$ ]] && { print_error "无效格式"; read -p "按回车返回..."; return; }
+            ;;
+        0) return ;;
+        *) print_error "无效选项"; read -p "按回车返回..."; return ;;
+    esac
+    
+    print_info "创建 ${swap_size} 虚拟内存文件..."
+    
+    # 创建 swap 文件
+    dd if=/dev/zero of=/swapfile bs=1M count=$(echo $swap_size | sed 's/G/*1024/;s/M//' | bc) status=progress 2>&1 | grep --line-buffered -o '[0-9]* bytes' | tail -1
+    
+    if [ ! -f /swapfile ]; then
+        print_error "创建失败"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    print_info "设置权限..."
+    chmod 600 /swapfile
+    
+    print_info "格式化为 swap..."
+    mkswap /swapfile >/dev/null 2>&1
+    
+    print_info "启用虚拟内存..."
+    swapon /swapfile
+    
+    print_info "设置开机自动挂载..."
+    echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    
+    # 优化 swap 使用策略
+    print_info "优化虚拟内存参数..."
+    sysctl vm.swappiness=10 >/dev/null 2>&1
+    sysctl vm.vfs_cache_pressure=50 >/dev/null 2>&1
+    
+    # 永久保存配置
+    grep -q "vm.swappiness" /etc/sysctl.conf || echo "vm.swappiness=10" >> /etc/sysctl.conf
+    grep -q "vm.vfs_cache_pressure" /etc/sysctl.conf || echo "vm.vfs_cache_pressure=50" >> /etc/sysctl.conf
+    
+    echo ""
+    print_success "虚拟内存配置完成!"
+    echo ""
+    print_info "当前内存状态:"
+    free -h
+    echo ""
+    print_info "虚拟内存详情:"
+    swapon --show
+    echo ""
+    read -p "按回车返回..."
+}
+
 # 主菜单
 show_menu() {
     print_banner
@@ -326,10 +420,11 @@ show_menu() {
     echo "  5. 重启面板"
     echo "  6. 查看状态"
     echo "  7. 查看日志"
-    echo "  8. 卸载面板"
+    echo "  8. 设置虚拟内存"
+    echo "  9. 卸载面板"
     echo "  0. 退出"
     echo ""
-    read -p "请输入 [0-8]: " choice
+    read -p "请输入 [0-9]: " choice
     
     case $choice in
         1) install_panel ;;
@@ -339,7 +434,8 @@ show_menu() {
         5) restart_panel ;;
         6) view_status ;;
         7) view_logs ;;
-        8) uninstall_panel ;;
+        8) setup_swap ;;
+        9) uninstall_panel ;;
         0) print_info "再见!"; exit 0 ;;
         *) print_error "无效选项"; sleep 1 ;;
     esac
