@@ -139,10 +139,17 @@ func securityMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Security headers
 		c.Header("X-Content-Type-Options", "nosniff")
-		c.Header("X-Frame-Options", "DENY")
+		c.Header("X-Frame-Options", "SAMEORIGIN")
 		c.Header("X-XSS-Protection", "1; mode=block")
 		c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
-		c.Header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'")
+		// Relaxed CSP for Vue application and Monaco Editor compatibility
+		c.Header("Content-Security-Policy",
+			"default-src 'self'; "+
+				"script-src 'self' 'unsafe-inline' 'unsafe-eval'; "+
+				"style-src 'self' 'unsafe-inline' https:; "+
+				"font-src 'self' data: https:; "+
+				"img-src 'self' data: https:; "+
+				"connect-src 'self' ws: wss:")
 
 		c.Next()
 	}
