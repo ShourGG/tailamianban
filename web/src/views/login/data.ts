@@ -16,6 +16,7 @@ const { required, length } = PRESET_RULES
 type FormField = {
   type: 'input' | 'select' | 'daterange'
   prop: 'username' | 'password'
+  label?: string
   value: string
   placeholder: string
   rules: FieldRule[]
@@ -31,6 +32,7 @@ type FormField = {
 export const OPTIONS: FormField[] = [
   {
     type: 'input',
+    label: '用户名',
     value: 'admin',  // 默认用户名
     prop: 'username',
     placeholder: '请输入用户名',
@@ -42,6 +44,7 @@ export const OPTIONS: FormField[] = [
   },
   {
     type: 'input',
+    label: '密码',
     value: 'admin123',  // 默认密码
     placeholder: '请输入密码',
     prop: 'password',
