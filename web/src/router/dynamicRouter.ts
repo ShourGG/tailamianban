@@ -55,8 +55,8 @@ const resolveComponent = (path?: string) => {
 
   try {
     const normalizedPath = path.startsWith('/') ? path : `/${path}`
-    const viewPath = `/src/views${normalizedPath}.vue`
-    const modules = import.meta.glob('@/views/**/*.vue')
+    const viewPath = `../views${normalizedPath}.vue`
+    const modules = import.meta.glob('../views/**/*.vue')
 
     // 添加组件不存在的警告
     if (modules[viewPath]) {

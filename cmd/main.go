@@ -14,7 +14,7 @@ import (
 	static "github.com/soulteary/gin-static"
 )
 
-//go:embed all:dist
+//go:embed all:web/dist
 var EmbedFS embed.FS
 
 var (
@@ -39,7 +39,7 @@ func main() {
 
 	// Initialize services
 	log.Println("🚀 Starting Terraria Panel...")
-	
+
 	// Initialize database and services
 	if err := service.InitializeServices(); err != nil {
 		log.Fatalf("❌ Failed to initialize services: %v", err)
@@ -61,11 +61,18 @@ func main() {
 	api.SetupRoutes(r)
 
 	// Static files (embedded frontend)
-	r.Use(static.Serve("/", static.EmbedFolder(EmbedFS, "dist")))
+	// Static files (embedded frontend)
+	embedFS, err := static.EmbedFolder(EmbedFS, "web/dist")
+	if err != nil {
+		log.Printf("⚠️  Failed to create embed folder: %v", err)
+		log.Println("📌 Frontend assets may not be available")
+	} else {
+		r.Use(static.Serve("/", embedFS))
+	}
 
 	// Fallback for SPA routing
 	r.NoRoute(func(c *gin.Context) {
-		data, err := EmbedFS.ReadFile("dist/index.html")
+		data, err := EmbedFS.ReadFile("web/dist/index.html")
 		if err != nil {
 			c.String(404, "Page not found")
 			return
@@ -81,7 +88,7 @@ func main() {
 	log.Printf("🌐 Server starting on port %s", port)
 	log.Printf("📱 Web interface: http://localhost:%s", port)
 	log.Printf("🔧 API endpoint: http://localhost:%s/api", port)
-	
+
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("❌ Failed to start server: %v", err)
 	}
@@ -118,12 +125,12 @@ func corsMiddleware() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-		
+
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
 		}
-		
+
 		c.Next()
 	}
 }
@@ -136,7 +143,7 @@ func securityMiddleware() gin.HandlerFunc {
 		c.Header("X-XSS-Protection", "1; mode=block")
 		c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
 		c.Header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'")
-		
+
 		c.Next()
 	}
 }

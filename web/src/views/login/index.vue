@@ -30,7 +30,7 @@
     <div class="login-wrapper">
       <!-- Robot avatar -->
       <div class="robot-avatar">
-        <img src="/robot-avatar.png" alt="Robot Avatar" />
+        <img src="@/assets/images/robot-avatar-1.png" alt="Robot Avatar" />
       </div>
       
       <h3 class="login-title">{{ '泰拉瑞亚管理面板' }}</h3>

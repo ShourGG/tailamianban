@@ -2,17 +2,15 @@
  * @Author: ChenYu ycyplus@gmail.com
  * @Date: 2025-05-25 14:11:31
  * @LastEditors: ChenYu ycyplus@gmail.com
- * @LastEditTime: 2025-05-25 15:58:27
+ * @LastEditTime: 2025-09-29 16:38:00
  * @FilePath: \Robot_Admin\src\plugins\dynamic-components.ts
  * @Description: 动态组件加载插件(处理:is 动态组件加载)
  * Copyright (c) 2025 by CHENY, All Rights Reserved 😎.
  */
 import {
   type App,
-  type VNode,
   type Component,
   defineAsyncComponent,
-  h,
 } from 'vue'
 
 /**
@@ -23,8 +21,9 @@ const componentPaths: Record<string, () => Promise<unknown>> = {}
 /**
  * * @description 这里使用 `import.meta.glob` 异步导入 `@/components` 目录下及其子目录下的所有 `.vue` 文件
  * ? @param path - 文件的完整路径
+ * ! 修复 Windows 构建路径问题
  */
-const modules = import.meta.glob('@/components/**/*.vue')
+const modules = import.meta.glob('../components/**/*.vue')
 
 /**
  * * @description 提取文件路径中的文件名和目录名
@@ -107,20 +106,25 @@ const handleLocalComponent = (
  * ! @returns void
  */
 Object.entries(modules).forEach(([path, importFn]) => {
-  const { fileName, dirName } = extractFileAndDirName(path)
-  const parentDir = path.split('/').slice(-2, -1)[0]
+  // 规范化路径，确保使用正斜杠
+  const normalizedPath = path.replace(/\\/g, '/')
+  const { fileName, dirName } = extractFileAndDirName(normalizedPath)
+  const parentDir = normalizedPath.split('/').slice(-2, -1)[0]
 
-  // 直接使用完整路径作为键
-  componentPaths[path] = importFn
+  // 创建简化的路径键（去除 ../components/ 前缀）
+  const simplifiedPath = normalizedPath.replace(/^\.\.\/components\//, '')
+  
+  // 使用简化路径作为键
+  componentPaths[simplifiedPath] = importFn
   // 使用文件名作为键
   componentPaths[fileName] = importFn
 
   handleComponentMapping(componentPaths, fileName, parentDir, importFn)
 
-  if (dirName === 'global' || path.includes('/global/')) {
+  if (dirName === 'global' || normalizedPath.includes('/global/')) {
     // 处理全局组件
     handleGlobalComponent(componentPaths, fileName, importFn)
-  } else if (dirName === 'local' || path.includes('/local/')) {
+  } else if (dirName === 'local' || normalizedPath.includes('/local/')) {
     // 处理局部组件
     handleLocalComponent(componentPaths, fileName, importFn)
   }
@@ -172,33 +176,5 @@ export function setupDynamicComponents(app: App) {
   app.provide('getComponent', (name: string) => {
     registerComponent(name)
     return app.component(name)
-  })
-
-  // 注册全局动态组件
-  app.component('DynamicComponent', {
-    props: {
-      name: { type: String, required: true },
-    },
-    /**
-     * * @description 渲染动态组件
-     * ! @returns 渲染的 VNode 节点或 null
-     */
-    render(this: {
-      name: string
-      $attrs: Record<string, unknown>
-    }): VNode | null {
-      const { name } = this // 使用对象解构获取组件名称
-      // console.log('渲染动态组件:', name)
-
-      const Component =
-        app.component(name) || (registerComponent(name) && app.component(name))
-
-      if (!Component) {
-        console.warn(`动态渲染的组件 "${name}" 未找到`)
-        return null
-      }
-
-      return h(Component, this.$attrs)
-    },
   })
 }
