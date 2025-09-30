@@ -66,6 +66,7 @@ export default defineConfig({
     // 只包含确实需要强制预构建的核心依赖
     include: [
       'naive-ui', // UI 框架通常需要预构建
+      '@splinetool/runtime', // Spline 3D runtime必须预构建
     ],
     // 只排除真正有问题的包
     exclude: [

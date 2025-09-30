@@ -99,6 +99,35 @@ http://localhost:8080
 
 > ⚠️ **安全提醒**: 首次登录后请立即修改默认密码！
 
+### 🔍 启动诊断信息
+
+启动时会自动显示完整的系统诊断信息：
+
+```
+╔════════════════════════════════════════════════╗
+║   泰拉瑞亚服务器管理面板 - 诊断信息           ║
+║   Terraria Server Management Panel            ║
+╚════════════════════════════════════════════════╝
+
+📦 Version: v1.1.9 (Build: release)
+🐹 Go Version: go1.22.x
+💻 OS/Arch: linux/amd64
+📂 Working Dir: /path/to/panel
+🔧 CPU Cores: 4
+
+🔍 Environment Configuration:
+  • PORT: 8080 (default)
+  • GIN_MODE: release (default)
+  • DB_PATH: ./data/panel.db (default)
+  • DATA_DIR: ./data (default)
+
+📁 Path Check:
+  ✅ Frontend assets exists at ./dist
+  ✅ Data directory exists at ./data
+```
+
+这个诊断信息可以帮助您快速定位启动问题。
+
 ## 🔧 管理命令
 
 ### 使用run.sh脚本管理

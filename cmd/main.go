@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strings"
 	"terraria-panel/internal/api"
 	"terraria-panel/internal/api/handlers"
 	"terraria-panel/internal/service"
@@ -39,9 +40,15 @@ func main() {
 		}
 	}
 
+	// Print diagnostic banner
+	printDiagnosticBanner()
+
 	// Initialize services
 	log.Println("🚀 Starting Terraria Panel...")
 	log.Printf("📌 Version: %s (Build: %s)", Version, Build)
+	log.Printf("💻 Go Version: %s", runtime.Version())
+	log.Printf("🖥️  OS/Arch: %s/%s", runtime.GOOS, runtime.GOARCH)
+	log.Printf("🔧 Working Directory: %s", getWorkingDir())
 
 	// Set version information in handlers
 	handlers.AppVersion = Version
@@ -92,13 +99,69 @@ func main() {
 		port = "8080"
 	}
 
-	log.Printf("🌐 Server starting on port %s", port)
+	fmt.Println("\n╔════════════════════════════════════════════════╗")
+	fmt.Println("║         🎮 Server is Ready!                    ║")
+	fmt.Println("╚════════════════════════════════════════════════╝")
+	log.Printf("🌐 Server listening on port: %s", port)
 	log.Printf("📱 Web interface: http://localhost:%s", port)
 	log.Printf("🔧 API endpoint: http://localhost:%s/api", port)
+	log.Printf("❤️  Health check: http://localhost:%s/api/health", port)
+	fmt.Println(strings.Repeat("─", 50))
 
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("❌ Failed to start server: %v", err)
 	}
+}
+
+func printDiagnosticBanner() {
+	fmt.Println("\n╔════════════════════════════════════════════════╗")
+	fmt.Println("║   泰拉瑞亚服务器管理面板 - 诊断信息           ║")
+	fmt.Println("║   Terraria Server Management Panel            ║")
+	fmt.Println("╚════════════════════════════════════════════════╝\n")
+
+	fmt.Printf("📦 Version: %s (Build: %s)\n", Version, Build)
+	fmt.Printf("🐹 Go Version: %s\n", runtime.Version())
+	fmt.Printf("💻 OS/Arch: %s/%s\n", runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("📂 Working Dir: %s\n", getWorkingDir())
+	fmt.Printf("🔧 CPU Cores: %d\n", runtime.NumCPU())
+
+	// Check environment variables
+	fmt.Println("\n🔍 Environment Configuration:")
+	printEnvVar("PORT", "8080")
+	printEnvVar("GIN_MODE", "release")
+	printEnvVar("DB_PATH", "./data/panel.db")
+	printEnvVar("DATA_DIR", "./data")
+
+	// Check important paths
+	fmt.Println("\n📁 Path Check:")
+	checkPath("./dist", "Frontend assets")
+	checkPath("./data", "Data directory")
+
+	fmt.Println("\n" + strings.Repeat("─", 50) + "\n")
+}
+
+func printEnvVar(key, defaultValue string) {
+	value := os.Getenv(key)
+	if value == "" {
+		value = defaultValue + " (default)"
+	}
+	fmt.Printf("  • %s: %s\n", key, value)
+}
+
+func checkPath(path, description string) {
+	if _, err := os.Stat(path); err == nil {
+		fmt.Printf("  ✅ %s exists at %s\n", description, path)
+	} else {
+		fmt.Printf("  ⚠️  %s NOT FOUND at %s\n", description, path)
+	}
+}
+
+func getWorkingDir() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "unknown"
+	}
+	return dir
 }
 
 func printHelp() {
@@ -152,11 +215,11 @@ func securityMiddleware() gin.HandlerFunc {
 		// Relaxed CSP for Vue application, Monaco Editor, and Spline 3D compatibility
 		c.Header("Content-Security-Policy",
 			"default-src 'self'; "+
-				"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://prod.spline.design; "+
+				"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://prod.spline.design https://unpkg.com; "+
 				"style-src 'self' 'unsafe-inline' https:; "+
 				"font-src 'self' data: https:; "+
 				"img-src 'self' data: https: blob:; "+
-				"connect-src 'self' ws: wss: https://prod.spline.design https://*.spline.design; "+
+				"connect-src 'self' ws: wss: https://prod.spline.design https://*.spline.design https://unpkg.com; "+
 				"worker-src 'self' blob:; "+
 				"child-src 'self' blob:")
 
