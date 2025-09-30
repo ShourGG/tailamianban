@@ -131,19 +131,30 @@
         originalWarn.apply(console, args)
       }
 
+      console.log('🤖 开始加载Spline场景:', props.scene)
       await splineApp.value.load(props.scene)
+      console.log('✅ Spline场景加载成功!')
 
       console.warn = originalWarn
 
       const cleanUpFns = [
         eventHandler('mouseDown', (e: any) => emit('spline-mouse-down', e)),
         eventHandler('mouseUp', (e: any) => emit('spline-mouse-up', e)),
-        eventHandler('mouseHover', (e: any) => emit('spline-mouse-hover', e)),
+        eventHandler('mouseHover', (e: any) => {
+          console.log('🖱️ 鼠标移动事件:', e)
+          emit('spline-mouse-hover', e)
+        }),
         eventHandler('keyDown', (e: any) => emit('spline-key-down', e)),
         eventHandler('keyUp', (e: any) => emit('spline-key-up', e)),
         eventHandler('start', (e: any) => emit('spline-start', e)),
-        eventHandler('lookAt', (e: any) => emit('spline-look-at', e)),
-        eventHandler('follow', (e: any) => emit('spline-follow', e)),
+        eventHandler('lookAt', (e: any) => {
+          console.log('👁️ LookAt事件触发:', e)
+          emit('spline-look-at', e)
+        }),
+        eventHandler('follow', (e: any) => {
+          console.log('🎯 Follow事件触发:', e)
+          emit('spline-follow', e)
+        }),
         eventHandler('scroll', (e: any) => emit('spline-scroll', e)),
       ].filter(Boolean)
 
@@ -154,7 +165,11 @@
         cleanUpFns.forEach(fn => fn?.())
       }
     } catch (err) {
-      console.error('Spline initialization error:', err)
+      console.error('❌ Spline初始化失败:', err)
+      console.error('请检查:')
+      console.error('1. 网络连接是否正常')
+      console.error('2. Spline场景URL是否可访问')
+      console.error('3. @splinetool/runtime版本是否兼容')
       emit('error', err)
       isLoading.value = false
       return () => {}
