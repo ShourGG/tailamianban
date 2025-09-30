@@ -32,7 +32,7 @@ print_banner() {
     echo "╔════════════════════════════════════════════════╗"
     echo "║       泰拉瑞亚服务器管理面板                   ║"
     echo "║    Terraria Server Management Panel           ║"
-    echo "║                  Version 1.1.2                 ║"
+    echo "║                  Version 1.1.7                 ║"
     echo "╚════════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -67,6 +67,9 @@ get_local_version() {
     if [ -z "$version" ] && [ -f "$INSTALL_DIR/terraria-panel" ]; then
         version=$($INSTALL_DIR/terraria-panel --version 2>/dev/null | head -1 || echo "未知")
     fi
+    
+    # 标准化版本号格式，只保留 vX.Y.Z 部分
+    version=$(echo "$version" | grep -oP 'v\d+\.\d+\.\d+' || echo "$version")
     
     echo "${version:-未知}"
 }
@@ -170,7 +173,11 @@ update_panel() {
     [ -z "$latest" ] && { print_error "无法获取版本信息"; read -p "按回车返回..."; return; }
     print_info "最新版本: $latest"
     
-    if [ "$current" = "$latest" ]; then
+    # 标准化版本号进行比较（去除前缀v）
+    local current_num=$(echo "$current" | sed 's/^v//')
+    local latest_num=$(echo "$latest" | sed 's/^v//')
+    
+    if [ "$current_num" = "$latest_num" ] || [ "$current" = "$latest" ]; then
         print_success "已是最新版本!"
         read -p "按回车返回..."
         return
