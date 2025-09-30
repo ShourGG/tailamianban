@@ -6,19 +6,18 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-	"terraria-panel/internal/repository"
 )
 
 // World represents a Terraria world
 type World struct {
-	ID         string    `json:"id"`
-	Name       string    `json:"name"`
-	FileName   string    `json:"file_name"`
-	Size       int64     `json:"size"`
-	CreatedAt  time.Time `json:"created_at"`
-	ModifiedAt time.Time `json:"modified_at"`
-	IsActive   bool      `json:"is_active"`
-	BackupCount int      `json:"backup_count"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	FileName    string    `json:"file_name"`
+	Size        int64     `json:"size"`
+	CreatedAt   time.Time `json:"created_at"`
+	ModifiedAt  time.Time `json:"modified_at"`
+	IsActive    bool      `json:"is_active"`
+	BackupCount int       `json:"backup_count"`
 }
 
 var worldsDirectory = "./data/worlds"
@@ -35,10 +34,10 @@ func GetWorldsDirectory() string {
 // GetAllWorlds returns all available worlds
 func GetAllWorlds() ([]World, error) {
 	worldsDir := GetWorldsDirectory()
-	
+
 	// Ensure worlds directory exists
 	os.MkdirAll(worldsDir, 0755)
-	
+
 	entries, err := os.ReadDir(worldsDir)
 	if err != nil {
 		return nil, err
@@ -74,9 +73,9 @@ func GetAllWorlds() ([]World, error) {
 func CreateWorld(name, size, difficulty, seed string) (*World, error) {
 	// This would typically call the Terraria server to generate a new world
 	// For now, we'll just create a placeholder
-	
-	worldPath := filepath.Join(GetWorldsDirectory(), name + ".wld")
-	
+
+	worldPath := filepath.Join(GetWorldsDirectory(), name+".wld")
+
 	// Check if world already exists
 	if _, err := os.Stat(worldPath); err == nil {
 		return nil, fmt.Errorf("world with name %s already exists", name)
@@ -84,7 +83,7 @@ func CreateWorld(name, size, difficulty, seed string) (*World, error) {
 
 	// In a real implementation, we'd call the Terraria server here
 	// to generate the world with the specified parameters
-	
+
 	world := &World{
 		ID:         name,
 		Name:       name,
@@ -101,7 +100,7 @@ func CreateWorld(name, size, difficulty, seed string) (*World, error) {
 // GetWorldByID returns a world by its ID
 func GetWorldByID(worldID string) (*World, error) {
 	worldPath := filepath.Join(GetWorldsDirectory(), worldID)
-	
+
 	info, err := os.Stat(worldPath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -132,7 +131,7 @@ func UpdateWorld(worldID string, updates map[string]interface{}) error {
 // DeleteWorld deletes a world file
 func DeleteWorld(worldID string) error {
 	worldPath := filepath.Join(GetWorldsDirectory(), worldID)
-	
+
 	// Check if world exists
 	if _, err := os.Stat(worldPath); os.IsNotExist(err) {
 		return fmt.Errorf("world not found: %s", worldID)
@@ -145,7 +144,7 @@ func DeleteWorld(worldID string) error {
 // BackupWorld creates a backup of a world
 func BackupWorld(worldID string) (string, error) {
 	worldPath := filepath.Join(GetWorldsDirectory(), worldID)
-	
+
 	// Check if world exists
 	if _, err := os.Stat(worldPath); os.IsNotExist(err) {
 		return "", fmt.Errorf("world not found: %s", worldID)
@@ -183,7 +182,7 @@ func BackupWorld(worldID string) (string, error) {
 // RestoreWorld restores a world from backup
 func RestoreWorld(worldID, backupPath string) error {
 	worldPath := filepath.Join(GetWorldsDirectory(), worldID)
-	
+
 	// Check if backup exists
 	if _, err := os.Stat(backupPath); os.IsNotExist(err) {
 		return fmt.Errorf("backup not found: %s", backupPath)
@@ -209,7 +208,7 @@ func RestoreWorld(worldID, backupPath string) error {
 // RegisterWorld registers a newly uploaded world in the system
 func RegisterWorld(filename string) (*World, error) {
 	worldPath := filepath.Join(GetWorldsDirectory(), filename)
-	
+
 	info, err := os.Stat(worldPath)
 	if err != nil {
 		return nil, err
