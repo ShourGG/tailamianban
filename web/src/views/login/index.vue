@@ -20,13 +20,6 @@
       @hidden="handleTypewriterHidden"
     />
 
-    <!-- 原有的登录界面 -->
-    <div class="spline-background">
-      <Spline
-        scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-      />
-    </div>
-
     <div class="login-wrapper">
       <!-- Robot avatar -->
       <div class="robot-avatar">
@@ -73,7 +66,6 @@
   import { useFormSubmit } from '@/hooks/useFormSubmit'
   import { loginApi, type LoginResponse } from '@/api/auth'
   import './index.scss'
-  import Spline from './components/Spline.vue'
   import C_Captcha from '@/components/global/C_Captcha/index.vue'
   import Typewriter from './components/Typewriter.vue'
 
