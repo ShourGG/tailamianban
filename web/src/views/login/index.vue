@@ -34,9 +34,13 @@
       </div>
       
       <h3 class="login-title">{{ '泰拉瑞亚管理面板' }}</h3>
+      <div class="version-info" style="text-align: center; color: #666; font-size: 12px; margin-bottom: 10px;">
+        版本: v1.1.9.7
+      </div>
       <C_Form
         class="login-form"
         :options="OPTIONS"
+        layout-type="default"
       >
         <template #action="formScope">
           <!-- 登录按钮 -->
