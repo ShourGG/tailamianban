@@ -47,7 +47,25 @@
 
 ## 🚀 快速开始
 
-### 方式一：一键安装脚本 (推荐)
+### 方式一：交互式管理脚本 (最简单，强烈推荐！)
+
+```bash
+# 下载管理脚本
+wget https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
+
+# 赋予执行权限
+chmod +x panel.sh
+
+# 运行脚本
+sudo ./panel.sh
+```
+
+**交互式菜单操作：**
+1. 首次使用选择 `1. 下载并安装面板`
+2. 已安装用户选择 `2. 更新面板` 即可一键更新
+3. 其他选项：启动/停止/重启/查看状态/查看日志/卸载
+
+### 方式二：一键安装脚本
 
 ```bash
 # 下载并运行安装脚本
@@ -57,7 +75,7 @@ curl -fsSL https://raw.githubusercontent.com/ShourGG/tailamianban/main/scripts/i
 http://你的服务器IP:8080
 ```
 
-### 方式二：手动安装
+### 方式三：手动安装
 
 ```bash
 # 1. 下载最新版本
