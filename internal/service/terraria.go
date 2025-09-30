@@ -8,24 +8,23 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 	"syscall"
-	"time"
 	"terraria-panel/internal/repository"
+	"time"
 )
 
 // TerrariaServerStatus represents the server status
 type TerrariaServerStatus struct {
-	Status      string `json:"status"`       // running, stopped, starting, stopping
-	PID         int    `json:"pid"`          // Process ID
-	Uptime      int64  `json:"uptime"`       // Uptime in seconds
-	PlayerCount int    `json:"player_count"` // Current player count
-	MaxPlayers  int    `json:"max_players"`  // Maximum players
-	WorldName   string `json:"world_name"`   // Current world name
-	Port        int    `json:"port"`         // Server port
-	Version     string `json:"version"`      // Terraria version
-	StartTime   time.Time `json:"start_time"` // Server start time
+	Status      string    `json:"status"`       // running, stopped, starting, stopping
+	PID         int       `json:"pid"`          // Process ID
+	Uptime      int64     `json:"uptime"`       // Uptime in seconds
+	PlayerCount int       `json:"player_count"` // Current player count
+	MaxPlayers  int       `json:"max_players"`  // Maximum players
+	WorldName   string    `json:"world_name"`   // Current world name
+	Port        int       `json:"port"`         // Server port
+	Version     string    `json:"version"`      // Terraria version
+	StartTime   time.Time `json:"start_time"`   // Server start time
 }
 
 // TerrariaServerConfig represents server configuration
@@ -135,16 +134,16 @@ func StartTerrariaServer() error {
 
 	// Create the command
 	serverProcess = exec.Command(config.ServerPath, args...)
-	
+
 	// Set working directory
 	serverProcess.Dir = filepath.Dir(config.ServerPath)
-	
+
 	// Create log file
 	logFile, err := createServerLogFile()
 	if err != nil {
 		return fmt.Errorf("failed to create log file: %v", err)
 	}
-	
+
 	serverProcess.Stdout = logFile
 	serverProcess.Stderr = logFile
 
@@ -308,13 +307,13 @@ func UpdateTerrariaServerConfig(config *TerrariaServerConfig) error {
 // GetTerrariaServerLogs returns server logs
 func GetTerrariaServerLogs(lines string, follow bool) ([]string, error) {
 	logPath := getServerLogPath()
-	
+
 	if !fileExists(logPath) {
 		return []string{}, nil
 	}
 
 	var result []string
-	
+
 	if follow {
 		// For real-time logs, return last few lines
 		// This is a simplified implementation
@@ -381,7 +380,7 @@ func fileExists(path string) bool {
 func createServerLogFile() (*os.File, error) {
 	logDir := "./logs"
 	os.MkdirAll(logDir, 0755)
-	
+
 	logPath := filepath.Join(logDir, fmt.Sprintf("terraria-server-%s.log", time.Now().Format("2006-01-02")))
 	return os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 }
@@ -397,10 +396,10 @@ func monitorServerProcess() {
 
 	// Wait for process to exit
 	err := serverProcess.Wait()
-	
+
 	serverMutex.Lock()
 	defer serverMutex.Unlock()
-	
+
 	if err != nil {
 		// Server crashed or was killed
 		serverStatus.Status = "crashed"
@@ -408,44 +407,16 @@ func monitorServerProcess() {
 		// Server exited normally
 		serverStatus.Status = "stopped"
 	}
-	
+
 	serverStatus.PID = 0
 	serverStatus.Uptime = 0
 	serverProcess = nil
-}
-		
-		// Return last N lines
-		lineCount, _ := strconv.Atoi(lines)
-		if lineCount > 0 && len(result) > lineCount {
-			result = result[len(result)-lineCount:]
-		}
-	} else {
-		// Read specified number of lines
-		file, err := os.Open(logPath)
-		if err != nil {
-			return nil, err
-		}
-		defer file.Close()
-
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			result = append(result, scanner.Text())
-		}
-		
-		// Return last N lines
-		lineCount, _ := strconv.Atoi(lines)
-		if lineCount > 0 && len(result) > lineCount {
-			result = result[len(result)-lineCount:]
-		}
-	}
-
-	return result, nil
 }
 
 // ClearTerrariaServerLogs clears server logs
 func ClearTerrariaServerLogs() error {
 	logPath := getServerLogPath()
-	
+
 	// Truncate the log file
 	file, err := os.OpenFile(logPath, os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
@@ -454,93 +425,4 @@ func ClearTerrariaServerLogs() error {
 	defer file.Close()
 
 	return nil
-}
-
-// Helper functions
-
-func monitorServerProcess() {
-	if serverProcess == nil {
-		return
-	}
-
-	// Wait for process to complete
-	err := serverProcess.Wait()
-	
-	serverMutex.Lock()
-	defer serverMutex.Unlock()
-
-	if err != nil {
-		serverStatus.Status = "stopped"
-	} else {
-		serverStatus.Status = "stopped"
-	}
-	
-	serverStatus.PID = 0
-	serverStatus.Uptime = 0
-	serverProcess = nil
-}
-
-func getDefaultServerPath() string {
-	// Try common Terraria server paths
-	paths := []string{
-		"/opt/terraria/TerrariaServer.bin.x86_64",
-		"/usr/local/bin/TerrariaServer",
-		"./TerrariaServer.bin.x86_64",
-		"./TerrariaServer",
-	}
-
-	for _, path := range paths {
-		if fileExists(path) {
-			return path
-		}
-	}
-
-	return "/opt/terraria/TerrariaServer.bin.x86_64"
-}
-
-func getDefaultWorldPath() string {
-	dataDir := os.Getenv("DATA_DIR")
-	if dataDir == "" {
-		dataDir = "./data"
-	}
-	return filepath.Join(dataDir, "worlds", "world.wld")
-}
-
-func getServerLogPath() string {
-	logDir := "./logs"
-	if dir := os.Getenv("LOG_DIR"); dir != "" {
-		logDir = dir
-	}
-	return filepath.Join(logDir, "terraria-server.log")
-}
-
-func createServerLogFile() (*os.File, error) {
-	logPath := getServerLogPath()
-	
-	// Ensure log directory exists
-	err := os.MkdirAll(filepath.Dir(logPath), 0755)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create or append to log file
-	return os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-}
-
-func getDifficultyNumber(difficulty string) string {
-	switch strings.ToLower(difficulty) {
-	case "classic":
-		return "0"
-	case "expert":
-		return "1"
-	case "master":
-		return "2"
-	default:
-		return "0"
-	}
-}
-
-func fileExists(path string) bool {
-	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
 }
