@@ -14,11 +14,9 @@ type User struct {
 	Password    string    `json:"-" db:"password"` // Never expose password in JSON
 	Role        string    `json:"role" db:"role"`
 	Email       string    `json:"email" db:"email"`
-	IsActive    bool      `json:"is_active" db:"is_active"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
-	LastLoginAt time.Time `json:"last_login_at" db:"last_login_at"`
-	LastLogin   time.Time `json:"last_login" db:"last_login_at"`
+	LastLoginAt time.Time `json:"last_login_at,omitempty" db:"last_login_at"`
 }
 
 // CreateUser creates a new user
@@ -26,7 +24,7 @@ func CreateUser(user *User) error {
 	if user.ID == "" {
 		user.ID = uuid.New().String()
 	}
-	
+
 	now := time.Now()
 	user.CreatedAt = now
 	user.UpdatedAt = now
@@ -35,7 +33,7 @@ func CreateUser(user *User) error {
 		INSERT INTO users (id, username, password, role, email, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?)
 	`
-	
+
 	_, err := db.Exec(query, user.ID, user.Username, user.Password, user.Role, user.Email, user.CreatedAt, user.UpdatedAt)
 	return err
 }
@@ -47,16 +45,22 @@ func GetUserByUsername(username string) (*User, error) {
 		SELECT id, username, password, role, email, created_at, updated_at, last_login_at
 		FROM users WHERE username = ?
 	`
-	
+
+	var lastLoginAt sql.NullTime
 	err := db.QueryRow(query, username).Scan(
 		&user.ID, &user.Username, &user.Password, &user.Role, &user.Email,
-		&user.CreatedAt, &user.UpdatedAt, &user.LastLoginAt,
+		&user.CreatedAt, &user.UpdatedAt, &lastLoginAt,
 	)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
+	// Handle nullable last_login_at
+	if lastLoginAt.Valid {
+		user.LastLoginAt = lastLoginAt.Time
+	}
+
 	return user, nil
 }
 
@@ -67,16 +71,22 @@ func GetUserByID(id string) (*User, error) {
 		SELECT id, username, password, role, email, created_at, updated_at, last_login_at
 		FROM users WHERE id = ?
 	`
-	
+
+	var lastLoginAt sql.NullTime
 	err := db.QueryRow(query, id).Scan(
 		&user.ID, &user.Username, &user.Password, &user.Role, &user.Email,
-		&user.CreatedAt, &user.UpdatedAt, &user.LastLoginAt,
+		&user.CreatedAt, &user.UpdatedAt, &lastLoginAt,
 	)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
+	// Handle nullable last_login_at
+	if lastLoginAt.Valid {
+		user.LastLoginAt = lastLoginAt.Time
+	}
+
 	return user, nil
 }
 
@@ -104,7 +114,7 @@ func ListUsers() ([]*User, error) {
 		SELECT id, username, role, email, created_at, updated_at, last_login_at
 		FROM users ORDER BY created_at DESC
 	`
-	
+
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -115,7 +125,7 @@ func ListUsers() ([]*User, error) {
 	for rows.Next() {
 		user := &User{}
 		var lastLoginAt sql.NullTime
-		
+
 		err := rows.Scan(
 			&user.ID, &user.Username, &user.Role, &user.Email,
 			&user.CreatedAt, &user.UpdatedAt, &lastLoginAt,
@@ -123,27 +133,27 @@ func ListUsers() ([]*User, error) {
 		if err != nil {
 			return nil, err
 		}
-		
+
 		if lastLoginAt.Valid {
 			user.LastLoginAt = lastLoginAt.Time
 		}
-		
+
 		users = append(users, user)
 	}
-	
+
 	return users, nil
 }
 
 // UpdateUser updates user information
 func UpdateUser(user *User) error {
 	user.UpdatedAt = time.Now()
-	
+
 	query := `
 		UPDATE users 
 		SET username = ?, role = ?, email = ?, updated_at = ?
 		WHERE id = ?
 	`
-	
+
 	_, err := db.Exec(query, user.Username, user.Role, user.Email, user.UpdatedAt, user.ID)
 	return err
 }

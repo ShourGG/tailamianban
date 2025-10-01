@@ -2,31 +2,31 @@ package service
 
 import (
 	"fmt"
-	"time"
 	"terraria-panel/internal/repository"
+	"time"
 )
 
 // Player represents a Terraria player
 type Player struct {
-	ID         string    `json:"id"`
-	Name       string    `json:"name"`
-	SteamID    string    `json:"steam_id,omitempty"`
-	IP         string    `json:"ip"`
-	IsOnline   bool      `json:"is_online"`
-	IsBanned   bool      `json:"is_banned"`
-	PlayTime   int64     `json:"play_time"`
-	LastSeen   time.Time `json:"last_seen"`
-	JoinedAt   time.Time `json:"joined_at"`
+	ID       string    `json:"id"`
+	Name     string    `json:"name"`
+	SteamID  string    `json:"steam_id,omitempty"`
+	IP       string    `json:"ip"`
+	IsOnline bool      `json:"is_online"`
+	IsBanned bool      `json:"is_banned"`
+	PlayTime int64     `json:"play_time"`
+	LastSeen time.Time `json:"last_seen"`
+	JoinedAt time.Time `json:"joined_at"`
 }
 
 // PlayerStatistics represents player statistics
 type PlayerStatistics struct {
-	TotalPlayTime int64  `json:"total_play_time"`
-	SessionCount  int    `json:"session_count"`
-	LastSession   time.Time `json:"last_session"`
-	Deaths        int    `json:"deaths"`
-	Kills         int    `json:"kills"`
-	ItemsCollected int    `json:"items_collected"`
+	TotalPlayTime  int64     `json:"total_play_time"`
+	SessionCount   int       `json:"session_count"`
+	LastSession    time.Time `json:"last_session"`
+	Deaths         int       `json:"deaths"`
+	Kills          int       `json:"kills"`
+	ItemsCollected int       `json:"items_collected"`
 }
 
 // GetAllPlayers returns all registered players
@@ -143,7 +143,6 @@ func CreateUser(username, email, password, role string) (*repository.User, error
 		Email:     email,
 		Password:  hashedPassword,
 		Role:      role,
-		IsActive:  true,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -216,14 +215,14 @@ func ClearServerLogs() error {
 func GetTerrariaServerInfo() (map[string]interface{}, error) {
 	// In a real implementation, this would get info from the Terraria server
 	info := map[string]interface{}{
-		"version":        "1.4.4.9",
-		"world_name":     "MyWorld",
-		"world_size":     "Large",
-		"difficulty":     "Expert",
-		"max_players":    8,
+		"version":         "1.4.4.9",
+		"world_name":      "MyWorld",
+		"world_size":      "Large",
+		"difficulty":      "Expert",
+		"max_players":     8,
 		"current_players": 0,
-		"uptime":         3600,
-		"mods":           []string{},
+		"uptime":          3600,
+		"mods":            []string{},
 	}
 	return info, nil
 }

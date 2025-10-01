@@ -152,7 +152,6 @@ func RegisterFirstAdmin(username, password, email string) (*repository.User, err
 		Password: hashedPassword,
 		Role:     "admin",
 		Email:    email,
-		IsActive: true,
 	}
 
 	if err := repository.CreateUser(user); err != nil {
