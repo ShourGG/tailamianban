@@ -237,40 +237,30 @@
       return
     }
 
-    // 使用 setTimeout 确保表单完全渲染
-    setTimeout(() => {
-      // 检查表单引用是否存在
-      if (!formRef.value) {
-        message.error('表单初始化失败，请刷新页面重试')
-        console.error('Form ref is null after timeout')
-        return
-      }
+    // 检查表单引用是否存在
+    if (!formRef.value) {
+      message.error('表单初始化失败，请刷新页面重试')
+      console.error('Form ref is null')
+      return
+    }
 
-      // 表单验证
-      formRef.value.validate((errors: any) => {
-        if (errors) {
-          message.error('表单校验失败，请检查输入')
-          return
-        }
-        
-        // 准备登录数据
-        const { username, password } = formModel.value
-        const formScope = {
-          model: {
-            username,
-            password,
-            captcha: {
-              token: captchaData.value!.token,
-              timestamp: captchaData.value!.timestamp,
-              type: 'puzzle-captcha',
-            },
-          }
-        }
-        
-        // 调用 login
-        login(formScope)
-      })
-    }, 100)
+    // 准备登录数据 - 必须包含 form 属性！
+    const { username, password } = formModel.value
+    const formScope = {
+      form: formRef.value,  // 这是关键！useFormSubmit 需要这个属性
+      model: {
+        username,
+        password,
+        captcha: {
+          token: captchaData.value.token,
+          timestamp: captchaData.value.timestamp,
+          type: 'puzzle-captcha',
+        },
+      }
+    }
+    
+    // 调用 login
+    login(formScope)
   }
 
   // 创建登录方法 - 使用官方的 meta 属性
