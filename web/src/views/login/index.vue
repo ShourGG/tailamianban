@@ -153,6 +153,8 @@
     try {
       checkingInit.value = true
       const response = await checkInitApi()
+      // getData 返回的是 res.data，即后端的完整响应: { code, data: { initialized, message }, message }
+      // 所以 response.data 是 { initialized, message }
       if (response.data) {
         pageMode.value = response.data.initialized ? 'login' : 'register'
       }
