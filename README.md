@@ -13,6 +13,10 @@
 ### 第一步：下载管理脚本
 
 ```bash
+# 删除旧脚本（如果存在）
+rm -f panel.sh
+
+# 下载最新脚本
 wget https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
 chmod +x panel.sh
 ```
