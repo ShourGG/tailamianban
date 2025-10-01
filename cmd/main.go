@@ -75,17 +75,29 @@ func main() {
 	api.SetupRoutes(r)
 
 	// Static files (embedded frontend)
-	// Static files (embedded frontend)
 	embedFS, err := static.EmbedFolder(EmbedFS, "dist")
 	if err != nil {
 		log.Printf("⚠️  Failed to create embed folder: %v", err)
 		log.Println("📌 Frontend assets may not be available")
 	} else {
-		r.Use(static.Serve("/", embedFS))
+		// Only serve static files for non-API requests
+		r.Use(func(c *gin.Context) {
+			// Skip static file serving for API routes
+			if !strings.HasPrefix(c.Request.URL.Path, "/api/") {
+				static.Serve("/", embedFS)(c)
+			}
+		})
 	}
 
-	// Fallback for SPA routing
+	// Fallback for SPA routing (only for non-API routes)
 	r.NoRoute(func(c *gin.Context) {
+		// If it's an API request, return 404 JSON
+		if strings.HasPrefix(c.Request.URL.Path, "/api/") {
+			c.JSON(404, gin.H{"error": "API endpoint not found", "path": c.Request.URL.Path})
+			return
+		}
+
+		// For non-API requests, serve SPA index.html
 		data, err := EmbedFS.ReadFile("dist/index.html")
 		if err != nil {
 			c.String(404, "Page not found")
