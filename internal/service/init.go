@@ -23,10 +23,11 @@ func InitializeServices() error {
 		return err
 	}
 
-	// Initialize default admin user if not exists
-	if err := initializeDefaultUser(); err != nil {
-		return err
-	}
+	// ⚠️ Default user creation disabled to support web-based first-time registration
+	// Users must register the first admin account through the web interface on first access
+	// if err := initializeDefaultUser(); err != nil {
+	// 	return err
+	// }
 
 	// Initialize other services
 	if err := initializeSystemMonitoring(); err != nil {
@@ -53,7 +54,7 @@ func initializeDefaultUser() error {
 
 	if !exists {
 		log.Println("📝 Creating default admin user...")
-		
+
 		// Create default admin user
 		// Username: admin, Password: admin123 (should be changed on first login)
 		hashedPassword, err := HashPassword("admin123")
@@ -81,10 +82,10 @@ func initializeDefaultUser() error {
 
 func initializeSystemMonitoring() error {
 	log.Println("📊 Initializing system monitoring...")
-	
+
 	// Start background monitoring goroutines
 	go startMetricsCollection()
-	
+
 	return nil
 }
 
