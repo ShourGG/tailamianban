@@ -23,11 +23,10 @@ func InitializeServices() error {
 		return err
 	}
 
-	// ⚠️ Default user creation disabled to support web-based first-time registration
-	// Users must register the first admin account through the web interface on first access
-	// if err := initializeDefaultUser(); err != nil {
-	// 	return err
-	// }
+	// ⚠️ No default user creation - users must register through web interface
+	// The first user to register will automatically become the admin
+	// Registration is only allowed when no users exist in the system
+	log.Println("💡 First-time setup: Please register your admin account via web interface")
 
 	// Initialize other services
 	if err := initializeSystemMonitoring(); err != nil {

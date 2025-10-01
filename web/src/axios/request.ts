@@ -13,11 +13,11 @@ import { s_userStore } from '@/stores/user'
 import { d_isCheckTimeout } from '@/utils/d_auth'
 import { createDiscreteApi } from 'naive-ui/es'
 
-const { VITE_API_BASE } = import.meta.env
+const { VITE_API_BASE_URL } = import.meta.env
 const { message } = createDiscreteApi(['message'])
 
 const service = axios.create({
-  baseURL: VITE_API_BASE || '',
+  baseURL: VITE_API_BASE_URL || '/api/v1',
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
