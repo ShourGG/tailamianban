@@ -153,13 +153,25 @@
     try {
       checkingInit.value = true
       const response = await checkInitApi()
+      
+      // 调试日志：查看完整响应
+      console.log('[CheckInit] 完整响应:', response)
+      console.log('[CheckInit] response.data:', response.data)
+      console.log('[CheckInit] initialized值:', response.data?.initialized)
+      console.log('[CheckInit] initialized类型:', typeof response.data?.initialized)
+      
       // getData 返回的是 res.data，即后端的完整响应: { code, data: { initialized, message }, message }
       // 所以 response.data 是 { initialized, message }
       if (response.data) {
-        pageMode.value = response.data.initialized ? 'login' : 'register'
+        const isInitialized = response.data.initialized
+        pageMode.value = isInitialized ? 'login' : 'register'
+        console.log('[CheckInit] 最终模式:', pageMode.value, '(initialized:', isInitialized, ')')
+      } else {
+        console.warn('[CheckInit] response.data 为空，默认使用登录模式')
+        pageMode.value = 'login'
       }
     } catch (error) {
-      console.error('检查初始化状态失败:', error)
+      console.error('[CheckInit] 检查初始化状态失败:', error)
       message.error('检查系统状态失败')
       pageMode.value = 'login'
     } finally {
