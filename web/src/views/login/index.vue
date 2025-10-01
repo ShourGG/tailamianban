@@ -114,10 +114,20 @@
   const { loading, createSubmit } = useFormSubmit<LoginResponse>()
 
   // 表单数据和验证规则
-  const formRef = ref()
+  const formRef = ref<any>(null)
   const formModel = ref({
     username: 'admin',
     password: 'admin123'
+  })
+  
+  // 表单是否已准备好
+  const formReady = ref(false)
+  
+  // 组件挂载后标记表单已准备好
+  onMounted(() => {
+    nextTick(() => {
+      formReady.value = true
+    })
   })
   
   const formRules = {
@@ -221,8 +231,12 @@
 
   // 直接登录处理函数
   const handleDirectLogin = (): void => {
-    if (!formRef.value) return
-    
+    // 检查表单是否准备好
+    if (!formReady.value || !formRef.value) {
+      message.warning('表单正在初始化，请稍候...')
+      return
+    }
+
     // 验证码检查
     if (!captchaValid.value || !captchaData.value) {
       message.error('请先完成人机验证')
@@ -241,8 +255,8 @@
           username,
           password,
           captcha: {
-            token: captchaData.value.token,
-            timestamp: captchaData.value.timestamp,
+            token: captchaData.value!.token,
+            timestamp: captchaData.value!.timestamp,
             type: 'puzzle-captcha',
           },
         }
