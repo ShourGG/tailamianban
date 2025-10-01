@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 	"os"
-	"time"
 	"terraria-panel/internal/repository"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -41,7 +41,7 @@ func AuthenticateUser(username, password string) (*repository.User, error) {
 // GenerateJWTToken creates a new JWT token for the user
 func GenerateJWTToken(userID, username, role string) (string, int64, error) {
 	expirationTime := time.Now().Add(24 * time.Hour) // 24 hours
-	
+
 	claims := &JWTClaims{
 		UserID:   userID,
 		Username: username,
@@ -65,7 +65,7 @@ func GenerateJWTToken(userID, username, role string) (string, int64, error) {
 // ValidateJWTToken validates and parses a JWT token
 func ValidateJWTToken(tokenString string) (*JWTClaims, error) {
 	claims := &JWTClaims{}
-	
+
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
@@ -107,7 +107,7 @@ func LogAuditEvent(userID, action, description, ipAddress string) {
 		IPAddress:   ipAddress,
 		Timestamp:   time.Now(),
 	}
-	
+
 	// Log to database (ignore errors for now)
 	repository.CreateAuditLog(auditLog)
 }
@@ -118,4 +118,46 @@ func getJWTSecret() string {
 	}
 	// Default secret (should be changed in production)
 	return "terraria-panel-default-secret-change-me-in-production"
+}
+
+// HasAnyUser checks if any user exists in the system
+func HasAnyUser() (bool, error) {
+	users, err := repository.ListUsers()
+	if err != nil {
+		return false, err
+	}
+	return len(users) > 0, nil
+}
+
+// RegisterFirstAdmin creates the first admin user
+func RegisterFirstAdmin(username, password, email string) (*repository.User, error) {
+	// Double-check that no users exist
+	hasUser, err := HasAnyUser()
+	if err != nil {
+		return nil, err
+	}
+	if hasUser {
+		return nil, errors.New("registration is disabled: system already has users")
+	}
+
+	// Hash the password
+	hashedPassword, err := HashPassword(password)
+	if err != nil {
+		return nil, errors.New("failed to hash password")
+	}
+
+	// Create the user
+	user := &repository.User{
+		Username: username,
+		Password: hashedPassword,
+		Role:     "admin",
+		Email:    email,
+		IsActive: true,
+	}
+
+	if err := repository.CreateUser(user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

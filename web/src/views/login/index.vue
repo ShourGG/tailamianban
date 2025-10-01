@@ -33,13 +33,20 @@
         <img src="@/assets/images/robot-avatar-1.png" alt="Robot Avatar" />
       </div>
       
-      <h3 class="login-title">{{ '泰拉瑞亚管理面板' }}</h3>
+      <h3 class="login-title">{{ pageMode === 'register' ? '首次注册' : '泰拉瑞亚管理面板' }}</h3>
       <div class="version-info" style="text-align: center; color: #666; font-size: 12px; margin-bottom: 10px;">
         版本: v{{ version }}
       </div>
       
-      <!-- 临时调试：直接使用 NForm -->
+      <!-- 加载状态提示 -->
+      <div v-if="checkingInit" style="text-align: center; padding: 20px;">
+        <NSpin size="small" />
+        <p style="margin-top: 10px; color: #999;">正在检查系统状态...</p>
+      </div>
+      
+      <!-- 注册/登录表单 -->
       <NForm
+        v-else
         ref="formRef"
         class="login-form"
         :model="formModel"
@@ -61,15 +68,23 @@
             clearable
           />
         </NFormItem>
+        <!-- 注册模式下显示邮箱输入 -->
+        <NFormItem v-if="pageMode === 'register'" label="邮箱（可选）" path="email">
+          <NInput
+            v-model:value="formModel.email"
+            placeholder="请输入邮箱"
+            clearable
+          />
+        </NFormItem>
         <NFormItem>
           <NButton
             class="login-btn"
             type="primary"
             :loading="loading"
             :disabled="!captchaValid"
-            @click.prevent="handleDirectLogin"
+            @click.prevent="pageMode === 'register' ? handleRegister() : handleDirectLogin()"
           >
-            {{ captchaValid ? '登录' : '请先点击下方图标完成人机验证' }}
+            {{ captchaValid ? (pageMode === 'register' ? '注册' : '登录') : '请先点击下方图标完成人机验证' }}
           </NButton>
         </NFormItem>
       </NForm>
@@ -92,7 +107,7 @@
   import { initDynamicRouter } from '@/router/dynamicRouter'
   import { s_userStore } from '@/stores/user/index'
   import { useFormSubmit } from '@/hooks/useFormSubmit'
-  import { loginApi, type LoginResponse } from '@/api/auth'
+  import { loginApi, registerApi, checkInitApi, type LoginResponse } from '@/api/auth'
   import { VERSION } from '@/config/version'
   import './index.scss'
   import Spline from './components/Spline.vue'
@@ -101,6 +116,10 @@
 
   // 版本号
   const version = VERSION
+
+  // 页面模式：register（注册）或 login（登录）
+  const pageMode = ref<'register' | 'login'>('login')
+  const checkingInit = ref<boolean>(true)
 
   // 类型定义
   interface CaptchaData {
@@ -116,29 +135,59 @@
   // 表单数据和验证规则
   const formRef = ref<any>(null)
   const formModel = ref({
-    username: 'admin',
-    password: 'admin123'
+    username: '',
+    password: '',
+    email: ''
   })
   
   // 表单是否已准备好
   const formReady = ref(false)
   
-  // 组件挂载后标记表单已准备好
-  onMounted(() => {
+  // 组件挂载后检查初始化状态
+  onMounted(async () => {
     nextTick(() => {
       formReady.value = true
     })
+    
+    // 检查系统是否已初始化
+    try {
+      checkingInit.value = true
+      const response = await checkInitApi()
+      if (response.data) {
+        pageMode.value = response.data.initialized ? 'login' : 'register'
+      }
+    } catch (error) {
+      console.error('检查初始化状态失败:', error)
+      message.error('检查系统状态失败')
+      pageMode.value = 'login'
+    } finally {
+      checkingInit.value = false
+    }
   })
   
-  const formRules = {
-    username: [
-      { required: true, message: '请输入用户名', trigger: 'blur' }
-    ],
-    password: [
-      { required: true, message: '请输入密码', trigger: 'blur' },
-      { min: 6, max: 15, message: '密码长度在 6 到 15 个字符', trigger: 'blur' }
-    ]
-  }
+  const formRules = computed(() => {
+    const baseRules = {
+      username: [
+        { required: true, message: '请输入用户名', trigger: 'blur' },
+        { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' }
+      ],
+      password: [
+        { required: true, message: '请输入密码', trigger: 'blur' },
+        { min: 6, max: 30, message: '密码长度在 6 到 30 个字符', trigger: 'blur' }
+      ]
+    }
+    
+    if (pageMode.value === 'register') {
+      return {
+        ...baseRules,
+        email: [
+          { type: 'email', message: '请输入有效的邮箱地址', trigger: 'blur' }
+        ]
+      }
+    }
+    
+    return baseRules
+  })
 
   // 打字机控制
   const showTypewriter = ref<boolean>(true)
@@ -285,6 +334,65 @@
 
     globalErrorHandler: (error: Error) => {
       console.error('登录错误:', error)
+      resetCaptcha()
+    },
+  })
+
+  // 注册处理函数
+  const handleRegister = (): void => {
+    if (!captchaValid.value || !captchaData.value) {
+      message.error('请先完成人机验证')
+      return
+    }
+
+    if (!formRef.value) {
+      message.error('表单初始化失败，请刷新页面重试')
+      return
+    }
+
+    const { username, password, email } = formModel.value
+    const formScope = {
+      form: formRef.value,
+      model: {
+        username,
+        password,
+        email: email || undefined,
+        captcha: {
+          token: captchaData.value.token,
+          timestamp: captchaData.value.timestamp,
+          type: 'puzzle-captcha',
+        },
+      }
+    }
+    
+    register(formScope)
+  }
+
+  // 创建注册方法
+  const register = createSubmit(registerApi, {
+    successMsg: '注册成功',
+    errorMsg: '注册失败',
+
+    onSuccess: async (response: LoginResponse) => {
+      try {
+        const { data: { token } } = response
+        userStore.handleLoginSuccess(token)
+        await initDynamicRouter()
+        
+        pageMode.value = 'login'
+        message.success('注册成功！正在跳转...')
+        
+        setTimeout(() => {
+          router.push('/home')
+        }, 1000)
+      } catch (error) {
+        console.error('注册成功后操作失败:', error)
+        resetCaptcha()
+      }
+    },
+
+    globalErrorHandler: (error: Error) => {
+      console.error('注册错误:', error)
       resetCaptcha()
     },
   })

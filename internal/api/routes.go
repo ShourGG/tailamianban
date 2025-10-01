@@ -19,6 +19,8 @@ func SetupRoutes(r *gin.Engine) {
 		// Authentication routes (public)
 		auth := api.Group("/auth")
 		{
+			auth.GET("/check-init", handlers.CheckInit)
+			auth.POST("/register", handlers.Register)
 			auth.POST("/login", handlers.Login)
 			auth.POST("/logout", handlers.Logout)
 			auth.GET("/me", middleware.AuthRequired(), handlers.GetCurrentUser)
