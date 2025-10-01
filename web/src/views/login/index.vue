@@ -203,7 +203,41 @@
     captchaRef.value?.reset()
   }
 
-  // 处理登录点击
+  // 直接登录处理函数
+  const handleDirectLogin = (): void => {
+    if (!formRef.value) return
+    
+    // 验证码检查
+    if (!captchaValid.value || !captchaData.value) {
+      message.error('请先完成人机验证')
+      return
+    }
+
+    formRef.value.validate((errors: any) => {
+      if (errors) {
+        message.error('表单校验失败,请检查输入')
+        return
+      }
+      
+      const { username, password } = formModel.value
+      const formScope = {
+        model: {
+          username,
+          password,
+          captcha: {
+            token: captchaData.value.token,
+            timestamp: captchaData.value.timestamp,
+            type: 'puzzle-captcha',
+          },
+        }
+      }
+      
+      // 调用 login
+      login(formScope)
+    })
+  }
+
+  // 处理登录点击 (保留旧函数作为参考)
   const handleLogin = (formScope: FormScope): void => {
     // 验证码检查
     if (!captchaValid.value || !captchaData.value) {
