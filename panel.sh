@@ -3,8 +3,10 @@
 ###########################################
 # 泰拉瑞亚面板一键管理脚本
 # Terraria Panel One-Click Management Script
-# Version: 2.2
+# Version: 2.3
 # 更新日志:
+# v2.3 - 修复版本号显示bug（支持四段版本号如v1.1.9.29）
+#      - 新增端口配置功能（支持动态修改监听端口）
 # v2.2 - 限制脚本位置：强制安装到/root目录，仅允许在/root目录运行
 # v2.1 - 新增脚本自动更新机制（启动时自动检测并更新脚本）
 # v2.0 - 优化更新功能：增强版本检测和自动备份
@@ -12,7 +14,7 @@
 ###########################################
 
 # 脚本版本
-SCRIPT_VERSION="2.2"
+SCRIPT_VERSION="2.3"
 
 # 脚本固定安装位置
 SCRIPT_HOME="/root"
@@ -46,7 +48,7 @@ print_banner() {
     echo "╔════════════════════════════════════════════════╗"
     echo "║       泰拉瑞亚服务器管理面板                   ║"
     echo "║    Terraria Server Management Panel           ║"
-    echo "║              管理脚本 v${SCRIPT_VERSION}                     ║"
+    echo "║            管理脚本 v${SCRIPT_VERSION}                       ║"
     echo "╚════════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -82,8 +84,8 @@ get_local_version() {
         version=$($INSTALL_DIR/terraria-panel --version 2>/dev/null | head -1 || echo "未知")
     fi
     
-    # 标准化版本号格式，只保留 vX.Y.Z 部分
-    version=$(echo "$version" | grep -oP 'v\d+\.\d+\.\d+' || echo "$version")
+    # 标准化版本号格式，支持 vX.Y.Z 或 vX.Y.Z.W 格式
+    version=$(echo "$version" | grep -oP 'v\d+(\.\d+)+' || echo "$version")
     
     echo "${version:-未知}"
 }
@@ -553,6 +555,139 @@ uninstall_panel() {
     read -p "按回车返回..."
 }
 
+# 修改端口配置
+change_port() {
+    print_banner
+    echo -e "${GREEN}╔════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║              修改面板端口                      ║${NC}"
+    echo -e "${GREEN}╚════════════════════════════════════════════════╝${NC}"
+    echo ""
+    
+    if ! check_installed; then
+        print_error "面板未安装"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    # 获取当前端口
+    local current_port="8080"
+    if systemctl is-active --quiet "$SERVICE_NAME" 2>/dev/null; then
+        current_port=$(systemctl show "$SERVICE_NAME" --property=Environment 2>/dev/null | grep -oP 'PORT=\K\d+' || echo "8080")
+    fi
+    
+    print_info "当前端口: $current_port"
+    echo ""
+    
+    # 输入新端口
+    local new_port=""
+    while true; do
+        read -p "请输入新端口号 (1024-65535, 0取消): " new_port
+        
+        # 取消
+        if [ "$new_port" = "0" ]; then
+            print_info "取消修改"
+            read -p "按回车返回..."
+            return
+        fi
+        
+        # 验证端口号
+        if ! [[ "$new_port" =~ ^[0-9]+$ ]]; then
+            print_error "端口必须是数字"
+            continue
+        fi
+        
+        if [ "$new_port" -lt 1024 ] || [ "$new_port" -gt 65535 ]; then
+            print_error "端口范围必须在 1024-65535 之间"
+            continue
+        fi
+        
+        # 检查端口是否被占用
+        if netstat -tuln 2>/dev/null | grep -q ":$new_port " || ss -tuln 2>/dev/null | grep -q ":$new_port "; then
+            if [ "$new_port" != "$current_port" ]; then
+                print_error "端口 $new_port 已被占用"
+                continue
+            fi
+        fi
+        
+        break
+    done
+    
+    # 确认修改
+    echo ""
+    print_warning "将修改端口: $current_port → $new_port"
+    read -p "确认修改? (Y/n): " -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Nn]$ ]] && return
+    
+    echo ""
+    print_info "开始修改端口..."
+    
+    # 1. 停止服务
+    print_info "[1/4] 停止服务..."
+    if check_running; then
+        systemctl stop "$SERVICE_NAME" 2>/dev/null
+        sleep 1
+    fi
+    
+    # 2. 更新 systemd 服务配置
+    print_info "[2/4] 更新服务配置..."
+    if [ -f "/etc/systemd/system/${SERVICE_NAME}.service" ]; then
+        sed -i "s/Environment=PORT=.*/Environment=PORT=$new_port/" "/etc/systemd/system/${SERVICE_NAME}.service"
+        print_success "服务配置已更新"
+    fi
+    
+    # 3. 重载 systemd
+    print_info "[3/4] 重载系统服务..."
+    systemctl daemon-reload
+    
+    # 4. 配置防火墙
+    print_info "[4/4] 配置防火墙..."
+    
+    # UFW
+    if command -v ufw >/dev/null 2>&1; then
+        ufw allow "$new_port/tcp" 2>/dev/null
+        [ "$new_port" != "$current_port" ] && ufw delete allow "$current_port/tcp" 2>/dev/null
+        print_success "UFW防火墙已更新"
+    # firewalld
+    elif command -v firewall-cmd >/dev/null 2>&1; then
+        firewall-cmd --permanent --add-port="$new_port/tcp" 2>/dev/null
+        [ "$new_port" != "$current_port" ] && firewall-cmd --permanent --remove-port="$current_port/tcp" 2>/dev/null
+        firewall-cmd --reload 2>/dev/null
+        print_success "firewalld防火墙已更新"
+    # iptables
+    elif command -v iptables >/dev/null 2>&1; then
+        iptables -A INPUT -p tcp --dport "$new_port" -j ACCEPT 2>/dev/null
+        [ "$new_port" != "$current_port" ] && iptables -D INPUT -p tcp --dport "$current_port" -j ACCEPT 2>/dev/null
+        # 保存规则
+        if command -v iptables-save >/dev/null 2>&1; then
+            iptables-save > /etc/iptables/rules.v4 2>/dev/null || true
+        fi
+        print_success "iptables防火墙已更新"
+    else
+        print_warning "未检测到防火墙，请手动开放端口 $new_port"
+    fi
+    
+    echo ""
+    print_success "端口修改完成: $new_port"
+    echo ""
+    
+    read -p "立即启动面板? (Y/n): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        echo ""
+        start_panel
+        
+        if check_running; then
+            echo ""
+            print_success "面板已在新端口 $new_port 上运行"
+            print_info "访问地址: http://您的IP:$new_port"
+        fi
+    fi
+    
+    echo ""
+    read -p "按回车返回..."
+}
+
 # 设置虚拟内存
 setup_swap() {
     print_banner
@@ -667,11 +802,12 @@ show_menu() {
     echo "  5. 重启面板"
     echo "  6. 查看状态"
     echo "  7. 查看日志"
-    echo "  8. 设置虚拟内存"
-    echo "  9. 完全卸载 (清理所有数据)"
+    echo "  8. 修改端口"
+    echo "  9. 设置虚拟内存"
+    echo "  10. 完全卸载 (清理所有数据)"
     echo "  0. 退出"
     echo ""
-    read -p "请输入 [0-9]: " choice
+    read -p "请输入 [0-10]: " choice
     
     case $choice in
         1) install_panel ;;
@@ -681,8 +817,9 @@ show_menu() {
         5) restart_panel ;;
         6) view_status ;;
         7) view_logs ;;
-        8) setup_swap ;;
-        9) uninstall_panel ;;
+        8) change_port ;;
+        9) setup_swap ;;
+        10) uninstall_panel ;;
         0) print_info "再见!"; exit 0 ;;
         *) print_error "无效选项"; sleep 1 ;;
     esac
