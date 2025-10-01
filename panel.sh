@@ -3,15 +3,21 @@
 ###########################################
 # 泰拉瑞亚面板一键管理脚本
 # Terraria Panel One-Click Management Script
-# Version: 2.1
+# Version: 2.2
 # 更新日志:
+# v2.2 - 限制脚本位置：强制安装到/root目录，仅允许在/root目录运行
 # v2.1 - 新增脚本自动更新机制（启动时自动检测并更新脚本）
 # v2.0 - 优化更新功能：增强版本检测和自动备份
 #      - 优化卸载功能：完全清理所有文件和服务
 ###########################################
 
 # 脚本版本
-SCRIPT_VERSION="2.1"
+SCRIPT_VERSION="2.2"
+
+# 脚本固定安装位置
+SCRIPT_HOME="/root"
+SCRIPT_NAME="panel.sh"
+SCRIPT_PATH="${SCRIPT_HOME}/${SCRIPT_NAME}"
 
 # GitHub 仓库信息
 GITHUB_REPO="ShourGG/tailamianban"
@@ -691,6 +697,53 @@ check_root() {
     fi
 }
 
+# 检查并确保脚本在正确位置
+check_script_location() {
+    local current_script=$(readlink -f "$0")
+    local current_dir=$(dirname "$current_script")
+    
+    # 如果当前不在 /root 目录
+    if [ "$current_dir" != "$SCRIPT_HOME" ]; then
+        clear
+        echo -e "${YELLOW}╔════════════════════════════════════════════════╗${NC}"
+        echo -e "${YELLOW}║            检测到脚本位置不正确                ║${NC}"
+        echo -e "${YELLOW}╚════════════════════════════════════════════════╝${NC}"
+        echo ""
+        print_warning "当前位置: $current_dir"
+        print_info "要求位置: $SCRIPT_HOME"
+        echo ""
+        print_info "正在自动修正脚本位置..."
+        echo ""
+        
+        # 删除 /root 下的旧脚本（如果存在）
+        if [ -f "$SCRIPT_PATH" ]; then
+            print_info "[1/3] 删除旧脚本"
+            rm -f "$SCRIPT_PATH"
+        else
+            print_info "[1/3] 无需删除旧脚本"
+        fi
+        
+        # 复制当前脚本到 /root
+        print_info "[2/3] 复制脚本到 $SCRIPT_HOME"
+        if cp "$current_script" "$SCRIPT_PATH" 2>/dev/null; then
+            chmod +x "$SCRIPT_PATH"
+            print_success "脚本已复制到正确位置"
+        else
+            print_error "复制失败，请手动执行:"
+            echo "  cp $current_script $SCRIPT_PATH"
+            echo "  chmod +x $SCRIPT_PATH"
+            exit 1
+        fi
+        
+        # 重新执行正确位置的脚本
+        print_info "[3/3] 重新启动脚本"
+        echo ""
+        print_success "位置修正完成，正在重新启动..."
+        sleep 2
+        exec "$SCRIPT_PATH" "$@"
+    fi
+}
+
 # 脚本自动更新功能
 check_script_update() {
     echo -e "${BLUE}[检查]${NC} 检测脚本版本..."
@@ -731,30 +784,27 @@ check_script_update() {
         print_warning "脚本将在 3 秒后自动更新..."
         sleep 3
         
-        # 获取当前脚本路径
-        local script_path=$(readlink -f "$0")
-        
         # 备份当前脚本
-        local backup_script="${script_path}.bak.$(date +%Y%m%d_%H%M%S)"
-        if cp "$script_path" "$backup_script" 2>/dev/null; then
+        local backup_script="${SCRIPT_PATH}.bak.$(date +%Y%m%d_%H%M%S)"
+        if cp "$SCRIPT_PATH" "$backup_script" 2>/dev/null; then
             print_success "[1/3] 已备份当前脚本"
         else
             print_warning "[1/3] 无法备份脚本，但继续更新"
         fi
         
-        # 替换脚本
-        if cp "$temp_script" "$script_path" 2>/dev/null; then
-            chmod +x "$script_path"
+        # 替换脚本到 /root 目录
+        if cp "$temp_script" "$SCRIPT_PATH" 2>/dev/null; then
+            chmod +x "$SCRIPT_PATH"
             print_success "[2/3] 脚本已更新到 v$remote_version"
             print_success "[3/3] 正在重新启动脚本..."
             echo ""
             rm -f "$temp_script"
             
             # 清理超过7天的备份文件
-            find "$(dirname "$script_path")" -name "$(basename "$script_path").bak.*" -mtime +7 -delete 2>/dev/null
+            find "$SCRIPT_HOME" -name "${SCRIPT_NAME}.bak.*" -mtime +7 -delete 2>/dev/null
             
             # 重新执行新脚本
-            exec "$script_path" "$@"
+            exec "$SCRIPT_PATH" "$@"
         else
             print_error "脚本更新失败"
             rm -f "$temp_script"
@@ -772,6 +822,9 @@ check_script_update() {
 # 主函数
 main() {
     check_root
+    
+    # 确保脚本在正确位置 (/root)
+    check_script_location "$@"
     
     # 在首次显示菜单前自动检查脚本更新
     check_script_update "$@"

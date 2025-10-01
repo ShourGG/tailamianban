@@ -13,18 +13,19 @@
 ### 第一步：下载管理脚本
 
 ```bash
-# 删除旧脚本（如果存在）
+# 切换到 root 主目录并下载脚本
+cd /root
 rm -f panel.sh
-
-# 下载最新脚本
 wget https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
 chmod +x panel.sh
 ```
 
+> 📍 **重要提示**：脚本必须在 `/root` 目录下运行。无论在哪里执行下载命令，脚本会自动移动到 `/root` 目录。
+
 ### 第二步：运行安装
 
 ```bash
-sudo ./panel.sh
+sudo /root/panel.sh
 # 选择 "1. 下载并安装面板"
 ```
 
@@ -80,7 +81,7 @@ http://localhost:8080
 
 ```bash
 # 使用管理脚本（推荐）
-sudo ./panel.sh
+sudo /root/panel.sh
 
 # 或使用 systemd（如果是脚本安装的）
 sudo systemctl start terraria-panel    # 启动
@@ -282,7 +283,7 @@ sudo firewall-cmd --list-ports
 ### 自动更新 (推荐)
 ```bash
 # 使用管理脚本更新
-sudo ./panel.sh
+sudo /root/panel.sh
 # 选择 "2. 更新面板"
 ```
 
