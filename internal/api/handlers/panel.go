@@ -12,18 +12,18 @@ import (
 
 // PanelSettings represents panel configuration
 type PanelSettings struct {
-	SiteName          string `json:"site_name"`
-	SiteDescription   string `json:"site_description"`
-	ServerName        string `json:"server_name"`
-	AdminEmail        string `json:"admin_email"`
+	SiteName           string `json:"site_name"`
+	SiteDescription    string `json:"site_description"`
+	ServerName         string `json:"server_name"`
+	AdminEmail         string `json:"admin_email"`
 	EnableRegistration bool   `json:"enable_registration"`
-	EnableAutoBackup  bool   `json:"enable_auto_backup"`
-	BackupInterval    int    `json:"backup_interval"` // in hours
-	MaxBackupCount    int    `json:"max_backup_count"`
-	SessionTimeout    int    `json:"session_timeout"` // in minutes
-	LogRetention      int    `json:"log_retention"`   // in days
-	Theme             string `json:"theme"`
-	Language          string `json:"language"`
+	EnableAutoBackup   bool   `json:"enable_auto_backup"`
+	BackupInterval     int    `json:"backup_interval"` // in hours
+	MaxBackupCount     int    `json:"max_backup_count"`
+	SessionTimeout     int    `json:"session_timeout"` // in minutes
+	LogRetention       int    `json:"log_retention"`   // in days
+	Theme              string `json:"theme"`
+	Language           string `json:"language"`
 }
 
 // User represents a panel user
@@ -32,7 +32,6 @@ type User struct {
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	Role      string    `json:"role"`
-	IsActive  bool      `json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	LastLogin time.Time `json:"last_login,omitempty"`
@@ -84,7 +83,7 @@ func GetPanelSettings(c *gin.Context) {
 func UpdatePanelSettings(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	role, _ := c.Get("role")
-	
+
 	// Check if user is admin
 	if role != "admin" {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -97,8 +96,8 @@ func UpdatePanelSettings(c *gin.Context) {
 	var settings PanelSettings
 	if err := c.ShouldBindJSON(&settings); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid settings format",
-			"code":  "INVALID_SETTINGS",
+			"error":   "Invalid settings format",
+			"code":    "INVALID_SETTINGS",
 			"details": err.Error(),
 		})
 		return
@@ -107,9 +106,9 @@ func UpdatePanelSettings(c *gin.Context) {
 	// Update settings
 	err := service.UpdatePanelSettings(&settings)
 	if err != nil {
-		service.LogAuditEvent(userID.(string), "panel.settings_update_failed", 
+		service.LogAuditEvent(userID.(string), "panel.settings_update_failed",
 			fmt.Sprintf("Failed to update settings: %v", err), c.ClientIP())
-		
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update settings",
 			"code":  "SETTINGS_UPDATE_ERROR",
@@ -118,11 +117,11 @@ func UpdatePanelSettings(c *gin.Context) {
 	}
 
 	// Log success
-	service.LogAuditEvent(userID.(string), "panel.settings_update", 
+	service.LogAuditEvent(userID.(string), "panel.settings_update",
 		"Updated panel settings", c.ClientIP())
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Settings updated successfully",
+		"message":  "Settings updated successfully",
 		"settings": settings,
 	})
 }
@@ -130,7 +129,7 @@ func UpdatePanelSettings(c *gin.Context) {
 // ListUsers returns all panel users
 func ListUsers(c *gin.Context) {
 	role, _ := c.Get("role")
-	
+
 	// Check if user is admin
 	if role != "admin" {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -157,10 +156,9 @@ func ListUsers(c *gin.Context) {
 			Username:  u.Username,
 			Email:     u.Email,
 			Role:      u.Role,
-			IsActive:  u.IsActive,
 			CreatedAt: u.CreatedAt,
 			UpdatedAt: u.UpdatedAt,
-			LastLogin: u.LastLogin,
+			LastLogin: u.LastLoginAt,
 		})
 	}
 
@@ -174,7 +172,7 @@ func ListUsers(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	role, _ := c.Get("role")
-	
+
 	// Check if user is admin
 	if role != "admin" {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -187,8 +185,8 @@ func CreateUser(c *gin.Context) {
 	var req UserCreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request format",
-			"code":  "INVALID_REQUEST",
+			"error":   "Invalid request format",
+			"code":    "INVALID_REQUEST",
 			"details": err.Error(),
 		})
 		return
@@ -207,9 +205,9 @@ func CreateUser(c *gin.Context) {
 	// Create the user
 	newUser, err := service.CreateUser(req.Username, req.Email, req.Password, req.Role)
 	if err != nil {
-		service.LogAuditEvent(userID.(string), "panel.user_create_failed", 
+		service.LogAuditEvent(userID.(string), "panel.user_create_failed",
 			fmt.Sprintf("Failed to create user %s: %v", req.Username, err), c.ClientIP())
-		
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to create user",
 			"code":  "USER_CREATE_ERROR",
@@ -218,7 +216,7 @@ func CreateUser(c *gin.Context) {
 	}
 
 	// Log success
-	service.LogAuditEvent(userID.(string), "panel.user_create", 
+	service.LogAuditEvent(userID.(string), "panel.user_create",
 		fmt.Sprintf("Created user: %s (role: %s)", req.Username, req.Role), c.ClientIP())
 
 	c.JSON(http.StatusCreated, User{
@@ -226,7 +224,6 @@ func CreateUser(c *gin.Context) {
 		Username:  newUser.Username,
 		Email:     newUser.Email,
 		Role:      newUser.Role,
-		IsActive:  newUser.IsActive,
 		CreatedAt: newUser.CreatedAt,
 	})
 }
@@ -236,7 +233,7 @@ func UpdateUser(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	role, _ := c.Get("role")
 	targetUserID := c.Param("id")
-	
+
 	// Check if user is admin or updating own account
 	if role != "admin" && userID != targetUserID {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -249,8 +246,8 @@ func UpdateUser(c *gin.Context) {
 	var req UserUpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request format",
-			"code":  "INVALID_REQUEST",
+			"error":   "Invalid request format",
+			"code":    "INVALID_REQUEST",
 			"details": err.Error(),
 		})
 		return
@@ -275,9 +272,9 @@ func UpdateUser(c *gin.Context) {
 	// Update the user
 	err = service.UpdateUser(targetUserID, req)
 	if err != nil {
-		service.LogAuditEvent(userID.(string), "panel.user_update_failed", 
+		service.LogAuditEvent(userID.(string), "panel.user_update_failed",
 			fmt.Sprintf("Failed to update user %s: %v", targetUser.Username, err), c.ClientIP())
-		
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update user",
 			"code":  "USER_UPDATE_ERROR",
@@ -286,7 +283,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// Log success
-	service.LogAuditEvent(userID.(string), "panel.user_update", 
+	service.LogAuditEvent(userID.(string), "panel.user_update",
 		fmt.Sprintf("Updated user: %s", targetUser.Username), c.ClientIP())
 
 	c.JSON(http.StatusOK, gin.H{
@@ -299,7 +296,7 @@ func DeleteUser(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	role, _ := c.Get("role")
 	targetUserID := c.Param("id")
-	
+
 	// Check if user is admin
 	if role != "admin" {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -331,9 +328,9 @@ func DeleteUser(c *gin.Context) {
 	// Delete the user
 	err = repository.DeleteUser(targetUserID)
 	if err != nil {
-		service.LogAuditEvent(userID.(string), "panel.user_delete_failed", 
+		service.LogAuditEvent(userID.(string), "panel.user_delete_failed",
 			fmt.Sprintf("Failed to delete user %s: %v", targetUser.Username, err), c.ClientIP())
-		
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to delete user",
 			"code":  "USER_DELETE_ERROR",
@@ -342,7 +339,7 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	// Log success
-	service.LogAuditEvent(userID.(string), "panel.user_delete", 
+	service.LogAuditEvent(userID.(string), "panel.user_delete",
 		fmt.Sprintf("Deleted user: %s", targetUser.Username), c.ClientIP())
 
 	c.JSON(http.StatusOK, gin.H{
@@ -353,7 +350,7 @@ func DeleteUser(c *gin.Context) {
 // GetAuditLogs returns audit logs
 func GetAuditLogs(c *gin.Context) {
 	role, _ := c.Get("role")
-	
+
 	// Check if user is admin or moderator
 	if role != "admin" && role != "moderator" {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -368,7 +365,7 @@ func GetAuditLogs(c *gin.Context) {
 	offset := 0
 	userFilter := c.Query("user_id")
 	actionFilter := c.Query("action")
-	
+
 	// Get audit logs
 	logs, err := repository.GetAuditLogs(limit, offset, userFilter, actionFilter)
 	if err != nil {
@@ -380,9 +377,9 @@ func GetAuditLogs(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"logs":  logs,
-		"count": len(logs),
-		"limit": limit,
+		"logs":   logs,
+		"count":  len(logs),
+		"limit":  limit,
 		"offset": offset,
 	})
 }
@@ -394,7 +391,7 @@ func GetServerLogs(c *gin.Context) {
 	if l := c.Query("lines"); l != "" {
 		fmt.Sscanf(l, "%d", &lines)
 	}
-	
+
 	// Get server logs
 	logs, err := service.GetServerLogs(lines)
 	if err != nil {
@@ -415,7 +412,7 @@ func GetServerLogs(c *gin.Context) {
 func ClearServerLogs(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	role, _ := c.Get("role")
-	
+
 	// Check if user is admin
 	if role != "admin" {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -428,9 +425,9 @@ func ClearServerLogs(c *gin.Context) {
 	// Clear logs
 	err := service.ClearServerLogs()
 	if err != nil {
-		service.LogAuditEvent(userID.(string), "server.logs_clear_failed", 
+		service.LogAuditEvent(userID.(string), "server.logs_clear_failed",
 			fmt.Sprintf("Failed to clear logs: %v", err), c.ClientIP())
-		
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to clear logs",
 			"code":  "LOGS_CLEAR_ERROR",
@@ -439,7 +436,7 @@ func ClearServerLogs(c *gin.Context) {
 	}
 
 	// Log success
-	service.LogAuditEvent(userID.(string), "server.logs_clear", 
+	service.LogAuditEvent(userID.(string), "server.logs_clear",
 		"Cleared server logs", c.ClientIP())
 
 	c.JSON(http.StatusOK, gin.H{
