@@ -3,11 +3,19 @@
 ###########################################
 # 泰拉瑞亚面板一键管理脚本
 # Terraria Panel One-Click Management Script
-# Version: 1.0
+# Version: 2.1
+# 更新日志:
+# v2.1 - 新增脚本自动更新机制（启动时自动检测并更新脚本）
+# v2.0 - 优化更新功能：增强版本检测和自动备份
+#      - 优化卸载功能：完全清理所有文件和服务
 ###########################################
+
+# 脚本版本
+SCRIPT_VERSION="2.1"
 
 # GitHub 仓库信息
 GITHUB_REPO="ShourGG/tailamianban"
+SCRIPT_URL="https://raw.githubusercontent.com/${GITHUB_REPO}/main/panel.sh"
 INSTALL_DIR="/opt/terraria-panel"
 SERVICE_NAME="terraria-panel"
 
@@ -32,7 +40,7 @@ print_banner() {
     echo "╔════════════════════════════════════════════════╗"
     echo "║       泰拉瑞亚服务器管理面板                   ║"
     echo "║    Terraria Server Management Panel           ║"
-    echo "║                  Version 1.1.7                 ║"
+    echo "║              管理脚本 v${SCRIPT_VERSION}                     ║"
     echo "╚════════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -157,7 +165,10 @@ EOF
 # 更新面板
 update_panel() {
     print_banner
-    echo -e "${GREEN}更新面板...${NC}\n"
+    echo -e "${GREEN}╔════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║              更新泰拉瑞亚面板                  ║${NC}"
+    echo -e "${GREEN}╚════════════════════════════════════════════════╝${NC}"
+    echo ""
     
     if ! check_installed; then
         print_error "未检测到已安装的面板"
@@ -165,53 +176,160 @@ update_panel() {
         return
     fi
     
-    # 获取当前版本
+    # 获取版本信息
+    print_info "检查版本信息..."
     local current=$(get_local_version)
-    print_info "当前版本: $current"
-    
     local latest=$(get_latest_version)
-    [ -z "$latest" ] && { print_error "无法获取版本信息"; read -p "按回车返回..."; return; }
-    print_info "最新版本: $latest"
     
-    # 标准化版本号进行比较（去除前缀v）
-    local current_num=$(echo "$current" | sed 's/^v//')
-    local latest_num=$(echo "$latest" | sed 's/^v//')
-    
-    if [ "$current_num" = "$latest_num" ] || [ "$current" = "$latest" ]; then
-        print_success "已是最新版本!"
+    if [ -z "$latest" ]; then
+        print_error "无法获取最新版本信息"
+        print_warning "请检查网络连接或稍后重试"
         read -p "按回车返回..."
         return
     fi
     
-    print_warning "发现新版本!"
+    echo ""
+    print_info "当前版本: ${BLUE}$current${NC}"
+    print_info "最新版本: ${GREEN}$latest${NC}"
+    echo ""
+    
+    # 标准化版本号进行比较
+    local current_num=$(echo "$current" | sed 's/^v//')
+    local latest_num=$(echo "$latest" | sed 's/^v//')
+    
+    if [ "$current_num" = "$latest_num" ] || [ "$current" = "$latest" ]; then
+        print_success "✓ 当前已是最新版本!"
+        echo ""
+        read -p "是否强制重新安装? (y/N): " -n 1 -r
+        echo
+        [[ ! $REPLY =~ ^[Yy]$ ]] && return
+        print_warning "将重新安装当前版本"
+    else
+        print_warning "发现新版本可用!"
+    fi
+    
+    echo ""
     read -p "继续更新? (Y/n): " -n 1 -r
     echo
     [[ $REPLY =~ ^[Nn]$ ]] && return
     
-    print_info "停止服务..."
-    stop_panel
+    echo ""
+    print_info "===== 开始更新流程 ====="
+    echo ""
     
-    if [ -d "$INSTALL_DIR/data" ]; then
-        print_info "备份数据..."
-        cp -r "$INSTALL_DIR/data" "$INSTALL_DIR/data.bak.$(date +%s)"
+    # 1. 自动备份数据
+    local backup_success=false
+    if [ -d "$INSTALL_DIR/data" ] || [ -d "$INSTALL_DIR/worlds" ]; then
+        print_info "[1/6] 备份数据..."
+        local backup_dir="$INSTALL_DIR/backup-$(date +%Y%m%d-%H%M%S)"
+        mkdir -p "$backup_dir"
+        
+        [ -d "$INSTALL_DIR/data" ] && cp -r "$INSTALL_DIR/data" "$backup_dir/" 2>/dev/null
+        [ -d "$INSTALL_DIR/worlds" ] && cp -r "$INSTALL_DIR/worlds" "$backup_dir/" 2>/dev/null
+        [ -d "$INSTALL_DIR/logs" ] && cp -r "$INSTALL_DIR/logs" "$backup_dir/" 2>/dev/null
+        
+        if [ -d "$backup_dir/data" ] || [ -d "$backup_dir/worlds" ]; then
+            local backup_size=$(du -sh "$backup_dir" 2>/dev/null | cut -f1)
+            print_success "备份完成: $backup_dir ($backup_size)"
+            backup_success=true
+        else
+            print_warning "备份失败，但继续更新"
+            rm -rf "$backup_dir" 2>/dev/null
+        fi
+    else
+        print_info "[1/6] 跳过备份 (无数据)"
     fi
     
+    # 2. 停止服务
+    print_info "[2/6] 停止服务..."
+    stop_panel
+    sleep 1
+    
+    # 3. 下载新版本
     local arch=$(detect_arch)
     local url="https://github.com/${GITHUB_REPO}/releases/download/${latest}/terraria-panel-linux-${arch}.tar.gz"
-    local temp="/tmp/terraria-panel-update.tar.gz"
+    local temp="/tmp/terraria-panel-update-$(date +%s).tar.gz"
     
-    print_info "下载新版本..."
-    curl -L -# -o "$temp" "$url" || { print_error "下载失败"; read -p "按回车返回..."; return; }
+    print_info "[3/6] 下载新版本..."
+    print_info "URL: $url"
     
-    print_info "更新中..."
-    tar -xzf "$temp" -C "$INSTALL_DIR" --strip-components=1
+    if ! curl -L --progress-bar -o "$temp" "$url"; then
+        print_error "下载失败"
+        print_warning "请检查网络连接或 GitHub 访问"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    # 验证下载文件
+    if [ ! -f "$temp" ] || [ ! -s "$temp" ]; then
+        print_error "下载文件无效"
+        rm -f "$temp"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    local file_size=$(du -h "$temp" | cut -f1)
+    print_success "下载完成 ($file_size)"
+    
+    # 4. 备份旧程序
+    print_info "[4/6] 备份旧程序..."
+    if [ -f "$INSTALL_DIR/terraria-panel" ]; then
+        cp "$INSTALL_DIR/terraria-panel" "$INSTALL_DIR/terraria-panel.old" 2>/dev/null
+    fi
+    
+    # 5. 解压更新
+    print_info "[5/6] 安装新版本..."
+    if ! tar -xzf "$temp" -C "$INSTALL_DIR" --strip-components=1 2>/dev/null; then
+        print_error "解压失败"
+        
+        # 尝试恢复
+        if [ -f "$INSTALL_DIR/terraria-panel.old" ]; then
+            print_warning "尝试恢复旧版本..."
+            mv "$INSTALL_DIR/terraria-panel.old" "$INSTALL_DIR/terraria-panel"
+        fi
+        
+        rm -f "$temp"
+        read -p "按回车返回..."
+        return
+    fi
+    
     chmod +x "$INSTALL_DIR/terraria-panel"
     rm -f "$temp"
+    rm -f "$INSTALL_DIR/terraria-panel.old" 2>/dev/null
     
-    print_success "更新完成!"
-    read -p "立即启动? (Y/n): " -n 1 -r
+    print_success "安装完成"
+    
+    # 6. 重载 systemd
+    print_info "[6/6] 重载系统服务..."
+    systemctl daemon-reload
+    
+    echo ""
+    echo -e "${GREEN}╔════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║              更新完成！                        ║${NC}"
+    echo -e "${GREEN}╚════════════════════════════════════════════════╝${NC}"
+    echo ""
+    
+    if [ "$backup_success" = true ]; then
+        print_info "数据备份: $backup_dir"
+        print_warning "确认更新正常后可删除备份"
+    fi
+    
+    echo ""
+    read -p "立即启动面板? (Y/n): " -n 1 -r
     echo
-    [[ ! $REPLY =~ ^[Nn]$ ]] && start_panel
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        echo ""
+        start_panel
+        
+        if check_running; then
+            echo ""
+            print_success "面板已启动"
+            local new_version=$(get_local_version)
+            print_info "当前运行版本: $new_version"
+        fi
+    fi
+    
+    echo ""
     read -p "按回车返回..."
 }
 
@@ -299,10 +417,13 @@ view_logs() {
     tail -f "$log"
 }
 
-# 卸载面板
+# 完全卸载面板
 uninstall_panel() {
     print_banner
-    echo -e "${RED}卸载面板${NC}\n"
+    echo -e "${RED}╔════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║            完全卸载泰拉瑞亚面板                ║${NC}"
+    echo -e "${RED}╚════════════════════════════════════════════════╝${NC}"
+    echo ""
     
     if ! check_installed; then
         print_warning "面板未安装"
@@ -310,25 +431,119 @@ uninstall_panel() {
         return
     fi
     
-    print_warning "此操作将删除所有数据!"
-    read -p "确认卸载? 输入 yes 继续: " -r
-    [ "$REPLY" != "yes" ] && return
+    # 显示将要删除的内容
+    echo -e "${YELLOW}此操作将删除以下内容:${NC}"
+    echo "  • 面板程序文件"
+    echo "  • 数据库文件 (data/)"
+    echo "  • 日志文件 (logs/)"
+    echo "  • 世界文件 (worlds/)"
+    echo "  • systemd 服务配置"
+    echo "  • 所有配置文件"
+    echo ""
     
-    stop_panel
-    systemctl disable ${SERVICE_NAME} 2>/dev/null
-    rm -f /etc/systemd/system/${SERVICE_NAME}.service
-    systemctl daemon-reload
-    
-    read -p "备份数据? (Y/n): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        local backup="/tmp/terraria-backup-$(date +%s).tar.gz"
-        tar -czf "$backup" -C "$INSTALL_DIR" data worlds 2>/dev/null
-        print_success "备份到: $backup"
+    # 显示当前数据统计
+    if [ -d "$INSTALL_DIR" ]; then
+        local total_size=$(du -sh "$INSTALL_DIR" 2>/dev/null | cut -f1)
+        print_info "安装目录大小: $total_size"
+        
+        if [ -d "$INSTALL_DIR/worlds" ]; then
+            local world_count=$(ls -1 "$INSTALL_DIR/worlds"/*.wld 2>/dev/null | wc -l)
+            [ "$world_count" -gt 0 ] && print_warning "检测到 $world_count 个世界文件"
+        fi
     fi
     
-    rm -rf "$INSTALL_DIR"
-    print_success "卸载完成"
+    echo ""
+    print_warning "⚠️  此操作不可恢复！请务必确认！"
+    echo ""
+    read -p "确认完全卸载? 输入 'YES' 继续 (大写): " -r confirm
+    
+    if [ "$confirm" != "YES" ]; then
+        print_info "取消卸载"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    echo ""
+    print_info "开始卸载流程..."
+    echo ""
+    
+    # 1. 备份数据 (可选)
+    local backup_path=""
+    read -p "是否备份数据? (Y/n): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        backup_path="/tmp/terraria-backup-$(date +%Y%m%d-%H%M%S).tar.gz"
+        print_info "正在备份数据..."
+        
+        if tar -czf "$backup_path" -C "$INSTALL_DIR" data worlds logs 2>/dev/null; then
+            local backup_size=$(du -h "$backup_path" | cut -f1)
+            print_success "备份完成: $backup_path ($backup_size)"
+        else
+            print_warning "备份失败，但继续卸载流程"
+            backup_path=""
+        fi
+        echo ""
+    fi
+    
+    # 2. 停止服务
+    print_info "停止面板服务..."
+    if check_running; then
+        systemctl stop ${SERVICE_NAME} 2>/dev/null
+        pkill -9 -f "terraria-panel" 2>/dev/null
+        sleep 1
+        
+        if check_running; then
+            print_warning "无法正常停止，强制结束进程"
+            pkill -9 -f "terraria-panel"
+        fi
+    fi
+    print_success "服务已停止"
+    
+    # 3. 禁用并删除 systemd 服务
+    print_info "删除系统服务..."
+    systemctl disable ${SERVICE_NAME} 2>/dev/null
+    systemctl stop ${SERVICE_NAME} 2>/dev/null
+    rm -f /etc/systemd/system/${SERVICE_NAME}.service
+    systemctl daemon-reload
+    systemctl reset-failed 2>/dev/null
+    print_success "系统服务已删除"
+    
+    # 4. 删除安装目录
+    print_info "删除安装目录..."
+    if [ -d "$INSTALL_DIR" ]; then
+        rm -rf "$INSTALL_DIR"
+        print_success "安装目录已删除: $INSTALL_DIR"
+    else
+        print_warning "安装目录不存在"
+    fi
+    
+    # 5. 清理可能的临时文件
+    print_info "清理临时文件..."
+    rm -f /tmp/terraria-panel*.tar.gz 2>/dev/null
+    rm -f /tmp/terraria-panel-update*.tar.gz 2>/dev/null
+    print_success "临时文件已清理"
+    
+    # 6. 清理日志 (可选)
+    read -p "是否清理系统日志中的面板记录? (y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        journalctl --rotate 2>/dev/null
+        journalctl --vacuum-time=1s 2>/dev/null
+        print_success "系统日志已清理"
+    fi
+    
+    echo ""
+    echo -e "${GREEN}╔════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║              卸载完成！                        ║${NC}"
+    echo -e "${GREEN}╚════════════════════════════════════════════════╝${NC}"
+    echo ""
+    
+    if [ -n "$backup_path" ] && [ -f "$backup_path" ]; then
+        print_info "数据备份位置: $backup_path"
+        print_warning "备份文件请自行妥善保管或删除"
+    fi
+    
+    echo ""
     read -p "按回车返回..."
 }
 
@@ -440,14 +655,14 @@ show_menu() {
     echo "请选择操作:"
     echo ""
     echo "  1. 下载并安装面板"
-    echo "  2. 更新面板"
+    echo "  2. 更新面板 (自动备份、版本检测)"
     echo "  3. 启动面板"
     echo "  4. 停止面板"
     echo "  5. 重启面板"
     echo "  6. 查看状态"
     echo "  7. 查看日志"
     echo "  8. 设置虚拟内存"
-    echo "  9. 卸载面板"
+    echo "  9. 完全卸载 (清理所有数据)"
     echo "  0. 退出"
     echo ""
     read -p "请输入 [0-9]: " choice
@@ -476,9 +691,91 @@ check_root() {
     fi
 }
 
+# 脚本自动更新功能
+check_script_update() {
+    echo -e "${BLUE}[检查]${NC} 检测脚本版本..."
+    
+    # 临时文件
+    local temp_script="/tmp/panel_new_$(date +%s).sh"
+    
+    # 下载最新脚本（静默模式，3秒超时）
+    if ! curl -sSL --connect-timeout 3 --max-time 5 -o "$temp_script" "$SCRIPT_URL" 2>/dev/null; then
+        echo -e "${YELLOW}[提示]${NC} 无法检查脚本更新（网络问题或GitHub访问受限），继续使用当前版本"
+        return 0
+    fi
+    
+    # 检查下载的文件是否有效
+    if [[ ! -s "$temp_script" ]]; then
+        rm -f "$temp_script"
+        return 0
+    fi
+    
+    # 获取远程脚本版本号
+    local remote_version=$(grep '^SCRIPT_VERSION=' "$temp_script" | head -1 | cut -d'"' -f2)
+    
+    if [[ -z "$remote_version" ]]; then
+        rm -f "$temp_script"
+        return 0
+    fi
+    
+    # 比较版本号（使用字符串比较）
+    if [[ "$remote_version" != "$SCRIPT_VERSION" ]]; then
+        clear
+        echo -e "${GREEN}╔════════════════════════════════════════════════╗${NC}"
+        echo -e "${GREEN}║           发现脚本新版本，自动更新中           ║${NC}"
+        echo -e "${GREEN}╚════════════════════════════════════════════════╝${NC}"
+        echo ""
+        echo -e "${BLUE}当前版本:${NC} ${RED}v$SCRIPT_VERSION${NC}"
+        echo -e "${BLUE}最新版本:${NC} ${GREEN}v$remote_version${NC}"
+        echo ""
+        print_warning "脚本将在 3 秒后自动更新..."
+        sleep 3
+        
+        # 获取当前脚本路径
+        local script_path=$(readlink -f "$0")
+        
+        # 备份当前脚本
+        local backup_script="${script_path}.bak.$(date +%Y%m%d_%H%M%S)"
+        if cp "$script_path" "$backup_script" 2>/dev/null; then
+            print_success "[1/3] 已备份当前脚本"
+        else
+            print_warning "[1/3] 无法备份脚本，但继续更新"
+        fi
+        
+        # 替换脚本
+        if cp "$temp_script" "$script_path" 2>/dev/null; then
+            chmod +x "$script_path"
+            print_success "[2/3] 脚本已更新到 v$remote_version"
+            print_success "[3/3] 正在重新启动脚本..."
+            echo ""
+            rm -f "$temp_script"
+            
+            # 清理超过7天的备份文件
+            find "$(dirname "$script_path")" -name "$(basename "$script_path").bak.*" -mtime +7 -delete 2>/dev/null
+            
+            # 重新执行新脚本
+            exec "$script_path" "$@"
+        else
+            print_error "脚本更新失败"
+            rm -f "$temp_script"
+            [ -f "$backup_script" ] && rm -f "$backup_script"
+            return 1
+        fi
+    else
+        echo -e "${GREEN}[✓]${NC} 脚本已是最新版本 (v$SCRIPT_VERSION)"
+        rm -f "$temp_script"
+    fi
+    
+    echo ""
+}
+
 # 主函数
 main() {
     check_root
+    
+    # 在首次显示菜单前自动检查脚本更新
+    check_script_update "$@"
+    
     while true; do
         show_menu
     done
