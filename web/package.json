@@ -11,8 +11,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "env-manager dev && vite && vite",
+    "prebuild": "node scripts/sync-version.js",
     "build": "env-manager prod && vite build",
+    "prebuild:test": "node scripts/sync-version.js",
     "build:test": "env-manager test && vite build --mode test --emptyOutDir",
+    "prebuild:staging": "node scripts/sync-version.js",
     "build:staging": "env-manager staging && vite build --mode staging --profile",
     "preview": "bun run build && vite preview",
     "test:unit": "vitest",

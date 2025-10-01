@@ -93,14 +93,14 @@
   import { s_userStore } from '@/stores/user/index'
   import { useFormSubmit } from '@/hooks/useFormSubmit'
   import { loginApi, type LoginResponse } from '@/api/auth'
-  import packageJson from '../../package.json'
+  import { VERSION } from '@/config/version'
   import './index.scss'
   import Spline from './components/Spline.vue'
   import C_Captcha from '@/components/global/C_Captcha/index.vue'
   import Typewriter from './components/Typewriter.vue'
 
   // 版本号
-  const version = packageJson.version
+  const version = VERSION
 
   // 类型定义
   interface CaptchaData {
