@@ -1,6 +1,35 @@
 # 🎮 泰拉瑞亚服务器管理面板
 
+[![最新版本](https://img.shields.io/github/v/release/ShourGG/tailamianban?style=flat-square)](https://github.com/ShourGG/tailamianban/releases/latest)
+[![构建状态](https://img.shields.io/github/actions/workflow/status/ShourGG/tailamianban/release.yml?style=flat-square)](https://github.com/ShourGG/tailamianban/actions)
+[![许可证](https://img.shields.io/github/license/ShourGG/tailamianban?style=flat-square)](LICENSE)
+
 一个现代化的泰拉瑞亚游戏服务器管理面板，基于 Go + Vue3 + Naive UI 构建，提供简单易用的一键部署体验。
+
+## 📢 最新版本
+
+**当前版本**: v1.1.9.12
+
+### 🔄 最近更新
+- **v1.1.9.12** (2025-01-01)
+  - 📝 优化 GitHub Release 描述模板
+  - ✨ 自动生成分类更新日志（按功能、修复、重构等分类）
+  - 📚 改进发布页面信息展示
+  
+- **v1.1.9.11** (2025-01-01)
+  - 📝 创建开发协作规范文档
+  - 🔧 完善版本管理流程
+  
+- **v1.1.9.10** (2025-01-01)
+  - 🐛 修复登录表单实例未准备好的错误
+  - ✨ 添加表单生命周期状态追踪
+  
+- **v1.1.9.9** (2025-01-01)
+  - 🐛 修复登录页面表单显示问题
+  - 🐛 修复 Vite 构建错误
+  - ✨ 实现版本号自动同步机制
+
+查看完整更新日志：[Release 页面](https://github.com/ShourGG/tailamianban/releases)
 
 ## ✨ 特性
 

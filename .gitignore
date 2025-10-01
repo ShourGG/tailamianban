@@ -85,3 +85,16 @@ references/
 
 # Documentation build
 docs/_build/
+
+# Development documentation (keep local, don't upload)
+会话上下文摘要.md
+开发协作规范.md
+泰拉瑞亚面板完整制作教程.md
+泰拉瑞亚面板项目规划文档.md
+泰拉瑞亚面板项目完整分析与实施方案.md
+PROJECT_REDESIGN_PLAN.md
+
+# Architecture documentation (development only)
+.arc/
+.cursor/
+.spec-workflow/
