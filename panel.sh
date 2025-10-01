@@ -27,29 +27,83 @@ SCRIPT_URL="https://raw.githubusercontent.com/${GITHUB_REPO}/main/panel.sh"
 INSTALL_DIR="/opt/terraria-panel"
 SERVICE_NAME="terraria-panel"
 
-# 颜色定义
+# 颜色定义 - 增强版
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+WHITE='\033[1;37m'
+GRAY='\033[0;90m'
+BOLD='\033[1m'
+DIM='\033[2m'
+UNDERLINE='\033[4m'
+BLINK='\033[5m'
 NC='\033[0m'
 
-# 打印函数
-print_info() { echo -e "${CYAN}[INFO]${NC} $1"; }
-print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
-print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
-print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+# 背景色
+BG_RED='\033[41m'
+BG_GREEN='\033[42m'
+BG_YELLOW='\033[43m'
+BG_BLUE='\033[44m'
+BG_CYAN='\033[46m'
 
-# 打印横幅
+# 组合效果
+SUCCESS="${GREEN}${BOLD}"
+ERROR="${RED}${BOLD}"
+WARNING="${YELLOW}${BOLD}"
+INFO="${CYAN}"
+HIGHLIGHT="${MAGENTA}${BOLD}"
+
+# 打印函数 - 美化版
+print_info() { echo -e "${CYAN}${BOLD}ℹ${NC} ${CYAN}$1${NC}"; }
+print_success() { echo -e "${GREEN}${BOLD}✓${NC} ${GREEN}$1${NC}"; }
+print_warning() { echo -e "${YELLOW}${BOLD}⚠${NC} ${YELLOW}$1${NC}"; }
+print_error() { echo -e "${RED}${BOLD}✗${NC} ${RED}$1${NC}"; }
+
+# 进度条函数
+print_progress() {
+    local current=$1
+    local total=$2
+    local desc=$3
+    local percent=$((current * 100 / total))
+    local filled=$((percent / 2))
+    local empty=$((50 - filled))
+    
+    printf "\r${CYAN}${BOLD}[${NC}"
+    printf "${GREEN}%0.s█${NC}" $(seq 1 $filled)
+    printf "${GRAY}%0.s░${NC}" $(seq 1 $empty)
+    printf "${CYAN}${BOLD}]${NC} ${WHITE}${percent}%%${NC} ${GRAY}${desc}${NC}"
+}
+
+# 步骤提示函数
+print_step() {
+    local step=$1
+    local total=$2
+    local desc=$3
+    echo -e "${MAGENTA}${BOLD}[${step}/${total}]${NC} ${WHITE}${desc}${NC}"
+}
+
+# 打印横幅 - 炫酷版
 print_banner() {
     clear
-    echo -e "${CYAN}"
-    echo "╔════════════════════════════════════════════════╗"
-    echo "║       泰拉瑞亚服务器管理面板                   ║"
-    echo "║    Terraria Server Management Panel           ║"
-    echo "║            管理脚本 v${SCRIPT_VERSION}                       ║"
-    echo "╚════════════════════════════════════════════════╝"
+    echo -e "${CYAN}${BOLD}"
+    echo "╔══════════════════════════════════════════════════════════╗"
+    echo "║                                                          ║"
+    echo "║      ████████╗███████╗██████╗ ██████╗  █████╗           ║"
+    echo "║      ╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██╔══██╗          ║"
+    echo "║         ██║   █████╗  ██████╔╝██████╔╝███████║          ║"
+    echo "║         ██║   ██╔══╝  ██╔══██╗██╔══██╗██╔══██║          ║"
+    echo "║         ██║   ███████╗██║  ██║██║  ██║██║  ██║          ║"
+    echo "║         ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝          ║"
+    echo "║                                                          ║"
+    echo -e "║          ${MAGENTA}🎮 泰拉瑞亚服务器管理面板${CYAN}${BOLD}                     ║"
+    echo -e "║             ${WHITE}Terraria Server Panel${CYAN}${BOLD}                     ║"
+    echo -e "║                                                          ║"
+    echo -e "║               ${GRAY}管理脚本 ${GREEN}v${SCRIPT_VERSION}${CYAN}${BOLD}                          ║"
+    echo "║                                                          ║"
+    echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
 
@@ -228,7 +282,7 @@ update_panel() {
     # 1. 自动备份数据
     local backup_success=false
     if [ -d "$INSTALL_DIR/data" ] || [ -d "$INSTALL_DIR/worlds" ]; then
-        print_info "[1/6] 备份数据..."
+        print_step 1 6 "备份数据..."
         local backup_dir="$INSTALL_DIR/backup-$(date +%Y%m%d-%H%M%S)"
         mkdir -p "$backup_dir"
         
@@ -245,11 +299,11 @@ update_panel() {
             rm -rf "$backup_dir" 2>/dev/null
         fi
     else
-        print_info "[1/6] 跳过备份 (无数据)"
+        print_step 1 6 "跳过备份 ${GRAY}(无数据)${NC}"
     fi
     
     # 2. 停止服务
-    print_info "[2/6] 停止服务..."
+    print_step 2 6 "停止服务..."
     stop_panel
     sleep 1
     
@@ -258,7 +312,7 @@ update_panel() {
     local url="https://github.com/${GITHUB_REPO}/releases/download/${latest}/terraria-panel-linux-${arch}.tar.gz"
     local temp="/tmp/terraria-panel-update-$(date +%s).tar.gz"
     
-    print_info "[3/6] 下载新版本..."
+    print_step 3 6 "下载新版本..."
     print_info "URL: $url"
     
     if ! curl -L --progress-bar -o "$temp" "$url"; then
@@ -280,13 +334,13 @@ update_panel() {
     print_success "下载完成 ($file_size)"
     
     # 4. 备份旧程序
-    print_info "[4/6] 备份旧程序..."
+    print_step 4 6 "备份旧程序..."
     if [ -f "$INSTALL_DIR/terraria-panel" ]; then
         cp "$INSTALL_DIR/terraria-panel" "$INSTALL_DIR/terraria-panel.old" 2>/dev/null
     fi
     
     # 5. 解压更新
-    print_info "[5/6] 安装新版本..."
+    print_step 5 6 "安装新版本..."
     if ! tar -xzf "$temp" -C "$INSTALL_DIR" --strip-components=1 2>/dev/null; then
         print_error "解压失败"
         
@@ -308,7 +362,7 @@ update_panel() {
     print_success "安装完成"
     
     # 6. 重载 systemd
-    print_info "[6/6] 重载系统服务..."
+    print_step 6 6 "重载系统服务..."
     systemctl daemon-reload
     
     echo ""
@@ -378,33 +432,67 @@ restart_panel() {
     read -p "按回车返回..."
 }
 
-# 查看状态
+# 查看状态 - 美化版
 view_status() {
     print_banner
-    echo -e "${GREEN}面板状态${NC}\n"
+    echo -e "${BOLD}${WHITE}━━━━━━━━━━━━━━━━ 📊 系统状态 ━━━━━━━━━━━━━━━━${NC}"
+    echo ""
     
+    # 安装信息
+    echo -e "${CYAN}${BOLD}╔═══ 安装信息 ═══╗${NC}"
     if check_installed; then
-        print_success "安装状态: 已安装 ($INSTALL_DIR)"
         local ver=$(get_local_version)
-        print_info "当前版本: $ver"
+        echo -e "  ${GREEN}✓${NC} 状态: ${SUCCESS}已安装${NC}"
+        echo -e "  ${GREEN}✓${NC} 版本: ${HIGHLIGHT}${ver}${NC}"
+        echo -e "  ${GREEN}✓${NC} 路径: ${INFO}$INSTALL_DIR${NC}"
     else
-        print_warning "安装状态: 未安装"
+        echo -e "  ${RED}✗${NC} 状态: ${ERROR}未安装${NC}"
+        echo -e "  ${GRAY}ℹ${NC} 请选择菜单 ${HIGHLIGHT}1${NC} 进行安装"
     fi
+    echo -e "${CYAN}${BOLD}╚══════════════════╝${NC}"
     
     echo ""
     
+    # 运行状态
+    echo -e "${CYAN}${BOLD}╔═══ 运行状态 ═══╗${NC}"
     if check_running; then
-        print_success "运行状态: 运行中"
         local pid=$(pgrep -f "terraria-panel" | head -1)
-        [ -n "$pid" ] && print_info "进程 PID: $pid"
-        print_info "访问地址: http://您的IP:8080"
+        local port=$(systemctl show "$SERVICE_NAME" --property=Environment 2>/dev/null | grep -oP 'PORT=\K\d+' || echo "8080")
+        local uptime=$(ps -p "$pid" -o etime= 2>/dev/null | tr -d ' ' || echo "未知")
+        
+        echo -e "  ${GREEN}●${NC} 状态: ${SUCCESS}运行中${NC}"
+        echo -e "  ${GREEN}✓${NC} 进程: ${INFO}PID ${pid}${NC}  运行时间: ${GRAY}${uptime}${NC}"
+        echo -e "  ${GREEN}✓${NC} 端口: ${HIGHLIGHT}${port}${NC}"
+        echo -e "  ${GREEN}✓${NC} 访问: ${UNDERLINE}${BLUE}http://$(hostname -I | awk '{print $1}'):${port}${NC}"
     else
-        print_warning "运行状态: 未运行"
+        echo -e "  ${YELLOW}●${NC} 状态: ${WARNING}未运行${NC}"
+        echo -e "  ${GRAY}ℹ${NC} 请选择菜单 ${HIGHLIGHT}3${NC} 启动服务"
     fi
+    echo -e "${CYAN}${BOLD}╚══════════════════╝${NC}"
     
     echo ""
-    print_info "系统架构: $(detect_arch)"
-    print_info "CPU 核心: $(nproc)"
+    
+    # 系统信息
+    echo -e "${CYAN}${BOLD}╔═══ 系统信息 ═══╗${NC}"
+    echo -e "  ${BLUE}◆${NC} 架构: ${INFO}$(uname -m) ($(detect_arch))${NC}"
+    echo -e "  ${BLUE}◆${NC} CPU: ${INFO}$(nproc) 核心${NC}"
+    
+    # 内存信息
+    local mem_info=$(free -h | awk '/^Mem:/ {printf "%s / %s (使用率: %.1f%%)", $3, $2, ($3/$2)*100}')
+    echo -e "  ${BLUE}◆${NC} 内存: ${INFO}${mem_info}${NC}"
+    
+    # 磁盘信息
+    local disk_info=$(df -h "$INSTALL_DIR" 2>/dev/null | awk 'NR==2 {printf "%s / %s (使用率: %s)", $3, $2, $5}' || echo "未知")
+    echo -e "  ${BLUE}◆${NC} 磁盘: ${INFO}${disk_info}${NC}"
+    
+    # Swap信息
+    local swap_info=$(free -h | awk '/^Swap:/ {if ($2 == "0B") print "未配置"; else printf "%s / %s", $3, $2}')
+    echo -e "  ${BLUE}◆${NC} Swap: ${INFO}${swap_info}${NC}"
+    
+    echo -e "${CYAN}${BOLD}╚══════════════════╝${NC}"
+    
+    echo ""
+    echo -e "${BOLD}${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     read -p "按回车返回..."
 }
@@ -620,28 +708,29 @@ change_port() {
     [[ $REPLY =~ ^[Nn]$ ]] && return
     
     echo ""
-    print_info "开始修改端口..."
+    echo -e "${BOLD}${WHITE}━━━━━━━━━━━ 开始修改端口 ━━━━━━━━━━━${NC}"
+    echo ""
     
     # 1. 停止服务
-    print_info "[1/4] 停止服务..."
+    print_step 1 4 "停止服务..."
     if check_running; then
         systemctl stop "$SERVICE_NAME" 2>/dev/null
         sleep 1
     fi
     
     # 2. 更新 systemd 服务配置
-    print_info "[2/4] 更新服务配置..."
+    print_step 2 4 "更新服务配置..."
     if [ -f "/etc/systemd/system/${SERVICE_NAME}.service" ]; then
         sed -i "s/Environment=PORT=.*/Environment=PORT=$new_port/" "/etc/systemd/system/${SERVICE_NAME}.service"
         print_success "服务配置已更新"
     fi
     
     # 3. 重载 systemd
-    print_info "[3/4] 重载系统服务..."
+    print_step 3 4 "重载系统服务..."
     systemctl daemon-reload
     
     # 4. 配置防火墙
-    print_info "[4/4] 配置防火墙..."
+    print_step 4 4 "配置防火墙..."
     
     # UFW
     if command -v ufw >/dev/null 2>&1; then
@@ -782,32 +871,60 @@ setup_swap() {
     read -p "按回车返回..."
 }
 
-# 主菜单
+# 主菜单 - 美化版
 show_menu() {
     print_banner
     
+    # 状态栏 - 炫酷显示
+    echo -e "${BOLD}┌────────────────────────────────────────────────────────┐${NC}"
     if check_installed; then
-        check_running && echo -e "${GREEN}● 状态: 运行中${NC}" || echo -e "${YELLOW}● 状态: 已安装未运行${NC}"
+        local version=$(get_local_version)
+        if check_running; then
+            echo -e "${BOLD}│${NC}  ${BG_GREEN}${WHITE} ● 运行中 ${NC}  ${GREEN}版本: ${version}${NC}  ${GRAY}[$(date '+%Y-%m-%d %H:%M:%S')]${NC}"
+        else
+            echo -e "${BOLD}│${NC}  ${BG_YELLOW}${WHITE} ● 已停止 ${NC}  ${YELLOW}版本: ${version}${NC}  ${GRAY}[$(date '+%Y-%m-%d %H:%M:%S')]${NC}"
+        fi
     else
-        echo -e "${RED}● 状态: 未安装${NC}"
+        echo -e "${BOLD}│${NC}  ${BG_RED}${WHITE} ● 未安装 ${NC}  ${RED}请先安装面板${NC}  ${GRAY}[$(date '+%Y-%m-%d %H:%M:%S')]${NC}"
     fi
+    echo -e "${BOLD}└────────────────────────────────────────────────────────┘${NC}"
     
     echo ""
-    echo "请选择操作:"
+    echo -e "${BOLD}${WHITE}━━━━━━━━━━━━━━━━ 📋 功能菜单 ━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo "  1. 下载并安装面板"
-    echo "  2. 更新面板 (自动备份、版本检测)"
-    echo "  3. 启动面板"
-    echo "  4. 停止面板"
-    echo "  5. 重启面板"
-    echo "  6. 查看状态"
-    echo "  7. 查看日志"
-    echo "  8. 修改端口"
-    echo "  9. 设置虚拟内存"
-    echo "  10. 完全卸载 (清理所有数据)"
-    echo "  0. 退出"
+    echo -e "  ${CYAN}╭─ 安装与更新${NC}"
+    echo -e "  ${CYAN}│${NC}  ${HIGHLIGHT}1.${NC} 📦 下载并安装面板"
+    echo -e "  ${CYAN}│${NC}  ${HIGHLIGHT}2.${NC} 🔄 更新面板 ${GRAY}(自动备份、版本检测)${NC}"
+    echo -e "  ${CYAN}╰${NC}"
     echo ""
-    read -p "请输入 [0-10]: " choice
+    echo -e "  ${GREEN}╭─ 服务管理${NC}"
+    echo -e "  ${GREEN}│${NC}  ${HIGHLIGHT}3.${NC} ▶️  启动面板"
+    echo -e "  ${GREEN}│${NC}  ${HIGHLIGHT}4.${NC} ⏸️  停止面板"
+    echo -e "  ${GREEN}│${NC}  ${HIGHLIGHT}5.${NC} 🔁 重启面板"
+    echo -e "  ${GREEN}╰${NC}"
+    echo ""
+    echo -e "  ${BLUE}╭─ 监控与日志${NC}"
+    echo -e "  ${BLUE}│${NC}  ${HIGHLIGHT}6.${NC} 📊 查看状态"
+    echo -e "  ${BLUE}│${NC}  ${HIGHLIGHT}7.${NC} 📜 查看日志"
+    echo -e "  ${BLUE}╰${NC}"
+    echo ""
+    echo -e "  ${MAGENTA}╭─ 高级配置${NC}"
+    echo -e "  ${MAGENTA}│${NC}  ${HIGHLIGHT}8.${NC} 🔧 修改端口"
+    echo -e "  ${MAGENTA}│${NC}  ${HIGHLIGHT}9.${NC} 💾 设置虚拟内存"
+    echo -e "  ${MAGENTA}╰${NC}"
+    echo ""
+    echo -e "  ${RED}╭─ 系统操作${NC}"
+    echo -e "  ${RED}│${NC}  ${HIGHLIGHT}10.${NC} 🗑️  完全卸载 ${GRAY}(清理所有数据)${NC}"
+    echo -e "  ${RED}╰${NC}"
+    echo ""
+    echo -e "  ${GRAY}╭─ 其他${NC}"
+    echo -e "  ${GRAY}│${NC}  ${HIGHLIGHT}0.${NC} 🚪 退出"
+    echo -e "  ${GRAY}╰${NC}"
+    echo ""
+    echo -e "${BOLD}${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -ne "${BOLD}${CYAN}➜${NC} 请输入选项 ${GRAY}[0-10]${NC}: "
+    read choice
     
     case $choice in
         1) install_panel ;;
