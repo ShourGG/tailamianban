@@ -35,7 +35,7 @@
       
       <h3 class="login-title">{{ '泰拉瑞亚管理面板' }}</h3>
       <div class="version-info" style="text-align: center; color: #666; font-size: 12px; margin-bottom: 10px;">
-        版本: v1.1.9.7 (DEBUG)
+        版本: v{{ version }}
       </div>
       
       <!-- 临时调试：直接使用 NForm -->
@@ -91,13 +91,16 @@
 <script setup lang="ts">
   import { initDynamicRouter } from '@/router/dynamicRouter'
   import { s_userStore } from '@/stores/user/index'
-  // import { PRESET_RULES } from '@/utils/v_verify' // 暂时不需要
   import { useFormSubmit } from '@/hooks/useFormSubmit'
   import { loginApi, type LoginResponse } from '@/api/auth'
+  import packageJson from '../../package.json'
   import './index.scss'
   import Spline from './components/Spline.vue'
   import C_Captcha from '@/components/global/C_Captcha/index.vue'
   import Typewriter from './components/Typewriter.vue'
+
+  // 版本号
+  const version = packageJson.version
 
   // 类型定义
   interface CaptchaData {
@@ -105,14 +108,27 @@
     timestamp: number
   }
 
-  interface FormScope {
-    model: Record<string, any>
-  }
-
   const router = useRouter()
   const userStore = s_userStore()
   const message = useMessage()
   const { loading, createSubmit } = useFormSubmit<LoginResponse>()
+
+  // 表单数据和验证规则
+  const formRef = ref()
+  const formModel = ref({
+    username: 'admin',
+    password: 'admin123'
+  })
+  
+  const formRules = {
+    username: [
+      { required: true, message: '请输入用户名', trigger: 'blur' }
+    ],
+    password: [
+      { required: true, message: '请输入密码', trigger: 'blur' },
+      { min: 6, max: 15, message: '密码长度在 6 到 15 个字符', trigger: 'blur' }
+    ]
+  }
 
   // 打字机控制
   const showTypewriter = ref<boolean>(true)
@@ -235,28 +251,6 @@
       // 调用 login
       login(formScope)
     })
-  }
-
-  // 处理登录点击 (保留旧函数作为参考)
-  const handleLogin = (formScope: FormScope): void => {
-    // 验证码检查
-    if (!captchaValid.value || !captchaData.value) {
-      message.error('请先完成人机验证')
-      return
-    }
-
-    // 将验证码数据添加到 formScope.model
-    formScope.model = {
-      ...formScope.model,
-      captcha: {
-        token: captchaData.value.token,
-        timestamp: captchaData.value.timestamp,
-        type: 'puzzle-captcha',
-      },
-    }
-
-    // 调用 login
-    login(formScope)
   }
 
   // 创建登录方法 - 使用官方的 meta 属性
