@@ -140,8 +140,45 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
     - name: Download all artifacts
       uses: actions/download-artifact@v4
+
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        VERSION="${{ github.event.inputs.version || github.ref_name }}"
+        PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v "^${VERSION}$" | head -n 1)
+        
+        if [ -z "$PREVIOUS_TAG" ]; then
+          CHANGES=$(git log --pretty=format:"- %s (%h)" --no-merges)
+        else
+          CHANGES=$(git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+        fi
+        
+        FEATURES=$(echo "$CHANGES" | grep -E "^- (feat|feature|✨)" || echo "")
+        FIXES=$(echo "$CHANGES" | grep -E "^- (fix|🐛)" || echo "")
+        DOCS=$(echo "$CHANGES" | grep -E "^- (docs|📝)" || echo "")
+        REFACTOR=$(echo "$CHANGES" | grep -E "^- (refactor|♻️)" || echo "")
+        CHORE=$(echo "$CHANGES" | grep -E "^- (chore|build|ci|🔧)" || echo "")
+        OTHERS=$(echo "$CHANGES" | grep -vE "^- (feat|feature|fix|docs|refactor|chore|build|ci|✨|🐛|📝|♻️|🔧)" || echo "")
+        
+        CHANGELOG=""
+        [ -n "$FEATURES" ] && CHANGELOG="${CHANGELOG}#### ✨ 新增特性\n${FEATURES}\n\n"
+        [ -n "$FIXES" ] && CHANGELOG="${CHANGELOG}#### 🐛 Bug 修复\n${FIXES}\n\n"
+        [ -n "$REFACTOR" ] && CHANGELOG="${CHANGELOG}#### ♻️ 代码重构\n${REFACTOR}\n\n"
+        [ -n "$DOCS" ] && CHANGELOG="${CHANGELOG}#### 📝 文档更新\n${DOCS}\n\n"
+        [ -n "$CHORE" ] && CHANGELOG="${CHANGELOG}#### 🔧 构建/工具\n${CHORE}\n\n"
+        [ -n "$OTHERS" ] && CHANGELOG="${CHANGELOG}#### 🔄 其他变更\n${OTHERS}\n\n"
+        [ -z "$CHANGELOG" ] && CHANGELOG="#### 🔄 本次更新\n- 版本发布\n\n"
+        
+        echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+        echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Create Release
       id: create_release
@@ -159,7 +196,7 @@ jobs:
         body: |
           ## 🎮 泰拉瑞亚面板 ${{ github.event.inputs.version || github.ref_name }}
           
-          ### 📦 安装方法
+          ### 📦 快速安装
           
           **一键安装（推荐）：**
           ```bash
@@ -171,18 +208,27 @@ jobs:
           # 下载对应架构的版本
           wget https://github.com/ShourGG/tailamianban/releases/download/${{ github.event.inputs.version || github.ref_name }}/terraria-panel-linux-amd64.tar.gz
           
-          # 解压
+          # 解压并启动
           tar -xzf terraria-panel-linux-amd64.tar.gz
-          cd terraria-panel
-          
-          # 启动
-          ./scripts/run.sh start
+          cd terraria-panel && ./scripts/run.sh start
           ```
           
-          ### 🔄 更新内容
-          - 详见提交记录
+          ---
+          
+          ### 🔄 本次更新
+          
+          ${{ steps.release_notes.outputs.CHANGELOG }}
+          
+          ---
           
           ### 📝 默认配置
-          - 端口: 8080
-          - 用户名: admin
-          - 密码: admin123
+          - **访问地址**: http://your-server-ip:8080
+          - **默认用户名**: `admin`
+          - **默认密码**: `admin123`
+          - **数据目录**: `./data`
+          - **日志目录**: `./logs`
+          
+          ### ⚠️ 重要提示
+          - 首次登录后请立即修改默认密码
+          - 建议使用 Nginx 反向代理并配置 HTTPS
+          - 定期备份 `./data` 目录
