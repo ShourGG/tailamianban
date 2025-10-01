@@ -2,4 +2,4 @@
  * 版本号配置
  * 此文件由构建脚本自动生成，请勿手动修改
  */
-export const VERSION = '1.1.9.26'
+export const VERSION = '1.1.9.27'
