@@ -2,8 +2,8 @@ import type { BuildOptions } from 'vite'
 
 const buildConfig: BuildOptions = {
   // 基础构建优化
-  minify: 'esbuild', // Vite 7 默认，比 terser 更快
-  target: 'baseline-widely-available', // Vite 7 新默认值，更好的浏览器兼容性
+  minify: 'esbuild', // 比 terser 更快
+  target: 'es2020', // 兼容现代浏览器，Vite 5 支持
   chunkSizeWarningLimit: 800, // 适度调高，减少无意义警告
 
   rollupOptions: {

@@ -12,7 +12,7 @@ import {
   defineConfig,
   presetAttributify,
   presetIcons,
-  presetWind3,
+  presetWind,
   transformerDirectives,
 } from 'unocss'
 
@@ -21,7 +21,7 @@ import { shortcutsArr } from './src/utils/unocss/shortcuts-arr'
 
 export default defineConfig({
   presets: [
-    presetWind3(),
+    presetWind(),
     presetAttributify(),
     presetIcons({
       scale: 1.2,
