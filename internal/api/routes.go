@@ -9,15 +9,11 @@ import (
 
 // SetupRoutes configures all API routes
 func SetupRoutes(r *gin.Engine) {
-	// API group
-	api := r.Group("/api")
+	// API v1 group
+	v1 := r.Group("/api/v1")
 	{
-		// Health check and version info (public)
-		api.GET("/health", handlers.HealthCheck)
-		api.GET("/version", handlers.GetVersion)
-
 		// Authentication routes (public)
-		auth := api.Group("/auth")
+		auth := v1.Group("/auth")
 		{
 			auth.GET("/check-init", handlers.CheckInit)
 			auth.POST("/register", handlers.Register)
@@ -27,7 +23,7 @@ func SetupRoutes(r *gin.Engine) {
 		}
 
 		// Protected routes
-		protected := api.Group("/")
+		protected := v1.Group("/")
 		protected.Use(middleware.AuthRequired())
 		{
 			// Server management
