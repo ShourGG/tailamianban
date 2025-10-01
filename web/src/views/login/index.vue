@@ -230,47 +230,47 @@
   }
 
   // 直接登录处理函数
-  const handleDirectLogin = async (): Promise<void> => {
+  const handleDirectLogin = (): void => {
     // 验证码检查
     if (!captchaValid.value || !captchaData.value) {
       message.error('请先完成人机验证')
       return
     }
 
-    // 等待表单实例准备好
-    await nextTick()
-    
-    // 检查表单引用是否存在
-    if (!formRef.value) {
-      message.error('表单实例未准备好，请刷新页面重试')
-      console.error('Form ref is null')
-      return
-    }
-
-    // 表单验证
-    try {
-      await formRef.value.validate()
-    } catch {
-      message.error('表单校验失败，请检查输入')
-      return
-    }
-    
-    // 准备登录数据
-    const { username, password } = formModel.value
-    const formScope = {
-      model: {
-        username,
-        password,
-        captcha: {
-          token: captchaData.value.token,
-          timestamp: captchaData.value.timestamp,
-          type: 'puzzle-captcha',
-        },
+    // 使用 setTimeout 确保表单完全渲染
+    setTimeout(() => {
+      // 检查表单引用是否存在
+      if (!formRef.value) {
+        message.error('表单初始化失败，请刷新页面重试')
+        console.error('Form ref is null after timeout')
+        return
       }
-    }
-    
-    // 调用 login
-    login(formScope)
+
+      // 表单验证
+      formRef.value.validate((errors: any) => {
+        if (errors) {
+          message.error('表单校验失败，请检查输入')
+          return
+        }
+        
+        // 准备登录数据
+        const { username, password } = formModel.value
+        const formScope = {
+          model: {
+            username,
+            password,
+            captcha: {
+              token: captchaData.value!.token,
+              timestamp: captchaData.value!.timestamp,
+              type: 'puzzle-captcha',
+            },
+          }
+        }
+        
+        // 调用 login
+        login(formScope)
+      })
+    }, 100)
   }
 
   // 创建登录方法 - 使用官方的 meta 属性
