@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, h } from 'vue'
 import { NCard, NDataTable, NButton, NSpace, NTag, NModal, NInput, NForm, NFormItem, NSpin, NPopconfirm, NEmpty } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
-import { getOnlinePlayers, kickPlayer, banPlayer, sendMessage, type Player } from '@/api/terraria'
+import { getOnlinePlayers, kickPlayer, banPlayer, sendPlayerMessage, type Player } from '@/api/terraria'
 
 // State
 const loading = ref(false)
@@ -93,7 +93,7 @@ const confirmSendMessage = async () => {
   
   loading.value = true
   try {
-    await sendMessage(selectedPlayer.value.id, messageContent.value)
+    await sendPlayerMessage(selectedPlayer.value.id, messageContent.value)
     window.$message?.success('消息已发送')
     showMessageModal.value = false
   } catch (error) {
