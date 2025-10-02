@@ -87,14 +87,32 @@ EOF
 get_repo_source() {
     # 直接使用 GitHub 镜像 (国内已优化)
     # 快速测试每个镜像的连通性
+    local mirror_index=0
     for mirror in "${GITHUB_MIRRORS[@]}"; do
+        mirror_index=$((mirror_index + 1))
         local test_url="${mirror}https://api.github.com/repos/${GITHUB_REPO}"
-        # 使用更短的超时时间以实现快速失败
-        if curl -s --connect-timeout 2 --max-time 5 "$test_url" >/dev/null 2>&1; then
+        local mirror_name="${mirror:-GitHub直连}"
+        
+        # 显示测试进度(仅在交互模式下)
+        if [ -t 1 ]; then
+            echo -ne "\r${BLUE}ℹ${NC} 测试镜像 ${mirror_index}/9: ${mirror_name:0:40}..." >&2
+        fi
+        
+        # 使用更短的超时时间以实现快速失败 (1秒连接+2秒总计)
+        if curl -s --connect-timeout 1 --max-time 2 "$test_url" >/dev/null 2>&1; then
+            # 清除进度行
+            if [ -t 1 ]; then
+                echo -ne "\r\033[K" >&2
+            fi
             echo "github_mirror|${mirror}"
             return
         fi
     done
+    
+    # 清除进度行
+    if [ -t 1 ]; then
+        echo -ne "\r\033[K" >&2
+    fi
     
     # 无可用源
     echo ""
