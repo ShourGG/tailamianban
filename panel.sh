@@ -3,8 +3,8 @@
 # =============================================================================
 # Terraria 服务器管理面板 - 安装/管理脚本
 # 
-# 版本: v2.5
-# 更新日期: 2024-01-21
+# 版本: v2.6
+# 更新日期: 2024-01-22
 # 描述: 用于安装、更新、管理泰拉瑞亚服务器面板的一键脚本
 # 
 # 使用方法:
@@ -78,7 +78,7 @@ print_banner() {
 ║          🎮 泰拉瑞亚服务器管理面板                     ║
 ║             Terraria Server Panel                     ║
 ║                                                          ║
-║               管理脚本 v2.5                          ║
+║               管理脚本 v2.6                          ║
 ║                                                          ║
 ╚══════════════════════════════════════════════════════════╝
 EOF
@@ -139,18 +139,10 @@ get_script_url() {
 get_download_url() {
     local version=$1
     local arch=$2
-    local source=$(get_repo_source)
-    local source_type="${source%%|*}"
-    local mirror="${source#*|}"
     
-    case $source_type in
-        "github_mirror")
-            echo "${mirror}https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz"
-            ;;
-        *)
-            echo ""
-            ;;
-    esac
+    # releases 文件必须直接从 GitHub 下载
+    # 加速镜像不支持 releases 下载，只支持 raw 文件和 git clone
+    echo "https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz"
 }
 
 # 获取 API URL
@@ -269,27 +261,6 @@ install_panel() {
     local arch=$(detect_arch)
     print_info "系统架构: $arch"
     
-    # 显示使用的源
-    local source=$(get_repo_source)
-    local source_type="${source%%|*}"
-    local mirror="${source#*|}"
-    
-    if [ "$source_type" != "github_mirror" ]; then
-        print_error "无法连接到任何 GitHub 镜像源"
-        print_info "解决方案:"
-        echo "  1. 检查网络连接"
-        echo "  2. 配置代理或 VPN"
-        echo "  3. 稍后重试"
-        echo "  4. 手动下载: https://github.com/${GITHUB_REPO}/releases"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    print_info "使用 GitHub 加速镜像"
-    if [ -n "$mirror" ]; then
-        print_info "镜像地址: ${mirror:-GitHub直连}"
-    fi
-    
     print_info "获取最新版本..."
     local version=$(get_latest_version)
     if [ -z "$version" ]; then
@@ -300,19 +271,21 @@ install_panel() {
     print_success "最新版本: $version"
     
     local download_url=$(get_download_url "$version" "$arch")
-    if [ -z "$download_url" ]; then
-        print_error "无法获取下载链接，请检查网络连接"
-        read -p "按回车返回..."
-        return
-    fi
     local temp_file="/tmp/terraria-panel.tar.gz"
     
     print_info "下载中..."
+    print_info "从 GitHub 直接下载 releases..."
     print_info "URL: $download_url"
     
     # 使用更长的超时时间用于下载大文件
+    # releases 必须直接从 GitHub 下载，不能使用加速镜像
     if ! curl -L -# --connect-timeout 10 --max-time 300 -o "$temp_file" "$download_url"; then
         print_error "下载失败"
+        print_info "解决方案:"
+        echo "  1. 检查网络连接"
+        echo "  2. 配置代理或 VPN"
+        echo "  3. 稍后重试"
+        echo "  4. 手动下载: https://github.com/${GITHUB_REPO}/releases"
         read -p "按回车返回..."
         return
     fi
@@ -634,24 +607,17 @@ update_panel() {
     
     # 执行安装(会覆盖现有文件)
     local arch=$(detect_arch)
-    local source=$(get_repo_source)
-    local source_type="${source%%|*}"
-    
-    if [ "$source_type" != "github_mirror" ]; then
-        print_error "无法连接到 GitHub 镜像源"
-        print_info "恢复备份..."
-        rm -rf "$INSTALL_DIR"
-        mv "$backup_dir" "$INSTALL_DIR"
-        read -p "按回车返回..."
-        return
-    fi
-    
     local download_url=$(get_download_url "$latest_version" "$arch")
     local temp_file="/tmp/terraria-panel-update.tar.gz"
     
     print_info "下载更新..."
+    print_info "从 GitHub 直接下载 releases..."
     if ! curl -L -# --connect-timeout 10 --max-time 300 -o "$temp_file" "$download_url"; then
         print_error "下载失败"
+        print_info "解决方案:"
+        echo "  1. 检查网络连接"
+        echo "  2. 配置代理或 VPN"
+        echo "  3. 稍后重试"
         print_info "恢复备份..."
         rm -rf "$INSTALL_DIR"
         mv "$backup_dir" "$INSTALL_DIR"
