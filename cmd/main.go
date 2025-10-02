@@ -4,8 +4,11 @@ import (
 	"embed"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
+	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"terraria-panel/internal/api"
@@ -13,7 +16,6 @@ import (
 	"terraria-panel/internal/service"
 
 	"github.com/gin-gonic/gin"
-	static "github.com/soulteary/gin-static"
 )
 
 //go:embed all:dist
@@ -21,7 +23,7 @@ var EmbedFS embed.FS
 
 var (
 	// Version will be set by ldflags during build
-	Version = "1.1.9.39"
+	Version = "1.2.0.7"
 	Build   = "dev"
 )
 
@@ -74,37 +76,56 @@ func main() {
 	// API routes
 	api.SetupRoutes(r)
 
-	// Static files (embedded frontend)
-	embedFS, err := static.EmbedFolder(EmbedFS, "dist")
+	// Static files (embedded frontend) - serve assets directly from embed.FS
+	distFS, err := fs.Sub(EmbedFS, "dist")
 	if err != nil {
-		log.Printf("Failed to create embed folder: %v", err)
+		log.Printf("Failed to create dist filesystem: %v", err)
 		log.Println("Frontend assets may not be available")
 	} else {
-		// Only serve static files for non-API requests
-		r.Use(func(c *gin.Context) {
-			// Skip static file serving for API routes
-			if !strings.HasPrefix(c.Request.URL.Path, "/api/") {
-				static.Serve("/", embedFS)(c)
+		// Serve static files with correct MIME types
+		r.GET("/*filepath", func(c *gin.Context) {
+			// Skip API routes
+			if strings.HasPrefix(c.Request.URL.Path, "/api/") {
+				c.Next()
+				return
 			}
+
+			path := c.Param("filepath")
+			if path == "/" || path == "" {
+				path = "/index.html"
+			}
+
+			// Remove leading slash for fs.FS compatibility
+			path = strings.TrimPrefix(path, "/")
+
+			// Try to read the file from embed FS
+			data, err := fs.ReadFile(distFS, path)
+			if err != nil {
+				// If file not found and not an asset, serve index.html for SPA routing
+				if !strings.Contains(path, ".") ||
+					strings.HasPrefix(path, "assets/") ||
+					strings.HasPrefix(path, "_vercel/") {
+					// File not found, return 404 for assets
+					c.Status(http.StatusNotFound)
+					return
+				}
+				// Serve index.html for frontend routes
+				indexData, indexErr := fs.ReadFile(distFS, "index.html")
+				if indexErr != nil {
+					c.String(http.StatusNotFound, "Page not found")
+					return
+				}
+				c.Data(http.StatusOK, "text/html; charset=utf-8", indexData)
+				return
+			}
+
+			// Determine MIME type based on file extension
+			ext := filepath.Ext(path)
+			mimeType := getMimeType(ext)
+
+			c.Data(http.StatusOK, mimeType, data)
 		})
 	}
-
-	// Fallback for SPA routing (only for non-API routes)
-	r.NoRoute(func(c *gin.Context) {
-		// If it's an API request, return 404 JSON
-		if strings.HasPrefix(c.Request.URL.Path, "/api/") {
-			c.JSON(404, gin.H{"error": "API endpoint not found", "path": c.Request.URL.Path})
-			return
-		}
-
-		// For non-API requests, serve SPA index.html
-		data, err := EmbedFS.ReadFile("dist/index.html")
-		if err != nil {
-			c.String(404, "Page not found")
-			return
-		}
-		c.Data(200, "text/html; charset=utf-8", data)
-	})
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -246,4 +267,32 @@ func securityMiddleware() gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+// getMimeType returns the MIME type for common file extensions
+func getMimeType(ext string) string {
+	mimeTypes := map[string]string{
+		".html":  "text/html; charset=utf-8",
+		".css":   "text/css; charset=utf-8",
+		".js":    "application/javascript; charset=utf-8",
+		".json":  "application/json; charset=utf-8",
+		".png":   "image/png",
+		".jpg":   "image/jpeg",
+		".jpeg":  "image/jpeg",
+		".gif":   "image/gif",
+		".svg":   "image/svg+xml",
+		".ico":   "image/x-icon",
+		".woff":  "font/woff",
+		".woff2": "font/woff2",
+		".ttf":   "font/ttf",
+		".eot":   "application/vnd.ms-fontobject",
+		".webp":  "image/webp",
+		".webm":  "video/webm",
+		".mp4":   "video/mp4",
+	}
+
+	if mime, ok := mimeTypes[ext]; ok {
+		return mime
+	}
+	return "application/octet-stream"
 }
