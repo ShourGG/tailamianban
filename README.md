@@ -8,28 +8,51 @@
 
 ---
 
-## 🚀 快速开始（三步即用）
+## 🚀 快速开始
 
-### 第一步：下载管理脚本
+### 🌟 推荐方式：使用公益镜像（国内用户首选）
+
+如果您在国内无法访问 GitHub，推荐使用以下镜像加速下载：
 
 ```bash
-# 切换到 root 主目录并下载脚本
-cd /root
-rm -f panel.sh
+# 方式 1：使用 AKAMS 公益镜像（推荐）
+curl -fsSL https://github.akams.cn/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh | bash
+
+# 方式 2：使用 ghproxy.com 镜像
+curl -fsSL https://ghproxy.com/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh | bash
+
+# 方式 3：使用 ghproxy.net 镜像
+curl -fsSL https://ghproxy.net/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh | bash
+```
+
+### 📥 标准安装方式（三步即用）
+
+#### 第一步：下载管理脚本
+
+**国内用户（推荐使用镜像）：**
+```bash
+# 使用 AKAMS 公益镜像下载
+wget https://github.akams.cn/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh -O panel.sh
+chmod +x panel.sh
+```
+
+**海外用户或网络正常：**
+```bash
+# 直接从 GitHub 下载
 wget https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
 chmod +x panel.sh
 ```
 
-> 📍 **重要提示**：脚本必须在 `/root` 目录下运行。无论在哪里执行下载命令，脚本会自动移动到 `/root` 目录。
+> 💡 **提示**：脚本会自动尝试 10+ 个镜像源下载程序文件，确保安装成功率
 
-### 第二步：运行安装
+#### 第二步：运行安装
 
 ```bash
-sudo /root/panel.sh
-# 选择 "1. 下载并安装面板"
+sudo bash panel.sh
+# 在菜单中选择 "1. 安装/更新面板"
 ```
 
-### 第三步：访问面板
+#### 第三步：访问面板
 
 打开浏览器访问：`http://你的服务器IP:8080`
 
@@ -41,16 +64,58 @@ sudo /root/panel.sh
 
 ---
 
-## 📖 其他安装方式
+## 📖 更多下载方式
 
 <details>
-<summary><b>方式二：一键安装脚本</b></summary>
+<summary><b>🌐 所有可用镜像源列表</b></summary>
+
+如果上述镜像都无法使用，可以尝试以下任一镜像：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ShourGG/tailamianban/main/scripts/install.sh | sudo bash
+# AKAMS 公益镜像（首选）
+wget https://github.akams.cn/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
+
+# ghproxy.com
+wget https://ghproxy.com/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
+
+# mirror.ghproxy.com
+wget https://mirror.ghproxy.com/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
+
+# ghproxy.net
+wget https://ghproxy.net/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
+
+# gh-proxy.com
+wget https://gh-proxy.com/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
+
+# gh.api.99988866.xyz
+wget https://gh.api.99988866.xyz/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
+
+# github.moeyy.xyz
+wget https://github.moeyy.xyz/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
+
+# ghps.cc
+wget https://ghps.cc/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
+
+# gh.con.sh
+wget https://gh.con.sh/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh
 ```
 
-安装完成后自动启动，访问 `http://你的服务器IP:8080`
+</details>
+
+<details>
+<summary><b>🔗 使用 Gitee 镜像（国内直连）</b></summary>
+
+```bash
+# 从 Gitee 镜像仓库下载
+curl -fsSL https://gitee.com/cd-writer/tailamianban/raw/main/panel.sh | bash
+
+# 或手动下载
+wget https://gitee.com/cd-writer/tailamianban/raw/main/panel.sh
+chmod +x panel.sh
+sudo bash panel.sh
+```
+
+> 📌 **注意**：Gitee 仓库需要手动同步，可能不是最新版本
 
 </details>
 
@@ -81,13 +146,20 @@ http://localhost:8080
 
 ```bash
 # 使用管理脚本（推荐）
-sudo /root/panel.sh
+sudo bash panel.sh
 
 # 或使用 systemd（如果是脚本安装的）
 sudo systemctl start terraria-panel    # 启动
 sudo systemctl stop terraria-panel     # 停止
 sudo systemctl restart terraria-panel  # 重启
 sudo systemctl status terraria-panel   # 查看状态
+
+# 直接使用命令参数
+sudo bash panel.sh start     # 启动面板
+sudo bash panel.sh stop      # 停止面板
+sudo bash panel.sh restart   # 重启面板
+sudo bash panel.sh status    # 查看状态
+sudo bash panel.sh logs      # 查看日志
 ```
 
 ---
@@ -117,15 +189,15 @@ sudo systemctl status terraria-panel   # 查看状态
 
 ## 📢 版本信息
 
-**当前版本**: v1.1.9.15 | [查看所有版本](https://github.com/ShourGG/tailamianban/releases)
+**当前版本**: v1.1.9.39 | [查看所有版本](https://github.com/ShourGG/tailamianban/releases)
 
 <details>
 <summary><b>最近更新</b></summary>
 
-- **v1.1.9.15** (2025-10-01) - 📝 更新 README 版本号和日期信息
-- **v1.1.9.14** (2025-10-01) - 🧹 优化仓库结构，只保留核心项目文件
-- **v1.1.9.13** (2025-10-01) - 🔧 改进 .gitignore 配置
-- **v1.1.9.12** (2025-10-01) - ✨ 自动生成分类更新日志
+- **v1.1.9.39** (2025-10-02) - 🚀 添加 AKAMS 公益镜像作为首选下载源
+- **v1.1.9.38** (2025-10-02) - 🔧 修复 API 请求必须直连 GitHub 的问题
+- **v1.1.9.37** (2025-10-02) - ⚡ 优化镜像测试速度，添加进度显示
+- **v1.1.9.36** (2025-10-02) - 🐛 修复版本号解析导致的 URL 错误
 
 </details>
 
@@ -283,27 +355,23 @@ sudo firewall-cmd --list-ports
 ### 自动更新 (推荐)
 ```bash
 # 使用管理脚本更新
-sudo /root/panel.sh
-# 选择 "2. 更新面板"
+sudo bash panel.sh
+# 选择 "1. 安装/更新面板"
 ```
 
-### 手动更新
+> 💡 脚本会自动检测已安装版本，询问是否覆盖更新
+
+### 使用镜像加速更新
+
+如果更新失败，可以重新下载最新的安装脚本：
+
 ```bash
-# 1. 停止服务
-./scripts/run.sh stop
+# 下载最新脚本（使用 AKAMS 镜像）
+wget https://github.akams.cn/https://raw.githubusercontent.com/ShourGG/tailamianban/main/panel.sh -O panel.sh
+chmod +x panel.sh
 
-# 2. 备份数据
-cp -r data/ data_backup/
-
-# 3. 下载新版本
-wget https://github.com/ShourGG/tailamianban/releases/latest/download/terraria-panel-linux-amd64.tar.gz
-
-# 4. 替换程序文件
-tar -xzf terraria-panel-linux-amd64.tar.gz
-cp terraria-panel-new/terraria-panel ./
-
-# 5. 重启服务
-./scripts/run.sh start
+# 运行更新
+sudo bash panel.sh
 ```
 
 </details>
