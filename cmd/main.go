@@ -23,7 +23,7 @@ var EmbedFS embed.FS
 
 var (
 	// Version will be set by ldflags during build
-	Version = "1.2.0.7"
+	Version = "1.2.0.8"
 	Build   = "dev"
 )
 
@@ -82,21 +82,17 @@ func main() {
 		log.Printf("Failed to create dist filesystem: %v", err)
 		log.Println("Frontend assets may not be available")
 	} else {
-		// Serve static files with correct MIME types
-		r.GET("/*filepath", func(c *gin.Context) {
-			// Skip API routes
-			if strings.HasPrefix(c.Request.URL.Path, "/api/") {
-				c.Next()
-				return
-			}
-
-			path := c.Param("filepath")
-			if path == "/" || path == "" {
-				path = "/index.html"
-			}
+		// Use NoRoute to handle all unmatched routes (after API routes are registered)
+		r.NoRoute(func(c *gin.Context) {
+			path := c.Request.URL.Path
 
 			// Remove leading slash for fs.FS compatibility
 			path = strings.TrimPrefix(path, "/")
+
+			// Default to index.html for root
+			if path == "" {
+				path = "index.html"
+			}
 
 			// Try to read the file from embed FS
 			data, err := fs.ReadFile(distFS, path)
