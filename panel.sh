@@ -207,13 +207,10 @@ check_requirements() {
 
 # 获取最新版本号
 get_latest_version() {
-    local api_url=$(get_api_url)
-    if [ -z "$api_url" ]; then
-        print_error "无法连接到任何代码仓库" >&2
-        return 1
-    fi
+    # API 请求必须直连 GitHub,不能使用镜像(镜像只支持文件下载)
+    local api_url="https://api.github.com/repos/${GITHUB_REPO}/releases/latest"
     
-    # 直接从 GitHub 获取版本信息
+    # 直接从 GitHub API 获取版本信息
     local version=$(curl -s --connect-timeout 5 --max-time 10 "$api_url" 2>/dev/null | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | head -1)
     
     if [ -z "$version" ]; then
