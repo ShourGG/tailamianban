@@ -2,26 +2,6 @@
   "code": "0",
   "data": [
     {
-      "path": "/",
-      "component": "layout",
-      "redirect": "/terraria/dashboard",
-      "children": [
-        {
-          "path": "home",
-          "name": "home",
-          "component": "/home/index",
-          "meta": {
-            "icon": "mdi:home-assistant",
-            "title": "首页",
-            "hidden": true,
-            "affix": false,
-            "keepAlive": false,
-            "full": false
-          }
-        }
-      ]
-    },
-    {
       "path": "/terraria",
       "name": "terraria",
       "component": "layout",
