@@ -23,7 +23,7 @@ var EmbedFS embed.FS
 
 var (
 	// Version will be set by ldflags during build
-	Version = "1.2.0.10"
+	Version = "1.2.0.11"
 	Build   = "dev"
 )
 
@@ -119,6 +119,10 @@ func main() {
 					c.String(http.StatusNotFound, "Page not found")
 					return
 				}
+				// Force no-cache for index.html served as SPA fallback
+				c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+				c.Header("Pragma", "no-cache")
+				c.Header("Expires", "0")
 				c.Data(http.StatusOK, "text/html; charset=utf-8", indexData)
 				return
 			}
@@ -126,6 +130,17 @@ func main() {
 			// Determine MIME type based on file extension
 			ext := filepath.Ext(path)
 			mimeType := getMimeType(ext)
+
+			// Set cache control headers to prevent caching issues
+			// For HTML files, force no-cache to ensure users get the latest version
+			if ext == ".html" || path == "index.html" {
+				c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+				c.Header("Pragma", "no-cache")
+				c.Header("Expires", "0")
+			} else {
+				// For static assets (JS, CSS, images), allow short-term caching
+				c.Header("Cache-Control", "public, max-age=3600")
+			}
 
 			c.Data(http.StatusOK, mimeType, data)
 		})
