@@ -101,61 +101,6 @@
           }
         }
       ]
-    },
-    {
-      "path": "/sys-manage",
-      "name": "sys-manage",
-      "component": "layout",
-      "redirect": "/sys-manage/user-manage",
-      "meta": {
-        "icon": "mdi:cog-outline",
-        "title": "系统管理",
-        "hidden": false,
-        "full": false,
-        "affix": false,
-        "keepAlive": false
-      },
-      "children": [
-        {
-          "path": "user-manage",
-          "name": "sys-user-manage",
-          "component": "/sys-manage/user-manage/index",
-          "meta": {
-            "icon": "mdi:account-outline",
-            "title": "用户管理",
-            "hidden": false,
-            "full": false,
-            "affix": false,
-            "keepAlive": false
-          }
-        },
-        {
-          "path": "role-manage",
-          "name": "sys-role-manage",
-          "component": "/sys-manage/role-manage/index",
-          "meta": {
-            "icon": "mdi:account-group-outline",
-            "title": "角色管理",
-            "hidden": false,
-            "full": false,
-            "affix": false,
-            "keepAlive": false
-          }
-        },
-        {
-          "path": "menu-manage",
-          "name": "sys-menu-manage",
-          "component": "/sys-manage/menu-manage/index",
-          "meta": {
-            "icon": "mdi:menu",
-            "title": "菜单管理",
-            "hidden": false,
-            "full": false,
-            "affix": false,
-            "keepAlive": false
-          }
-        }
-      ]
     }
   ],
   "msg": "成功"
