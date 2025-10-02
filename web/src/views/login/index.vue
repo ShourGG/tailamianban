@@ -20,12 +20,12 @@
       @hidden="handleTypewriterHidden"
     />
 
-    <!-- 3D 机器人背景 -->
-    <div class="spline-background">
+    <!-- 3D 机器人背景 - 临时禁用以修复加载问题 -->
+    <!-- <div class="spline-background">
       <Spline
         scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
       />
-    </div>
+    </div> -->
 
     <div class="login-wrapper">
       <!-- Robot avatar -->
@@ -110,7 +110,7 @@
   import { loginApi, registerApi, checkInitApi, type LoginResponse } from '@/api/auth'
   import { VERSION } from '@/config/version'
   import './index.scss'
-  import Spline from './components/Spline.vue'
+  // import Spline from './components/Spline.vue' // 临时禁用以修复加载问题
   import C_Captcha from '@/components/global/C_Captcha/index.vue'
   import Typewriter from './components/Typewriter.vue'
 
