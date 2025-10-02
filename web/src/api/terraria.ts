@@ -1,237 +1,258 @@
-import http from '@/axios/request'
+import { api } from '@/utils/api'
 
-// API响应类型定义
-export interface ApiResponse<T = any> {
-  code: number
-  message: string
-  data: T
-}
+// ==================== 类型定义 ====================
 
-// 服务器状态
 export interface ServerStatus {
-  status: 'running' | 'stopped' | 'starting' | 'stopping'
-  pid: number
+  status: 'running' | 'stopped' | 'starting' | 'stopping' | 'error'
   uptime: number
-  player_count: number
-  max_players: number
-  world_name: string
-  port: number
   version: string
-}
-
-// 服务器配置
-export interface ServerConfig {
-  world_name: string
-  max_players: number
   port: number
-  password?: string
-  difficulty: 'classic' | 'expert' | 'master'
-  auto_save: boolean
-  auto_save_time: number
+  maxPlayers: number
+  currentPlayers: number
+  worldName: string
+  difficulty: string
+  password: boolean
 }
 
-// 世界信息
+export interface Player {
+  id: string
+  name: string
+  ip: string
+  joinTime: string
+  team: number
+  health: number
+  mana: number
+}
+
 export interface World {
   id: string
   name: string
   size: number
-  created_at: string
-  modified_at: string
-  is_active: boolean
-  backup_count: number
+  sizeLabel: string
+  createdAt: string
+  modifiedAt: string
+  difficulty: 'normal' | 'expert' | 'master'
+  hardmode: boolean
+  path: string
 }
 
-// 玩家信息
-export interface Player {
-  id: string
-  name: string
-  steam_id?: string
-  ip: string
-  is_online: boolean
-  is_banned: boolean
-  play_time: number
-  last_seen: string
-  joined_at: string
-}
-
-// 系统指标
-export interface SystemMetrics {
-  cpu: {
-    usage_percent: number
-    cores: number
-    load_average?: number[]
-  }
-  memory: {
-    total: number
-    used: number
-    free: number
-    used_percent: number
-  }
-  disk: {
-    total: number
-    used: number
-    free: number
-    used_percent: number
-  }
+export interface SystemStats {
+  cpu: number
+  memory: number
+  disk: number
   network: {
-    bytes_sent: number
-    bytes_recv: number
+    in: number
+    out: number
   }
   timestamp: string
 }
 
-// 用户信息
-export interface User {
+export interface ServerConfig {
+  port: number
+  maxPlayers: number
+  password: string
+  motd: string
+  worldPath: string
+  difficulty: string
+  autocreate: boolean
+}
+
+export interface BanRecord {
   id: string
-  username: string
-  email: string
-  role: 'admin' | 'moderator' | 'viewer'
-  is_active: boolean
-  created_at: string
-  last_login?: string
+  playerName: string
+  playerIp: string
+  reason: string
+  bannedBy: string
+  bannedAt: string
+}
+
+export interface ServerLog {
+  timestamp: string
+  level: 'info' | 'warn' | 'error' | 'debug'
+  message: string
+}
+
+// ==================== 服务器控制 ====================
+
+/**
+ * Get server status
+ * GET /api/server/status
+ */
+export const getServerStatus = () => 
+  api.get<ServerStatus>('/api/server/status')
+
+/**
+ * Start server
+ * POST /api/server/start
+ */
+export const startServer = () => 
+  api.post('/api/server/start')
+
+/**
+ * Stop server
+ * POST /api/server/stop
+ */
+export const stopServer = () => 
+  api.post('/api/server/stop')
+
+/**
+ * Restart server
+ * POST /api/server/restart
+ */
+export const restartServer = () => 
+  api.post('/api/server/restart')
+
+/**
+ * Get server configuration
+ * GET /api/server/config
+ */
+export const getServerConfig = () => 
+  api.get<ServerConfig>('/api/server/config')
+
+/**
+ * Update server configuration
+ * PUT /api/server/config
+ */
+export const updateServerConfig = (config: Partial<ServerConfig>) => 
+  api.put('/api/server/config', config)
+
+// ==================== 玩家管理 ====================
+
+/**
+ * Get online players
+ * GET /api/players/online
+ */
+export const getOnlinePlayers = () => 
+  api.get<Player[]>('/api/players/online')
+
+/**
+ * Kick player
+ * POST /api/players/:id/kick
+ */
+export const kickPlayer = (playerId: string, reason?: string) => 
+  api.post(`/api/players/${playerId}/kick`, { reason })
+
+/**
+ * Ban player
+ * POST /api/players/:id/ban
+ */
+export const banPlayer = (playerId: string, reason: string) => 
+  api.post(`/api/players/${playerId}/ban`, { reason })
+
+/**
+ * Unban player
+ * POST /api/players/:id/unban
+ */
+export const unbanPlayer = (playerId: string) => 
+  api.post(`/api/players/${playerId}/unban`)
+
+/**
+ * Get ban list
+ * GET /api/players/banlist
+ */
+export const getBanList = () => 
+  api.get<BanRecord[]>('/api/players/banlist')
+
+/**
+ * Send message to player
+ * POST /api/players/:id/message
+ */
+export const sendPlayerMessage = (playerId: string, message: string) => 
+  api.post(`/api/players/${playerId}/message`, { message })
+
+/**
+ * Send broadcast message
+ * POST /api/players/broadcast
+ */
+export const broadcastMessage = (message: string) => 
+  api.post('/api/players/broadcast', { message })
+
+// ==================== 世界管理 ====================
+
+/**
+ * Get world list
+ * GET /api/worlds
+ */
+export const getWorldList = () => 
+  api.get<World[]>('/api/worlds')
+
+/**
+ * Upload world file
+ * POST /api/worlds/upload
+ */
+export const uploadWorld = (file: File) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  return api.post('/api/worlds/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
 }
 
 /**
- * 泰拉瑞亚面板API
+ * Download world file
+ * GET /api/worlds/:id/download
  */
-export const terrariaApi = {
-  // ========== 认证相关 ==========
-  auth: {
-    login: (data: { username: string; password: string }) =>
-      http.post<ApiResponse<{ token: string; user: User }>>('/api/auth/login', data),
-    
-    logout: () => http.post('/api/auth/logout'),
-    
-    getCurrentUser: () => http.get<ApiResponse<User>>('/api/auth/me')
-  },
-
-  // ========== 服务器管理 ==========
-  server: {
-    getStatus: () => http.get<ApiResponse<ServerStatus>>('/api/server/status'),
-    
-    start: () => http.post('/api/server/start'),
-    
-    stop: () => http.post('/api/server/stop'),
-    
-    restart: () => http.post('/api/server/restart'),
-    
-    getConfig: () => http.get<ApiResponse<ServerConfig>>('/api/server/config'),
-    
-    updateConfig: (config: ServerConfig) =>
-      http.put('/api/server/config', config),
-    
-    getLogs: (lines = 100) =>
-      http.get<ApiResponse<string[]>>(`/api/server/logs?lines=${lines}`),
-    
-    clearLogs: () => http.delete('/api/server/logs')
-  },
-
-  // ========== 世界管理 ==========
-  world: {
-    getList: () =>
-      http.get<ApiResponse<{ worlds: World[]; count: number }>>('/api/worlds'),
-    
-    create: (data: { name: string; size: string; difficulty: string; seed?: string }) =>
-      http.post<ApiResponse<World>>('/api/worlds', data),
-    
-    getById: (id: string) =>
-      http.get<ApiResponse<World>>(`/api/worlds/${id}`),
-    
-    update: (id: string, data: Partial<World>) =>
-      http.put(`/api/worlds/${id}`, data),
-    
-    delete: (id: string) =>
-      http.delete(`/api/worlds/${id}`),
-    
-    backup: (id: string) =>
-      http.post<ApiResponse<{ backup_path: string }>>(`/api/worlds/${id}/backup`),
-    
-    restore: (id: string, backupPath: string) =>
-      http.post(`/api/worlds/${id}/restore`, { backup_path: backupPath }),
-    
-    upload: (file: File) => {
-      const formData = new FormData()
-      formData.append('world', file)
-      return http.post<ApiResponse<World>>('/api/worlds/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-    },
-    
-    download: (id: string) =>
-      window.open(`/api/worlds/${id}/download`, '_blank')
-  },
-
-  // ========== 玩家管理 ==========
-  player: {
-    getList: (params?: { online?: boolean; banned?: boolean }) =>
-      http.get<ApiResponse<{ players: Player[]; count: number }>>('/api/players', { params }),
-    
-    getOnline: () =>
-      http.get<ApiResponse<{ players: Player[]; online_count: number; max_players: number }>>('/api/players/online'),
-    
-    getById: (id: string) =>
-      http.get<ApiResponse<{ player: Player; stats: any }>>(`/api/players/${id}`),
-    
-    kick: (id: string, reason: string) =>
-      http.post(`/api/players/${id}/kick`, { reason }),
-    
-    ban: (id: string, data: { reason: string; duration?: number; ip_ban?: boolean }) =>
-      http.post(`/api/players/${id}/ban`, data),
-    
-    unban: (id: string) =>
-      http.delete(`/api/players/${id}/ban`),
-    
-    getBanned: () =>
-      http.get<ApiResponse<{ bans: Player[]; count: number }>>('/api/players/bans')
-  },
-
-  // ========== 系统监控 ==========
-  system: {
-    getMetrics: () =>
-      http.get<ApiResponse<SystemMetrics>>('/api/system/metrics'),
-    
-    getMetricsHistory: (duration = '1h', resolution = '1m') =>
-      http.get<ApiResponse<{ history: SystemMetrics[]; count: number }>>('/api/system/metrics/history', {
-        params: { duration, resolution }
-      }),
-    
-    getInfo: () =>
-      http.get<ApiResponse<any>>('/api/system/info'),
-    
-    getProcesses: () =>
-      http.get<ApiResponse<{ processes: any[]; count: number }>>('/api/system/processes')
-  },
-
-  // ========== 面板设置 ==========
-  panel: {
-    getSettings: () =>
-      http.get<ApiResponse<any>>('/api/panel/settings'),
-    
-    updateSettings: (settings: any) =>
-      http.put('/api/panel/settings', settings),
-    
-    getUsers: () =>
-      http.get<ApiResponse<{ users: User[]; count: number }>>('/api/panel/users'),
-    
-    createUser: (data: { username: string; email: string; password: string; role: string }) =>
-      http.post<ApiResponse<User>>('/api/panel/users', data),
-    
-    updateUser: (id: string, data: Partial<User>) =>
-      http.put(`/api/panel/users/${id}`, data),
-    
-    deleteUser: (id: string) =>
-      http.delete(`/api/panel/users/${id}`),
-    
-    getAuditLogs: (params?: { user_id?: string; action?: string }) =>
-      http.get<ApiResponse<{ logs: any[]; count: number }>>('/api/panel/audit-logs', { params })
-  },
-
-  // ========== WebSocket连接 ==========
-  ws: {
-    connect: () => {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const host = window.location.host
-      return new WebSocket(`${protocol}//${host}/api/ws`)
-    }
-  }
+export const downloadWorld = (worldId: string) => {
+  const url = `/api/worlds/${worldId}/download`
+  window.open(url, '_blank')
 }
+
+/**
+ * Delete world
+ * DELETE /api/worlds/:id
+ */
+export const deleteWorld = (worldId: string) => 
+  api.delete(`/api/worlds/${worldId}`)
+
+/**
+ * Backup world
+ * POST /api/worlds/:id/backup
+ */
+export const backupWorld = (worldId: string) => 
+  api.post(`/api/worlds/${worldId}/backup`)
+
+/**
+ * Restore world from backup
+ * POST /api/worlds/:id/restore
+ */
+export const restoreWorld = (worldId: string, backupId: string) => 
+  api.post(`/api/worlds/${worldId}/restore`, { backupId })
+
+/**
+ * Get world backups
+ * GET /api/worlds/:id/backups
+ */
+export const getWorldBackups = (worldId: string) => 
+  api.get<any[]>(`/api/worlds/${worldId}/backups`)
+
+// ==================== 系统监控 ====================
+
+/**
+ * Get system stats
+ * GET /api/monitor/stats
+ */
+export const getSystemStats = () => 
+  api.get<SystemStats>('/api/monitor/stats')
+
+/**
+ * Get server logs
+ * GET /api/server/logs
+ */
+export const getServerLogs = (lines: number = 100) => 
+  api.get<ServerLog[]>(`/api/server/logs?lines=${lines}`)
+
+/**
+ * Clear server logs
+ * DELETE /api/server/logs
+ */
+export const clearServerLogs = () => 
+  api.delete('/api/server/logs')
+
+/**
+ * Get system info
+ * GET /api/monitor/info
+ */
+export const getSystemInfo = () => 
+  api.get<any>('/api/monitor/info')

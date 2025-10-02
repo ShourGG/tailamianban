@@ -1,438 +1,251 @@
-<template>
-  <div class="dashboard-container">
-    <!-- 状态卡片 -->
-    <n-grid :x-gap="16" :y-gap="16" :cols="24">
-      <n-gi :span="6">
-        <n-card>
-          <n-statistic label="服务器状态">
-            <template #prefix>
-              <n-icon :color="serverStatusColor">
-                <i-mdi-server />
-              </n-icon>
-            </template>
-            {{ serverStatusText }}
-          </n-statistic>
-        </n-card>
-      </n-gi>
-      
-      <n-gi :span="6">
-        <n-card>
-          <n-statistic label="在线玩家" :value="onlinePlayers">
-            <template #prefix>
-              <n-icon color="#18a058">
-                <i-mdi-account-group />
-              </n-icon>
-            </template>
-            <template #suffix>
-              / {{ maxPlayers }}
-            </template>
-          </n-statistic>
-        </n-card>
-      </n-gi>
-      
-      <n-gi :span="6">
-        <n-card>
-          <n-statistic label="CPU使用率" :value="cpuUsage">
-            <template #prefix>
-              <n-icon :color="cpuColor">
-                <i-mdi-cpu-64-bit />
-              </n-icon>
-            </template>
-            <template #suffix>%</template>
-          </n-statistic>
-        </n-card>
-      </n-gi>
-      
-      <n-gi :span="6">
-        <n-card>
-          <n-statistic label="内存使用" :value="memoryUsage">
-            <template #prefix>
-              <n-icon :color="memoryColor">
-                <i-mdi-memory />
-              </n-icon>
-            </template>
-            <template #suffix>%</template>
-          </n-statistic>
-        </n-card>
-      </n-gi>
-    </n-grid>
-
-    <!-- 快捷操作 -->
-    <n-card title="快捷操作" class="mt-4">
-      <n-space>
-        <n-button 
-          type="success" 
-          :loading="starting"
-          :disabled="serverStatus === 'running'"
-          @click="startServer"
-        >
-          <template #icon>
-            <n-icon><i-mdi-play /></n-icon>
-          </template>
-          启动服务器
-        </n-button>
-        
-        <n-button 
-          type="error" 
-          :loading="stopping"
-          :disabled="serverStatus !== 'running'"
-          @click="stopServer"
-        >
-          <template #icon>
-            <n-icon><i-mdi-stop /></n-icon>
-          </template>
-          停止服务器
-        </n-button>
-        
-        <n-button 
-          type="warning"
-          :loading="restarting"
-          :disabled="serverStatus !== 'running'"
-          @click="restartServer"
-        >
-          <template #icon>
-            <n-icon><i-mdi-restart /></n-icon>
-          </template>
-          重启服务器
-        </n-button>
-        
-        <n-button type="info" @click="backupWorld">
-          <template #icon>
-            <n-icon><i-mdi-content-save /></n-icon>
-          </template>
-          备份世界
-        </n-button>
-      </n-space>
-    </n-card>
-
-    <!-- 服务器信息和系统监控 -->
-    <n-grid :x-gap="16" :y-gap="16" :cols="24" class="mt-4">
-      <n-gi :span="12">
-        <n-card title="服务器信息">
-          <n-descriptions :column="1" label-placement="left">
-            <n-descriptions-item label="世界名称">
-              {{ worldName || '-' }}
-            </n-descriptions-item>
-            <n-descriptions-item label="游戏版本">
-              {{ gameVersion || '-' }}
-            </n-descriptions-item>
-            <n-descriptions-item label="服务器端口">
-              {{ serverPort || '-' }}
-            </n-descriptions-item>
-            <n-descriptions-item label="运行时间">
-              {{ uptimeText }}
-            </n-descriptions-item>
-            <n-descriptions-item label="难度模式">
-              <n-tag :type="difficultyType">{{ difficultyText }}</n-tag>
-            </n-descriptions-item>
-          </n-descriptions>
-        </n-card>
-      </n-gi>
-      
-      <n-gi :span="12">
-        <n-card title="系统资源">
-          <div ref="chartContainer" style="height: 250px"></div>
-        </n-card>
-      </n-gi>
-    </n-grid>
-
-    <!-- 最近日志 -->
-    <n-card title="最近日志" class="mt-4">
-      <n-scrollbar style="max-height: 300px">
-        <n-log :lines="recentLogs" :font-size="12" />
-      </n-scrollbar>
-      <template #header-extra>
-        <n-button text @click="refreshLogs">
-          <template #icon>
-            <n-icon><i-mdi-refresh /></n-icon>
-          </template>
-          刷新
-        </n-button>
-      </template>
-    </n-card>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useMessage } from 'naive-ui'
-import { terrariaApi } from '@/api/terraria'
-import * as echarts from 'echarts'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { NGrid, NGi, NCard, NStatistic, NSpin, NDataTable, NButton, NSpace, NTag, NEmpty } from 'naive-ui'
+import type { DataTableColumns } from 'naive-ui'
+import { getServerStatus, getOnlinePlayers, getSystemStats, type ServerStatus, type Player, type SystemStats } from '@/api/terraria'
 
-const message = useMessage()
+// State
+const loading = ref(true)
+const serverStatus = ref<ServerStatus | null>(null)
+const onlinePlayers = ref<Player[]>([])
+const systemStats = ref<SystemStats | null>(null)
+const refreshInterval = ref<number | null>(null)
 
-// 服务器状态
-const serverStatus = ref<string>('stopped')
-const onlinePlayers = ref(0)
-const maxPlayers = ref(8)
-const worldName = ref('')
-const gameVersion = ref('1.4.4.9')
-const serverPort = ref(7777)
-const uptime = ref(0)
-const difficulty = ref('classic')
-
-// 系统资源
-const cpuUsage = ref(0)
-const memoryUsage = ref(0)
-
-// 操作状态
-const starting = ref(false)
-const stopping = ref(false)
-const restarting = ref(false)
-
-// 日志
-const recentLogs = ref<string[]>([])
-
-// 图表
-const chartContainer = ref<HTMLElement>()
-let chart: echarts.ECharts | null = null
-let refreshTimer: number | null = null
-
-// 计算属性
-const serverStatusText = computed(() => {
-  const statusMap: Record<string, string> = {
-    running: '运行中',
-    stopped: '已停止',
-    starting: '启动中',
-    stopping: '停止中'
+// Table columns
+const playerColumns: DataTableColumns<Player> = [
+  {
+    title: '玩家ID',
+    key: 'id',
+    width: 100
+  },
+  {
+    title: '玩家名称',
+    key: 'name',
+    width: 150
+  },
+  {
+    title: 'IP地址',
+    key: 'ip',
+    width: 150
+  },
+  {
+    title: '加入时间',
+    key: 'joinTime',
+    width: 180
+  },
+  {
+    title: '队伍',
+    key: 'team',
+    width: 80,
+    render: (row) => {
+      const teamColors: Record<number, string> = {
+        0: 'default',
+        1: 'error',
+        2: 'success',
+        3: 'warning',
+        4: 'info'
+      }
+      const teamNames: Record<number, string> = {
+        0: '无',
+        1: '红队',
+        2: '绿队',
+        3: '蓝队',
+        4: '黄队'
+      }
+      return h(NTag, { type: teamColors[row.team] || 'default' }, { default: () => teamNames[row.team] || '未知' })
+    }
+  },
+  {
+    title: '生命值',
+    key: 'health',
+    width: 100
+  },
+  {
+    title: '魔力值',
+    key: 'mana',
+    width: 100
   }
-  return statusMap[serverStatus.value] || '未知'
-})
+]
 
-const serverStatusColor = computed(() => {
-  const colorMap: Record<string, string> = {
+// Load data from real API
+const loadData = async () => {
+  loading.value = true
+  try {
+    const [statusRes, playersRes, statsRes] = await Promise.all([
+      getServerStatus().catch(() => null),
+      getOnlinePlayers().catch(() => []),
+      getSystemStats().catch(() => null)
+    ])
+    
+    serverStatus.value = statusRes
+    onlinePlayers.value = playersRes || []
+    systemStats.value = statsRes
+  } catch (error) {
+    console.error('Failed to load dashboard data:', error)
+    window.$message?.error('加载数据失败，请检查服务器连接')
+  } finally {
+    loading.value = false
+  }
+}
+
+// Format uptime
+const formatUptime = (seconds: number): string => {
+  const days = Math.floor(seconds / 86400)
+  const hours = Math.floor((seconds % 86400) / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const secs = seconds % 60
+  
+  if (days > 0) {
+    return `${days}天 ${hours}小时`
+  } else if (hours > 0) {
+    return `${hours}小时 ${minutes}分钟`
+  } else if (minutes > 0) {
+    return `${minutes}分钟 ${secs}秒`
+  } else {
+    return `${secs}秒`
+  }
+}
+
+// Get status color
+const getStatusColor = (status: string): string => {
+  const colors: Record<string, string> = {
     running: '#18a058',
     stopped: '#d03050',
     starting: '#f0a020',
-    stopping: '#f0a020'
+    stopping: '#f0a020',
+    error: '#d03050'
   }
-  return colorMap[serverStatus.value] || '#999'
-})
-
-const cpuColor = computed(() => {
-  if (cpuUsage.value >= 80) return '#d03050'
-  if (cpuUsage.value >= 60) return '#f0a020'
-  return '#18a058'
-})
-
-const memoryColor = computed(() => {
-  if (memoryUsage.value >= 80) return '#d03050'
-  if (memoryUsage.value >= 60) return '#f0a020'
-  return '#18a058'
-})
-
-const uptimeText = computed(() => {
-  const hours = Math.floor(uptime.value / 3600)
-  const minutes = Math.floor((uptime.value % 3600) / 60)
-  const seconds = uptime.value % 60
-  return `${hours}小时 ${minutes}分钟 ${seconds}秒`
-})
-
-const difficultyText = computed(() => {
-  const difficultyMap: Record<string, string> = {
-    classic: '经典',
-    expert: '专家',
-    master: '大师',
-    journey: '旅程'
-  }
-  return difficultyMap[difficulty.value] || '经典'
-})
-
-const difficultyType = computed(() => {
-  const typeMap: Record<string, any> = {
-    classic: 'default',
-    expert: 'warning',
-    master: 'error',
-    journey: 'info'
-  }
-  return typeMap[difficulty.value] || 'default'
-})
-
-// 方法
-const fetchServerStatus = async () => {
-  try {
-    const res = await terrariaApi.server.getStatus()
-    const data = res.data.data
-    serverStatus.value = data.status
-    onlinePlayers.value = data.player_count
-    maxPlayers.value = data.max_players
-    worldName.value = data.world_name
-    serverPort.value = data.port
-    uptime.value = data.uptime
-  } catch (error) {
-    console.error('获取服务器状态失败:', error)
-  }
+  return colors[status] || '#666666'
 }
 
-const fetchSystemMetrics = async () => {
-  try {
-    const res = await terrariaApi.system.getMetrics()
-    const data = res.data.data
-    cpuUsage.value = Math.round(data.cpu.usage_percent)
-    memoryUsage.value = Math.round(data.memory.used_percent)
-    
-    // 更新图表
-    updateChart(data)
-  } catch (error) {
-    console.error('获取系统指标失败:', error)
+// Get status text
+const getStatusText = (status: string): string => {
+  const texts: Record<string, string> = {
+    running: '运行中',
+    stopped: '已停止',
+    starting: '启动中',
+    stopping: '停止中',
+    error: '错误'
   }
+  return texts[status] || '未知'
 }
 
-const fetchLogs = async () => {
-  try {
-    const res = await terrariaApi.server.getLogs(20)
-    recentLogs.value = res.data.data
-  } catch (error) {
-    console.error('获取日志失败:', error)
-  }
-}
-
-const startServer = async () => {
-  starting.value = true
-  try {
-    await terrariaApi.server.start()
-    message.success('服务器启动成功')
-    await fetchServerStatus()
-  } catch (error) {
-    message.error('服务器启动失败')
-  } finally {
-    starting.value = false
-  }
-}
-
-const stopServer = async () => {
-  stopping.value = true
-  try {
-    await terrariaApi.server.stop()
-    message.success('服务器停止成功')
-    await fetchServerStatus()
-  } catch (error) {
-    message.error('服务器停止失败')
-  } finally {
-    stopping.value = false
-  }
-}
-
-const restartServer = async () => {
-  restarting.value = true
-  try {
-    await terrariaApi.server.restart()
-    message.success('服务器重启成功')
-    await fetchServerStatus()
-  } catch (error) {
-    message.error('服务器重启失败')
-  } finally {
-    restarting.value = false
-  }
-}
-
-const backupWorld = async () => {
-  message.info('备份功能开发中...')
-}
-
-const refreshLogs = () => {
-  fetchLogs()
-}
-
-const initChart = () => {
-  if (!chartContainer.value) return
-  
-  chart = echarts.init(chartContainer.value)
-  const option = {
-    tooltip: {
-      trigger: 'axis'
-    },
-    legend: {
-      data: ['CPU', '内存', '磁盘']
-    },
-    xAxis: {
-      type: 'category',
-      data: []
-    },
-    yAxis: {
-      type: 'value',
-      max: 100,
-      axisLabel: {
-        formatter: '{value}%'
-      }
-    },
-    series: [
-      {
-        name: 'CPU',
-        type: 'line',
-        smooth: true,
-        data: []
-      },
-      {
-        name: '内存',
-        type: 'line',
-        smooth: true,
-        data: []
-      },
-      {
-        name: '磁盘',
-        type: 'line',
-        smooth: true,
-        data: []
-      }
-    ]
-  }
-  
-  chart.setOption(option)
-}
-
-const updateChart = (metrics: any) => {
-  if (!chart) return
-  
-  const option = chart.getOption() as any
-  const time = new Date().toLocaleTimeString()
-  
-  // 保持最近30个数据点
-  if (option.xAxis[0].data.length >= 30) {
-    option.xAxis[0].data.shift()
-    option.series[0].data.shift()
-    option.series[1].data.shift()
-    option.series[2].data.shift()
-  }
-  
-  option.xAxis[0].data.push(time)
-  option.series[0].data.push(Math.round(metrics.cpu.usage_percent))
-  option.series[1].data.push(Math.round(metrics.memory.used_percent))
-  option.series[2].data.push(Math.round(metrics.disk.used_percent))
-  
-  chart.setOption(option)
-}
-
-// 生命周期
+// Lifecycle
 onMounted(() => {
-  fetchServerStatus()
-  fetchSystemMetrics()
-  fetchLogs()
-  initChart()
-  
-  // 定时刷新
-  refreshTimer = setInterval(() => {
-    fetchServerStatus()
-    fetchSystemMetrics()
-  }, 5000)
+  loadData()
+  // Auto refresh every 5 seconds
+  refreshInterval.value = window.setInterval(loadData, 5000)
 })
 
 onUnmounted(() => {
-  if (refreshTimer) {
-    clearInterval(refreshTimer)
-  }
-  if (chart) {
-    chart.dispose()
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value)
   }
 })
 </script>
 
-<style scoped>
-.dashboard-container {
-  padding: 16px;
-}
+<template>
+  <div class="terraria-dashboard">
+    <NSpin :show="loading">
+      <!-- Status Cards -->
+      <NGrid :x-gap="16" :y-gap="16" :cols="4" responsive="screen">
+        <!-- Server Status -->
+        <NGi>
+          <NCard title="服务器状态" :bordered="false" size="small">
+            <template v-if="serverStatus">
+              <NStatistic 
+                :value="getStatusText(serverStatus.status)"
+                :value-style="{ color: getStatusColor(serverStatus.status) }"
+              />
+              <div style="margin-top: 12px; font-size: 13px; color: #666;">
+                <div>运行时间: {{ formatUptime(serverStatus.uptime) }}</div>
+                <div>端口: {{ serverStatus.port }}</div>
+                <div>版本: {{ serverStatus.version }}</div>
+              </div>
+            </template>
+            <NEmpty v-else description="无法获取服务器状态" size="small" />
+          </NCard>
+        </NGi>
 
-.mt-4 {
-  margin-top: 16px;
+        <!-- Online Players -->
+        <NGi>
+          <NCard title="在线玩家" :bordered="false" size="small">
+            <template v-if="serverStatus">
+              <NStatistic :value="serverStatus.currentPlayers">
+                <template #suffix>
+                  / {{ serverStatus.maxPlayers }}
+                </template>
+              </NStatistic>
+              <div style="margin-top: 12px; font-size: 13px; color: #666;">
+                <div>世界: {{ serverStatus.worldName || '未加载' }}</div>
+                <div>难度: {{ serverStatus.difficulty || '普通' }}</div>
+              </div>
+            </template>
+            <NEmpty v-else description="无数据" size="small" />
+          </NCard>
+        </NGi>
+
+        <!-- CPU Usage -->
+        <NGi>
+          <NCard title="CPU使用率" :bordered="false" size="small">
+            <template v-if="systemStats">
+              <NStatistic :value="systemStats.cpu.toFixed(2)">
+                <template #suffix>%</template>
+              </NStatistic>
+              <div style="margin-top: 12px; font-size: 13px; color: #666;">
+                <div>更新时间: {{ new Date(systemStats.timestamp).toLocaleTimeString() }}</div>
+              </div>
+            </template>
+            <NEmpty v-else description="无数据" size="small" />
+          </NCard>
+        </NGi>
+
+        <!-- Memory Usage -->
+        <NGi>
+          <NCard title="内存使用率" :bordered="false" size="small">
+            <template v-if="systemStats">
+              <NStatistic :value="systemStats.memory.toFixed(2)">
+                <template #suffix>%</template>
+              </NStatistic>
+              <div style="margin-top: 12px; font-size: 13px; color: #666;">
+                <div>磁盘: {{ systemStats.disk.toFixed(2) }}%</div>
+              </div>
+            </template>
+            <NEmpty v-else description="无数据" size="small" />
+          </NCard>
+        </NGi>
+      </NGrid>
+
+      <!-- Online Players Table -->
+      <NCard title="在线玩家列表" :bordered="false" style="margin-top: 16px">
+        <template #header-extra>
+          <NSpace>
+            <NButton size="small" @click="loadData">刷新</NButton>
+          </NSpace>
+        </template>
+        <NDataTable
+          v-if="onlinePlayers.length > 0"
+          :columns="playerColumns"
+          :data="onlinePlayers"
+          :pagination="false"
+          :bordered="false"
+          size="small"
+        />
+        <NEmpty v-else description="当前无在线玩家" />
+      </NCard>
+    </NSpin>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.terraria-dashboard {
+  padding: 16px;
+  
+  :deep(.n-statistic) {
+    .n-statistic-value {
+      font-size: 28px;
+      font-weight: 600;
+    }
+  }
 }
 </style>
