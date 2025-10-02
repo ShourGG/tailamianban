@@ -378,7 +378,9 @@ GITHUB_REPO}/releases"
     print_info "解压中..."
     mkdir -p "$INSTALL_DIR"
     
-    if ! tar -xzf "$temp_file" -C "$INSTALL_DIR"; then
+    # 使用 --strip-components=1 移除 tar 包中的顶层目录
+    # 这样可以直接将文件解压到 INSTALL_DIR 而不是 INSTALL_DIR/terraria-panel/
+    if ! tar -xzf "$temp_file" -C "$INSTALL_DIR" --strip-components=1; then
         print_error "解压失败"
         rm -f "$temp_file"
         read -p "按回车返回..."
