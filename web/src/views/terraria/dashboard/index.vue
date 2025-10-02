@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, h } from 'vue'
 import { NGrid, NGi, NCard, NStatistic, NSpin, NDataTable, NButton, NSpace, NTag, NEmpty } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import { getServerStatus, getOnlinePlayers, getSystemStats, type ServerStatus, type Player, type SystemStats } from '@/api/terraria'
