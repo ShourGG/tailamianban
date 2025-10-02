@@ -14,7 +14,6 @@ export * from './dynamic-components'
 export * from './passive-scroll'
 export * from './markdown'
 export * from './directives'
-export * from './analytics'
 
 export {
   setupHighlight,

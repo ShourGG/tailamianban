@@ -26,7 +26,6 @@ import {
   setupHighlight,
   setupMarkdown,
   setupDirectives,
-  setupAnalytics,
 } from '@/plugins'
 
 /**
@@ -55,7 +54,6 @@ async function bootstrap() {
   setupHighlight(app)
   setupMarkdown(app)
   setupDirectives(app)
-  setupAnalytics(app)
 
   // 第四阶段：异步插件
   await router.isReady()
