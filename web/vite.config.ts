@@ -36,16 +36,15 @@ export default defineConfig({
     Icons({ autoInstall: true }),
     viteAutoImportPlugin,
     viteComponentsPlugin,
-    preloader({
-      routes: [
-        '/demo/13-calendar',
-        '/demo/29-antv-x6-editor',
-        '/demo/16-text-editor',
-        '/demo/33-v-table-gantt',
-        '/demo/20-dragable',
-        // 后续还觉得哪些页面初次切换等待时间长，添加到预加载里面来耍
-      ],
-    }),
+    // preloader插件暂时禁用，因为demo页面已被删除
+    // 如果后续需要预加载泰拉瑞亚相关页面，可以重新启用
+    // preloader({
+    //   routes: [
+    //     '/terraria/dashboard',
+    //     '/terraria/server',
+    //     // 添加需要预加载的泰拉瑞亚页面路由
+    //   ],
+    // }),
     // 可视化分析 vite 打包结果
     ...(process.env.ANALYZE
       ? [
