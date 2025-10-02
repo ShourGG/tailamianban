@@ -23,7 +23,7 @@ var EmbedFS embed.FS
 
 var (
 	// Version will be set by ldflags during build
-	Version = "1.2.0.9"
+	Version = "1.2.0.10"
 	Build   = "dev"
 )
 
@@ -97,15 +97,23 @@ func main() {
 			// Try to read the file from embed FS
 			data, err := fs.ReadFile(distFS, path)
 			if err != nil {
-				// If file not found and not an asset, serve index.html for SPA routing
-				if !strings.Contains(path, ".") ||
-					strings.HasPrefix(path, "assets/") ||
-					strings.HasPrefix(path, "_vercel/") {
-					// File not found, return 404 for assets
+				// If file not found, determine if it's a static asset or frontend route
+				// Static assets (with extensions and in asset directories) should return 404
+				isStaticAsset := strings.Contains(path, ".") && (strings.HasPrefix(path, "assets/") ||
+					strings.HasPrefix(path, "js/") ||
+					strings.HasPrefix(path, "css/") ||
+					strings.HasPrefix(path, "images/") ||
+					strings.HasPrefix(path, "fonts/") ||
+					strings.HasPrefix(path, "media/") ||
+					strings.HasPrefix(path, "_vercel/"))
+
+				if isStaticAsset {
+					// File not found, return 404 for static assets
 					c.Status(http.StatusNotFound)
 					return
 				}
-				// Serve index.html for frontend routes
+
+				// For frontend routes (no extension or not in asset dirs), serve index.html for SPA routing
 				indexData, indexErr := fs.ReadFile(distFS, "index.html")
 				if indexErr != nil {
 					c.String(http.StatusNotFound, "Page not found")
