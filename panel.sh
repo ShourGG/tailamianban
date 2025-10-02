@@ -3,8 +3,10 @@
 ###########################################
 # 泰拉瑞亚面板一键管理脚本
 # Terraria Panel One-Click Management Script
-# Version: 2.3
+# Version: 2.4
 # 更新日志:
+# v2.4 - 新增多源支持（GitHub + Gitee自动切换）
+#      - 解决中国大陆服务器GitHub访问问题
 # v2.3 - 修复版本号显示bug（支持四段版本号如v1.1.9.29）
 #      - 新增端口配置功能（支持动态修改监听端口）
 # v2.2 - 限制脚本位置：强制安装到/root目录，仅允许在/root目录运行
@@ -14,16 +16,59 @@
 ###########################################
 
 # 脚本版本
-SCRIPT_VERSION="2.3"
+SCRIPT_VERSION="2.4"
 
 # 脚本固定安装位置
 SCRIPT_HOME="/root"
 SCRIPT_NAME="panel.sh"
 SCRIPT_PATH="${SCRIPT_HOME}/${SCRIPT_NAME}"
 
-# GitHub 仓库信息
+# 仓库信息 - 支持多源
 GITHUB_REPO="ShourGG/tailamianban"
-SCRIPT_URL="https://raw.githubusercontent.com/${GITHUB_REPO}/main/panel.sh"
+GITEE_REPO="cd-writer/tailamianban"  # Gitee镜像仓库
+
+# 自动选择最快的源
+get_repo_source() {
+    # 测试GitHub连接
+    if curl -s --connect-timeout 3 --max-time 5 "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" >/dev/null 2>&1; then
+        echo "github"
+    # 测试Gitee连接
+    elif curl -s --connect-timeout 3 --max-time 5 "https://gitee.com/api/v5/repos/${GITEE_REPO}/releases/latest" >/dev/null 2>&1; then
+        echo "gitee"
+    else
+        echo "none"
+    fi
+}
+
+# 根据源获取URL
+get_script_url() {
+    local source=$(get_repo_source)
+    case $source in
+        "github") echo "https://raw.githubusercontent.com/${GITHUB_REPO}/main/panel.sh" ;;
+        "gitee") echo "https://gitee.com/${GITEE_REPO}/raw/main/panel.sh" ;;
+        *) echo "" ;;
+    esac
+}
+
+get_download_url() {
+    local version=$1
+    local arch=$2
+    local source=$(get_repo_source)
+    case $source in
+        "github") echo "https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz" ;;
+        "gitee") echo "https://gitee.com/${GITEE_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz" ;;
+        *) echo "" ;;
+    esac
+}
+
+get_api_url() {
+    local source=$(get_repo_source)
+    case $source in
+        "github") echo "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" ;;
+        "gitee") echo "https://gitee.com/api/v5/repos/${GITEE_REPO}/releases/latest" ;;
+        *) echo "" ;;
+    esac
+}
 INSTALL_DIR="/opt/terraria-panel"
 SERVICE_NAME="terraria-panel"
 
@@ -117,9 +162,32 @@ detect_arch() {
     esac
 }
 
-# 获取最新版本
+# 获取最新版本 - 支持多源
 get_latest_version() {
-    local version=$(curl -s "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    local api_url=$(get_api_url)
+    if [ -z "$api_url" ]; then
+        print_error "无法连接到任何代码仓库"
+        return 1
+    fi
+    
+    local source=$(get_repo_source)
+    local version=""
+    
+    case $source in
+        "github")
+            print_info "使用 GitHub 源获取版本..."
+            version=$(curl -s "$api_url" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+            ;;
+        "gitee")
+            print_info "使用 Gitee 源获取版本..."
+            version=$(curl -s "$api_url" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+            ;;
+        *)
+            print_error "无可用的代码仓库源"
+            return 1
+            ;;
+    esac
+    
     echo "$version"
 }
 
@@ -175,7 +243,12 @@ install_panel() {
     [ -z "$version" ] && { print_error "无法获取版本信息"; read -p "按回车返回..."; return; }
     print_success "最新版本: $version"
     
-    local download_url="https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz"
+    local download_url=$(get_download_url "$version" "$arch")
+    if [ -z "$download_url" ]; then
+        print_error "无法获取下载链接，请检查网络连接"
+        read -p "按回车返回..."
+        return
+    fi
     local temp_file="/tmp/terraria-panel.tar.gz"
     
     print_info "下载中..."
@@ -309,7 +382,12 @@ update_panel() {
     
     # 3. 下载新版本
     local arch=$(detect_arch)
-    local url="https://github.com/${GITHUB_REPO}/releases/download/${latest}/terraria-panel-linux-${arch}.tar.gz"
+    local url=$(get_download_url "$latest" "$arch")
+    if [ -z "$url" ]; then
+        print_error "无法获取下载链接"
+        read -p "按回车返回..."
+        return
+    fi
     local temp="/tmp/terraria-panel-update-$(date +%s).tar.gz"
     
     print_step 3 6 "下载新版本..."
@@ -1005,8 +1083,15 @@ check_script_update() {
     # 临时文件
     local temp_script="/tmp/panel_new_$(date +%s).sh"
     
+    # 获取脚本更新URL
+    local script_url=$(get_script_url)
+    if [ -z "$script_url" ]; then
+        echo -e "${YELLOW}[提示]${NC} 无法连接到任何代码仓库，继续使用当前版本"
+        return 0
+    fi
+    
     # 下载最新脚本（静默模式，3秒超时）
-    if ! curl -sSL --connect-timeout 3 --max-time 5 -o "$temp_script" "$SCRIPT_URL" 2>/dev/null; then
+    if ! curl -sSL --connect-timeout 3 --max-time 5 -o "$temp_script" "$script_url" 2>/dev/null; then
         echo -e "${YELLOW}[提示]${NC} 无法检查脚本更新（网络问题或GitHub访问受限），继续使用当前版本"
         return 0
     fi
