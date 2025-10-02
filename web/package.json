@@ -1,6 +1,6 @@
 {
   "name": "robot-admin",
-  "version": "1.2.0.5",
+  "version": "1.2.0.9",
   "private": true,
   "type": "module",
   "scripts": {
@@ -32,7 +32,6 @@
     "@kangc/v-md-editor": "^2.3.18",
     "@splinetool/runtime": "^1.9.92",
     "@tato30/vue-pdf": "^1.11.4",
-    "@vercel/analytics": "^1.5.0",
     "@visactor/vtable-gantt": "^1.19.3",
     "@vue-flow/core": "1.45.0",
     "@vueuse/core": "^11.2.0",
