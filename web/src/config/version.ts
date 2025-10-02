@@ -1,3 +1,3 @@
 ﻿/**
  * 鐗堟湰鍙烽厤缃? * 姝ゆ枃浠剁敱鏋勫缓鑴氭湰鑷姩鐢熸垚锛岃鍕挎墜鍔ㄤ慨鏀? */
-export const VERSION = '1.1.9.33'
+export const VERSION = '1.1.9.34'
