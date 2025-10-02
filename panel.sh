@@ -580,6 +580,189 @@ uninstall_panel() {
     read -p "按回车返回..."
 }
 
+# 更新面板
+update_panel() {
+    if ! check_installed; then
+        print_error "面板未安装,请先安装"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    print_info "检查更新..."
+    local current_version=$(get_local_version)
+    local latest_version=$(get_latest_version 2>/dev/null)
+    
+    if [ -z "$latest_version" ]; then
+        print_error "无法获取最新版本信息"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    echo ""
+    print_info "当前版本: $current_version"
+    print_info "最新版本: $latest_version"
+    echo ""
+    
+    if [ "$current_version" = "$latest_version" ]; then
+        print_success "已是最新版本,无需更新"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    print_warning "发现新版本!"
+    read -p "是否更新到 $latest_version? (y/N): " -n 1 -r
+    echo
+    
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        print_info "已取消更新"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    # 停止服务
+    if check_running; then
+        print_info "停止当前服务..."
+        stop_panel
+        sleep 2
+    fi
+    
+    # 备份当前版本
+    print_info "备份当前版本..."
+    local backup_dir="${INSTALL_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
+    cp -r "$INSTALL_DIR" "$backup_dir"
+    print_success "备份完成: $backup_dir"
+    
+    # 执行安装(会覆盖现有文件)
+    local arch=$(detect_arch)
+    local source=$(get_repo_source)
+    local source_type="${source%%|*}"
+    
+    if [ "$source_type" != "github_mirror" ]; then
+        print_error "无法连接到 GitHub 镜像源"
+        print_info "恢复备份..."
+        rm -rf "$INSTALL_DIR"
+        mv "$backup_dir" "$INSTALL_DIR"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    local download_url=$(get_download_url "$latest_version" "$arch")
+    local temp_file="/tmp/terraria-panel-update.tar.gz"
+    
+    print_info "下载更新..."
+    if ! curl -L -# --connect-timeout 10 --max-time 300 -o "$temp_file" "$download_url"; then
+        print_error "下载失败"
+        print_info "恢复备份..."
+        rm -rf "$INSTALL_DIR"
+        mv "$backup_dir" "$INSTALL_DIR"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    # 验证文件
+    if ! file "$temp_file" | grep -q "gzip compressed"; then
+        print_error "下载的文件格式错误"
+        rm -f "$temp_file"
+        print_info "恢复备份..."
+        rm -rf "$INSTALL_DIR"
+        mv "$backup_dir" "$INSTALL_DIR"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    print_info "解压更新..."
+    if ! tar -xzf "$temp_file" -C "$INSTALL_DIR" --strip-components=1; then
+        print_error "解压失败"
+        rm -f "$temp_file"
+        print_info "恢复备份..."
+        rm -rf "$INSTALL_DIR"
+        mv "$backup_dir" "$INSTALL_DIR"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    rm -f "$temp_file"
+    chmod +x "$INSTALL_DIR/terraria-panel"
+    
+    print_success "更新完成!"
+    print_info "备份保留在: $backup_dir"
+    
+    # 启动服务
+    print_info "启动面板..."
+    start_panel
+}
+
+# 修改端口
+change_port() {
+    if ! check_installed; then
+        print_error "面板未安装"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    local config_file="$INSTALL_DIR/config.yaml"
+    local current_port="8080"
+    
+    # 尝试从配置文件读取当前端口
+    if [ -f "$config_file" ]; then
+        current_port=$(grep -oP '(?<=port: )\d+' "$config_file" 2>/dev/null || echo "8080")
+    fi
+    
+    echo ""
+    print_info "当前端口: $current_port"
+    echo ""
+    read -p "请输入新端口 (1024-65535): " new_port
+    
+    # 验证端口号
+    if ! [[ "$new_port" =~ ^[0-9]+$ ]] || [ "$new_port" -lt 1024 ] || [ "$new_port" -gt 65535 ]; then
+        print_error "无效的端口号"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    # 检查端口是否被占用
+    if netstat -tuln 2>/dev/null | grep -q ":$new_port " || ss -tuln 2>/dev/null | grep -q ":$new_port "; then
+        print_error "端口 $new_port 已被占用"
+        read -p "按回车返回..."
+        return
+    fi
+    
+    print_info "修改端口为: $new_port"
+    
+    # 创建或更新配置文件
+    if [ ! -f "$config_file" ]; then
+        cat > "$config_file" << EOF
+server:
+  port: $new_port
+  mode: release
+
+database:
+  path: $DATA_DIR/terraria.db
+
+log:
+  level: info
+  path: $DATA_DIR/logs
+EOF
+    else
+        # 使用 sed 修改端口
+        sed -i "s/port: [0-9]*/port: $new_port/" "$config_file"
+    fi
+    
+    print_success "端口已修改"
+    
+    # 如果服务正在运行,需要重启
+    if check_running; then
+        print_info "重启面板以应用更改..."
+        restart_panel
+    else
+        print_info "请启动面板以应用更改"
+    fi
+    
+    print_success "新访问地址: http://$(hostname -I | awk '{print $1}'):$new_port"
+    echo ""
+    read -p "按回车返回..."
+}
+
 # 主菜单
 show_menu() {
     clear
@@ -603,13 +786,15 @@ show_menu() {
     
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "  1. 安装/更新面板"
-    echo "  2. 启动面板"
-    echo "  3. 停止面板"
-    echo "  4. 重启面板"
-    echo "  5. 查看日志"
-    echo "  6. 查看状态"
-    echo "  7. 卸载面板"
+    echo "  1. 安装面板"
+    echo "  2. 更新面板"
+    echo "  3. 启动面板"
+    echo "  4. 停止面板"
+    echo "  5. 重启面板"
+    echo "  6. 查看日志"
+    echo "  7. 查看状态"
+    echo "  8. 修改端口"
+    echo "  9. 卸载面板"
     echo "  0. 退出"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
@@ -629,8 +814,12 @@ main() {
     
     # 处理命令行参数
     case "${1:-}" in
-        install|update)
+        install)
             install_panel
+            exit 0
+            ;;
+        update)
+            update_panel
             exit 0
             ;;
         start)
@@ -657,33 +846,43 @@ main() {
             uninstall_panel
             exit 0
             ;;
+        port)
+            change_port
+            exit 0
+            ;;
     esac
     
     # 交互式菜单
     while true; do
         show_menu
-        read -p "请选择操作 [0-7]: " choice
+        read -p "请选择操作 [0-9]: " choice
         
         case $choice in
             1)
                 install_panel
                 ;;
             2)
-                start_panel
+                update_panel
                 ;;
             3)
-                stop_panel
+                start_panel
                 ;;
             4)
-                restart_panel
+                stop_panel
                 ;;
             5)
-                view_logs
+                restart_panel
                 ;;
             6)
-                check_status
+                view_logs
                 ;;
             7)
+                check_status
+                ;;
+            8)
+                change_port
+                ;;
+            9)
                 uninstall_panel
                 ;;
             0)
