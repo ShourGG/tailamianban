@@ -3,7 +3,7 @@
 # =============================================================================
 # Terraria 服务器管理面板 - 安装/管理脚本
 # 
-# 版本: v2.7
+# 版本: v2.8
 # 更新日期: 2024-01-22
 # 描述: 用于安装、更新、管理泰拉瑞亚服务器面板的一键脚本
 # 
@@ -78,7 +78,7 @@ print_banner() {
 ║          🎮 泰拉瑞亚服务器管理面板                     ║
 ║             Terraria Server Panel                     ║
 ║                                                          ║
-║               管理脚本 v2.7                          ║
+║               管理脚本 v2.8                          ║
 ║                                                          ║
 ╚══════════════════════════════════════════════════════════╝
 EOF
@@ -330,48 +330,35 @@ install_panel() {
     
     # 检查文件类型(必须是 gzip 格式)
     if ! file "$temp_file" | grep -q "gzip compressed"; then
-        print_error "下载的文件格式错误(不是 gzip 压缩文件)"
-        print_warning "可能原因: ${source_type} 仓库未发布 releases"
-        echo ""
+        print_warning "镜像下载的文件格式错误，尝试直连 GitHub..."
+        rm -f "$temp_file"
         
-        # 如果是 Gitee 源失败,尝试切换到 GitHub
-        if [[ "$source_type" == "gitee" ]]; then
-            print_info "正在切换到 GitHub 镜像源重试..."
-            
-            # 强制使用 GitHub 镜像
-            local success=false
-            for mirror in "${GITHUB_MIRRORS[@]}"; do
-                local github_url="${mirror}https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz"
-                print_info "尝试: ${mirror:-GitHub直连}"
-                
-                if curl -L -# -o "$temp_file" "$github_url" 2>/dev/null; then
-                    if file "$temp_file" | grep -q "gzip compressed"; then
-                        print_success "切换成功! 继续安装..."
-                        success=true
-                        break
-                    fi
-                fi
-            done
-            
-            # 再次验证
-            if [ "$success" = false ]; then
-                print_error "所有源均下载失败"
-                rm -f "$temp_file"
-                echo ""
-                print_info "解决方案:"
-                echo "  1. 在 Gitee 发布 releases: https://gitee.com/${GITEE_REPO}/releases"
-                echo "  2. 或检查 GitHub releases: https://github.com/${
-GITHUB_REPO}/releases"
-                echo "  3. 配置代理访问 GitHub"
-                echo ""
-                read -p "按回车返回..."
-                return
-            fi
-        else
+        # 直连 GitHub 重试
+        local direct_url="https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz"
+        print_info "直连下载: $direct_url"
+        
+        if ! curl -L -# --connect-timeout 10 --max-time 300 -o "$temp_file" "$direct_url"; then
+            print_error "直连下载也失败"
             rm -f "$temp_file"
             read -p "按回车返回..."
             return
         fi
+        
+        # 再次验证直连下载的文件
+        if ! file "$temp_file" | grep -q "gzip compressed"; then
+            print_error "下载的文件格式仍然错误"
+            rm -f "$temp_file"
+            echo ""
+            print_info "解决方案:"
+            echo "  1. 检查 GitHub releases: https://github.com/${GITHUB_REPO}/releases"
+            echo "  2. 配置代理访问 GitHub"
+            echo "  3. 联系管理员"
+            echo ""
+            read -p "按回车返回..."
+            return
+        fi
+        
+        print_success "直连下载成功!"
     fi
     
     local file_size=$(du -h "$temp_file" | cut -f1)
@@ -687,19 +674,41 @@ update_panel() {
     
     # 检查文件类型
     if ! file "$temp_file" | grep -q "gzip compressed"; then
-        print_error "下载的文件格式错误(不是 gzip 压缩文件)"
-        print_warning "可能原因: 当前镜像源暂时不可用"
+        print_warning "镜像下载的文件格式错误，尝试直连 GitHub..."
         rm -f "$temp_file"
-        echo ""
-        print_info "解决方案:"
-        echo "  1. 重新运行脚本，系统会自动切换到其他镜像源"
-        echo "  2. 检查 GitHub releases: https://github.com/${GITHUB_REPO}/releases"
-        echo ""
-        print_info "恢复备份..."
-        rm -rf "$INSTALL_DIR"
-        mv "$backup_dir" "$INSTALL_DIR"
-        read -p "按回车返回..."
-        return
+        
+        # 直连 GitHub 重试
+        local direct_url="https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz"
+        print_info "直连下载: $direct_url"
+        
+        if ! curl -L -# --connect-timeout 10 --max-time 300 -o "$temp_file" "$direct_url"; then
+            print_error "直连下载也失败"
+            rm -f "$temp_file"
+            print_info "恢复备份..."
+            rm -rf "$INSTALL_DIR"
+            mv "$backup_dir" "$INSTALL_DIR"
+            read -p "按回车返回..."
+            return
+        fi
+        
+        # 再次验证直连下载的文件
+        if ! file "$temp_file" | grep -q "gzip compressed"; then
+            print_error "下载的文件格式仍然错误"
+            rm -f "$temp_file"
+            echo ""
+            print_info "解决方案:"
+            echo "  1. 检查 GitHub releases: https://github.com/${GITHUB_REPO}/releases"
+            echo "  2. 配置代理访问 GitHub"
+            echo "  3. 联系管理员"
+            echo ""
+            print_info "恢复备份..."
+            rm -rf "$INSTALL_DIR"
+            mv "$backup_dir" "$INSTALL_DIR"
+            read -p "按回车返回..."
+            return
+        fi
+        
+        print_success "直连下载成功!"
     fi
     
     print_info "解压更新..."
