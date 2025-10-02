@@ -28,7 +28,8 @@ NC='\033[0m' # No Color
 
 # GitHub 加速镜像列表 (优先级从高到低,针对国内网络优化)
 GITHUB_MIRRORS=(
-    "https://ghproxy.com/"               # 主力加速器 (首选)
+    "https://github.akams.cn/"           # AKAMS 公益镜像 (首选)
+    "https://ghproxy.com/"               # 主力加速器
     "https://mirror.ghproxy.com/"        # 备用镜像
     "https://ghproxy.net/"               # GHProxy 官方镜像
     "https://gh-proxy.com/"              # 公共代理服务
@@ -95,7 +96,7 @@ get_repo_source() {
         
         # 显示测试进度(仅在交互模式下)
         if [ -t 1 ]; then
-            echo -ne "\r${BLUE}ℹ${NC} 测试镜像 ${mirror_index}/9: ${mirror_name:0:40}..." >&2
+            echo -ne "\r${BLUE}ℹ${NC} 测试镜像 ${mirror_index}/10: ${mirror_name:0:40}..." >&2
         fi
         
         # 使用更短的超时时间以实现快速失败 (1秒连接+2秒总计)
