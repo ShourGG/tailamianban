@@ -47,7 +47,7 @@ func main() {
 	log.Println("🚀 Starting Terraria Panel...")
 	log.Printf("📌 Version: %s (Build: %s)", Version, Build)
 	log.Printf("💻 Go Version: %s", runtime.Version())
-	log.Printf("🖥�? OS/Arch: %s/%s", runtime.GOOS, runtime.GOARCH)
+	log.Printf("🖥️  OS/Arch: %s/%s", runtime.GOOS, runtime.GOARCH)
 	log.Printf("🔧 Working Directory: %s", getWorkingDir())
 
 	// Set version information in handlers
@@ -56,7 +56,7 @@ func main() {
 
 	// Initialize database and services
 	if err := service.InitializeServices(); err != nil {
-		log.Fatalf("�?Failed to initialize services: %v", err)
+		log.Fatalf("❌ Failed to initialize services: %v", err)
 	}
 
 	// Setup Gin
@@ -112,7 +112,7 @@ func main() {
 	}
 
 	fmt.Println("\n╔════════════════════════════════════════════════╗")
-	fmt.Println("�?        🎮 Server is Ready!                    �?)
+	fmt.Println("║         🎮 Server is Ready!                    ║")
 	fmt.Println("╚════════════════════════════════════════════════╝")
 	log.Printf("🌐 Server listening on port: %s", port)
 	log.Printf("📱 Web interface: http://localhost:%s", port)
@@ -121,14 +121,14 @@ func main() {
 	fmt.Println(strings.Repeat("─", 50))
 
 	if err := r.Run(":" + port); err != nil {
-		log.Fatalf("�?Failed to start server: %v", err)
+		log.Fatalf("❌ Failed to start server: %v", err)
 	}
 }
 
 func printDiagnosticBanner() {
 	fmt.Println("\n╔════════════════════════════════════════════════╗")
-	fmt.Println("�?  泰拉瑞亚服务器管理面�?- 诊断信息           �?)
-	fmt.Println("�?  Terraria Server Management Panel            �?)
+	fmt.Println("║   泰拉瑞亚服务器管理面板 - 诊断信息           ║")
+	fmt.Println("║   Terraria Server Management Panel            ║")
 	fmt.Println("╚════════════════════════════════════════════════╝\n")
 
 	fmt.Printf("📦 Version: %s (Build: %s)\n", Version, Build)
@@ -157,12 +157,12 @@ func printEnvVar(key, defaultValue string) {
 	if value == "" {
 		value = defaultValue + " (default)"
 	}
-	fmt.Printf("  �?%s: %s\n", key, value)
+	fmt.Printf("  �?%s: %s\n", key, value)
 }
 
 func checkPath(path, description string) {
 	if _, err := os.Stat(path); err == nil {
-		fmt.Printf("  �?%s exists at %s\n", description, path)
+		fmt.Printf("  �?%s exists at %s\n", description, path)
 	} else {
 		fmt.Printf("  ⚠️  %s NOT FOUND at %s\n", description, path)
 	}
@@ -171,9 +171,9 @@ func checkPath(path, description string) {
 func checkEmbedFS() {
 	// Check if index.html exists in embed
 	if data, err := EmbedFS.ReadFile("dist/index.html"); err == nil {
-		fmt.Printf("  �?Frontend assets embedded (index.html: %d bytes)\n", len(data))
+		fmt.Printf("  �?Frontend assets embedded (index.html: %d bytes)\n", len(data))
 	} else {
-		fmt.Printf("  �?Frontend assets NOT embedded: %v\n", err)
+		fmt.Printf("  �?Frontend assets NOT embedded: %v\n", err)
 	}
 }
 
