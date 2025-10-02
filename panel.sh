@@ -3,7 +3,7 @@
 # =============================================================================
 # Terraria 服务器管理面板 - 安装/管理脚本
 # 
-# 版本: v2.8
+# 版本: v2.9
 # 更新日期: 2024-01-22
 # 描述: 用于安装、更新、管理泰拉瑞亚服务器面板的一键脚本
 # 
@@ -27,16 +27,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # GitHub 加速镜像列表 (优先级从高到低,针对国内网络优化)
+# 已移除不可用的镜像站点，保留经过验证的可用镜像
 GITHUB_MIRRORS=(
     "https://github.akams.cn/"           # AKAMS 公益镜像 (首选)
-    "https://ghproxy.com/"               # 主力加速器
-    "https://mirror.ghproxy.com/"        # 备用镜像
-    "https://ghproxy.net/"               # GHProxy 官方镜像
     "https://gh-proxy.com/"              # 公共代理服务
-    "https://gh.api.99988866.xyz/"       # 公共加速服务
-    "https://github.moeyy.xyz/"          # MoeYY 加速器
-    "https://ghps.cc/"                   # GHPS 加速
-    "https://gh.con.sh/"                 # CON.SH 镜像
+    "https://gh.llkk.cc/"                # LLKK 加速镜像
     ""                                    # 直连 GitHub (最后备选)
 )
 
@@ -78,7 +73,7 @@ print_banner() {
 ║          🎮 泰拉瑞亚服务器管理面板                     ║
 ║             Terraria Server Panel                     ║
 ║                                                          ║
-║               管理脚本 v2.8                          ║
+║               管理脚本 v2.9                          ║
 ║                                                          ║
 ╚══════════════════════════════════════════════════════════╝
 EOF
