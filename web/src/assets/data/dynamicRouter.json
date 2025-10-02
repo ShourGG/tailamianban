@@ -2,6 +2,17 @@
   "code": "0",
   "data": [
     {
+      "path": "/",
+      "name": "root",
+      "component": "layout",
+      "redirect": "/terraria/dashboard",
+      "meta": {
+        "title": "根路由",
+        "hidden": true
+      },
+      "children": []
+    },
+    {
       "path": "/terraria",
       "name": "terraria",
       "component": "layout",
