@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"embed"
@@ -21,7 +21,7 @@ var EmbedFS embed.FS
 
 var (
 	// Version will be set by ldflags during build
-	Version = "1.1.9.32"
+	Version = "1.1.9.33"
 	Build   = "dev"
 )
 
@@ -44,11 +44,11 @@ func main() {
 	printDiagnosticBanner()
 
 	// Initialize services
-	log.Println("🚀 Starting Terraria Panel...")
-	log.Printf("📌 Version: %s (Build: %s)", Version, Build)
-	log.Printf("💻 Go Version: %s", runtime.Version())
-	log.Printf("🖥️  OS/Arch: %s/%s", runtime.GOOS, runtime.GOARCH)
-	log.Printf("🔧 Working Directory: %s", getWorkingDir())
+	log.Println("馃殌 Starting Terraria Panel...")
+	log.Printf("馃搶 Version: %s (Build: %s)", Version, Build)
+	log.Printf("馃捇 Go Version: %s", runtime.Version())
+	log.Printf("馃枼锔? OS/Arch: %s/%s", runtime.GOOS, runtime.GOARCH)
+	log.Printf("馃敡 Working Directory: %s", getWorkingDir())
 
 	// Set version information in handlers
 	handlers.AppVersion = Version
@@ -56,7 +56,7 @@ func main() {
 
 	// Initialize database and services
 	if err := service.InitializeServices(); err != nil {
-		log.Fatalf("❌ Failed to initialize services: %v", err)
+		log.Fatalf("鉂?Failed to initialize services: %v", err)
 	}
 
 	// Setup Gin
@@ -77,8 +77,8 @@ func main() {
 	// Static files (embedded frontend)
 	embedFS, err := static.EmbedFolder(EmbedFS, "dist")
 	if err != nil {
-		log.Printf("⚠️  Failed to create embed folder: %v", err)
-		log.Println("📌 Frontend assets may not be available")
+		log.Printf("鈿狅笍  Failed to create embed folder: %v", err)
+		log.Println("馃搶 Frontend assets may not be available")
 	} else {
 		// Only serve static files for non-API requests
 		r.Use(func(c *gin.Context) {
@@ -111,45 +111,45 @@ func main() {
 		port = "8080"
 	}
 
-	fmt.Println("\n╔════════════════════════════════════════════════╗")
-	fmt.Println("║         🎮 Server is Ready!                    ║")
-	fmt.Println("╚════════════════════════════════════════════════╝")
-	log.Printf("🌐 Server listening on port: %s", port)
-	log.Printf("📱 Web interface: http://localhost:%s", port)
-	log.Printf("🔧 API endpoint: http://localhost:%s/api", port)
-	log.Printf("❤️  Health check: http://localhost:%s/api/health", port)
-	fmt.Println(strings.Repeat("─", 50))
+	fmt.Println("\n鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽")
+	fmt.Println("鈺?        馃幃 Server is Ready!                    鈺?)
+	fmt.Println("鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆")
+	log.Printf("馃寪 Server listening on port: %s", port)
+	log.Printf("馃摫 Web interface: http://localhost:%s", port)
+	log.Printf("馃敡 API endpoint: http://localhost:%s/api", port)
+	log.Printf("鉂わ笍  Health check: http://localhost:%s/api/health", port)
+	fmt.Println(strings.Repeat("鈹€", 50))
 
 	if err := r.Run(":" + port); err != nil {
-		log.Fatalf("❌ Failed to start server: %v", err)
+		log.Fatalf("鉂?Failed to start server: %v", err)
 	}
 }
 
 func printDiagnosticBanner() {
-	fmt.Println("\n╔════════════════════════════════════════════════╗")
-	fmt.Println("║   泰拉瑞亚服务器管理面板 - 诊断信息           ║")
-	fmt.Println("║   Terraria Server Management Panel            ║")
-	fmt.Println("╚════════════════════════════════════════════════╝\n")
+	fmt.Println("\n鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽")
+	fmt.Println("鈺?  娉版媺鐟炰簹鏈嶅姟鍣ㄧ鐞嗛潰鏉?- 璇婃柇淇℃伅           鈺?)
+	fmt.Println("鈺?  Terraria Server Management Panel            鈺?)
+	fmt.Println("鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆\n")
 
-	fmt.Printf("📦 Version: %s (Build: %s)\n", Version, Build)
-	fmt.Printf("🐹 Go Version: %s\n", runtime.Version())
-	fmt.Printf("💻 OS/Arch: %s/%s\n", runtime.GOOS, runtime.GOARCH)
-	fmt.Printf("📂 Working Dir: %s\n", getWorkingDir())
-	fmt.Printf("🔧 CPU Cores: %d\n", runtime.NumCPU())
+	fmt.Printf("馃摝 Version: %s (Build: %s)\n", Version, Build)
+	fmt.Printf("馃惞 Go Version: %s\n", runtime.Version())
+	fmt.Printf("馃捇 OS/Arch: %s/%s\n", runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("馃搨 Working Dir: %s\n", getWorkingDir())
+	fmt.Printf("馃敡 CPU Cores: %d\n", runtime.NumCPU())
 
 	// Check environment variables
-	fmt.Println("\n🔍 Environment Configuration:")
+	fmt.Println("\n馃攳 Environment Configuration:")
 	printEnvVar("PORT", "8080")
 	printEnvVar("GIN_MODE", "release")
 	printEnvVar("DB_PATH", "./data/panel.db")
 	printEnvVar("DATA_DIR", "./data")
 
 	// Check important paths
-	fmt.Println("\n📁 Resource Check:")
+	fmt.Println("\n馃搧 Resource Check:")
 	checkEmbedFS()
 	checkPath("./data", "Data directory")
 
-	fmt.Println("\n" + strings.Repeat("─", 50) + "\n")
+	fmt.Println("\n" + strings.Repeat("鈹€", 50) + "\n")
 }
 
 func printEnvVar(key, defaultValue string) {
@@ -157,23 +157,23 @@ func printEnvVar(key, defaultValue string) {
 	if value == "" {
 		value = defaultValue + " (default)"
 	}
-	fmt.Printf("  �?%s: %s\n", key, value)
+	fmt.Printf("  锟?%s: %s\n", key, value)
 }
 
 func checkPath(path, description string) {
 	if _, err := os.Stat(path); err == nil {
-		fmt.Printf("  �?%s exists at %s\n", description, path)
+		fmt.Printf("  锟?%s exists at %s\n", description, path)
 	} else {
-		fmt.Printf("  ⚠️  %s NOT FOUND at %s\n", description, path)
+		fmt.Printf("  鈿狅笍  %s NOT FOUND at %s\n", description, path)
 	}
 }
 
 func checkEmbedFS() {
 	// Check if index.html exists in embed
 	if data, err := EmbedFS.ReadFile("dist/index.html"); err == nil {
-		fmt.Printf("  �?Frontend assets embedded (index.html: %d bytes)\n", len(data))
+		fmt.Printf("  锟?Frontend assets embedded (index.html: %d bytes)\n", len(data))
 	} else {
-		fmt.Printf("  �?Frontend assets NOT embedded: %v\n", err)
+		fmt.Printf("  锟?Frontend assets NOT embedded: %v\n", err)
 	}
 }
 
