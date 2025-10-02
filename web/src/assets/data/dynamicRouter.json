@@ -41,7 +41,7 @@
           "component": "/terraria/dashboard/index",
           "meta": {
             "icon": "mdi:view-dashboard",
-            "title": "仪表盘",
+            "title": "首页",
             "hidden": false,
             "full": false,
             "affix": true,
