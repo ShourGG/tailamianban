@@ -23,7 +23,7 @@ var EmbedFS embed.FS
 
 var (
 	// Version will be set by ldflags during build
-	Version = "1.2.0.14"
+	Version = "1.2.0.16"
 	Build   = "dev"
 )
 
@@ -98,12 +98,12 @@ func main() {
 			data, err := fs.ReadFile(distFS, path)
 			if err != nil {
 				// If file not found, determine if it's a static asset or frontend route
-				// Any file with an extension should be treated as a static asset
-				// Only pure paths without extensions are SPA routes (e.g., /dashboard, /server)
-				hasExtension := strings.Contains(filepath.Base(path), ".")
+				// Check if the path has a file extension (e.g., .js, .css, .png)
+				ext := filepath.Ext(path)
 
-				if hasExtension {
-					// File with extension not found, return 404
+				// If path has extension, it's a static asset - return 404
+				if ext != "" {
+					log.Printf("Static asset not found: %s", path)
 					c.Status(http.StatusNotFound)
 					return
 				}

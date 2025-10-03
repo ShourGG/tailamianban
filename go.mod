@@ -1,6 +1,6 @@
 module terraria-panel
 
-go 1.23.0
+go 1.24.4
 
 require (
 	github.com/gin-gonic/gin v1.10.0
@@ -8,7 +8,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/soulteary/gin-static v0.2.3
 	golang.org/x/crypto v0.24.0
 	modernc.org/sqlite v1.33.1
 )
