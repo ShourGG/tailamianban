@@ -103,10 +103,10 @@ router.beforeEach(
         return LOGIN_PATH
       }
 
-      // 2. 已登录但访问登录页 - 关键修复点
+      // 2. 已登录但访问登录页 - 修复: 跳转到正确的首页路径
       if (to.path === LOGIN_PATH) {
-        // console.log('✅ 已登录用户访问登录页，跳转首页')
-        return '/home'
+        // console.log('✅ 已登录用户访问登录页，跳转到 /terraria/dashboard')
+        return '/terraria/dashboard'
       }
 
       // 3. 动态路由初始化 - 简化逻辑

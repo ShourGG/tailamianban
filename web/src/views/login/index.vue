@@ -339,7 +339,7 @@
         } = response // ✅ 使用解构
         userStore.handleLoginSuccess(token)
         await initDynamicRouter()
-        router.push('/home')
+        router.push('/terraria/dashboard')
       } catch (error) {
         console.error('登录成功后操作失败:', error)
         resetCaptcha()
@@ -397,7 +397,7 @@
         message.success('注册成功！正在跳转...')
         
         setTimeout(() => {
-          router.push('/home')
+          router.push('/terraria/dashboard')
         }, 1000)
       } catch (error) {
         console.error('注册成功后操作失败:', error)
