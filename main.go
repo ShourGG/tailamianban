@@ -32,8 +32,10 @@ func main() {
 	api.SetupRoutes(r)
 
 	// Serve static files from embedded FS as fallback (MUST be last)
-	// Use NoRoute to handle 404s with static files
-	r.NoRoute(static.ServeEmbed("web/dist", EmbedFS))
+	// CRITICAL: First parameter must be EMPTY for root-level serving
+	// Because EmbedFS already contains "web/dist/*", we don't add prefix
+	// Request "/js/file.js" → EmbedFS.Open("web/dist/js/file.js") ✅
+	r.NoRoute(static.ServeEmbed("", EmbedFS))
 
 	// Start server
 	port := 8080
