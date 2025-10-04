@@ -338,8 +338,15 @@
           data: { token },
         } = response // ✅ 使用解构
         userStore.handleLoginSuccess(token)
+        
+        // 初始化动态路由
         await initDynamicRouter()
-        router.push('/terraria/dashboard')
+        
+        // 等待路由完全注册后再跳转
+        await router.isReady()
+        
+        // 使用 replace 而不是 push,避免登录页留在历史记录中
+        await router.replace('/terraria/dashboard')
       } catch (error) {
         console.error('登录成功后操作失败:', error)
         resetCaptcha()
@@ -391,13 +398,19 @@
       try {
         const { data: { token } } = response
         userStore.handleLoginSuccess(token)
+        
+        // 初始化动态路由
         await initDynamicRouter()
+        
+        // 等待路由完全注册
+        await router.isReady()
         
         pageMode.value = 'login'
         message.success('注册成功！正在跳转...')
         
-        setTimeout(() => {
-          router.push('/terraria/dashboard')
+        // 使用 replace 而不是 push,避免登录页留在历史记录中
+        setTimeout(async () => {
+          await router.replace('/terraria/dashboard')
         }, 1000)
       } catch (error) {
         console.error('注册成功后操作失败:', error)

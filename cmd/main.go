@@ -23,7 +23,7 @@ var EmbedFS embed.FS
 
 var (
 	// Version will be set by ldflags during build
-	Version = "1.2.0.19"
+	Version = "1.2.0.20"
 	Build   = "dev"
 )
 

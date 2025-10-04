@@ -103,8 +103,16 @@ router.beforeEach(
         return LOGIN_PATH
       }
 
-      // 2. 已登录但访问登录页 - 修复: 跳转到正确的首页路径
+      // 2. 已登录但访问登录页 - 等待动态路由加载后再重定向
       if (to.path === LOGIN_PATH) {
+        // 如果动态路由未加载，先初始化
+        if (!authMenuList.length && !isInitializing) {
+          await handleDynamicRouterInit(to.fullPath)
+        }
+        
+        // 等待路由完全准备好
+        await router.isReady()
+        
         // console.log('✅ 已登录用户访问登录页，跳转到 /terraria/dashboard')
         return '/terraria/dashboard'
       }
