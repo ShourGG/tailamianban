@@ -9,7 +9,26 @@ import (
 
 // SetupRoutes configures all API routes
 func SetupRoutes(r *gin.Engine) {
-	// API v1 group
+	// Top-level API routes (for health check, version info, and legacy compatibility)
+	api := r.Group("/api")
+	{
+		// Health and version endpoints (top-level)
+		api.GET("/health", handlers.HealthCheck)
+		api.GET("/version", handlers.GetVersion)
+
+		// Legacy/shorthand routes (redirect to /api/v1)
+		// This maintains compatibility with frontend expecting /api/* paths
+		auth := api.Group("/auth")
+		{
+			auth.GET("/check-init", handlers.CheckInit)
+			auth.POST("/register", handlers.Register)
+			auth.POST("/login", handlers.Login)
+			auth.POST("/logout", handlers.Logout)
+			auth.GET("/me", middleware.AuthRequired(), handlers.GetCurrentUser)
+		}
+	}
+
+	// API v1 group (explicit version)
 	v1 := r.Group("/api/v1")
 	{
 		// Authentication routes (public)
