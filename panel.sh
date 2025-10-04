@@ -3,8 +3,8 @@
 # =============================================================================
 # Terraria 服务器管理面板 - 安装/管理脚本
 # 
-# 版本: v2.9
-# 更新日期: 2024-01-22
+# 版本: v3.1
+# 更新日期: 2025-01-04
 # 描述: 用于安装、更新、管理泰拉瑞亚服务器面板的一键脚本
 # 
 # 使用方法:
@@ -27,7 +27,6 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # GitHub 加速镜像列表 (优先级从高到低,针对国内网络优化)
-# 已移除不可用的镜像站点，保留经过验证的可用镜像
 GITHUB_MIRRORS=(
     "https://github.akams.cn/"           # AKAMS 公益镜像 (首选)
     "https://gh-proxy.com/"              # 公共代理服务
@@ -40,6 +39,7 @@ GITHUB_REPO="ShourGG/tailamianban"
 INSTALL_DIR="/opt/terraria-panel"
 SERVICE_NAME="terraria-panel"
 DATA_DIR="/opt/terraria-panel/data"
+CONFIG_FILE="/opt/terraria-panel/data/config.json"
 
 # 打印带颜色的消息
 print_error() {
@@ -73,17 +73,30 @@ print_banner() {
 ║          🎮 泰拉瑞亚服务器管理面板                     ║
 ║             Terraria Server Panel                     ║
 ║                                                          ║
-║               管理脚本 v2.9                          ║
+║               管理脚本 v3.1                          ║
 ║                                                          ║
 ╚══════════════════════════════════════════════════════════╝
 EOF
 }
 
+# 获取面板端口 (从配置文件动态读取)
+get_panel_port() {
+    if [ -f "$CONFIG_FILE" ]; then
+        local port=$(grep -o '"port"[[:space:]]*:[[:space:]]*[0-9]*' "$CONFIG_FILE" | grep -o '[0-9]*' | head -1)
+        if [ -n "$port" ]; then
+            echo "$port"
+            return 0
+        fi
+    fi
+    # 默认端口
+    echo "8080"
+}
+
 # 测试并选择最快的代码仓库源
 get_repo_source() {
-    # 直接使用 GitHub 镜像 (国内已优化)
-    # 快速测试每个镜像的连通性
+    local mirror_count=${#GITHUB_MIRRORS[@]}
     local mirror_index=0
+    
     for mirror in "${GITHUB_MIRRORS[@]}"; do
         mirror_index=$((mirror_index + 1))
         local test_url="${mirror}https://api.github.com/repos/${GITHUB_REPO}"
@@ -91,7 +104,7 @@ get_repo_source() {
         
         # 显示测试进度(仅在交互模式下)
         if [ -t 1 ]; then
-            echo -ne "\r${BLUE}ℹ${NC} 测试镜像 ${mirror_index}/10: ${mirror_name:0:40}..." >&2
+            echo -ne "\r${BLUE}ℹ${NC} 测试镜像 ${mirror_index}/${mirror_count}: ${mirror_name:0:40}..." >&2
         fi
         
         # 使用更短的超时时间以实现快速失败 (1秒连接+2秒总计)
@@ -101,7 +114,7 @@ get_repo_source() {
                 echo -ne "\r\033[K" >&2
             fi
             echo "github_mirror|${mirror}"
-            return
+            return 0
         fi
     done
     
@@ -112,20 +125,24 @@ get_repo_source() {
     
     # 无可用源
     echo ""
+    return 1
 }
 
 # 获取脚本更新 URL
 get_script_url() {
     local source=$(get_repo_source)
+    [ $? -ne 0 ] && return 1
+    
     local source_type="${source%%|*}"
     local mirror="${source#*|}"
     
     case $source_type in
         "github_mirror")
             echo "${mirror}https://raw.githubusercontent.com/${GITHUB_REPO}/main/panel.sh"
+            return 0
             ;;
         *)
-            echo ""
+            return 1
             ;;
     esac
 }
@@ -135,33 +152,19 @@ get_download_url() {
     local version=$1
     local arch=$2
     local source=$(get_repo_source)
+    [ $? -ne 0 ] && return 1
+    
     local source_type="${source%%|*}"
     local mirror="${source#*|}"
     
     case $source_type in
         "github_mirror")
-            # 使用代理加速：在原始 GitHub 链接前加上代理前缀
             echo "${mirror}https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz"
+            return 0
             ;;
         *)
-            # 直连 GitHub
             echo "https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz"
-            ;;
-    esac
-}
-
-# 获取 API URL
-get_api_url() {
-    local source=$(get_repo_source)
-    local source_type="${source%%|*}"
-    local mirror="${source#*|}"
-    
-    case $source_type in
-        "github_mirror")
-            echo "${mirror}https://api.github.com/repos/${GITHUB_REPO}/releases/latest"
-            ;;
-        *)
-            echo ""
+            return 0
             ;;
     esac
 }
@@ -205,7 +208,6 @@ check_requirements() {
 
 # 获取最新版本号
 get_latest_version() {
-    # API 请求必须直连 GitHub,不能使用镜像(镜像只支持文件下载)
     local api_url="https://api.github.com/repos/${GITHUB_REPO}/releases/latest"
     
     # 直接从 GitHub API 获取版本信息
@@ -217,17 +219,21 @@ get_latest_version() {
     fi
     
     echo "$version"
+    return 0
 }
 
 # 获取本地版本 (通过 API)
 get_local_version() {
     if ! check_running; then
         echo "未运行"
-        return
+        return 0
     fi
     
+    # 动态获取端口
+    local port=$(get_panel_port)
+    
     # 尝试从 API 获取版本
-    local version=$(curl -s --connect-timeout 2 http://localhost:8080/api/version 2>/dev/null | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
+    local version=$(curl -s --connect-timeout 2 http://localhost:${port}/api/version 2>/dev/null | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
     
     # 如果 API 失败，尝试命令行
     if [ -z "$version" ] && [ -f "$INSTALL_DIR/terraria-panel" ]; then
@@ -238,6 +244,41 @@ get_local_version() {
     version=$(echo "$version" | grep -oP 'v\d+(\.\d+)+' || echo "$version")
     
     echo "${version:-未知}"
+    return 0
+}
+
+# 比较版本号 (返回: 0=相等, 1=v1>v2, 2=v1<v2)
+compare_versions() {
+    local v1=$1
+    local v2=$2
+    
+    # 移除 'v' 前缀
+    v1=${v1#v}
+    v2=${v2#v}
+    
+    # 处理特殊情况
+    [ "$v1" = "$v2" ] && return 0
+    [ "$v1" = "未知" ] && return 2
+    [ "$v2" = "未知" ] && return 1
+    
+    # 分割版本号
+    IFS='.' read -ra ver1 <<< "$v1"
+    IFS='.' read -ra ver2 <<< "$v2"
+    
+    # 逐段比较
+    local max_len=$((${#ver1[@]} > ${#ver2[@]} ? ${#ver1[@]} : ${#ver2[@]}))
+    for ((i=0; i<max_len; i++)); do
+        local num1=${ver1[i]:-0}
+        local num2=${ver2[i]:-0}
+        
+        if [ "$num1" -gt "$num2" ]; then
+            return 1
+        elif [ "$num1" -lt "$num2" ]; then
+            return 2
+        fi
+    done
+    
+    return 0
 }
 
 # 检查面板是否已安装
@@ -247,7 +288,7 @@ check_installed() {
 
 # 检查面板运行状态
 check_running() {
-    systemctl is-active --quiet "$SERVICE_NAME" 2>/dev/null || pgrep -f "terraria-panel" > /dev/null
+    systemctl is-active --quiet "$SERVICE_NAME" 2>/dev/null || pgrep -f "terraria-panel" > /dev/null 2>&1
 }
 
 # 下载并安装面板
@@ -260,7 +301,7 @@ install_panel() {
         read -p "是否覆盖安装? (y/N): " -n 1 -r
         echo
         [[ ! $REPLY =~ ^[Yy]$ ]] && return
-        stop_panel
+        stop_panel silent
     fi
     
     local arch=$(detect_arch)
@@ -268,10 +309,7 @@ install_panel() {
     
     # 测试并选择最快的镜像源
     local source=$(get_repo_source)
-    local source_type="${source%%|*}"
-    local mirror="${source#*|}"
-    
-    if [ "$source_type" != "github_mirror" ]; then
+    if [ $? -ne 0 ]; then
         print_error "无法连接到任何 GitHub 镜像源"
         print_info "解决方案:"
         echo "  1. 检查网络连接"
@@ -279,392 +317,47 @@ install_panel() {
         echo "  3. 稍后重试"
         echo "  4. 手动下载: https://github.com/${GITHUB_REPO}/releases"
         read -p "按回车返回..."
-        return
+        return 1
     fi
     
+    local mirror="${source#*|}"
     print_info "使用 GitHub 加速镜像"
-    if [ -n "$mirror" ]; then
-        print_info "镜像地址: ${mirror:-GitHub直连}"
-    fi
+    [ -n "$mirror" ] && print_info "镜像地址: ${mirror:-GitHub直连}"
     
     print_info "获取最新版本..."
     local version=$(get_latest_version)
-    if [ -z "$version" ]; then
+    if [ $? -ne 0 ] || [ -z "$version" ]; then
         print_error "无法获取版本信息"
         read -p "按回车返回..."
-        return
+        return 1
     fi
     print_success "最新版本: $version"
     
     local download_url=$(get_download_url "$version" "$arch")
-    if [ -z "$download_url" ]; then
-        print_error "无法获取下载链接，请检查网络连接"
+    if [ $? -ne 0 ] || [ -z "$download_url" ]; then
+        print_error "无法获取下载链接"
         read -p "按回车返回..."
-        return
+        return 1
     fi
+    
     local temp_file="/tmp/terraria-panel.tar.gz"
     
     print_info "下载中..."
     print_info "URL: $download_url"
     
-    # 使用更长的超时时间用于下载大文件
     if ! curl -L -# --connect-timeout 10 --max-time 300 -o "$temp_file" "$download_url"; then
         print_error "下载失败"
         read -p "按回车返回..."
-        return
+        return 1
     fi
     
     # 验证下载的文件
     print_info "验证文件..."
     if [ ! -f "$temp_file" ] || [ ! -s "$temp_file" ]; then
-        print_error "下载的文件无效(文件不存在或为空)"
+        print_error "下载的文件无效"
         rm -f "$temp_file"
         read -p "按回车返回..."
-        return
-    fi
-    
-    # 检查文件类型(必须是 gzip 格式)
-    if ! file "$temp_file" | grep -q "gzip compressed"; then
-        print_warning "镜像下载的文件格式错误，尝试直连 GitHub..."
-        rm -f "$temp_file"
-        
-        # 直连 GitHub 重试
-        local direct_url="https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz"
-        print_info "直连下载: $direct_url"
-        
-        if ! curl -L -# --connect-timeout 10 --max-time 300 -o "$temp_file" "$direct_url"; then
-            print_error "直连下载也失败"
-            rm -f "$temp_file"
-            read -p "按回车返回..."
-            return
-        fi
-        
-        # 再次验证直连下载的文件
-        if ! file "$temp_file" | grep -q "gzip compressed"; then
-            print_error "下载的文件格式仍然错误"
-            rm -f "$temp_file"
-            echo ""
-            print_info "解决方案:"
-            echo "  1. 检查 GitHub releases: https://github.com/${GITHUB_REPO}/releases"
-            echo "  2. 配置代理访问 GitHub"
-            echo "  3. 联系管理员"
-            echo ""
-            read -p "按回车返回..."
-            return
-        fi
-        
-        print_success "直连下载成功!"
-    fi
-    
-    local file_size=$(du -h "$temp_file" | cut -f1)
-    print_success "文件验证通过 ($file_size)"
-    
-    print_info "解压中..."
-    mkdir -p "$INSTALL_DIR"
-    
-    # 使用 --strip-components=1 移除 tar 包中的顶层目录
-    # 这样可以直接将文件解压到 INSTALL_DIR 而不是 INSTALL_DIR/terraria-panel/
-    if ! tar -xzf "$temp_file" -C "$INSTALL_DIR" --strip-components=1; then
-        print_error "解压失败"
-        rm -f "$temp_file"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    rm -f "$temp_file"
-    chmod +x "$INSTALL_DIR/terraria-panel"
-    
-    # 创建数据目录
-    mkdir -p "$DATA_DIR"
-    
-    # 创建 systemd 服务
-    print_info "配置系统服务..."
-    cat > /etc/systemd/system/${SERVICE_NAME}.service << EOF
-[Unit]
-Description=Terraria Server Panel
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=$INSTALL_DIR
-ExecStart=$INSTALL_DIR/terraria-panel
-Restart=on-failure
-RestartSec=5s
-
-[Install]
-WantedBy=multi-user.target
-EOF
-    
-    systemctl daemon-reload
-    systemctl enable "$SERVICE_NAME"
-    
-    print_success "安装完成!"
-    echo ""
-    print_info "下一步操作:"
-    echo "  1. 启动面板: sudo bash panel.sh start"
-    echo "  2. 访问地址: http://YOUR_SERVER_IP:8080"
-    echo "  3. 默认账号: admin / admin123"
-    echo ""
-    read -p "按回车返回..."
-}
-
-# 启动面板
-start_panel() {
-    if ! check_installed; then
-        print_error "面板未安装,请先安装"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    if check_running; then
-        print_warning "面板已在运行中"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    print_info "正在启动面板..."
-    if systemctl start "$SERVICE_NAME"; then
-        sleep 2
-        if check_running; then
-            print_success "面板已启动"
-            local version=$(get_local_version)
-            print_info "当前版本: $version"
-            print_info "访问地址: http://$(hostname -I | awk '{print $1}'):8080"
-        else
-            print_error "启动失败,请查看日志"
-        fi
-    else
-        print_error "启动失败"
-    fi
-    
-    read -p "按回车返回..."
-}
-
-# 停止面板
-stop_panel() {
-    if ! check_running; then
-        print_warning "面板未运行"
-        return
-    fi
-    
-    print_info "正在停止面板..."
-    if systemctl stop "$SERVICE_NAME" 2>/dev/null || pkill -f "terraria-panel"; then
-        sleep 1
-        if ! check_running; then
-            print_success "面板已停止"
-        else
-            print_error "停止失败"
-        fi
-    else
-        print_error "停止失败"
-    fi
-}
-
-# 重启面板
-restart_panel() {
-    stop_panel
-    sleep 1
-    start_panel
-}
-
-# 查看日志
-view_logs() {
-    if ! check_installed; then
-        print_error "面板未安装"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    print_info "正在查看日志 (Ctrl+C 退出)..."
-    sleep 1
-    journalctl -u "$SERVICE_NAME" -f
-}
-
-# 检查状态
-check_status() {
-    print_banner
-    echo ""
-    
-    if ! check_installed; then
-        print_error "面板状态: 未安装"
-        echo ""
-        return
-    fi
-    
-    local version=$(get_local_version)
-    local status_text="已停止"
-    local status_color="${RED}"
-    
-    if check_running; then
-        status_text="运行中"
-        status_color="${GREEN}"
-    fi
-    
-    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BLUE}面板状态:${NC} ${status_color}${status_text}${NC}"
-    echo -e "${BLUE}当前版本:${NC} ${version}"
-    echo -e "${BLUE}安装路径:${NC} ${INSTALL_DIR}"
-    echo -e "${BLUE}数据目录:${NC} ${DATA_DIR}"
-    
-    if check_running; then
-        local ip=$(hostname -I | awk '{print $1}')
-        echo -e "${BLUE}访问地址:${NC} http://${ip}:8080"
-    fi
-    
-    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo ""
-    
-    # 检查更新
-    print_info "检查更新..."
-    local latest_version=$(get_latest_version 2>/dev/null)
-    if [ -n "$latest_version" ] && [ "$version" != "$latest_version" ] && [ "$version" != "未知" ]; then
-        print_warning "发现新版本: $latest_version"
-        echo "  当前版本: $version"
-        echo "  运行 'sudo bash panel.sh' 选择安装来更新"
-    else
-        print_success "已是最新版本"
-    fi
-    
-    echo ""
-    read -p "按回车返回..."
-}
-
-# 卸载面板
-uninstall_panel() {
-    if ! check_installed; then
-        print_error "面板未安装"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    print_warning "确认要卸载面板吗?"
-    read -p "此操作将删除所有数据! 输入 'yes' 确认: " confirm
-    
-    if [ "$confirm" != "yes" ]; then
-        print_info "已取消"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    print_info "正在卸载面板..."
-    
-    # 停止服务
-    stop_panel
-    
-    # 删除服务
-    systemctl disable "$SERVICE_NAME" 2>/dev/null
-    rm -f "/etc/systemd/system/${SERVICE_NAME}.service"
-    systemctl daemon-reload
-    
-    # 删除文件
-    rm -rf "$INSTALL_DIR"
-    
-    print_success "卸载完成"
-    read -p "按回车返回..."
-}
-
-# 获取当前安装的版本号
-get_current_version() {
-    get_local_version
-}
-
-# 更新面板
-update_panel() {
-    print_banner
-    echo -e "${GREEN}开始更新泰拉瑞亚面板...${NC}\n"
-    
-    if ! check_installed; then
-        print_error "面板未安装，请先安装面板"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    # 获取当前版本
-    local current_version=$(get_current_version)
-    if [ -z "$current_version" ]; then
-        print_warning "无法获取当前版本，继续更新..."
-        current_version="未知"
-    else
-        print_info "当前版本: $current_version"
-    fi
-    
-    local arch=$(detect_arch)
-    print_info "系统架构: $arch"
-    
-    # 测试并选择最快的镜像源
-    local source=$(get_repo_source)
-    local source_type="${source%%|*}"
-    local mirror="${source#*|}"
-    
-    if [ "$source_type" != "github_mirror" ]; then
-        print_error "无法连接到任何 GitHub 镜像源"
-        print_info "解决方案:"
-        echo "  1. 检查网络连接"
-        echo "  2. 配置代理或 VPN"
-        echo "  3. 稍后重试"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    print_info "使用 GitHub 加速镜像"
-    if [ -n "$mirror" ]; then
-        print_info "镜像地址: ${mirror:-GitHub直连}"
-    fi
-    
-    print_info "检查最新版本..."
-    local version=$(get_latest_version)
-    if [ -z "$version" ]; then
-        print_error "无法获取最新版本信息"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    print_success "最新版本: $version"
-    
-    if [ "$current_version" = "$version" ]; then
-        print_success "已是最新版本，无需更新"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    print_warning "发现新版本!"
-    read -p "是否更新? (y/N): " -n 1 -r
-    echo
-    [[ ! $REPLY =~ ^[Yy]$ ]] && return
-    
-    # 停止服务
-    if check_running; then
-        print_info "停止服务..."
-        stop_panel
-        sleep 2
-    fi
-    
-    # 备份当前版本
-    print_info "备份当前版本..."
-    local backup_dir="${INSTALL_DIR}.backup.$(date +%Y%m%d_%H%M%S)"
-    cp -r "$INSTALL_DIR" "$backup_dir"
-    print_success "备份完成: $backup_dir"
-    
-    local download_url=$(get_download_url "$version" "$arch")
-    if [ -z "$download_url" ]; then
-        print_error "无法获取下载链接，请检查网络连接"
-        read -p "按回车返回..."
-        return
-    fi
-    local temp_file="/tmp/terraria-panel.tar.gz"
-    
-    print_info "下载中..."
-    print_info "URL: $download_url"
-    
-    # 使用更长的超时时间用于下载大文件
-    if ! curl -L -# --connect-timeout 10 --max-time 300 -o "$temp_file" "$download_url"; then
-        print_error "下载失败"
-        print_info "恢复备份..."
-        rm -rf "$INSTALL_DIR"
-        mv "$backup_dir" "$INSTALL_DIR"
-        read -p "按回车返回..."
-        return
+        return 1
     fi
     
     # 检查文件类型
@@ -672,349 +365,478 @@ update_panel() {
         print_warning "镜像下载的文件格式错误，尝试直连 GitHub..."
         rm -f "$temp_file"
         
-        # 直连 GitHub 重试
         local direct_url="https://github.com/${GITHUB_REPO}/releases/download/${version}/terraria-panel-linux-${arch}.tar.gz"
         print_info "直连下载: $direct_url"
         
-        if ! curl -L -# --connect-timeout 10 --max-time 300 -o "$temp_file" "$direct_url"; then
+        if ! curl -L -# --connect-timeout 10 --max-time
+ 300 -o "$temp_file" "$direct_url"; then
             print_error "直连下载也失败"
             rm -f "$temp_file"
-            print_info "恢复备份..."
-            rm -rf "$INSTALL_DIR"
-            mv "$backup_dir" "$INSTALL_DIR"
             read -p "按回车返回..."
-            return
+            return 1
         fi
         
-        # 再次验证直连下载的文件
+        # 再次验证文件
         if ! file "$temp_file" | grep -q "gzip compressed"; then
-            print_error "下载的文件格式仍然错误"
+            print_error "下载的文件格式错误,可能是网络问题"
             rm -f "$temp_file"
-            echo ""
-            print_info "解决方案:"
-            echo "  1. 检查 GitHub releases: https://github.com/${GITHUB_REPO}/releases"
-            echo "  2. 配置代理访问 GitHub"
-            echo "  3. 联系管理员"
-            echo ""
-            print_info "恢复备份..."
-            rm -rf "$INSTALL_DIR"
-            mv "$backup_dir" "$INSTALL_DIR"
             read -p "按回车返回..."
-            return
+            return 1
         fi
-        
-        print_success "直连下载成功!"
     fi
     
-    print_info "解压更新..."
-    if ! tar -xzf "$temp_file" -C "$INSTALL_DIR" --strip-components=1; then
+    print_success "文件下载成功"
+    
+    # 停止旧服务
+    if check_running; then
+        print_info "停止旧版本..."
+        stop_panel silent
+    fi
+    
+    # 备份旧版本
+    if [ -d "$INSTALL_DIR" ]; then
+        print_info "备份旧版本..."
+        mv "$INSTALL_DIR" "${INSTALL_DIR}.bak.$(date +%Y%m%d%H%M%S)"
+    fi
+    
+    # 创建安装目录
+    print_info "创建安装目录..."
+    mkdir -p "$INSTALL_DIR"
+    
+    # 解压文件
+    print_info "解压文件..."
+    if ! tar -xzf "$temp_file" -C "$INSTALL_DIR"; then
         print_error "解压失败"
         rm -f "$temp_file"
-        print_info "恢复备份..."
-        rm -rf "$INSTALL_DIR"
-        mv "$backup_dir" "$INSTALL_DIR"
         read -p "按回车返回..."
-        return
+        return 1
     fi
     
+    # 清理临时文件
     rm -f "$temp_file"
-    chmod +x "$INSTALL_DIR/terraria-panel"
     
-    print_success "更新完成!"
-    print_info "备份保留在: $backup_dir"
-    echo ""
+    # 设置权限
+    print_info "设置权限..."
+    chmod +x "$INSTALL_DIR/terraria-panel" 2>/dev/null || true
     
-    # 启动服务
+    # 创建数据目录
+    mkdir -p "$DATA_DIR"
+    
+    # 创建systemd服务
+    print_info "配置系统服务..."
+    cat > "/etc/systemd/system/${SERVICE_NAME}.service" << EOF
+[Unit]
+Description=Terraria Panel Server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=$INSTALL_DIR
+ExecStart=$INSTALL_DIR/terraria-panel
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    
+    systemctl daemon-reload
+    systemctl enable "$SERVICE_NAME" >/dev/null 2>&1
+    
+    print_success "安装完成!"
+    
+    # Bug修复2: 安装后自动启动,不需要用户再次确认
+    print_info "正在启动面板..."
+    start_panel
+    
+    # Bug修复1: 动态读取端口
+    local panel_port=$(get_panel_port)
+    
+    echo
+    print_success "=========================================="
+    print_success "泰拉瑞亚面板安装成功!"
+    print_success "=========================================="
+    echo
+    print_info "访问地址: http://YOUR_SERVER_IP:${panel_port}"
+    print_info "本地访问: http://localhost:${panel_port}"
+    echo
+    # Bug修复3: 不显示默认账户密码,首次访问会引导注册
+    print_warning "首次访问将引导您创建管理员账户"
+    echo
+    print_info "管理命令:"
+    echo "  启动: systemctl start $SERVICE_NAME"
+    echo "  停止: systemctl stop $SERVICE_NAME"
+    echo "  重启: systemctl restart $SERVICE_NAME"
+    echo "  状态: systemctl status $SERVICE_NAME"
+    echo "  日志: journalctl -u $SERVICE_NAME -f"
+    echo
+}
+
+# 启动面板
+start_panel() {
+    local mode=${1:-normal}
+    
+    if [ "$mode" != "silent" ]; then
+        print_info "启动面板..."
+    fi
+    
     if check_running; then
-        print_warning "服务仍在运行，重启中..."
-        restart_panel
-    else
-        print_info "启动服务..."
-        start_panel
-    fi
-}
-
-# 更新脚本本身
-update_script() {
-    print_banner
-    echo -e "${GREEN}开始更新管理脚本...${NC}\n"
-    
-    # 获取脚本更新 URL
-    local script_url=$(get_script_url)
-    if [ -z "$script_url" ]; then
-        print_error "无法连接到 GitHub 镜像源"
-        print_info "解决方案:"
-        echo "  1. 检查网络连接"
-        echo "  2. 配置代理或 VPN"
-        echo "  3. 稍后重试"
-        read -p "按回车返回..."
-        return
+        if [ "$mode" != "silent" ]; then
+            print_warning "面板已在运行中"
+        fi
+        return 0
     fi
     
-    print_info "下载最新脚本..."
-    print_info "URL: $script_url"
-    
-    local temp_script="/tmp/panel_new.sh"
-    if ! curl -sL --connect-timeout 10 --max-time 30 -o "$temp_script" "$script_url"; then
-        print_error "下载失败"
-        rm -f "$temp_script"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    # 验证下载的脚本
-    if [ ! -s "$temp_script" ]; then
-        print_error "下载的脚本文件为空"
-        rm -f "$temp_script"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    # 提取新脚本版本号
-    local new_version=$(grep -oP '(?<=版本: )v[\d.]+' "$temp_script" | head -1)
-    local current_version=$(grep -oP '(?<=版本: )v[\d.]+' "$0" | head -1)
-    
-    print_info "当前版本: ${current_version:-未知}"
-    print_info "最新版本: ${new_version:-未知}"
-    
-    if [ "$current_version" = "$new_version" ] && [ -n "$current_version" ]; then
-        print_success "已是最新版本"
-        rm -f "$temp_script"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    # 备份当前脚本
-    print_info "备份当前脚本..."
-    local backup_script="${0}.backup.$(date +%Y%m%d_%H%M%S)"
-    cp "$0" "$backup_script"
-    print_success "备份完成: $backup_script"
-    
-    # 替换脚本
-    print_info "更新脚本..."
-    chmod +x "$temp_script"
-    mv "$temp_script" "$0"
-    
-    print_success "脚本更新完成!"
-    print_info "新版本: $new_version"
-    print_info "备份保留在: $backup_script"
-    echo ""
-    print_info "脚本已更新，请重新运行"
-    exit 0
-}
-
-# 修改端口
-change_port() {
     if ! check_installed; then
         print_error "面板未安装"
         read -p "按回车返回..."
-        return
+        return 1
     fi
     
-    local config_file="$INSTALL_DIR/config.yaml"
-    local current_port="8080"
+    systemctl start "$SERVICE_NAME"
+    sleep 2
     
-    # 尝试从配置文件读取当前端口
-    if [ -f "$config_file" ]; then
-        current_port=$(grep -oP '(?<=port: )\d+' "$config_file" 2>/dev/null || echo "8080")
-    fi
-    
-    echo ""
-    print_info "当前端口: $current_port"
-    echo ""
-    read -p "请输入新端口 (1024-65535): " new_port
-    
-    # 验证端口号
-    if ! [[ "$new_port" =~ ^[0-9]+$ ]] || [ "$new_port" -lt 1024 ] || [ "$new_port" -gt 65535 ]; then
-        print_error "无效的端口号"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    # 检查端口是否被占用
-    if netstat -tuln 2>/dev/null | grep -q ":$new_port " || ss -tuln 2>/dev/null | grep -q ":$new_port "; then
-        print_error "端口 $new_port 已被占用"
-        read -p "按回车返回..."
-        return
-    fi
-    
-    print_info "修改端口为: $new_port"
-    
-    # 创建或更新配置文件
-    if [ ! -f "$config_file" ]; then
-        cat > "$config_file" << EOF
-server:
-  port: $new_port
-  mode: release
-
-database:
-  path: $DATA_DIR/terraria.db
-
-log:
-  level: info
-  path: $DATA_DIR/logs
-EOF
-    else
-        # 使用 sed 修改端口
-        sed -i "s/port: [0-9]*/port: $new_port/" "$config_file"
-    fi
-    
-    print_success "端口已修改"
-    
-    # 如果服务正在运行,需要重启
     if check_running; then
-        print_info "重启面板以应用更改..."
-        restart_panel
+        if [ "$mode" != "silent" ]; then
+            local panel_port=$(get_panel_port)
+            print_success "面板启动成功"
+            print_info "访问地址: http://localhost:${panel_port}"
+            read -p "按回车返回..."
+        fi
     else
-        print_info "请启动面板以应用更改"
+        print_error "启动失败"
+        print_info "查看日志: journalctl -u $SERVICE_NAME -n 50"
+        read -p "按回车返回..."
+        return 1
+    fi
+}
+
+# 停止面板
+stop_panel() {
+    local mode=${1:-normal}
+    
+    if [ "$mode" != "silent" ]; then
+        print_info "停止面板..."
     fi
     
-    print_success "新访问地址: http://$(hostname -I | awk '{print $1}'):$new_port"
-    echo ""
+    if ! check_running; then
+        if [ "$mode" != "silent" ]; then
+            print_warning "面板未运行"
+        fi
+        return 0
+    fi
+    
+    systemctl stop "$SERVICE_NAME"
+    sleep 2
+    
+    if ! check_running; then
+        if [ "$mode" != "silent" ]; then
+            print_success "面板已停止"
+            read -p "按回车返回..."
+        fi
+    else
+        print_error "停止失败"
+        read -p "按回车返回..."
+        return 1
+    fi
+}
+
+# 重启面板
+restart_panel() {
+    print_info "重启面板..."
+    
+    stop_panel silent
+    sleep 1
+    start_panel silent
+    
+    if check_running; then
+        local panel_port=$(get_panel_port)
+        print_success "面板重启成功"
+        print_info "访问地址: http://localhost:${panel_port}"
+    else
+        print_error "重启失败"
+    fi
+    
     read -p "按回车返回..."
+}
+
+# 查看状态
+show_status() {
+    print_banner
+    echo -e "${BLUE}面板状态信息${NC}\n"
+    
+    # 运行状态
+    if check_running; then
+        print_success "运行状态: 运行中"
+    else
+        print_error "运行状态: 已停止"
+    fi
+    
+    # 版本信息
+    local local_version=$(get_local_version)
+    print_info "当前版本: $local_version"
+    
+    # 安装目录
+    if check_installed; then
+        print_info "安装目录: $INSTALL_DIR"
+        local size=$(du -sh "$INSTALL_DIR" 2>/dev/null | cut -f1)
+        print_info "占用空间: ${size:-未知}"
+    else
+        print_warning "面板未安装"
+    fi
+    
+    # 端口信息
+    local panel_port=$(get_panel_port)
+    print_info "监听端口: $panel_port"
+    
+    # 检查更新
+    print_info "检查更新中..."
+    local latest_version=$(get_latest_version 2>/dev/null)
+    if [ -n "$latest_version" ] && [ "$latest_version" != "未知" ]; then
+        print_info "最新版本: $latest_version"
+        
+        if [ "$local_version" != "未运行" ] && [ "$local_version" != "未知" ]; then
+            compare_versions "$local_version" "$latest_version"
+            case $? in
+                0)
+                    print_success "已是最新版本"
+                    ;;
+                2)
+                    print_warning "发现新版本,建议更新"
+                    ;;
+            esac
+        fi
+    else
+        print_warning "无法检查更新"
+    fi
+    
+    echo
+    read -p "按回车返回..."
+}
+
+# 查看日志
+show_logs() {
+    print_info "显示最近50条日志 (Ctrl+C 退出)..."
+    sleep 1
+    journalctl -u "$SERVICE_NAME" -n 50 --no-pager
+    echo
+    read -p "按回车返回..."
+}
+
+# 更新面板
+update_panel() {
+    print_banner
+    echo -e "${GREEN}检查更新...${NC}\n"
+    
+    if ! check_installed; then
+        print_error "面板未安装,请先安装"
+        read -p "按回车返回..."
+        return 1
+    fi
+    
+    local local_version=$(get_local_version)
+    print_info "当前版本: $local_version"
+    
+    local latest_version=$(get_latest_version)
+    if [ $? -ne 0 ]; then
+        print_error "无法获取最新版本"
+        read -p "按回车返回..."
+        return 1
+    fi
+    
+    print_info "最新版本: $latest_version"
+    
+    if [ "$local_version" != "未运行" ] && [ "$local_version" != "未知" ]; then
+        compare_versions "$local_version" "$latest_version"
+        case $? in
+            0)
+                print_success "已是最新版本,无需更新"
+                read -p "按回车返回..."
+                return 0
+                ;;
+            1)
+                print_warning "本地版本高于远程版本"
+                ;;
+        esac
+    fi
+    
+    echo
+    read -p "确认更新到 $latest_version? (y/N): " -n 1 -r
+    echo
+    [[ ! $REPLY =~ ^[Yy]$ ]] && return
+    
+    install_panel
+}
+
+# 卸载面板
+uninstall_panel() {
+    print_banner
+    echo -e "${RED}卸载泰拉瑞亚面板${NC}\n"
+    
+    if ! check_installed; then
+        print_warning "面板未安装"
+        read -p "按回车返回..."
+        return 0
+    fi
+    
+    print_warning "此操作将删除所有面板文件和数据!"
+    read -p "确认卸载? (输入 yes 确认): " confirm
+    
+    if [ "$confirm" != "yes" ]; then
+        print_info "已取消"
+        read -p "按回车返回..."
+        return 0
+    fi
+    
+    print_info "停止服务..."
+    systemctl stop "$SERVICE_NAME" 2>/dev/null || true
+    systemctl disable "$SERVICE_NAME" 2>/dev/null || true
+    
+    print_info "删除服务文件..."
+    rm -f "/etc/systemd/system/${SERVICE_NAME}.service"
+    systemctl daemon-reload
+    
+    print_info "删除安装文件..."
+    rm -rf "$INSTALL_DIR"
+    
+    print_success "卸载完成"
+    read -p "按回车返回..."
+}
+
+# 更新脚本
+update_script() {
+    print_info "更新管理脚本..."
+    
+    local script_url=$(get_script_url)
+    if [ $? -ne 0 ]; then
+        print_error "无法获取更新源"
+        return 1
+    fi
+    
+    local temp_script="/tmp/panel.sh.new"
+    
+    if ! curl -sL --connect-timeout 10 --max-time 30 "$script_url" -o "$temp_script"; then
+        print_error "下载脚本失败"
+        rm -f "$temp_script"
+        return 1
+    fi
+    
+    # 验证脚本
+    if [ ! -f "$temp_script" ] || [ ! -s "$temp_script" ]; then
+        print_error "下载的脚本无效"
+        rm -f "$temp_script"
+        return 1
+    fi
+    
+    # 备份当前脚本
+    cp "$0" "$0.bak"
+    
+    # 替换脚本
+    mv "$temp_script" "$0"
+    chmod +x "$0"
+    
+    print_success "脚本更新成功"
+    print_info "重启脚本中..."
+    sleep 1
+    exec "$0"
 }
 
 # 主菜单
 show_menu() {
     clear
     print_banner
-    echo ""
+    echo
     
+    # 显示状态
     if check_installed; then
-        local version=$(get_local_version)
-        local status="已停止"
-        local status_color="${RED}"
-        
         if check_running; then
-            status="运行中"
-            status_color="${GREEN}"
+            echo -e "${GREEN}● 面板状态: 运行中${NC}"
+        else
+            echo -e "${RED}● 面板状态: 已停止${NC}"
         fi
         
-        echo -e "当前版本: ${BLUE}${version}${NC}  |  状态: ${status_color}${status}${NC}"
+        local local_version=$(get_local_version)
+        echo -e "${BLUE}● 当前版本: $local_version${NC}"
+        
+        local panel_port=$(get_panel_port)
+        echo -e "${BLUE}● 访问端口: $panel_port${NC}"
     else
-        echo -e "状态: ${RED}未安装${NC}"
+        echo -e "${YELLOW}● 面板状态: 未安装${NC}"
     fi
     
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo
+    echo -e "${BLUE}请选择操作:${NC}"
+    echo
     echo "  1. 安装面板"
-    echo "  2. 更新面板"
-    echo "  3. 更新脚本"
-    echo "  4. 启动面板"
-    echo "  5. 停止面板"
-    echo "  6. 重启面板"
-    echo "  7. 查看日志"
-    echo "  8. 查看状态"
-    echo "  9. 修改端口"
-    echo "  10. 卸载面板"
+    echo "  2. 启动面板"
+    echo "  3. 停止面板"
+    echo "  4. 重启面板"
+    echo "  5. 查看状态"
+    echo "  6. 查看日志"
+    echo "  7. 更新面板"
+    echo "  8. 卸载面板"
+    echo "  9. 更新脚本"
     echo "  0. 退出"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo ""
+    echo
 }
 
 # 主函数
 main() {
-    # 检查 root 权限
-    if [ "$EUID" -ne 0 ]; then
-        print_error "请使用 root 权限运行此脚本"
-        print_info "使用方法: sudo bash $0"
+    # 检查root权限
+    if [ $EUID -ne 0 ]; then
+        print_error "此脚本需要root权限运行"
+        echo "请使用: sudo bash $0"
         exit 1
     fi
     
-    # 检查依赖
+    # 检查必要工具
     check_requirements
     
-    # 处理命令行参数
-    case "${1:-}" in
-        install)
-            install_panel
-            exit 0
-            ;;
-        update)
-            update_panel
-            exit 0
-            ;;
-        start)
-            start_panel
-            exit 0
-            ;;
-        stop)
-            stop_panel
-            exit 0
-            ;;
-        restart)
-            restart_panel
-            exit 0
-            ;;
-        status)
-            check_status
-            exit 0
-            ;;
-        logs)
-            view_logs
-            exit 0
-            ;;
-        uninstall)
-            uninstall_panel
-            exit 0
-            ;;
-        port)
-            change_port
-            exit 0
-            ;;
-        script)
-            update_script
-            exit 0
-            ;;
-    esac
-    
-    # 交互式菜单
+    # 主循环
     while true; do
         show_menu
-        read -p "请选择操作 [0-10]: " choice
+        read -p "请输入选项 [0-9]: " choice
+        echo
         
         case $choice in
             1)
                 install_panel
                 ;;
             2)
-                update_panel
-                ;;
-            3)
-                update_script
-                ;;
-            4)
                 start_panel
                 ;;
-            5)
+            3)
                 stop_panel
                 ;;
-            6)
+            4)
                 restart_panel
                 ;;
+            5)
+                show_status
+                ;;
+            6)
+                show_logs
+                ;;
             7)
-                view_logs
+                update_panel
                 ;;
             8)
-                check_status
-                ;;
-            9)
-                change_port
-                ;;
-            10)
                 uninstall_panel
                 ;;
+            9)
+                update_script
+                ;;
             0)
-                print_info "再见!"
+                print_info "退出脚本"
                 exit 0
                 ;;
             *)
-                print_error "无效选择"
+                print_error "无效选项"
                 sleep 1
                 ;;
         esac
     done
 }
 
-# 运行主函数
+# 执行主函数
 main "$@"
