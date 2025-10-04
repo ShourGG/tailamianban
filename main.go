@@ -25,13 +25,15 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DefaultWriter = io.Discard
 
-	r := gin.Default()
+	r := gin.New()        // Use gin.New() instead of Default() to avoid interference
+	r.Use(gin.Recovery()) // Only add Recovery middleware
 
-	// Setup API routes
+	// Setup API routes FIRST
 	api.SetupRoutes(r)
 
-	// Serve static files from embedded FS (MUST be last)
-	r.Use(static.ServeEmbed("web/dist", EmbedFS))
+	// Serve static files from embedded FS as fallback (MUST be last)
+	// Use NoRoute to handle 404s with static files
+	r.NoRoute(static.ServeEmbed("web/dist", EmbedFS))
 
 	// Start server
 	port := 8080
