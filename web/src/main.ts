@@ -17,6 +17,7 @@ import '@/router/permission'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import router from './router'
+import { version } from './version'
 import {
   setupLoading,
   setupStore,
@@ -33,6 +34,11 @@ import {
  * @return {*}
  */
 async function bootstrap() {
+  // 输出版本信息
+  console.log('%c Terraria Panel ', 'background:#35495e ; padding: 3px; border-radius: 3px 0 0 3px; color: #fff')
+  console.log(`%c v${version} `, 'background:#41b883 ; padding: 3px; border-radius: 0 3px 3px 0; color: #fff')
+  console.log(`%c Frontend initialized successfully! `, 'background:#35495e ; padding: 3px; color: #fff')
+
   // 第一阶段：非Vue相关的初始化
   setupLoading()
 

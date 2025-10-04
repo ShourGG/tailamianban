@@ -12,10 +12,19 @@ import (
 	static "github.com/soulteary/gin-static"
 )
 
+// Version info
+const Version = "v1.2.1.4"
+
 //go:embed web/dist
 var EmbedFS embed.FS
 
 func main() {
+	// Print version information
+	fmt.Printf("==============================================\n")
+	fmt.Printf("  Terraria Panel %s\n", Version)
+	fmt.Printf("  Starting backend server...\n")
+	fmt.Printf("==============================================\n")
+
 	// Initialize all services (including database)
 	if err := service.InitializeServices(); err != nil {
 		log.Fatalf("Failed to initialize services: %v", err)
@@ -39,7 +48,8 @@ func main() {
 
 	// Start server
 	port := 8080
-	fmt.Printf("Server starting on port %d...\n", port)
+	fmt.Printf("Server listening on port %d\n", port)
+	fmt.Printf("Open http://localhost:%d in your browser\n", port)
 	if err := r.Run(fmt.Sprintf(":%d", port)); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
