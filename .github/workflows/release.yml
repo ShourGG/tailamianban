@@ -23,16 +23,16 @@ jobs:
           go-version: '1.23'
 
       - name: Build Backend (Linux amd64)
+        working-directory: ./api
         run: |
-          cd api
           go mod tidy
           go mod download
-          GO111MODULE=on GOOS=linux GOARCH=amd64 go build -o terraria-server-linux-amd64 main.go
+          GOOS=linux GOARCH=amd64 go build -o terraria-server-linux-amd64 .
 
       - name: Build Backend (Linux arm64)
+        working-directory: ./api
         run: |
-          cd api
-          GO111MODULE=on GOOS=linux GOARCH=arm64 go build -o terraria-server-linux-arm64 main.go
+          GOOS=linux GOARCH=arm64 go build -o terraria-server-linux-arm64 .
 
       - name: Prepare Release Package
         run: |
