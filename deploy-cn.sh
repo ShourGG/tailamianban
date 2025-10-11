@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# 泰拉瑞亚管理平台 - 一键部署脚本
-# 支持：安装、更新、卸载
+# 泰拉瑞亚管理平台 - 一键部署脚本（中国大陆版）
+# 使用国内镜像站点加速下载
 
 set -e
 
@@ -9,17 +9,8 @@ set -e
 INSTALL_DIR="/opt/terraria-admin"
 SERVICE_NAME="terraria-admin"
 GITHUB_REPO="ShourGG/tailamianban"
-
-# 使用镜像站点（国内用户）
-USE_MIRROR="${USE_MIRROR:-true}"
-if [ "$USE_MIRROR" = "true" ]; then
-    GITHUB_MIRROR="https://github.akams.cn"
-    GITHUB_API="${GITHUB_MIRROR}/https://api.github.com/repos/${GITHUB_REPO}/releases/latest"
-else
-    GITHUB_MIRROR="https://github.com"
-    GITHUB_API="https://api.github.com/repos/${GITHUB_REPO}/releases/latest"
-fi
-
+GITHUB_MIRROR="https://github.akams.cn"
+GITHUB_RAW="${GITHUB_MIRROR}/https://raw.githubusercontent.com/${GITHUB_REPO}/main/deploy.sh"
 CLI_PATH="/usr/local/bin/terraria-admin"
 
 # 颜色输出
@@ -109,26 +100,28 @@ stop_service() {
     fi
 }
 
-# 下载最新版本
+# 下载最新版本（使用国内镜像）
 download_release() {
     local arch=$1
-    log_step "从GitHub下载最新版本..."
+    log_step "从GitHub镜像站下载最新版本..."
+    log_info "使用镜像: ${GITHUB_MIRROR}"
     
-    # 获取最新release信息
-    log_info "API地址: $GITHUB_API"
-    local release_info=$(curl -s $GITHUB_API)
+    # 获取最新release信息（通过镜像）
+    local api_url="${GITHUB_MIRROR}/https://api.github.com/repos/${GITHUB_REPO}/releases/latest"
+    log_info "API地址: $api_url"
+    
+    local release_info=$(curl -s "$api_url")
     local download_url=$(echo "$release_info" | grep "browser_download_url.*linux-${arch}.tar.gz" | cut -d '"' -f 4)
     
     if [ -z "$download_url" ]; then
-        log_error "无法获取下载链接，请检查网络或GitHub仓库"
-        log_error "API返回: $release_info"
-        exit 1
+        log_error "无法获取下载链接"
+        log_info "尝试使用备用方案..."
+        # 备用：直接构造下载链接
+        download_url="https://github.com/${GITHUB_REPO}/releases/latest/download/terraria-admin-linux-${arch}.tar.gz"
     fi
     
-    # 如果使用镜像，替换下载链接
-    if [ "$USE_MIRROR" = "true" ]; then
-        download_url=$(echo "$download_url" | sed "s|https://github.com|${GITHUB_MIRROR}/https://github.com|")
-    fi
+    # 替换为镜像链接
+    download_url=$(echo "$download_url" | sed "s|https://github.com|${GITHUB_MIRROR}/https://github.com|")
     
     log_info "下载地址: $download_url"
     
@@ -136,8 +129,9 @@ download_release() {
     local temp_dir=$(mktemp -d)
     cd $temp_dir
     
-    if ! curl -L -o terraria-admin.tar.gz "$download_url"; then
-        log_error "下载失败"
+    log_info "开始下载，请稍候..."
+    if ! curl -L --progress-bar -o terraria-admin.tar.gz "$download_url"; then
+        log_error "下载失败，请检查网络连接"
         rm -rf $temp_dir
         exit 1
     fi
@@ -158,7 +152,7 @@ install_files() {
     
     # 复制文件
     cp -r $temp_dir/web $INSTALL_DIR/
-    cp $temp_dir/terraria-server-linux-* $INSTALL_DIR/terraria-server
+    cp $temp_dir/terraria-server $INSTALL_DIR/terraria-server
     cp $temp_dir/config.json $INSTALL_DIR/ 2>/dev/null || echo '{"port":8080}' > $INSTALL_DIR/config.json
     
     # 设置权限
@@ -213,12 +207,13 @@ EOF
 install_cli() {
     log_step "安装管理命令..."
     
-    cat > $CLI_PATH <<'EOF'
+    cat > $CLI_PATH <<'EOFCLI'
 #!/bin/bash
 
 SERVICE_NAME="terraria-admin"
 INSTALL_DIR="/opt/terraria-admin"
 CONFIG_FILE="${INSTALL_DIR}/config.json"
+GITHUB_MIRROR="https://github.akams.cn"
 
 case "$1" in
     start)
@@ -255,8 +250,8 @@ case "$1" in
         fi
         ;;
     update)
-        echo "更新泰拉瑞亚管理平台..."
-        curl -fsSL https://raw.githubusercontent.com/ShourGG/tailamianban/main/deploy.sh | sudo bash
+        echo "更新泰拉瑞亚管理平台（使用国内镜像）..."
+        curl -fsSL ${GITHUB_MIRROR}/https://raw.githubusercontent.com/ShourGG/tailamianban/main/deploy-cn.sh | sudo bash
         ;;
     uninstall)
         echo "卸载泰拉瑞亚管理平台..."
@@ -268,7 +263,7 @@ case "$1" in
         echo "卸载完成"
         ;;
     *)
-        echo "泰拉瑞亚服务器管理平台 - 管理工具"
+        echo "泰拉瑞亚服务器管理平台 - 管理工具（中国大陆版）"
         echo ""
         echo "用法: terraria-admin <命令> [参数]"
         echo ""
@@ -279,7 +274,7 @@ case "$1" in
         echo "  status     查看状态"
         echo "  logs       查看日志"
         echo "  port       查看/修改端口"
-        echo "  update     更新到最新版本"
+        echo "  update     更新到最新版本（镜像加速）"
         echo "  uninstall  卸载服务"
         echo ""
         echo "示例:"
@@ -289,7 +284,7 @@ case "$1" in
         exit 1
         ;;
 esac
-EOF
+EOFCLI
     
     chmod +x $CLI_PATH
     log_info "管理命令安装完成"
@@ -334,13 +329,16 @@ show_info() {
     echo "  terraria-admin status   - 查看状态"
     echo "  terraria-admin logs     - 查看日志"
     echo "  terraria-admin port     - 修改端口"
-    echo "  terraria-admin update   - 更新版本"
+    echo "  terraria-admin update   - 更新版本（镜像加速）"
     echo ""
     echo "🔐 默认账号:"
     echo "  用户名: CHENY 或 admin"
     echo "  密码: 123456 或 admin"
     echo ""
     echo "⚠️  首次登录后请立即修改密码！"
+    echo ""
+    echo "🌟 提示: 本脚本使用国内镜像站加速下载"
+    echo "   镜像站点: ${GITHUB_MIRROR}"
     echo "========================================"
 }
 
@@ -348,6 +346,7 @@ show_info() {
 main() {
     echo "========================================"
     echo "  泰拉瑞亚服务器管理平台 - 自动部署"
+    echo "       （中国大陆镜像加速版）"
     echo "========================================"
     echo ""
     
