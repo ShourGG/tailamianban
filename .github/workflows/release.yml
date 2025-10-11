@@ -25,13 +25,14 @@ jobs:
       - name: Build Backend (Linux amd64)
         run: |
           cd api
+          go mod tidy
           go mod download
-          GOOS=linux GOARCH=amd64 go build -o terraria-server-linux-amd64 main.go
+          GO111MODULE=on GOOS=linux GOARCH=amd64 go build -o terraria-server-linux-amd64 main.go
 
       - name: Build Backend (Linux arm64)
         run: |
           cd api
-          GOOS=linux GOARCH=arm64 go build -o terraria-server-linux-arm64 main.go
+          GO111MODULE=on GOOS=linux GOARCH=arm64 go build -o terraria-server-linux-arm64 main.go
 
       - name: Prepare Release Package
         run: |
