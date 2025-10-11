@@ -39,7 +39,7 @@ jobs:
           go mod tidy
           go mod download
           go list -m all
-          GOOS=linux GOARCH=amd64 go build -mod=mod -v -o terraria-server-linux-amd64 ./...
+          GOOS=linux GOARCH=amd64 go build -mod=mod -v -o terraria-server-linux-amd64 .
 
       - name: Build Backend (Linux arm64)
         working-directory: ./api
