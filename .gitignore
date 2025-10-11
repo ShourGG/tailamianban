@@ -1,8 +1,9 @@
 # 数据库和日志
-config/
 *.db
 *.log
 logs/
+config/*.db
+config/*.log
 
 # 临时文件
 *.tmp
@@ -19,6 +20,3 @@ terraria_servers/
 # Go构建产物（会被GitHub Actions生成）
 api/terraria-server
 api/terraria-server.exe
-
-# 测试文件
-api/config/
