@@ -22,17 +22,29 @@ jobs:
         with:
           go-version: '1.23'
 
+      - name: Verify API Directory Structure
+        run: |
+          echo "=== API Directory Structure ==="
+          ls -la api/
+          echo "=== Config Directory ==="
+          ls -la api/config/
+          echo "=== go.mod content ==="
+          cat api/go.mod
+          
       - name: Build Backend (Linux amd64)
         working-directory: ./api
         run: |
+          pwd
+          ls -la
           go mod tidy
           go mod download
-          GOOS=linux GOARCH=amd64 go build -o terraria-server-linux-amd64 .
+          go list -m all
+          GOOS=linux GOARCH=amd64 go build -mod=mod -v -o terraria-server-linux-amd64 ./...
 
       - name: Build Backend (Linux arm64)
         working-directory: ./api
         run: |
-          GOOS=linux GOARCH=arm64 go build -o terraria-server-linux-arm64 .
+          GOOS=linux GOARCH=arm64 go build -mod=mod -o terraria-server-linux-arm64 .
 
       - name: Prepare Release Package
         run: |
