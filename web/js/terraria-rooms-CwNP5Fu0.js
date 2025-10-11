@@ -1,0 +1,1 @@
+import{e as t}from"./index-CZdsPYOi.js";const e=()=>t.get("/terraria/rooms"),s=r=>t.post("/terraria/rooms",r),a=r=>t.delete(`/terraria/rooms/${r}`),m=r=>t.post(`/terraria/rooms/${r}/start`),n=r=>t.post(`/terraria/rooms/${r}/stop`);export{n as a,s as c,a as d,e as g,m as s};

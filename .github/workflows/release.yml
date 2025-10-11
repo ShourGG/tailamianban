@@ -1,0 +1,117 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.20'
+          cache-dependency-path: api/go.sum
+
+      - name: Build Backend (Linux amd64)
+        working-directory: ./api
+        run: |
+          GOOS=linux GOARCH=amd64 go build -o terraria-server-linux-amd64 main.go
+
+      - name: Build Backend (Linux arm64)
+        working-directory: ./api
+        run: |
+          GOOS=linux GOARCH=arm64 go build -o terraria-server-linux-arm64 main.go
+
+      - name: Prepare Release Package
+        run: |
+          mkdir -p release-amd64
+          mkdir -p release-arm64
+          
+          # amd64包
+          cp -r web release-amd64/
+          cp api/terraria-server-linux-amd64 release-amd64/terraria-server
+          cp config.json release-amd64/
+          cp deploy.sh release-amd64/
+          cp README.md release-amd64/
+          chmod +x release-amd64/terraria-server
+          chmod +x release-amd64/deploy.sh
+          
+          # arm64包
+          cp -r web release-arm64/
+          cp api/terraria-server-linux-arm64 release-arm64/terraria-server
+          cp config.json release-arm64/
+          cp deploy.sh release-arm64/
+          cp README.md release-arm64/
+          chmod +x release-arm64/terraria-server
+          chmod +x release-arm64/deploy.sh
+          
+          # 打包
+          cd release-amd64 && tar -czf ../terraria-admin-linux-amd64.tar.gz * && cd ..
+          cd release-arm64 && tar -czf ../terraria-admin-linux-arm64.tar.gz * && cd ..
+
+      - name: Generate Release Tag
+        id: tag
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Release ${{ steps.tag.outputs.tag }}
+          body: |
+            ## 🎮 泰拉瑞亚服务器管理平台
+            
+            ### 📦 下载说明
+            - `terraria-admin-linux-amd64.tar.gz` - Linux x64版本（推荐）
+            - `terraria-admin-linux-arm64.tar.gz` - Linux ARM64版本
+            
+            ### 🚀 一键部署
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/deploy.sh | sudo bash
+            ```
+            
+            ### ✨ 功能特性
+            - ✅ 单端口部署（默认8080）
+            - ✅ systemd服务（开机自启）
+            - ✅ 面板内安装游戏服务器（TShock/官方/TModLoader）
+            - ✅ 多服务器管理
+            - ✅ 实时监控
+            
+            ### 📖 使用说明
+            1. 执行上方一键部署命令
+            2. 访问 http://服务器IP:8080
+            3. 默认账号：CHENY / 123456
+            4. 登录后前往"系统设置 → 安装游戏服务器"
+            
+            ### 🔧 管理命令
+            ```bash
+            terraria-admin start    # 启动
+            terraria-admin stop     # 停止
+            terraria-admin restart  # 重启
+            terraria-admin port     # 修改端口
+            terraria-admin update   # 更新
+            ```
+          files: |
+            terraria-admin-linux-amd64.tar.gz
+            terraria-admin-linux-arm64.tar.gz
+            deploy.sh
+          draft: false
+          prerelease: ${{ steps.tag.outputs.tag == 'latest' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

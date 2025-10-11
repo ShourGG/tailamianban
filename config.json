@@ -1,0 +1,14 @@
+{
+  "port": 8080,
+  "database_path": "./config",
+  "static_path": "./web",
+  "log_level": "info",
+  "terraria": {
+    "servers_path": "./terraria_servers",
+    "max_servers": 10
+  },
+  "security": {
+    "jwt_secret": "your-secret-key-change-in-production",
+    "session_timeout": 86400
+  }
+}
